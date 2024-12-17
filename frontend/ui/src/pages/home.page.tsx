@@ -3,7 +3,7 @@ import { Grid, Skeleton, Container } from '@mantine/core';
 const child = <Skeleton height={140} radius="md" animate={true} />;
 
 
-export function Home() {
+export function HomePage() {
     return(
         <Container my="md" w="100%" size= "xl" >
             <h1>Home</h1>

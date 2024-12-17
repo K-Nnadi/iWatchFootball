@@ -6291,7 +6291,7 @@
     },
     "/auth/login": {
       "post": {
-        "operationId": "Auth_login",
+        "operationId": "AuthController_login",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6322,7 +6322,7 @@
     },
     "/auth/register": {
       "post": {
-        "operationId": "Auth_register",
+        "operationId": "AuthController_register",
         "parameters": [],
         "requestBody": {
           "required": true,

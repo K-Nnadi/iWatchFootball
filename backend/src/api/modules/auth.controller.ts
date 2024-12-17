@@ -4,10 +4,10 @@ import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
 import {IsEmail, IsNotEmpty} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
-import {UserModule, UserService} from "../user/user.module";
-import {LogModule} from "../log/log.module";
-import {User} from "../user/user";
-import {UserType} from "../../enums/user.enum";
+import {UserModule, UserService} from "./user/user.module";
+import {LogModule} from "./log/log.module";
+import {User} from "./user/user";
+import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
 
 
@@ -43,7 +43,7 @@ export class AuthResponse {
 }
 
 @NoAuthController('auth')
-export class Auth {
+export class AuthController {
 
     constructor(
         private userService: UserService,
@@ -102,7 +102,7 @@ export class Auth {
 
 @Module({
     imports: [UserModule, LogModule],
-    controllers: [Auth]
+    controllers: [AuthController]
 })
 export class AuthModule {
 }

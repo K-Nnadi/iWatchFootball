@@ -1,6 +1,6 @@
 import {Container} from "@mantine/core";
 
-export function Settings() {
+export function SettingsPage() {
     return(
         <div>
             <Container>

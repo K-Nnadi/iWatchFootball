@@ -1,23 +1,20 @@
-import {Box, Button, Text, TextInput} from "@mantine/core";
-import {useForm} from "@mantine/form";
-import {useNavigate} from "react-router-dom";
+import {
+	Box,
+	Button,
+	Container,
+	Paper,
+	Text,
+	TextInput,
+	Title,
+	useMantineTheme
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useNavigate } from "react-router-dom";
 
+export function SignUpPage() {
+	const theme = useMantineTheme();
+	const navigate = useNavigate();
 
-export function SignUp() {
-
-	// const {mutate: register, status} = useRegister({
-	// 	mutation: {
-	// 		onSuccess: (data) => {
-	// 			const {_id: userId, firstName, lastName, email, type} = data.user
-	// 			setAuthToken(data.tokens.access.token)
-	// 			validateUser({userId, firstName, lastName, email, type, authToken: data.tokens.access.token})
-	// 		},
-	// 		onError: (error) => {
-	// 			console.log(error)
-	// 		}
-	// 	}
-	// })
-	const navigate = useNavigate()
 	const form = useForm({
 		initialValues: {
 			firstName: '',
@@ -29,29 +26,81 @@ export function SignUp() {
 			firstName: (value) => (value ? null : 'First name is required'),
 			lastName: (value) => (value ? null : 'Last name is required'),
 			email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-			password: (value) => ('Password must contain at least 8 characters, one uppercase letter and one special character')
+			password: (value) => {
+				// Add your password validation logic here. For example:
+				const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+				const upperCase = /[A-Z]/;
+				return (specialChar.test(value) && upperCase.test(value) && value.length >= 8)
+					? null
+					: 'Password must contain at least 8 characters, one uppercase letter and one special character';
+			}
 		}
-	})
+	});
 
 	const formSubmit = (values: any) => {
-		// register({data: {...values, type: UserEntityType.CUSTOMER}})
-	}
-	return (
-		<form onSubmit={form.onSubmit((values) => formSubmit(values))}>
-			<Box>
-				<Text mt={'xl'} fz={'30px'}>Signup</Text>
-				<Text mt={'xl'}>First Name</Text>
-				<TextInput size={'md'} {...form.getInputProps('firstName')}/>
-				<Text mt={'xl'}>Last Name</Text>
-				<TextInput size={'md'} {...form.getInputProps('lastName')}/>
-				<Text mt={'xl'}>Email</Text>
-				<TextInput size={'md'} {...form.getInputProps('email')}/>
-				<Text mt={'xl'}>Password</Text>
-				{/*<PasswordStrength form={form}/>*/}
-				<Button my={'xl'} variant={'filled'} size={'md'} fullWidth type={'submit'} loading={status === 'pending'}>Sign up</Button>
-				<Button my={'xl'} variant={'outline'} size={'md'} fullWidth loading={status === 'pending'} onClick={() => navigate('/auth/login')}>Login</Button>
-			</Box>
-		</form>
-	)
+		// Submit form logic here, e.g. register({ data: { ...values, type: UserEntityType.CUSTOMER } })
+	};
 
+	return (
+		<Container size={420} my={40}>
+			<Paper p="xl" radius="md" shadow="lg" withBorder>
+				<form onSubmit={form.onSubmit((values) => formSubmit(values))}>
+					<Box mb="xl">
+						<Title order={2} align="center" mt="md" mb="lg">
+							Sign Up
+						</Title>
+						<Text size="sm" color="dimmed" align="center" mb="lg">
+							Create an account to start tracking your games!
+						</Text>
+					</Box>
+
+					<Text size="sm" mb="xs">First Name</Text>
+					<TextInput
+						size="md"
+						placeholder="John"
+						mb="md"
+						{...form.getInputProps('firstName')}
+					/>
+
+					<Text size="sm" mb="xs">Last Name</Text>
+					<TextInput
+						size="md"
+						placeholder="Doe"
+						mb="md"
+						{...form.getInputProps('lastName')}
+					/>
+
+					<Text size="sm" mb="xs">Email</Text>
+					<TextInput
+						size="md"
+						placeholder="you@example.com"
+						mb="md"
+						{...form.getInputProps('email')}
+					/>
+
+					<Text size="sm" mb="xs">Password</Text>
+					<TextInput
+						type="password"
+						size="md"
+						placeholder="Your secure password"
+						mb="md"
+						{...form.getInputProps('password')}
+					/>
+
+					<Button my="xl" variant="filled" size="md" fullWidth type="submit">
+						Sign up
+					</Button>
+					<Button
+						my="xl"
+						variant="outline"
+						size="md"
+						fullWidth
+						onClick={() => navigate('/signIn')}
+					>
+						Login
+					</Button>
+				</form>
+			</Paper>
+		</Container>
+	);
 }

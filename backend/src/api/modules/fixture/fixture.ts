@@ -3,7 +3,7 @@ import {Column, Entity, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Stadium} from "../stadium/stadium";
 import {Team} from "../team/team";
-import {FixtureStatus} from "../../enums/fixture.enum";
+import {FixtureStage, FixtureStatus} from "../../enums/fixture.enum";
 import {Goal} from "../goal/goal";
 import {FixtureReferee} from "../fixtureReferee/fixtureReferee";
 import {LineUp} from "../lineUp/lineUp";
@@ -53,6 +53,9 @@ export class Fixture extends BaseDbEntity {
 
     @Column({ default: FixtureStatus.SCHEDULED })
     status!: FixtureStatus;
+
+    @Column({ default: FixtureStage.LEAGUE })
+    stage!: FixtureStage;
 
     @Column({ nullable: true })
     attendance?: number;

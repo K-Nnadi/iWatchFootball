@@ -24,7 +24,7 @@ import {TeamCompetitionSeasonModule} from "./api/modules/teamCompetitionSeason/t
 import {SeasonModule} from "./api/modules/season/season.module";
 import {ManagerModule} from "./api/modules/manager/manager.module";
 import {PlayerLineUpModule} from "./api/modules/playerLineUp/playerLineUp.module";
-import {AuthModule} from "./api/modules/complexModules/auth.controller";
+import {AuthModule} from "./api/modules/auth.controller";
 
 
 const Modules = [

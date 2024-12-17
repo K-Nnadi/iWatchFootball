@@ -1,24 +1,28 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {NotFound} from "./pages/notFound.page";
-import {Logs} from "./pages/logs.page";
-import {Home} from "./pages/home.page";
-import {Matches} from "./pages/matches.page";
-import {Settings} from "./pages/settings.page";
+import {LogsPage} from "./pages/logs.page";
+import {HomePage} from "./pages/home.page";
+import {MatchesPage} from "./pages/matches.page";
+import {SettingsPage} from "./pages/settings.page";
+import {SignUpPage} from "./pages/signUp.page";
+import {LoginPage} from "./pages/login.page";
+import {CompetitionsPage} from "./pages/competitions.page";
 import {AppWrapper} from "./components/shell/appWrapper";
-import {SignUp} from "./pages/signUp.page";
-import {Login} from "./pages/login.page";
+import React from "react";
+import {CompetitionPage} from "./pages/competition.page";
 
 export type ElementMap = {
     [x: any]: Element;
 }
 
 const IWatchFootballElements: ElementMap = {
-    home: <Home/>,
-    logs: <Logs/>,
-    matches: <Matches/>,
-    settings: <Settings/>,
-    join: <SignUp />,
-    signIn: <Login />
+    home: <HomePage/>,
+    logs: <LogsPage/>,
+    matches: <MatchesPage/>,
+    settings: <SettingsPage/>,
+    join: <SignUpPage />,
+    signIn: <LoginPage />,
+    competitions: <CompetitionsPage />
 }
 
 const childrenRoutes = Object.entries(IWatchFootballElements).map(([path, element]) => ({
@@ -27,6 +31,10 @@ const childrenRoutes = Object.entries(IWatchFootballElements).map(([path, elemen
 }));
 
 const additionalRoutes = [
+    {
+        path: '/competition/:id',
+        element: <CompetitionPage />
+    },
     {
         path: '/*',
         element: <NotFound />
