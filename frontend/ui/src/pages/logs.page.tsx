@@ -61,7 +61,7 @@ interface UserGame {
     events?: MatchEvent[];
 }
 
-export function Logs() {
+export function LogsPage() {
     // States for searching and adding matches
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [seasons, setSeasons] = useState<Season[]>([]);

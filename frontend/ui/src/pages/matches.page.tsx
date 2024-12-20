@@ -16,7 +16,7 @@ interface TodayMatch {
     competitionName: string;
     homeTeam: string;
     awayTeam: string;
-    date: string; // ISO date string
+    date: string;
     venue: string;
     homeScore?: number;
     awayScore?: number;
@@ -43,7 +43,6 @@ function getMatchStatus(matchDateStr: string): 'past' | 'today' | 'future' {
 export function MatchesPage() {
     const navigate = useNavigate();
     const [matches, setMatches] = useState<TodayMatch[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const today = new Date();
     const daysRange = 14;
@@ -62,50 +61,44 @@ export function MatchesPage() {
     const selectedDate = dates[selectedDateIndex];
 
     const fetchMatchesForDate = (date: Date) => {
-        // Determine if matches are in the past or future for logic
-        // In reality, your API might already provide scores only for past matches.
-        setTimeout(() => {
-            const isPast = date < today && date.toDateString() !== today.toDateString();
-            const mockMatches: TodayMatch[] = [
-                {
-                    id: 'match1',
-                    competitionName: 'Premier League',
-                    homeTeam: 'Team A',
-                    awayTeam: 'Team B',
-                    date: date.toISOString(),
-                    venue: 'Stadium A',
-                    homeScore: isPast ? 2 : undefined,
-                    awayScore: isPast ? 1 : undefined
-                },
-                {
-                    id: 'match2',
-                    competitionName: 'Premier League',
-                    homeTeam: 'Team C',
-                    awayTeam: 'Team D',
-                    date: date.toISOString(),
-                    venue: 'Stadium B',
-                    homeScore: isPast ? 0 : undefined,
-                    awayScore: isPast ? 0 : undefined
-                },
-                {
-                    id: 'match3',
-                    competitionName: 'Champions League',
-                    homeTeam: 'Team E',
-                    awayTeam: 'Team F',
-                    date: date.toISOString(),
-                    venue: 'Stadium C',
-                    homeScore: isPast ? 3 : undefined,
-                    awayScore: isPast ? 2 : undefined
-                }
-            ];
-            setMatches(mockMatches);
-            setLoading(false);
-        }, 1000);
+        const isPast = date < today && date.toDateString() !== today.toDateString();
+        const mockMatches: TodayMatch[] = [
+            {
+                id: 'match1',
+                competitionName: 'Premier League',
+                homeTeam: 'Team A',
+                awayTeam: 'Team B',
+                date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0).toISOString(),
+                venue: 'Stadium A',
+                homeScore: isPast ? 2 : undefined,
+                awayScore: isPast ? 1 : undefined
+            },
+            {
+                id: 'match2',
+                competitionName: 'Premier League',
+                homeTeam: 'Team C',
+                awayTeam: 'Team D',
+                date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 30).toISOString(),
+                venue: 'Stadium B',
+                homeScore: isPast ? 0 : undefined,
+                awayScore: isPast ? 0 : undefined
+            },
+            {
+                id: 'match3',
+                competitionName: 'Champions League',
+                homeTeam: 'Team E',
+                awayTeam: 'Team F',
+                date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 45).toISOString(),
+                venue: 'Stadium C',
+                homeScore: isPast ? 3 : undefined,
+                awayScore: isPast ? 2 : undefined
+            }
+        ];
+        setMatches(mockMatches);
     };
 
     useEffect(() => {
         if (selectedDate) {
-            setLoading(true);
             fetchMatchesForDate(selectedDate);
         }
     }, [selectedDate]);
@@ -117,6 +110,7 @@ export function MatchesPage() {
         acc[match.competitionName].push(match);
         return acc;
     }, {});
+
 
     return (
         <Container size="md" my="xl" pos="relative" style={{ position: 'relative', minHeight: '400px' }}>
@@ -130,7 +124,7 @@ export function MatchesPage() {
                 setSelectedDateIndex={setSelectedDateIndex}
             />
 
-            {Object.keys(matchesByCompetition).length === 0 && !loading ? (
+            {Object.keys(matchesByCompetition).length === 0 ? (
                 <Text>No matches on this date.</Text>
             ) : (
                 <Accordion variant="separated" multiple>
@@ -146,12 +140,24 @@ export function MatchesPage() {
                                             : `${m.homeTeam} vs ${m.awayTeam}`;
 
                                         return (
-                                            <Card key={m.id} shadow="sm" padding="lg" radius="md" withBorder>
+                                            <Card
+                                                key={m.id}
+                                                shadow="sm"
+                                                padding="lg"
+                                                radius="md"
+                                                withBorder
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() =>
+                                                    navigate(`/match/${m.id}`, {
+                                                        state: { matchId: m.id, homeTeam: m.homeTeam, awayTeam: m.awayTeam, date: m.date, venue: m.venue }
+                                                    })
+                                                }
+                                            >
                                                 <Text weight={500} size="lg" mb="xs">
                                                     {resultText}
                                                 </Text>
                                                 <Text size="sm" color="dimmed" mb="xs">
-                                                    {new Date(m.date).toLocaleString()}
+                                                    {new Date(m.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                                                 </Text>
                                                 <Text size="sm" color="dimmed">
                                                     Venue: {m.venue}
@@ -162,7 +168,12 @@ export function MatchesPage() {
                                                         variant="outline"
                                                         size="xs"
                                                         mt="md"
-                                                        onClick={() => navigate(`/match/${m.id}`)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/seat-selection/${m.id}`, {
+                                                                state: { matchId: m.id, homeTeam: m.homeTeam, awayTeam: m.awayTeam, date: m.date, venue: m.venue },
+                                                            });
+                                                        }}
                                                     >
                                                         View Tickets
                                                     </Button>
