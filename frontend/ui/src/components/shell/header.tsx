@@ -6,10 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
 
 interface HeaderProps {
-    showHeader: boolean
+    showHeader: boolean;
+    isLoggedIn: boolean; // Add this prop to control login state
 }
 
-export function Header({ showHeader }: HeaderProps) {
+export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const navigate = useNavigate();
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
 
@@ -43,9 +44,13 @@ export function Header({ showHeader }: HeaderProps) {
                             <Group visibleFrom="sm" gap='lg'>
                                 <Divider orientation={'vertical'} />
                                 <IoSettingsOutline size={28} onClick={() => navigate('/settings')} />
-                                <DarkModeButton />
-                                <Button variant="outline" onClick={() => navigate('/join')}>Sign In</Button>
-                                <Button variant="light">Join</Button>
+                                {/*<DarkModeButton />*/}
+                                {!isLoggedIn && (
+                                    <>
+                                        <Button variant="outline" onClick={() => navigate('/signIn')}>Sign In</Button>
+                                        <Button variant="light" onClick={() => navigate('/join')}>Join</Button>
+                                    </>
+                                )}
                             </Group>
                         )
                     }
