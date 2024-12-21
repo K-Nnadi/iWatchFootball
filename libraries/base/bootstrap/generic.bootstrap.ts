@@ -19,6 +19,10 @@ export async function GenericBootstrap(module: any, port: number) {
         module,
         fastifyAdapter
     );
+    app.enableCors({
+        origin: 'http://localhost:3001',
+        credentials: true,
+    })
 
 
     const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
