@@ -62,6 +62,9 @@ export class Fixture extends BaseDbEntity {
 
     @OneToMany(() => Log, log => log.fixture)
     logs!: Log[]
+
+    @OneToMany(() => Prediction, prediction => prediction.fixture)
+    prediction?: prediction;
 }
 
 

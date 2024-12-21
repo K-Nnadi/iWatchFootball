@@ -36,6 +36,9 @@ export class User extends BaseDbEntity {
 
     @OneToMany(() => Log, log => log.user)
     logs!: Log[]
+
+    @OneToMany(() => Prediction, prediction => prediction.fixture)
+    prediction?: prediction;
 }
 
 export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type"] as const) {
