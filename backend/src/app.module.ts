@@ -24,9 +24,8 @@ import {TeamCompetitionSeasonModule} from "./api/modules/teamCompetitionSeason/t
 import {SeasonModule} from "./api/modules/season/season.module";
 import {ManagerModule} from "./api/modules/manager/manager.module";
 import {PlayerLineUpModule} from "./api/modules/playerLineUp/playerLineUp.module";
-import {AuthModule} from "./api/modules/auth.controller";
-import {PredictionModule} from "./api/modules/prediction/predicition.module";
-
+import {PredictionModule} from "./api/modules/prediction/prediction.module";
+import {AuthModule} from "./api/complexModules/auth.controller";
 
 const Modules = [
     AddressModule,

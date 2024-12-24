@@ -1,5 +1,5 @@
 import {PickType} from "@nestjs/swagger";
-import {Column, Entity, OneToMany} from "typeorm";
+import {Column, Entity, ManyToOne} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {PredictedResult} from "../../enums/prediction.enum";
 import {User} from "../user/user";
@@ -11,13 +11,13 @@ export class Prediction extends BaseDbEntity {
     @Column()
     userId!: number;
 
-    @ManyToOne(() => User, user => user.prediction)
+    @ManyToOne(() => User, user => user.predictions)
     user!: User;
 
     @Column()
     fixtureId!: number;
 
-    @ManyToOne(() => Fixture, fixture => fixture.prediction)
+    @ManyToOne(() => Fixture, fixture => fixture.predictions)
     fixture!: Fixture;
 
     @Column({nullable : true})

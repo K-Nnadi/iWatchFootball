@@ -9,6 +9,7 @@ import {FixtureReferee} from "../fixtureReferee/fixtureReferee";
 import {LineUp} from "../lineUp/lineUp";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
 import {Log} from "../log/log";
+import {Prediction} from "../prediction/prediction";
 
 @Entity('fixture')
 export class Fixture extends BaseDbEntity {
@@ -64,7 +65,7 @@ export class Fixture extends BaseDbEntity {
     logs!: Log[]
 
     @OneToMany(() => Prediction, prediction => prediction.fixture)
-    prediction?: prediction;
+    predictions?: Prediction[];
 }
 
 
