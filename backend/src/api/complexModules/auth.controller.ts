@@ -4,11 +4,11 @@ import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
 import {IsEmail, IsNotEmpty} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
-import {UserModule, UserService} from "./user/user.module";
-import {LogModule} from "./log/log.module";
-import {User} from "./user/user";
 import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
+import {User} from "../modules/user/user";
+import {UserModule, UserService} from "../modules/user/user.module";
+import {LogModule} from "../modules/log/log.module";
 
 
 export class ValidateBody {

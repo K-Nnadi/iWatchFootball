@@ -20,7 +20,7 @@ export async function GenericBootstrap(module: any, port: number) {
         fastifyAdapter
     );
     app.enableCors({
-        origin: 'http://localhost:3001',
+        origin: 'http://localhost:3000',
         credentials: true,
     })
 

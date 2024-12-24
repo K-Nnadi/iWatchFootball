@@ -1,6 +1,6 @@
-import { Carousel } from "@mantine/carousel";
+import { Carousel } from '@mantine/carousel';
 import { useMediaQuery } from '@mantine/hooks';
-import { Button, Paper, Text, Title, useMantineTheme, rem } from "@mantine/core";
+import { Button, Paper, Text, Title, useMantineTheme } from '@mantine/core';
 import classes from './news.carousel.module.css';
 
 interface CardProps {
@@ -33,48 +33,49 @@ function Card({ image, title, category }: CardProps) {
 	);
 }
 
+// Example football-themed data
 const data = [
 	{
 		image:
-			'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80',
-		title: 'Best forests to visit in North America',
-		category: 'Premier League',
+			'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=400&q=80',
+		title: 'Title race heats up in the Premier League',
+		category: 'EPL',
 	},
 	{
 		image:
-			'https://images.unsplash.com/photo-1559494007-9f5847c49d94?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80',
-		title: 'Hawaii beaches review: better than you think',
-		category: 'Chelsea',
+			'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=400&q=80',
+		title: 'Champions League review: Surprises and upsets',
+		category: 'UCL',
 	},
 	{
 		image:
-			'https://images.unsplash.com/photo-1608481337062-4093bf3ed404?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80',
-		title: 'Mountains at night: 12 best locations to enjoy the view',
-		category: 'Real Madrid',
+			'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=400&q=80',
+		title: 'Real Madrid unstoppable under new coach',
+		category: 'La Liga',
 	},
 	{
 		image:
-			'https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80',
-		title: 'Aurora in Norway: when to visit for best experience',
+			'https://images.unsplash.com/photo-1599245895529-3c0992ab3c91?auto=format&w=400&q=80',
+		title: 'Five-star performance: A new star is born',
 		category: 'Serie A',
 	},
 	{
 		image:
-			'https://images.unsplash.com/photo-1510798831971-661eb04b3739?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80',
-		title: 'Best places to visit this winter',
+			'https://images.unsplash.com/photo-1605973174423-47046f81ec9b?auto=format&w=400&q=80',
+		title: 'Paris Saint-Germain eyeing another big signing',
 		category: 'PSG',
 	},
 	{
 		image:
-			'https://images.unsplash.com/photo-1582721478779-0ae163c05a60?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80',
-		title: 'Active volcanos reviews: travel at your own risk',
-		category: 'Champions League',
+			'https://images.unsplash.com/photo-1616941360635-7d51b6607429?auto=format&w=400&q=80',
+		title: 'Bundesliga latest: Top scorers and stats',
+		category: 'Bundesliga',
 	},
 ];
 
 export function NewsCarousel() {
 	const theme = useMantineTheme();
-	const mobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
+	const mobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
 	const slides = data.map((item) => (
 		<Carousel.Slide key={item.title}>
 			<Card {...item} />
@@ -87,7 +88,7 @@ export function NewsCarousel() {
 			slideGap="md"
 			align="start"
 			loop
-			slidesToScroll={mobile ? 1 : 4} // Show 4 slides at a time on larger screens, 1 at a time on mobile
+			slidesToScroll={mobile ? 1 : 4}
 		>
 			{slides}
 		</Carousel>
