@@ -1,57 +1,66 @@
-import {PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToMany, OneToMany} from "typeorm";
+import {ApiProperty, PickType} from "@nestjs/swagger";
+import {Entity, ManyToMany, OneToMany} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Goal} from "../goal/goal";
 import {Transfer} from "../transfer/transfer";
 import {Team} from "../team/team";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
 @Entity('player')
 
 export class Player extends BaseDbEntity{
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     name!: string
 
-    @Column()
-    nickname!: string
+    @OptionalEntityColumn({db: {type: "varchar"}})
+    nickname?: string
 
-    @Column()
+    @EntityColumn({db: {type: "timestamp"}})
     dateOfBirth!: Date
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     nationality!: string
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     positionId!: number
 
-    @Column("int", { array: true })
+    @OptionalEntityColumn({db: {type: "varchar"}})
+    bio?: string
+
+    @OptionalEntityColumn({db: {type: "int", array: true}})
     teamIds?: number[]
 
+    @ApiProperty()
     @ManyToMany(() => Team, team => team.players)
     teams!: Team[]
 
-    @Column()
-    kitNumber!: number
+    @OptionalEntityColumn({db: {type: "int"}})
+    kitNumber?: number
 
-    @Column({ nullable: true })
+    @OptionalEntityColumn({db: {type: "int"}})
     height?: number;
 
-    @Column({ nullable: true })
+    @OptionalEntityColumn({db: {type: "int"}})
     weight?: number;
 
-    @Column()
+    @OptionalEntityColumn({db: {type: "varchar"}})
     photoUrl?: string
 
+    @ApiProperty()
     @OneToMany(() => Goal, goal => goal.scorer)
     goals!: Goal[];
 
+    @ApiProperty()
     @OneToMany(() => Goal, goal => goal.assistant)
     assists!: Goal[];
 
+    @ApiProperty()
     @OneToMany(() => Goal, goal => goal.ownGoal)
     ownGoals!: Goal[];
 
+    @ApiProperty()
     @OneToMany(() => Transfer, transfer => transfer.player)
     transfers!: Transfer[];
 
@@ -59,4 +68,4 @@ export class Player extends BaseDbEntity{
 
 
 
-export class CreatePlayerDTO extends PickType(Player, ["name", "nickname", "dateOfBirth", "nationality", "positionId", "teamIds", "height", "weight", "kitNumber", "photoUrl" ] as const) {}
+export class CreatePlayerDTO extends PickType(Player, ["name", "nickname", "dateOfBirth", "nationality", "bio", "positionId", "teamIds", "height", "weight", "kitNumber", "photoUrl" ] as const) {}

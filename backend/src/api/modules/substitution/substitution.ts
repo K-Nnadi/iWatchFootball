@@ -1,26 +1,26 @@
-import { PickType } from '@nestjs/swagger';
+import {ApiProperty, PickType} from '@nestjs/swagger';
 import {Column, Entity, ManyToOne} from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Player} from "../player/player";
 import {PlayerLineUp} from "../playerLineUp/playerLineUp";
 import {Team} from "../team/team";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('substitution')
 export class Substitution extends BaseDbEntity {
+    @ApiProperty()
     @ManyToOne(() => PlayerLineUp, playerLineup => playerLineup.substitutions)
     playerLineup!: PlayerLineUp;
 
-    @Column()
+    @EntityColumn({db:{type: "int"}})
     fixtureId!: number;
 
-    @Column()
-    teamId?: number;
+    @EntityColumn({db:{type: "int"}})
+    teamId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Team, { nullable: true })
     team?: Team;
-
-    @Column()
-    countryId?: number;
 
     @Column()
     playerInId!: number;
@@ -31,10 +31,11 @@ export class Substitution extends BaseDbEntity {
     @Column()
     playerOutId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Player)
     playerOut!: Player;
 
-    @Column()
+    @OptionalEntityColumn({db:{type: "int"}})
     minute!: number;
 }
 

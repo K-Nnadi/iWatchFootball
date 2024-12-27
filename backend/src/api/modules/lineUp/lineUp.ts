@@ -1,40 +1,48 @@
-import {PickType} from '@nestjs/swagger';
-import {Column, Entity, ManyToOne, OneToMany} from 'typeorm';
+import {ApiProperty, PickType} from '@nestjs/swagger';
+import {Entity, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Fixture} from "../fixture/fixture";
 import {Team} from "../team/team";
 import {Manager} from "../manager/manager";
 import {HomeOrAway} from "../../enums/fixture.enum";
 import {PlayerLineUp} from "../playerLineUp/playerLineUp";
+import {
+    EntityColumn,
+    EntityEnumColumn,
+    OptionalEntityColumn
+} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('lineUp')
 export class LineUp extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Fixture, fixture => fixture.lineUps)
     fixture!: Fixture;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     teamId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Team)
-    team!: Team;
+    team?: Team;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     managerId!: number;
 
     @ManyToOne(() => Manager)
     manager?: Manager;
 
-    @Column({ type: 'enum', enum: HomeOrAway, default: HomeOrAway.HOME })
+    @EntityEnumColumn({db: {enum: HomeOrAway}})
     teamType!: HomeOrAway;
 
+    @ApiProperty()
     @OneToMany(() => PlayerLineUp, playerLineUp => playerLineUp.lineup)
-    playerLineups!: PlayerLineUp[];
+    playerLineups?: PlayerLineUp[];
 
-    @Column()
+    @OptionalEntityColumn({db: {type: "varchar"}})
     formation?: string; // e.g., 4-4-2, 3-5-2
 }
 

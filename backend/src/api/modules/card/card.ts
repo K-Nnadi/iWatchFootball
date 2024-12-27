@@ -1,20 +1,23 @@
-import { PickType } from '@nestjs/swagger';
+import {ApiProperty, PickType} from '@nestjs/swagger';
 import { Column, Entity } from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {CardType} from "../../enums/card.enum";
+import {EntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('card')
 export class Card extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({})
     fixtureId!: number;
 
-    @Column()
+    @EntityColumn()
     playerId!: number;
 
+    @ApiProperty()
     @Column({ type: 'enum', enum: CardType })
     type!: CardType; // Enum for yellow or red card
 
+    @ApiProperty()
     @Column()
     minute!: number;
 }

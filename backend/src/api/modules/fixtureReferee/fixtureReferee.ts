@@ -1,30 +1,34 @@
-import {PickType} from "@nestjs/swagger";
+import {ApiProperty, PickType} from "@nestjs/swagger";
 import {Column, Entity, ManyToOne} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {RefereeRole} from "../../enums/referee.enum";
 import {Fixture} from "../fixture/fixture";
 import {Referee} from "../referee/referee";
+import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('fixtureReferee')
 export class FixtureReferee extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({
+        db: { type: 'int'}
+    })
     fixtureId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Fixture, fixture => fixture.referees)
     fixture!: Fixture;
 
-    @Column()
+    @EntityColumn({
+        db: { type: 'int'}
+    })
     refereeId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Referee, referee => referee.fixtures)
     referee!: Referee;
 
-
-    @Column({
-        type: 'enum',
-        enum: RefereeRole,
-        default: RefereeRole.MAIN
+    @EntityEnumColumn({
+        db: {enum: RefereeRole, default: RefereeRole.MAIN}
     })
     role!: RefereeRole;
 }

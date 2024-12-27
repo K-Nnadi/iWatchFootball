@@ -1,59 +1,68 @@
-import {PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToMany, ManyToOne, OneToMany} from 'typeorm';
+import {ApiProperty, PickType} from "@nestjs/swagger";
+import {Entity, ManyToMany, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Stadium} from "../stadium/stadium";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
 import {TeamType} from "../../enums/team.enum";
 import {Manager} from "../manager/manager";
 import {Player} from "../player/player";
+import {
+    EntityColumn,
+    EntityEnumColumn,
+    OptionalEntityColumn
+} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
 @Entity('team')
 export class Team extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     name!: string;
 
-    @Column()
-    founded!: number;
+    @OptionalEntityColumn({db: {type: "timestamp"}})
+    founded?: Date;
 
-    @Column("int", { array: true, nullable: true })
+    @OptionalEntityColumn({db: {type: "int", array: true}})
     stadiumIds?: number[];
 
+    @ApiProperty()
     @ManyToMany(() => Stadium, stadium => stadium.teams)
     stadiums?: Stadium[]
 
+    @ApiProperty()
     @OneToMany(() => TeamCompetitionSeason, teamCompSeason => teamCompSeason.team)
     teamCompetitionSeasons!: TeamCompetitionSeason[];
 
-    @Column("int", { nullable: true })
+    @OptionalEntityColumn({db:{type: "int"}})
     managerId?: number;
 
+    @ApiProperty()
     @ManyToOne(() => Manager, manager => manager.teams)
     manager?: Manager;
 
-    @Column("int", { array: true, nullable: true })
+    @OptionalEntityColumn({db:{type: "int", array: true}})
     playerIds?: number[]
 
+    @ApiProperty()
     @ManyToMany(() => Player, player => player.teams)
     players?: Player[]
 
-    @Column()
-    logoUrl!: string;
+    @OptionalEntityColumn({db:{type: "varchar"}})
+    logoUrl?: string;
 
-    @Column()
+    @OptionalEntityColumn({db:{type: "varchar"}})
     website?: string;
 
-    @Column()
-    city!: string;
+    @OptionalEntityColumn({db:{type: "int"}})
+    city?: string;
 
-    @Column()
+    @OptionalEntityColumn({db:{type: "varchar"}})
     country!: string;
 
-    @Column({ type: 'enum', enum: TeamType })
-    type?: TeamType;
+    @EntityColumn({ db: { enum: TeamType, default: TeamType.CLUB } })
+    type!: TeamType;
 
-    @Column()
+    @OptionalEntityColumn({db:{type: "int"}})
     parentId?: number;
 
 }

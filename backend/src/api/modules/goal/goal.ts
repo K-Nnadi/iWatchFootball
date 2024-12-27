@@ -1,39 +1,44 @@
-import { PickType } from '@nestjs/swagger';
+import {ApiProperty, PickType} from '@nestjs/swagger';
 import {Column, Entity, ManyToOne} from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Fixture} from "../fixture/fixture";
 import {Player} from "../player/player";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('goal')
 export class Goal extends BaseDbEntity {
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     minute!: number;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     scorerId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Player, player => player.goals)
     scorer!: Player;
 
-    @Column()
+    @OptionalEntityColumn({db: {type: "int"}})
     assistantId?: number;
 
+    @ApiProperty()
     @ManyToOne(() => Player, player => player.assists, { nullable: true })
     assistant?: Player;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Fixture, fixture => fixture.goals)
     fixture!: Fixture;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     teamId!: number;
 
+    @OptionalEntityColumn({db: {type: "boolean"}})
     @Column()
     ownGoal?: boolean;
 
-    @Column()
+    @OptionalEntityColumn({db: {type: "boolean"}})
     penalty?: boolean;
 }
 

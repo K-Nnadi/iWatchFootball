@@ -1,39 +1,44 @@
-import {PickType} from "@nestjs/swagger";
+import {ApiProperty, PickType} from "@nestjs/swagger";
 import {Column, Entity, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Team} from "../team/team";
 import {Competition} from "../competition/competition";
 import {Season} from "../season/season";
 import {Fixture} from "../fixture/fixture";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
 @Entity('teamCompetitionSeason')
 export class TeamCompetitionSeason extends BaseDbEntity {
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     teamId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Team, team => team.teamCompetitionSeasons)
     team!: Team;
-    
-    @Column()
+
+    @EntityColumn({db: {type: "int"}})
     competitionId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Competition, competition => competition.teamCompetitionSeasons)
     competition!: Competition;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     seasonId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Season, season => season.teamCompetitionSeasons)
     season!: Season;
 
+    @ApiProperty()
     @OneToMany(() => Fixture, fixture => fixture.teamCompetitionSeasons)
     fixtures?: Fixture[];
 
-    @Column({nullable: true})
+    @OptionalEntityColumn({db: {type: "int"}})
     points?: number; // Optional: Store points for league competitions
 
-    @Column({nullable: true})
+    @OptionalEntityColumn({db: {type: "int"}})
     position?: number; // Optional: Store the position in the competition for that season
 }
 

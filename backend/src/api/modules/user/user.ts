@@ -1,8 +1,8 @@
-import {PickType} from "@nestjs/swagger";
+import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Entity, OneToMany} from "typeorm";
 import {UserType} from "../../enums/user.enum";
 import {Log} from "../log/log";
-import {EntityColumn} from "@iWatchFootball/base-tools/decorators/entityColumn.decorator";
+import {EntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Prediction} from "../prediction/prediction";
 
@@ -34,10 +34,11 @@ export class User extends BaseDbEntity {
     })
     type!: UserType
 
-
+    @ApiProperty()
     @OneToMany(() => Log, log => log.user)
     logs!: Log[]
 
+    @ApiPropertyOptional()
     @OneToMany(() => Prediction, prediction => prediction.fixture)
     predictions?: Prediction[];
 }

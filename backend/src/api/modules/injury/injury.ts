@@ -1,23 +1,24 @@
-import { PickType } from '@nestjs/swagger';
-import { Column, Entity } from 'typeorm';
-import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
+import {PickType} from '@nestjs/swagger';
+import {Entity} from 'typeorm';
+import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('injury')
 export class Injury extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     playerId!: number;
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     injuryType!: string; // e.g., hamstring, ACL tear
 
-    @Column()
+    @EntityColumn({db: {type: "timestamp"}})
     startDate!: Date;
 
-    @Column()
-    endDate!: Date;
+    @OptionalEntityColumn({db: {type: "timestamp"}})
+    endDate?: Date;
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     status!: string; // e.g., injured, recovered
 }
 

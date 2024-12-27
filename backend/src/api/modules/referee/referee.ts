@@ -1,17 +1,19 @@
-import { PickType } from '@nestjs/swagger';
-import { Column, Entity, OneToMany } from 'typeorm';
-import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
+import {ApiProperty, PickType} from '@nestjs/swagger';
+import {Entity, OneToMany} from 'typeorm';
+import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {FixtureReferee} from "../fixtureReferee/fixtureReferee";
+import {EntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('referee')
 export class Referee extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({db:{type: "varchar"}})
     name!: string;
 
-    @Column()
+    @EntityColumn({db:{type: "varchar"}})
     nationality!: string;
 
+    @ApiProperty()
     @OneToMany(() => FixtureReferee, fixtureReferee => fixtureReferee.referee)
     fixtures!: FixtureReferee[];
 }

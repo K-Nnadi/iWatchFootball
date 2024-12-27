@@ -1,29 +1,37 @@
-import {PickType} from "@nestjs/swagger";
-import {Column, Entity, OneToMany} from 'typeorm';
+import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
+import {Entity, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {CompetitionType} from "../../enums/competition.enum";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
 import {Trophy} from "../trophy/trophy";
+import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
 @Entity('competition')
 export class Competition extends BaseDbEntity {
 
-    @Column()
+    @EntityColumn({
+        db: {type: "varchar"}
+    })
     name!: string;
 
-    @Column({ type: 'enum', enum: CompetitionType })
+    @EntityEnumColumn({
+        db: {enum: CompetitionType, default: CompetitionType.LEAGUE}
+    })
     type!: CompetitionType; // e.g., league, knockout
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     country!: string;
 
+    @ApiProperty()
     @OneToMany(() => TeamCompetitionSeason, teamCompSeason => teamCompSeason.competition)
     teamCompetitionSeasons!: TeamCompetitionSeason[];
 
+    @ApiProperty()
     @OneToMany(() => Trophy, trophy => trophy.competition)
     trophies!: Trophy[];
 }
 
-export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country"] as const) {}
+export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country"] as const) {
+}
 

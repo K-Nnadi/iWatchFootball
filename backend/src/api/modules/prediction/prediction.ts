@@ -1,26 +1,29 @@
-import {PickType} from "@nestjs/swagger";
+import {ApiProperty, PickType} from "@nestjs/swagger";
 import {Column, Entity, ManyToOne} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {PredictedResult} from "../../enums/prediction.enum";
 import {User} from "../user/user";
 import {Fixture} from "../fixture/fixture";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('prediction')
 export class Prediction extends BaseDbEntity {
-    
-    @Column()
+
+    @EntityColumn({db: {type: "int"}})
     userId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => User, user => user.predictions)
     user!: User;
 
-    @Column()
+    @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => Fixture, fixture => fixture.predictions)
     fixture!: Fixture;
 
-    @Column({nullable : true})
+    @OptionalEntityColumn({db:{enum: PredictedResult}})
     predicted?: PredictedResult;
 }
 

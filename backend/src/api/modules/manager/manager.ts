@@ -1,28 +1,31 @@
-import {PickType} from "@nestjs/swagger";
+import {ApiProperty, PickType} from "@nestjs/swagger";
 import {Column, Entity, OneToMany} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Team} from "../team/team";
 import {ManagerEmployment} from "../managerEmployment/managerEmployment";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
 @Entity('manager')
 
 export class Manager extends BaseDbEntity{
-    @Column()
+    @EntityColumn()
     name!: string
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     nickname!: string
 
-    @Column()
+    @EntityColumn({db: {type: "varchar"}})
     nationality!: string
 
-    @Column("int", { array: true })
+    @OptionalEntityColumn({db: {type: "int", array: true}})
     teamIds?: number[]
 
+    @ApiProperty()
     @OneToMany(() => Team, team => team.manager)
     teams?: Team[]
 
+    @ApiProperty()
     @OneToMany(() => ManagerEmployment, employment => employment.manager)
     employments!: ManagerEmployment[];
 }
