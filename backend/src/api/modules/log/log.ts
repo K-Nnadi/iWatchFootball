@@ -14,15 +14,15 @@ export class Log extends BaseDbEntity {
     userId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => User, user => user.logs)
-    user!: User;
+    @ManyToOne(() => User, user => user.logs, {lazy: true})
+    user!: Promise<User>;
 
     @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.logs)
-    fixture!: Fixture;
+    @ManyToOne(() => Fixture, fixture => fixture.logs, {lazy: true})
+    fixture!: Promise<Fixture>;
 
     @OptionalEntityColumn({db: {type: "varchar"}})
     ticketNumber?: string;

@@ -19,8 +19,8 @@ export class Trophy extends BaseDbEntity {
     competitionId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Competition, competition => competition.trophies)
-    competition!: Competition;
+    @ManyToOne(() => Competition, competition => competition.trophies, { lazy: true })
+    competition!: Promise<Competition>;
 }
 
 export class CreateTrophyDTO extends PickType(Trophy, ['name', 'description', 'yearIntroduced'] as const) {}

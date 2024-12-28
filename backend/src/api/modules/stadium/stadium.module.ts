@@ -5,6 +5,7 @@ import {CrudController} from "@iWatchFootball/base-tools/crud/crud.controller";
 import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";
 import {Repository} from "typeorm";
+import {Address} from "../address/address";
 
 
 @Injectable()
@@ -22,7 +23,7 @@ export class StadiumController extends CrudController<Stadium, CreateStadiumDTO>
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Stadium])],
+  imports: [TypeOrmModule.forFeature([Stadium, Address])],
   controllers: [StadiumController],
   providers: [StadiumService],
   exports: [StadiumService]

@@ -4,13 +4,8 @@ import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Fixture} from "../fixture/fixture";
 import {Team} from "../team/team";
 import {Manager} from "../manager/manager";
-import {HomeOrAway} from "../../enums/fixture.enum";
 import {PlayerLineUp} from "../playerLineUp/playerLineUp";
-import {
-    EntityColumn,
-    EntityEnumColumn,
-    OptionalEntityColumn
-} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('lineUp')
 export class LineUp extends BaseDbEntity {
@@ -19,31 +14,28 @@ export class LineUp extends BaseDbEntity {
     fixtureId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.lineUps)
-    fixture!: Fixture;
+    @ManyToOne(() => Fixture, fixture => fixture.lineUps, {lazy: true})
+    fixture!: Promise<Fixture>;
 
     @EntityColumn({db: {type: "int"}})
     teamId!: number;
 
     @ApiProperty()
     @ManyToOne(() => Team)
-    team?: Team;
+    team?: Promise<Team>;
 
     @EntityColumn({db: {type: "int"}})
     managerId!: number;
 
-    @ManyToOne(() => Manager)
-    manager?: Manager;
-
-    @EntityEnumColumn({db: {enum: HomeOrAway}})
-    teamType!: HomeOrAway;
+    @ManyToOne(() => Manager,{lazy: true})
+    manager?: Promise<Manager>;
 
     @ApiProperty()
-    @OneToMany(() => PlayerLineUp, playerLineUp => playerLineUp.lineup)
-    playerLineups?: PlayerLineUp[];
+    @OneToMany(() => PlayerLineUp, playerLineUp => playerLineUp.lineup, {lazy: true})
+    playerLineups?: Promise<PlayerLineUp[]>;
 
     @OptionalEntityColumn({db: {type: "varchar"}})
     formation?: string; // e.g., 4-4-2, 3-5-2
 }
 
-export class CreateLineUpDTO extends PickType(LineUp, ["fixtureId", "teamId", "managerId", "formation", "teamType"] as const) {}
+export class CreateLineUpDTO extends PickType(LineUp, ["fixtureId", "teamId", "managerId", "formation"] as const) {}

@@ -9,8 +9,8 @@ import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/dec
 @Entity('substitution')
 export class Substitution extends BaseDbEntity {
     @ApiProperty()
-    @ManyToOne(() => PlayerLineUp, playerLineup => playerLineup.substitutions)
-    playerLineup!: PlayerLineUp;
+    @ManyToOne(() => PlayerLineUp, playerLineup => playerLineup.substitutions, {lazy: true})
+    playerLineup!: Promise<PlayerLineUp>;
 
     @EntityColumn({db:{type: "int"}})
     fixtureId!: number;
@@ -19,21 +19,21 @@ export class Substitution extends BaseDbEntity {
     teamId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Team, { nullable: true })
-    team?: Team;
+    @ManyToOne(() => Team, { nullable: true, lazy: true })
+    team?: Promise<Team>;
 
     @Column()
     playerInId!: number;
 
-    @ManyToOne(() => Player)
-    playerIn!: Player;
+    @ManyToOne(() => Player, {lazy: true })
+    playerIn!: Promise<Player>;
 
     @Column()
     playerOutId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Player)
-    playerOut!: Player;
+    @ManyToOne(() => Player, {lazy: true })
+    playerOut!: Promise<Player>;
 
     @OptionalEntityColumn({db:{type: "int"}})
     minute!: number;

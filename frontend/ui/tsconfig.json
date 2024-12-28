@@ -35,6 +35,9 @@
   "references": [
     {
       "path": "../../libraries/base"
+    },
+    {
+      "path": "../../clients"
     }
   ]
 }

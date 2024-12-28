@@ -13,15 +13,15 @@ export class Prediction extends BaseDbEntity {
     userId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => User, user => user.predictions)
-    user!: User;
+    @ManyToOne(() => User, user => user.predictions, {lazy: true})
+    user!: Promise<User>;
 
     @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.predictions)
-    fixture!: Fixture;
+    @ManyToOne(() => Fixture, fixture => fixture.predictions, {lazy: true})
+    fixture!: Promise<Fixture>;
 
     @OptionalEntityColumn({db:{enum: PredictedResult}})
     predicted?: PredictedResult;

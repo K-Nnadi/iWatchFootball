@@ -5,6 +5,7 @@ import { NewsCarousel } from '../components/carousel/news.carousel';
 const skeletonStyle = { height: 140, borderRadius: 'md' };
 
 export function HomePage() {
+    Goal
     return (
         <Container my="md" w="100%" size="xl">
             <Title order={1} mb="xs">

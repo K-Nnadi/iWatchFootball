@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@iWatchFootball/base-tools": "workspace:*",
+    "@iWatchFootball/clients": "workspace:*",
     "@mantine/carousel": "^7.9.0",
     "@mantine/core": "^7.7.1",
     "@mantine/dates": "^7.7.1",

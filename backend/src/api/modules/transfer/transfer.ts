@@ -12,22 +12,22 @@ export class Transfer extends BaseDbEntity {
     playerId!: number
 
     @ApiProperty()
-    @ManyToOne(() => Player, player => player.transfers)
-    player!: Player
+    @ManyToOne(() => Player, player => player.transfers, { lazy: true })
+    player!: Promise<Player>
 
     @EntityColumn({db: {type: "int"}})
     sourceTeamId!: number
 
     @ApiProperty()
     @ManyToOne(() => Team)
-    sourceTeam!: Team;  // Country player is transferring from
+    sourceTeam!: Promise<Team>;  // Country player is transferring from
 
     @EntityColumn({db: {type: "int"}})
     destinationTeamId!: number
 
     @ApiProperty()
     @ManyToOne(() => Team)
-    destinationTeam!: Team;
+    destinationTeam!: Promise<Team>;
 
     @EntityColumn({db: {type: "int"}})
     transferFee!: number

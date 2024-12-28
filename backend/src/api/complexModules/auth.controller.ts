@@ -8,7 +8,7 @@ import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
 import {User} from "../modules/user/user";
 import {UserModule, UserService} from "../modules/user/user.module";
-import {LogModule} from "../modules/log/log.module";
+import {LogModule, LogService} from "../modules/log/log.module";
 
 
 export class ValidateBody {
@@ -47,6 +47,7 @@ export class AuthController {
 
     constructor(
         private userService: UserService,
+        private logService: LogService,
     ) {
     }
 
@@ -80,18 +81,19 @@ export class AuthController {
         const registerUser = register;
         registerUser.password = await hash(register.password, parseInt(process.env.SALT_ROUNDS || '10'));
 
-        const [user] = await this.userService.getQuery({where: {email: register.email}}) || [];
+        let [user] = await this.userService.getQuery({where: {email: register.email}}) || [];
 
         if (user) {
             void response.code(400).send({message: 'User already exists'});
         } else {
 
-            const user = await this.userService.create({
+            user = await this.userService.create({
                 ...registerUser, type: UserType.USER,
             });
 
-            if (user) {
 
+            if (user) {
+                //todo add CommsPreference
 
             } else {
                 void response.code(400).send({message: 'Something went wrong..'});

@@ -13,8 +13,8 @@ export class ManagerEmployment extends BaseDbEntity {
     managerId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Manager, manager => manager.employments)
-    manager?: Manager;
+    @ManyToOne(() => Manager, manager => manager.employments, { lazy: true })
+    manager?: Promise<Manager>;
 
     @EntityColumn({db: {type: "int"}})
     @Column()
@@ -22,7 +22,7 @@ export class ManagerEmployment extends BaseDbEntity {
 
     @ApiProperty()
     @ManyToOne(() => Team, { nullable: true })
-    team?: Team;
+    team?: Promise<Team>;
 
 
     @OptionalEntityColumn({db: {type: "timestamp"}})

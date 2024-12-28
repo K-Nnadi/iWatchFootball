@@ -23,11 +23,11 @@ export class Manager extends BaseDbEntity{
 
     @ApiProperty()
     @OneToMany(() => Team, team => team.manager)
-    teams?: Team[]
+    teams?: Promise<Team[]>
 
     @ApiProperty()
-    @OneToMany(() => ManagerEmployment, employment => employment.manager)
-    employments!: ManagerEmployment[];
+    @OneToMany(() => ManagerEmployment, employment => employment.manager, {lazy: true})
+    employments!: Promise<ManagerEmployment[]>;
 }
 
 

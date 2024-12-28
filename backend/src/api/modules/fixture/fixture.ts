@@ -14,7 +14,7 @@ import {
     EntityEnumColumn,
     OptionalEntityColumn,
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
-import {ApiProperty, PickType} from '@nestjs/swagger';
+import {ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
 
 @Entity('fixture')
 export class Fixture extends BaseDbEntity {
@@ -30,8 +30,9 @@ export class Fixture extends BaseDbEntity {
     })
     homeTeamId?: number;
 
-    @ManyToOne(() => Team, { eager: true, nullable: true })
-    homeTeam?: Team;
+    @ApiProperty()
+    @ManyToOne(() => Team, (team) => team.homeFixtures, {  nullable: true })
+    homeTeam?: Promise<Team>;
 
     @OptionalEntityColumn({
         db: { type: 'int' },
@@ -39,11 +40,13 @@ export class Fixture extends BaseDbEntity {
     })
     awayTeamId?: number;
 
-    @ManyToOne(() => Team, { eager: true, nullable: true })
-    awayTeam?: Team;
+    @ApiProperty()
+    @ManyToOne(() => Team, (team) => team.awayFixtures, {  nullable: true })
+    awayTeam?: Promise<Team>;
 
-    @OneToMany(() => LineUp, (lineUp) => lineUp.fixture)
-    lineUps!: LineUp[];
+    @ApiProperty()
+    @OneToMany(() => LineUp, (lineUp) => lineUp.fixture, {lazy: true})
+    lineUps!: Promise<LineUp[]>;
 
     @EntityColumn({
         db: { type: 'int' },
@@ -57,6 +60,7 @@ export class Fixture extends BaseDbEntity {
     })
     seasonId!: number;
 
+    @ApiProperty()
     @ManyToOne(() => TeamCompetitionSeason, (teamCompetitionSeason) => teamCompetitionSeason.fixtures)
     teamCompetitionSeasons!: TeamCompetitionSeason;
 
@@ -66,12 +70,15 @@ export class Fixture extends BaseDbEntity {
     })
     stadiumId!: number;
 
-    @ManyToOne(() => Stadium, (stadium) => stadium.fixtures, { eager: true })
-    stadium!: Stadium;
+    @ApiPropertyOptional({nullable: true})
+    @ManyToOne(() => Stadium, (stadium) => stadium.fixtures)
+    stadium?: Stadium;
 
+    @ApiProperty()
     @OneToMany(() => Goal, (goal) => goal.fixture, { cascade: true })
     goals!: Goal[];
 
+    @ApiProperty()
     @OneToMany(() => FixtureReferee, (fixtureReferee) => fixtureReferee.fixture)
     referees!: FixtureReferee[];
 

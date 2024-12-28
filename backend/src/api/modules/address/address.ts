@@ -48,9 +48,9 @@ export class Address extends BaseDbEntity {
     })
     stadiumId?: number;
 
-    @ApiPropertyOptional({ description: 'Associated stadium entity' })
-    @OneToOne(() => Stadium, (stadium) => stadium.address)
-    stadium?: Stadium;
+    @ApiPropertyOptional({nullable: true, description: 'Associated stadium entity' })
+    @OneToOne(() => Stadium, (stadium) => stadium.address, {nullable: true, lazy: true})
+    stadium?: Promise<Stadium>;
 }
 
 export class CreateAddressDTO extends PickType(Address, ['address1', 'address2', 'townOrCity', 'postcode', 'location', "stadiumId"] as const) {}

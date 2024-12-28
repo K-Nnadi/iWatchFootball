@@ -15,8 +15,8 @@ export class FixtureReferee extends BaseDbEntity {
     fixtureId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.referees)
-    fixture!: Fixture;
+    @ManyToOne(() => Fixture, fixture => fixture.referees, { lazy: true })
+    fixture!: Promise<Fixture>;
 
     @EntityColumn({
         db: { type: 'int'}

@@ -1,4 +1,4 @@
-import {ApiProperty, PickType} from "@nestjs/swagger";
+import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Entity, ManyToMany, OneToMany} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Goal} from "../goal/goal";
@@ -32,9 +32,9 @@ export class Player extends BaseDbEntity{
     @OptionalEntityColumn({db: {type: "int", array: true}})
     teamIds?: number[]
 
-    @ApiProperty()
-    @ManyToMany(() => Team, team => team.players)
-    teams!: Team[]
+    @ApiPropertyOptional()
+    @ManyToMany(() => Team, team => team.players, {lazy: true})
+    teams?: Promise<Team[]>
 
     @OptionalEntityColumn({db: {type: "int"}})
     kitNumber?: number
@@ -49,16 +49,16 @@ export class Player extends BaseDbEntity{
     photoUrl?: string
 
     @ApiProperty()
-    @OneToMany(() => Goal, goal => goal.scorer)
-    goals!: Goal[];
+    @OneToMany(() => Goal, goal => goal.scorer, {lazy: true})
+    goals!: Promise<Goal[]>;
 
     @ApiProperty()
-    @OneToMany(() => Goal, goal => goal.assistant)
-    assists!: Goal[];
+    @OneToMany(() => Goal, goal => goal.assistant, {lazy: true})
+    assists!: Promise<Goal[]>;
 
     @ApiProperty()
-    @OneToMany(() => Goal, goal => goal.ownGoal)
-    ownGoals!: Goal[];
+    @OneToMany(() => Goal, goal => goal.ownGoal, {lazy: true})
+    ownGoals!: Promise<Goal[]>;
 
     @ApiProperty()
     @OneToMany(() => Transfer, transfer => transfer.player)

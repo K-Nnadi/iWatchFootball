@@ -218,6 +218,12 @@ importers:
 
   frontend/ui:
     dependencies:
+      '@iWatchFootball/base-tools':
+        specifier: workspace:*
+        version: link:../../libraries/base
+      '@iWatchFootball/clients':
+        specifier: workspace:*
+        version: link:../../clients
       '@mantine/carousel':
         specifier: ^7.9.0
         version: 7.9.0(@mantine/core@7.7.1)(@mantine/hooks@7.7.1)(embla-carousel-react@8.1.5)(react-dom@18.2.0)(react@18.2.0)

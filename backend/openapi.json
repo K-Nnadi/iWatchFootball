@@ -6626,6 +6626,41 @@
     "schemas": {
       "CreateAddressDTO": {
         "type": "object",
+        "properties": {
+          "address1": {
+            "type": "string",
+            "description": "Primary address line",
+            "example": "123 Main Street"
+          },
+          "address2": {
+            "type": "string",
+            "description": "Secondary address line",
+            "example": "Suite 200"
+          },
+          "townOrCity": {
+            "type": "string",
+            "description": "Town or city",
+            "example": "London"
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Postcode or ZIP code",
+            "example": "SW1A 1AA"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location description or coordinates",
+            "example": "51.509865, -0.118092"
+          },
+          "stadiumId": {
+            "type": "number",
+            "description": "Associated stadium ID",
+            "example": 5
+          }
+        }
+      },
+      "Promise": {
+        "type": "object",
         "properties": {}
       },
       "Address": {
@@ -6642,6 +6677,50 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "address1": {
+            "type": "string",
+            "description": "Primary address line",
+            "example": "123 Main Street"
+          },
+          "address2": {
+            "type": "string",
+            "description": "Secondary address line",
+            "example": "Suite 200"
+          },
+          "townOrCity": {
+            "type": "string",
+            "description": "Town or city",
+            "example": "London"
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Postcode or ZIP code",
+            "example": "SW1A 1AA"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country name",
+            "example": "United Kingdom"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location description or coordinates",
+            "example": "51.509865, -0.118092"
+          },
+          "stadiumId": {
+            "type": "number",
+            "description": "Associated stadium ID",
+            "example": 5
+          },
+          "stadium": {
+            "nullable": true,
+            "description": "Associated stadium entity",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Promise"
+              }
+            ]
           }
         },
         "required": [
@@ -6650,7 +6729,26 @@
       },
       "CreateCardDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string"
+          },
+          "minute": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "playerId",
+          "type",
+          "minute"
+        ]
       },
       "Card": {
         "type": "object",
@@ -6666,15 +6764,52 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string"
+          },
+          "minute": {
+            "type": "number"
           }
         },
         "required": [
-          "id"
+          "id",
+          "fixtureId",
+          "playerId",
+          "type",
+          "minute"
         ]
       },
       "CreateCompetitionDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "League",
+              "Cup",
+              "Custom",
+              "Friendly"
+            ]
+          },
+          "country": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "country"
+        ]
       },
       "Competition": {
         "type": "object",
@@ -6690,15 +6825,204 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "League",
+              "Cup",
+              "Custom",
+              "Friendly"
+            ]
+          },
+          "country": {
+            "type": "string"
+          },
+          "teamCompetitionSeasons": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "trophies": {
+            "$ref": "#/components/schemas/Promise"
           }
         },
         "required": [
-          "id"
+          "id",
+          "name",
+          "type",
+          "country",
+          "teamCompetitionSeasons",
+          "trophies"
         ]
       },
       "CreateFixtureDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date and time of the fixture",
+            "example": "2023-12-25T18:00:00Z"
+          },
+          "homeTeamId": {
+            "type": "number",
+            "description": "ID of the home team",
+            "example": 1
+          },
+          "awayTeamId": {
+            "type": "number",
+            "description": "ID of the away team",
+            "example": 2
+          },
+          "competitionId": {
+            "type": "number",
+            "description": "Competition ID associated with the fixture",
+            "example": 1
+          },
+          "seasonId": {
+            "type": "number",
+            "description": "Season ID associated with the fixture",
+            "example": 2023
+          },
+          "stadiumId": {
+            "type": "number",
+            "description": "Stadium ID where the fixture takes place",
+            "example": 5
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the fixture",
+            "example": "Scheduled",
+            "enum": [
+              "Scheduled",
+              "Completed",
+              "Cancelled",
+              "Postponed",
+              "Suspended",
+              "In Play"
+            ]
+          },
+          "attendance": {
+            "type": "number",
+            "description": "Attendance for the fixture",
+            "example": 50000
+          }
+        },
+        "required": [
+          "date",
+          "competitionId",
+          "seasonId",
+          "stadiumId",
+          "status"
+        ]
+      },
+      "TeamCompetitionSeason": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "team": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "competitionId": {
+            "type": "number"
+          },
+          "competition": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "seasonId": {
+            "type": "number"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtures": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "points": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "teamId",
+          "competitionId",
+          "competition",
+          "seasonId",
+          "season",
+          "fixtures"
+        ]
+      },
+      "Stadium": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "opened": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "teams": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "addressId": {
+            "type": "number"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "fixtures": {
+            "$ref": "#/components/schemas/Promise"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "teamIds"
+        ]
       },
       "Fixture": {
         "type": "object",
@@ -6714,15 +7038,194 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date and time of the fixture",
+            "example": "2023-12-25T18:00:00Z"
+          },
+          "homeTeamId": {
+            "type": "number",
+            "description": "ID of the home team",
+            "example": 1
+          },
+          "homeTeam": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "awayTeamId": {
+            "type": "number",
+            "description": "ID of the away team",
+            "example": 2
+          },
+          "awayTeam": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "lineUps": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "competitionId": {
+            "type": "number",
+            "description": "Competition ID associated with the fixture",
+            "example": 1
+          },
+          "seasonId": {
+            "type": "number",
+            "description": "Season ID associated with the fixture",
+            "example": 2023
+          },
+          "teamCompetitionSeasons": {
+            "$ref": "#/components/schemas/TeamCompetitionSeason"
+          },
+          "stadiumId": {
+            "type": "number",
+            "description": "Stadium ID where the fixture takes place",
+            "example": 5
+          },
+          "stadium": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Stadium"
+              }
+            ]
+          },
+          "goals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "referees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the fixture",
+            "example": "Scheduled",
+            "enum": [
+              "Scheduled",
+              "Completed",
+              "Cancelled",
+              "Postponed",
+              "Suspended",
+              "In Play"
+            ]
+          },
+          "stage": {
+            "type": "string",
+            "description": "Stage of the fixture",
+            "example": "League",
+            "enum": [
+              "Final",
+              "Semi Final",
+              "Quarter Final",
+              "Last 16",
+              "Last 32",
+              "Group Stage",
+              "Third Place",
+              "Play Off",
+              "Round Robin",
+              "League"
+            ]
+          },
+          "attendance": {
+            "type": "number",
+            "description": "Attendance for the fixture",
+            "example": 50000
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "predictions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
-          "id"
+          "id",
+          "date",
+          "homeTeam",
+          "awayTeam",
+          "lineUps",
+          "competitionId",
+          "seasonId",
+          "teamCompetitionSeasons",
+          "stadiumId",
+          "goals",
+          "referees",
+          "status",
+          "stage",
+          "logs",
+          "predictions"
         ]
       },
       "CreateFixtureRefereeDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "refereeId": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "Main",
+              "Assistant",
+              "Var"
+            ]
+          }
+        },
+        "required": [
+          "fixtureId",
+          "refereeId",
+          "role"
+        ]
+      },
+      "Referee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "fixtures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "nationality",
+          "fixtures"
+        ]
       },
       "FixtureReferee": {
         "type": "object",
@@ -6738,15 +7241,62 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "refereeId": {
+            "type": "number"
+          },
+          "referee": {
+            "$ref": "#/components/schemas/Referee"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "Main",
+              "Assistant",
+              "Var"
+            ]
           }
         },
         "required": [
-          "id"
+          "id",
+          "fixtureId",
+          "fixture",
+          "refereeId",
+          "referee",
+          "role"
         ]
       },
       "CreateGenericTokenDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "expiry": {
+            "type": "string"
+          },
+          "userEmail": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "token",
+          "type",
+          "expiry",
+          "userId"
+        ]
       },
       "GenericToken": {
         "type": "object",
@@ -6762,15 +7312,62 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "expiry": {
+            "type": "string"
+          },
+          "userEmail": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "number"
           }
         },
         "required": [
-          "id"
+          "id",
+          "token",
+          "type",
+          "expiry",
+          "userId"
         ]
       },
       "CreateGoalDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "minute": {
+            "type": "number"
+          },
+          "scorerId": {
+            "type": "number"
+          },
+          "assistantId": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "ownGoal": {
+            "type": "boolean"
+          },
+          "penalty": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "minute",
+          "scorerId",
+          "fixtureId",
+          "teamId"
+        ]
       },
       "Goal": {
         "type": "object",
@@ -6786,15 +7383,76 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "minute": {
+            "type": "number"
+          },
+          "scorerId": {
+            "type": "number"
+          },
+          "scorer": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "assistantId": {
+            "type": "number"
+          },
+          "assistant": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "ownGoal": {
+            "type": "boolean"
+          },
+          "penalty": {
+            "type": "boolean"
           }
         },
         "required": [
-          "id"
+          "id",
+          "minute",
+          "scorerId",
+          "scorer",
+          "assistant",
+          "fixtureId",
+          "fixture",
+          "teamId"
         ]
       },
       "CreateInjuryDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "playerId": {
+            "type": "number"
+          },
+          "injuryType": {
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "playerId",
+          "injuryType",
+          "startDate",
+          "status"
+        ]
       },
       "Injury": {
         "type": "object",
@@ -6810,15 +7468,54 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "injuryType": {
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
           }
         },
         "required": [
-          "id"
+          "id",
+          "playerId",
+          "injuryType",
+          "startDate",
+          "status"
         ]
       },
       "CreateLineUpDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "formation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "teamId",
+          "managerId"
+        ]
       },
       "LineUp": {
         "type": "object",
@@ -6834,15 +7531,63 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "team": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "playerLineups": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "formation": {
+            "type": "string"
           }
         },
         "required": [
-          "id"
+          "id",
+          "fixtureId",
+          "fixture",
+          "teamId",
+          "team",
+          "managerId",
+          "playerLineups"
         ]
       },
       "CreateLogDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "userId": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "ticketNumber": {
+            "type": "string"
+          },
+          "isVerified": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "fixtureId",
+          "isVerified"
+        ]
       },
       "Log": {
         "type": "object",
@@ -6858,15 +7603,62 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "ticketNumber": {
+            "type": "string"
+          },
+          "isVerified": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
           }
         },
         "required": [
-          "id"
+          "id",
+          "userId",
+          "user",
+          "fixtureId",
+          "fixture",
+          "isVerified"
         ]
       },
       "CreateManagerDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "nickname",
+          "nationality"
+        ]
       },
       "Manager": {
         "type": "object",
@@ -6882,10 +7674,36 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "teams": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "employments": {
+            "$ref": "#/components/schemas/Promise"
           }
         },
         "required": [
-          "id"
+          "id",
+          "name",
+          "nickname",
+          "nationality",
+          "teams",
+          "employments"
         ]
       },
       "CreateManagerEmploymentDTO": {
@@ -6906,15 +7724,87 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "manager": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "team": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isCurrent": {
+            "type": "boolean"
           }
         },
         "required": [
-          "id"
+          "id",
+          "managerId",
+          "manager",
+          "teamId",
+          "team",
+          "isCurrent"
         ]
       },
       "CreatePlayerDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "positionId": {
+            "type": "number"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "kitNumber": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "photoUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "dateOfBirth",
+          "nationality",
+          "positionId"
+        ]
       },
       "Player": {
         "type": "object",
@@ -6930,15 +7820,100 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "positionId": {
+            "type": "number"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "teams": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "kitNumber": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "goals": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "assists": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "ownGoals": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "transfers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
-          "id"
+          "id",
+          "name",
+          "dateOfBirth",
+          "nationality",
+          "positionId",
+          "goals",
+          "assists",
+          "ownGoals",
+          "transfers"
         ]
       },
       "CreatePlayerLineUpDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "lineupId": {
+            "type": "number"
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "isStarting": {
+            "type": "boolean"
+          },
+          "positionId": {
+            "type": "number"
+          },
+          "isCaptain": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "lineupId",
+          "playerId",
+          "isStarting",
+          "isCaptain"
+        ]
       },
       "PlayerLineUp": {
         "type": "object",
@@ -6954,15 +7929,56 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "lineup": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "lineupId": {
+            "type": "number"
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "player": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "isStarting": {
+            "type": "boolean"
+          },
+          "positionId": {
+            "type": "number"
+          },
+          "substitutions": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "isCaptain": {
+            "type": "boolean"
           }
         },
         "required": [
-          "id"
+          "id",
+          "lineup",
+          "lineupId",
+          "playerId",
+          "player",
+          "isStarting",
+          "substitutions",
+          "isCaptain"
         ]
       },
       "CreatePositionDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "abbreviation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
       },
       "Position": {
         "type": "object",
@@ -6978,15 +7994,54 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Goalkeeper",
+              "Defender",
+              "Midfielder",
+              "Forward"
+            ]
+          },
+          "abbreviation": {
+            "type": "string"
           }
         },
         "required": [
-          "id"
+          "id",
+          "name",
+          "type"
         ]
       },
       "CreatePredictionDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "userId": {
+            "type": "number"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "predicted": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "user",
+          "fixtureId",
+          "fixture"
+        ]
       },
       "Prediction": {
         "type": "object",
@@ -7002,39 +8057,60 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "predicted": {
+            "type": "string"
           }
         },
         "required": [
-          "id"
+          "id",
+          "userId",
+          "user",
+          "fixtureId",
+          "fixture"
         ]
       },
       "CreateRefereeDTO": {
         "type": "object",
-        "properties": {}
-      },
-      "Referee": {
-        "type": "object",
         "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
+          "name": {
             "type": "string"
           },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
+          "nationality": {
             "type": "string"
           }
         },
         "required": [
-          "id"
+          "name",
+          "nationality"
         ]
       },
       "CreateSeasonDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "yearStart": {
+            "type": "number"
+          },
+          "yearEnd": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "yearStart",
+          "yearEnd"
+        ]
       },
       "Season": {
         "type": "object",
@@ -7050,39 +8126,72 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "yearStart": {
+            "type": "number"
+          },
+          "yearEnd": {
+            "type": "number"
+          },
+          "teamCompetitionSeasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
-          "id"
+          "id",
+          "yearStart",
+          "yearEnd",
+          "teamCompetitionSeasons"
         ]
       },
       "CreateStadiumDTO": {
         "type": "object",
-        "properties": {}
-      },
-      "Stadium": {
-        "type": "object",
         "properties": {
-          "id": {
+          "name": {
+            "type": "string"
+          },
+          "opened": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "capacity": {
             "type": "number"
           },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string"
+          "addressId": {
+            "type": "number"
           }
         },
         "required": [
-          "id"
+          "name",
+          "teamIds"
         ]
       },
       "CreateSubstitutionDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "minute": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "teamId"
+        ]
       },
       "Substitution": {
         "type": "object",
@@ -7098,15 +8207,81 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "playerLineup": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "team": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "playerOut": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "minute": {
+            "type": "number"
           }
         },
         "required": [
-          "id"
+          "id",
+          "playerLineup",
+          "fixtureId",
+          "teamId",
+          "team",
+          "playerOut"
         ]
       },
       "CreateTeamDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "founded": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "stadiumIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "logoUrl": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Club",
+              "Country"
+            ]
+          },
+          "parentId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ]
       },
       "Team": {
         "type": "object",
@@ -7122,39 +8297,142 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "founded": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "stadiumIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stadiums": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "teamCompetitionSeasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "manager": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "playerIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "players": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "logoUrl": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Club",
+              "Country"
+            ]
+          },
+          "parentId": {
+            "type": "number"
+          },
+          "homeFixtures": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "awayFixtures": {
+            "$ref": "#/components/schemas/Promise"
           }
         },
         "required": [
-          "id"
+          "id",
+          "name",
+          "teamCompetitionSeasons",
+          "manager",
+          "players",
+          "type",
+          "homeFixtures",
+          "awayFixtures"
         ]
       },
       "CreateTeamCompetitionSeasonDTO": {
         "type": "object",
-        "properties": {}
-      },
-      "TeamCompetitionSeason": {
-        "type": "object",
         "properties": {
-          "id": {
+          "teamId": {
             "type": "number"
           },
-          "createdAt": {
-            "type": "string"
+          "competitionId": {
+            "type": "number"
           },
-          "updatedAt": {
-            "type": "string"
+          "seasonId": {
+            "type": "number"
           },
-          "deletedAt": {
-            "type": "string"
+          "points": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
           }
         },
         "required": [
-          "id"
+          "teamId",
+          "competitionId",
+          "seasonId"
         ]
       },
       "CreateTransferDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "playerId": {
+            "type": "number"
+          },
+          "sourceTeamId": {
+            "type": "number"
+          },
+          "destinationTeamId": {
+            "type": "number"
+          },
+          "transferFee": {
+            "type": "number"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isLoan": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "playerId",
+          "sourceTeamId",
+          "destinationTeamId",
+          "transferFee"
+        ]
       },
       "Transfer": {
         "type": "object",
@@ -7170,15 +8448,64 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "player": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "sourceTeamId": {
+            "type": "number"
+          },
+          "sourceTeam": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "destinationTeamId": {
+            "type": "number"
+          },
+          "destinationTeam": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "transferFee": {
+            "type": "number"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isLoan": {
+            "type": "boolean"
           }
         },
         "required": [
-          "id"
+          "id",
+          "playerId",
+          "player",
+          "sourceTeamId",
+          "sourceTeam",
+          "destinationTeamId",
+          "destinationTeam",
+          "transferFee"
         ]
       },
       "CreateTrophyDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "yearIntroduced": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
       },
       "Trophy": {
         "type": "object",
@@ -7194,10 +8521,29 @@
           },
           "deletedAt": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "yearIntroduced": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "competitionId": {
+            "type": "number"
+          },
+          "competition": {
+            "$ref": "#/components/schemas/Promise"
           }
         },
         "required": [
-          "id"
+          "id",
+          "name",
+          "competitionId",
+          "competition"
         ]
       },
       "CreateUserDTO": {
@@ -7271,6 +8617,12 @@
               "USER",
               "ADMIN"
             ]
+          },
+          "logs": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "predictions": {
+            "$ref": "#/components/schemas/Promise"
           }
         },
         "required": [
@@ -7280,7 +8632,8 @@
           "userName",
           "email",
           "password",
-          "type"
+          "type",
+          "logs"
         ]
       },
       "LoginBody": {

@@ -4,7 +4,11 @@ import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {CompetitionType} from "../../enums/competition.enum";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
 import {Trophy} from "../trophy/trophy";
-import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {
+    EntityColumn,
+    EntityEnumColumn,
+    OptionalEntityColumn
+} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
 @Entity('competition')
@@ -15,6 +19,11 @@ export class Competition extends BaseDbEntity {
     })
     name!: string;
 
+    @OptionalEntityColumn({
+        db: {type: "varchar"}
+    })
+    code?: string;
+
     @EntityEnumColumn({
         db: {enum: CompetitionType, default: CompetitionType.LEAGUE}
     })
@@ -24,12 +33,12 @@ export class Competition extends BaseDbEntity {
     country!: string;
 
     @ApiProperty()
-    @OneToMany(() => TeamCompetitionSeason, teamCompSeason => teamCompSeason.competition)
-    teamCompetitionSeasons!: TeamCompetitionSeason[];
+    @OneToMany(() => TeamCompetitionSeason, teamCompSeason => teamCompSeason.competition, {lazy: true})
+    teamCompetitionSeasons!: Promise<TeamCompetitionSeason[]>;
 
     @ApiProperty()
-    @OneToMany(() => Trophy, trophy => trophy.competition)
-    trophies!: Trophy[];
+    @OneToMany(() => Trophy, trophy => trophy.competition, {lazy: true})
+    trophies!: Promise<Trophy[]>;
 }
 
 export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country"] as const) {

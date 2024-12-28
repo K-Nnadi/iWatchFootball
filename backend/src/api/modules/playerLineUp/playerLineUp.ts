@@ -9,32 +9,33 @@ import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/dec
 @Entity('playerLineup')
 export class PlayerLineUp extends BaseDbEntity {
     @ApiProperty()
-    @ManyToOne(() => LineUp, lineup => lineup.playerLineups)
-    lineup!: LineUp;
+    @ManyToOne(() => LineUp, lineup => lineup.playerLineups, {lazy: true})
+    lineup!: Promise<LineUp>;
 
-    @EntityColumn({ db:{ type: "int"}})
+    @EntityColumn({db: {type: "int"}})
     lineupId!: number;
 
-    @EntityColumn({ db:{ type: "int"}})
+    @EntityColumn({db: {type: "int"}})
     playerId!: number;
 
     @ApiProperty()
-    @ManyToOne(() => Player)
-    player!: Player;
+    @ManyToOne(() => Player, {lazy: true})
+    player!: Promise<Player>;
 
-    @EntityColumn({ db:{ type: "boolean"}})
+    @EntityColumn({db: {type: "boolean"}})
     isStarting!: boolean;
 
-    @OptionalEntityColumn({ db:{ type: "int"}})
+    @OptionalEntityColumn({db: {type: "int"}})
     positionId?: number;
 
     @ApiProperty()
-    @OneToMany(() => Substitution, substitution => substitution.playerLineup)
-    substitutions!: Substitution[];
+    @OneToMany(() => Substitution, substitution => substitution.playerLineup, {lazy: true})
+    substitutions!: Promise<Substitution[]>;
 
-    @EntityColumn({ db:{ type: "boolean"}})
+    @EntityColumn({db: {type: "boolean"}})
     isCaptain!: boolean;
 }
 
 
-export class CreatePlayerLineUpDTO extends PickType(PlayerLineUp, [ "lineupId" , "playerId" , "isCaptain" , "positionId", "isStarting"] as const) {}
+export class CreatePlayerLineUpDTO extends PickType(PlayerLineUp, ["lineupId", "playerId", "isCaptain", "positionId", "isStarting"] as const) {
+}
