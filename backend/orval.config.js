@@ -1,20 +1,25 @@
-import { defineConfig } from 'orval';
-
-export default defineConfig({
-    uiClients: {
+module.exports = {
+    mainApi: {
         output: {
             mode: 'tags-split',
-            target: '../clients/openapi.ts',
+            target: '../clients/client-instance.ts',
             client: 'react-query',
             override: {
+                /*operationName: (operation, route, verb) => {
+                    if(operation?.description){
+                        return operation?.description.replace('Entity', '')
+                    } else {
+                        return operation.operationId
+                    }
+                },*/
                 mutator: {
-                    path: '../client/client-instance.ts',
+                    path: '../clients/client-instance.ts',
                     name: 'clientInstance',
                 }
             }
         },
         input: {
-            target: 'resources/openapi.json'
+            target: './openapi.json'
         }
     }
-});
+}

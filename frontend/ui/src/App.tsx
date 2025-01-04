@@ -3,13 +3,25 @@ import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import {MantineProvider} from '@mantine/core';
 import {Router} from "./router";
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: false
+        }
+    }
+});
 
 function App() {
     return (
-        <MantineProvider defaultColorScheme={'light'}>
-            <Router/>
-        </MantineProvider>
+        <QueryClientProvider client={queryClient}>
+            <MantineProvider defaultColorScheme={'light'}>
+                <Router/>
+            </MantineProvider>
+        </QueryClientProvider>
     );
 }
 

@@ -2,8 +2,9 @@ module.exports = {
     mainApi: {
         output: {
             mode: 'tags-split',
-            target: '../link-tracker-client/main.ts',
+            target: '../../clients/client-instance.ts',
             client: 'react-query',
+
             override: {
                 /*operationName: (operation, route, verb) => {
                     if(operation?.description){
