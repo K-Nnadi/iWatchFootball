@@ -2,7 +2,7 @@ import {ApiBody, ApiOkResponse, ApiProperty, ApiPropertyOptional, PickType} from
 import {Body, Module, Post, Response} from '@nestjs/common';
 import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
-import {IsEmail, IsNotEmpty} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsOptional} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
@@ -19,9 +19,14 @@ export class ValidateBody {
 export class LoginBody {
 
     @IsEmail()
-    @IsNotEmpty()
+    @IsOptional()
     @ApiProperty()
-    email!: string;
+    email?: string;
+
+    @IsEmail()
+    @IsOptional()
+    @ApiProperty()
+    userName?: string;
 
     @ApiProperty()
     @IsNotEmpty()
@@ -47,7 +52,6 @@ export class AuthController {
 
     constructor(
         private userService: UserService,
-        private logService: LogService,
     ) {
     }
 
@@ -57,7 +61,10 @@ export class AuthController {
     async login(@Body() auth: LoginBody, @Response() response: FastifyReply) {
 
         const [user] = await this.userService.getQuery({
-            where: {email: auth.email},
+            where: [
+                {email: auth.email},
+                {userName: auth.userName}
+            ],
         }) || [];
         console.log('user login', user);
 
