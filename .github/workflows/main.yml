@@ -1,0 +1,84 @@
+name: FootyTrackr CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'clients/**'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'clients/**'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [backend, frontend, clients]
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build ${{ matrix.package }}
+        if: github.event_name != 'pull_request' || contains(github.event.pull_request.changed_files, matrix.package)
+        run: pnpm --filter ${{ matrix.package }} build
+
+      - name: Run Tests
+        if: github.event_name != 'pull_request' || contains(github.event.pull_request.changed_files, matrix.package)
+        run: pnpm --filter ${{ matrix.package }} test
+
+  deploy:
+    needs: ci
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [backend, frontend, clients]
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build ${{ matrix.package }}
+        run: pnpm --filter ${{ matrix.package }} build
+
+      - name: Deploy ${{ matrix.package }}
+        run: echo "Add your ${{ matrix.package }} deployment steps here"
+        # Add your actual deployment steps here
+
+  post-deploy:
+    needs: deploy
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify deployment complete
+        run: echo "All services deployed successfully"
