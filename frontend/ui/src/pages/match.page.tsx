@@ -7,7 +7,8 @@ import {
     Box,
     Text,
     Group,
-    Button
+    Button,
+    SimpleGrid
 } from '@mantine/core';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
@@ -37,16 +38,15 @@ interface MatchDetails {
 
 function getMatchStatus(matchDateStr: string): 'past' | 'today' | 'future' {
     const matchDate = new Date(matchDateStr);
+    const now = new Date();
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    // Set both dates to start of day for comparison
+    const matchDay = new Date(matchDate.getFullYear(), matchDate.getMonth(), matchDate.getDate());
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const tomorrowStart = new Date(todayStart);
-    tomorrowStart.setDate(todayStart.getDate() + 1);
-
-    if (matchDate < todayStart) {
+    if (matchDay < today) {
         return 'past';
-    } else if (matchDate >= todayStart && matchDate < tomorrowStart) {
+    } else if (matchDay.getTime() === today.getTime()) {
         return 'today';
     } else {
         return 'future';
@@ -75,47 +75,109 @@ function FormationView({ lineup, isPredicted }: { lineup: Lineup; isPredicted?: 
 
     return (
         <Box>
-            {isPredicted ? (
-                <Text color="dimmed" size="sm" mb="xs">
-                    Predicted Lineup ({lineup.formation})
-                </Text>
-            ) : (
-                <Text color="dimmed" size="sm" mb="xs">
-                    Starting XI ({lineup.formation})
-                </Text>
-            )}
-
-            <Box mb="md">
-                <Group position="center">
-                    {arranged.gk.map((player) => (
-                        <Badge key={player.id} variant="outline" color="teal">{player.name}</Badge>
-                    ))}
+            <Paper 
+                p="md" 
+                radius="md" 
+                sx={(theme) => ({
+                    backgroundColor: theme.colorScheme === 'dark' 
+                        ? theme.fn.rgba(theme.colors.dark[8], 0.5) 
+                        : theme.fn.rgba(theme.colors.gray[1], 0.7),
+                    border: isPredicted ? `1px dashed ${theme.colors.gray[5]}` : undefined
+                })}
+            >
+                <Group position="apart" mb="md">
+                    <Text 
+                        color="dimmed" 
+                        size="sm" 
+                        sx={(theme) => ({
+                            fontFamily: theme.fontFamilyMonospace,
+                            letterSpacing: 1
+                        })}
+                    >
+                        {isPredicted ? 'Predicted Formation' : 'Formation'}: {lineup.formation}
+                    </Text>
+                    {isPredicted && (
+                        <Badge variant="dot" color="yellow">Predicted</Badge>
+                    )}
                 </Group>
-            </Box>
 
-            <Box mb="md">
-                <Group position="center" spacing="xl">
-                    {arranged.defenders.map((player) => (
-                        <Badge key={player.id} variant="outline" color="blue">{player.name}</Badge>
-                    ))}
-                </Group>
-            </Box>
+                <Box 
+                    sx={(theme) => ({
+                        background: theme.fn.linearGradient(180, 
+                            theme.colorScheme === 'dark' 
+                                ? theme.colors.dark[8] 
+                                : theme.colors.gray[1],
+                            'transparent'
+                        ),
+                        borderRadius: theme.radius.sm,
+                        padding: theme.spacing.md
+                    })}
+                >
+                    <Box mb={40}>
+                        <Group position="center">
+                            {arranged.gk.map((player) => (
+                                <Badge 
+                                    key={player.id} 
+                                    variant="filled" 
+                                    color="teal"
+                                    size="lg"
+                                    sx={{ minWidth: 120, textAlign: 'center' }}
+                                >
+                                    {player.name}
+                                </Badge>
+                            ))}
+                        </Group>
+                    </Box>
 
-            <Box mb="md">
-                <Group position="center" spacing="xl">
-                    {arranged.midfielders.map((player) => (
-                        <Badge key={player.id} variant="outline" color="yellow">{player.name}</Badge>
-                    ))}
-                </Group>
-            </Box>
+                    <Box mb={40}>
+                        <Group position="center" spacing={20}>
+                            {arranged.defenders.map((player) => (
+                                <Badge 
+                                    key={player.id} 
+                                    variant="filled" 
+                                    color="blue"
+                                    size="lg"
+                                    sx={{ minWidth: 120, textAlign: 'center' }}
+                                >
+                                    {player.name}
+                                </Badge>
+                            ))}
+                        </Group>
+                    </Box>
 
-            <Box mb="md">
-                <Group position="center" spacing="xl">
-                    {arranged.forwards.map((player) => (
-                        <Badge key={player.id} variant="outline" color="red">{player.name}</Badge>
-                    ))}
-                </Group>
-            </Box>
+                    <Box mb={40}>
+                        <Group position="center" spacing={20}>
+                            {arranged.midfielders.map((player) => (
+                                <Badge 
+                                    key={player.id} 
+                                    variant="filled" 
+                                    color="violet"
+                                    size="lg"
+                                    sx={{ minWidth: 120, textAlign: 'center' }}
+                                >
+                                    {player.name}
+                                </Badge>
+                            ))}
+                        </Group>
+                    </Box>
+
+                    <Box>
+                        <Group position="center" spacing={20}>
+                            {arranged.forwards.map((player) => (
+                                <Badge 
+                                    key={player.id} 
+                                    variant="filled" 
+                                    color="red"
+                                    size="lg"
+                                    sx={{ minWidth: 120, textAlign: 'center' }}
+                                >
+                                    {player.name}
+                                </Badge>
+                            ))}
+                        </Group>
+                    </Box>
+                </Box>
+            </Paper>
         </Box>
     );
 }
@@ -136,34 +198,97 @@ export function MatchPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // For demonstration, we store lineups in code.
-    const mockHomeLineup: Lineup = {/* ... */} as Lineup;
-    const mockAwayLineup: Lineup = {/* ... */} as Lineup;
-    const mockHomePredicted: Lineup = {/* ... */} as Lineup;
-    const mockAwayPredicted: Lineup = {/* ... */} as Lineup;
-
-    // Aggregated predictions from all users
-    const [winPercent, setWinPercent] = useState(40);
-    const [drawPercent, setDrawPercent] = useState(30);
-    const [losePercent, setLosePercent] = useState(30);
-    const [totalVotes, setTotalVotes] = useState(100);
-
-    // Tracks if this user has predicted
-    const [hasPredicted, setHasPredicted] = useState(false);
-
-    // Mock match details
-    const matchDetails: MatchDetails = location.state || {
-        matchId: matchId || 'unknown',
-        homeTeam: 'Team A',
-        awayTeam: 'Team B',
-        date: '2023-12-25T18:00:00',
-        venue: 'Stadium X',
-        homeLineup: mockHomeLineup,
-        awayLineup: mockAwayLineup,
-        homePredictedLineup: mockHomePredicted,
-        awayPredictedLineup: mockAwayPredicted
+    // Mock match data
+    const mockMatchDetails: MatchDetails = {
+        matchId: matchId || '1',
+        homeTeam: 'Liverpool',
+        awayTeam: 'Manchester City',
+        date: '2025-01-21T15:00:00Z', // Set to tomorrow for testing
+        venue: 'Anfield',
+        homeLineup: {
+            formation: '4-3-3',
+            players: [
+                { id: 'h1', name: 'Alisson', position: 'GK' },
+                { id: 'h2', name: 'Alexander-Arnold', position: 'DF' },
+                { id: 'h3', name: 'Van Dijk', position: 'DF' },
+                { id: 'h4', name: 'Konate', position: 'DF' },
+                { id: 'h5', name: 'Robertson', position: 'DF' },
+                { id: 'h6', name: 'Mac Allister', position: 'MF' },
+                { id: 'h7', name: 'Szoboszlai', position: 'MF' },
+                { id: 'h8', name: 'Jones', position: 'MF' },
+                { id: 'h9', name: 'Salah', position: 'FW' },
+                { id: 'h10', name: 'Nunez', position: 'FW' },
+                { id: 'h11', name: 'Diaz', position: 'FW' }
+            ],
+            substitutes: [
+                { id: 'hs1', name: 'Kelleher', position: 'GK' },
+                { id: 'hs2', name: 'Gomez', position: 'DF' },
+                { id: 'hs3', name: 'Endo', position: 'MF' },
+                { id: 'hs4', name: 'Elliott', position: 'MF' },
+                { id: 'hs5', name: 'Gakpo', position: 'FW' }
+            ]
+        },
+        awayLineup: {
+            formation: '4-2-3-1',
+            players: [
+                { id: 'a1', name: 'Ederson', position: 'GK' },
+                { id: 'a2', name: 'Walker', position: 'DF' },
+                { id: 'a3', name: 'Dias', position: 'DF' },
+                { id: 'a4', name: 'Stones', position: 'DF' },
+                { id: 'a5', name: 'Ake', position: 'DF' },
+                { id: 'a6', name: 'Rodri', position: 'MF' },
+                { id: 'a7', name: 'De Bruyne', position: 'MF' },
+                { id: 'a8', name: 'Bernardo', position: 'MF' },
+                { id: 'a9', name: 'Foden', position: 'MF' },
+                { id: 'a10', name: 'Grealish', position: 'FW' },
+                { id: 'a11', name: 'Haaland', position: 'FW' }
+            ],
+            substitutes: [
+                { id: 'as1', name: 'Ortega', position: 'GK' },
+                { id: 'as2', name: 'Akanji', position: 'DF' },
+                { id: 'as3', name: 'Kovacic', position: 'MF' },
+                { id: 'as4', name: 'Doku', position: 'FW' },
+                { id: 'as5', name: 'Alvarez', position: 'FW' }
+            ]
+        },
+        homePredictedLineup: {
+            formation: '4-3-3',
+            players: [
+                { id: 'hp1', name: 'Alisson', position: 'GK' },
+                { id: 'hp2', name: 'Alexander-Arnold', position: 'DF' },
+                { id: 'hp3', name: 'Van Dijk', position: 'DF' },
+                { id: 'hp4', name: 'Konate', position: 'DF' },
+                { id: 'hp5', name: 'Robertson', position: 'DF' },
+                { id: 'hp6', name: 'Mac Allister', position: 'MF' },
+                { id: 'hp7', name: 'Szoboszlai', position: 'MF' },
+                { id: 'hp8', name: 'Jones', position: 'MF' },
+                { id: 'hp9', name: 'Salah', position: 'FW' },
+                { id: 'hp10', name: 'Nunez', position: 'FW' },
+                { id: 'hp11', name: 'Diaz', position: 'FW' }
+            ]
+        },
+        awayPredictedLineup: {
+            formation: '4-2-3-1',
+            players: [
+                { id: 'ap1', name: 'Ederson', position: 'GK' },
+                { id: 'ap2', name: 'Walker', position: 'DF' },
+                { id: 'ap3', name: 'Dias', position: 'DF' },
+                { id: 'ap4', name: 'Stones', position: 'DF' },
+                { id: 'ap5', name: 'Ake', position: 'DF' },
+                { id: 'ap6', name: 'Rodri', position: 'MF' },
+                { id: 'ap7', name: 'De Bruyne', position: 'MF' },
+                { id: 'ap8', name: 'Bernardo', position: 'MF' },
+                { id: 'ap9', name: 'Foden', position: 'MF' },
+                { id: 'ap10', name: 'Grealish', position: 'FW' },
+                { id: 'ap11', name: 'Haaland', position: 'FW' }
+            ]
+        }
     };
 
+    const [matchDetails, setMatchDetails] = useState<MatchDetails>(mockMatchDetails);
+    const [homeVotes, setHomeVotes] = useState(Math.floor(Math.random() * 100));
+    const [awayVotes, setAwayVotes] = useState(Math.floor(Math.random() * 100));
+    const [userVote, setUserVote] = useState<'home' | 'away' | null>(null);
     const status = getMatchStatus(matchDetails.date);
 
     // Retrieve last 5 games form for each team
@@ -172,13 +297,12 @@ export function MatchPage() {
 
     function handlePrediction(result: 'win' | 'draw' | 'lose') {
         console.log(`User predicted a ${result}`);
-        setHasPredicted(true);
+        setUserVote(result === 'win' ? 'home' : result === 'lose' ? 'away' : null);
         // Fake updating stats
-        const newVotes = totalVotes + 1;
-        setTotalVotes(newVotes);
-        if (result === 'win') setWinPercent(Math.min(winPercent + 5, 100));
-        if (result === 'draw') setDrawPercent(Math.min(drawPercent + 5, 100));
-        if (result === 'lose') setLosePercent(Math.min(losePercent + 5, 100));
+        const newHomeVotes = result === 'win' ? homeVotes + 1 : homeVotes;
+        const newAwayVotes = result === 'lose' ? awayVotes + 1 : awayVotes;
+        setHomeVotes(newHomeVotes);
+        setAwayVotes(newAwayVotes);
     }
 
     function handleViewTickets() {
@@ -189,86 +313,231 @@ export function MatchPage() {
     }
 
     return (
-        <Container size="md" my="xl">
-            <Title order={2} mb="lg">
-                {matchDetails.homeTeam} vs {matchDetails.awayTeam}
-            </Title>
-            <Text size="sm">{new Date(matchDetails.date).toLocaleString()}</Text>
-            <Text size="sm" mb="lg">Venue: {matchDetails.venue}</Text>
+        <Container size="xl" py="xl">
+            {/* Match Header */}
+            <Paper p="xl" radius="lg" withBorder mb="xl">
+                <Group position="apart" align="center" spacing={0}>
+                    <Box sx={{ flex: 1, textAlign: 'right', paddingRight: 40 }}>
+                        <Title order={2} mb="md">{matchDetails.homeTeam}</Title>
+                        <Group position="right" spacing={8}>
+                            {homeForm.map((result, i) => (
+                                <Badge 
+                                    key={i} 
+                                    color={result === 'W' ? 'green' : result === 'D' ? 'yellow' : 'red'}
+                                    size="lg"
+                                >
+                                    {result}
+                                </Badge>
+                            ))}
+                        </Group>
+                    </Box>
 
-            {/* Display last 5 games form for both teams */}
-            <Group mb="lg" spacing="xl">
-                <Group spacing="xs">
-                    <Text weight={500}>{matchDetails.homeTeam} Form:</Text>
-                    {homeForm.map((res, i) => (
-                        <Badge
-                            key={`${matchDetails.homeTeam}-form-${i}`}
-                            color={res === 'W' ? 'green' : res === 'D' ? 'blue' : 'red'}
-                            variant="filled"
+                    <Box 
+                        sx={(theme) => ({
+                            textAlign: 'center',
+                            padding: '0 40px',
+                            borderLeft: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+                            borderRight: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+                        })}
+                    >
+                        <Text size="sm" color="dimmed" mb="xs">
+                            {new Date(matchDetails.date).toLocaleDateString('en-GB', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </Text>
+                        <Text size="xl" weight={700} mb="xs">VS</Text>
+                        <Text size="sm" color="dimmed">{matchDetails.venue}</Text>
+                        <Button 
+                            variant="light" 
+                            color="blue" 
+                            size="sm" 
+                            mt="md"
+                            onClick={handleViewTickets}
                         >
-                            {res}
-                        </Badge>
-                    ))}
-                </Group>
-                <Group spacing="xs">
-                    <Text weight={500}>{matchDetails.awayTeam} Form:</Text>
-                    {awayForm.map((res, i) => (
-                        <Badge
-                            key={`${matchDetails.awayTeam}-form-${i}`}
-                            color={res === 'W' ? 'green' : res === 'D' ? 'blue' : 'red'}
-                            variant="filled"
-                        >
-                            {res}
-                        </Badge>
-                    ))}
-                </Group>
-            </Group>
-
-            {/* Display lineups or predicted lineups */}
-            <Group grow align="start" mb="lg">
-                <Paper shadow="sm" radius="md" p="md" withBorder>
-                    <Title order={4} mb="md">{matchDetails.homeTeam}</Title>
-                    {status === 'future' && matchDetails.homePredictedLineup
-                        ? <FormationView lineup={matchDetails.homePredictedLineup} isPredicted />
-                        : matchDetails.homeLineup && <FormationView lineup={matchDetails.homeLineup} />}
-                </Paper>
-
-                <Paper shadow="sm" radius="md" p="md" withBorder>
-                    <Title order={4} mb="md">{matchDetails.awayTeam}</Title>
-                    {status === 'future' && matchDetails.awayPredictedLineup
-                        ? <FormationView lineup={matchDetails.awayPredictedLineup} isPredicted />
-                        : matchDetails.awayLineup && <FormationView lineup={matchDetails.awayLineup} />}
-                </Paper>
-            </Group>
-
-            {status === 'future' && (
-                <>
-                    <Group spacing="md" mb="md">
-                        <Button variant="outline" onClick={handleViewTickets}>
                             View Tickets
                         </Button>
-                    </Group>
+                    </Box>
 
-                    {!hasPredicted ? (
-                        // Show prediction buttons
-                        <Group spacing="md">
-                            <Text weight={500}>Your Prediction:</Text>
-                            <Button variant="outline" onClick={() => handlePrediction('win')}>Win</Button>
-                            <Button variant="outline" onClick={() => handlePrediction('draw')}>Draw</Button>
-                            <Button variant="outline" onClick={() => handlePrediction('lose')}>Lose</Button>
+                    <Box sx={{ flex: 1, textAlign: 'left', paddingLeft: 40 }}>
+                        <Title order={2} mb="md">{matchDetails.awayTeam}</Title>
+                        <Group position="left" spacing={8}>
+                            {awayForm.map((result, i) => (
+                                <Badge 
+                                    key={i} 
+                                    color={result === 'W' ? 'green' : result === 'D' ? 'yellow' : 'red'}
+                                    size="lg"
+                                >
+                                    {result}
+                                </Badge>
+                            ))}
                         </Group>
-                    ) : (
-                        // User has predicted; show aggregated results
-                        <Group spacing="md">
-                            <Text weight={500}>Community Predictions:</Text>
-                            <Badge color="green" variant="filled">Win: {winPercent}%</Badge>
-                            <Badge color="blue" variant="filled">Draw: {drawPercent}%</Badge>
-                            <Badge color="red" variant="filled">Lose: {losePercent}%</Badge>
-                            <Text size="sm">Total Votes: {totalVotes}</Text>
-                        </Group>
-                    )}
-                </>
+                    </Box>
+                </Group>
+            </Paper>
+
+            {/* Predictions Section */}
+            {status !== 'past' && (
+                <Paper p="xl" radius="lg" withBorder mb="xl">
+                    <Title order={3} size="h4" mb="md" align="center">Match Prediction</Title>
+                    <SimpleGrid cols={3} spacing={0}>
+                        <Box sx={{ paddingRight: 20, borderRight: '1px solid', borderColor: 'gray.3' }}>
+                            <Button
+                                fullWidth
+                                variant={userVote === 'home' ? 'filled' : 'outline'}
+                                size="lg"
+                                color="blue"
+                                onClick={() => handlePrediction('win')}
+                                disabled={userVote !== null}
+                            >
+                                {matchDetails.homeTeam} Win
+                            </Button>
+                            <Text align="center" mt="xs" size="sm" color="dimmed">
+                                {homeVotes}%
+                            </Text>
+                        </Box>
+
+                        <Box sx={{ padding: '0 20px' }}>
+                            <Button
+                                fullWidth
+                                variant={userVote === null ? 'filled' : 'outline'}
+                                size="lg"
+                                color="yellow"
+                                onClick={() => handlePrediction('draw')}
+                                disabled={userVote !== null}
+                            >
+                                Draw
+                            </Button>
+                            <Text align="center" mt="xs" size="sm" color="dimmed">
+                                {100 - homeVotes - awayVotes}%
+                            </Text>
+                        </Box>
+
+                        <Box sx={{ paddingLeft: 20, borderLeft: '1px solid', borderColor: 'gray.3' }}>
+                            <Button
+                                fullWidth
+                                variant={userVote === 'away' ? 'filled' : 'outline'}
+                                size="lg"
+                                color="red"
+                                onClick={() => handlePrediction('lose')}
+                                disabled={userVote !== null}
+                            >
+                                {matchDetails.awayTeam} Win
+                            </Button>
+                            <Text align="center" mt="xs" size="sm" color="dimmed">
+                                {awayVotes}%
+                            </Text>
+                        </Box>
+                    </SimpleGrid>
+                    <Text size="sm" color="dimmed" align="center" mt="md">
+                        Total Predictions: {homeVotes + awayVotes}
+                    </Text>
+                </Paper>
             )}
+
+            {/* Team Lineups */}
+            <Paper p="xl" radius="lg" withBorder mb="xl">
+                <Title order={3} size="h4" mb="xl" align="center">Team Lineups</Title>
+                <Group align="flex-start" spacing={0} noWrap>
+                    {/* Home Team */}
+                    <Box sx={{ flex: 1, paddingRight: 40 }}>
+                        <Title order={4} size="h5" mb="xl" align="center">
+                            {matchDetails.homeTeam}
+                        </Title>
+                        {status === 'future' ? (
+                            <>
+                                {matchDetails.homePredictedLineup && (
+                                    <FormationView 
+                                        lineup={matchDetails.homePredictedLineup} 
+                                        isPredicted 
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {matchDetails.homeLineup && (
+                                    <FormationView 
+                                        lineup={matchDetails.homeLineup}
+                                    />
+                                )}
+                            </>
+                        )}
+                        {matchDetails.homeLineup?.substitutes && status !== 'future' && (
+                            <Box mt="xl">
+                                <Text size="sm" weight={500} mb="xs" align="center">Substitutes</Text>
+                                <Group position="center" spacing={8}>
+                                    {matchDetails.homeLineup.substitutes.map((player) => (
+                                        <Badge 
+                                            key={player.id} 
+                                            variant="dot" 
+                                            color="gray"
+                                            size="lg"
+                                        >
+                                            {player.name}
+                                        </Badge>
+                                    ))}
+                                </Group>
+                            </Box>
+                        )}
+                    </Box>
+
+                    {/* Central Divider */}
+                    <Box 
+                        sx={(theme) => ({
+                            width: 2,
+                            alignSelf: 'stretch',
+                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3],
+                            margin: '0 40px'
+                        })}
+                    />
+
+                    {/* Away Team */}
+                    <Box sx={{ flex: 1, paddingLeft: 40 }}>
+                        <Title order={4} size="h5" mb="xl" align="center">
+                            {matchDetails.awayTeam}
+                        </Title>
+                        {status === 'future' ? (
+                            <>
+                                {matchDetails.awayPredictedLineup && (
+                                    <FormationView 
+                                        lineup={matchDetails.awayPredictedLineup} 
+                                        isPredicted 
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {matchDetails.awayLineup && (
+                                    <FormationView 
+                                        lineup={matchDetails.awayLineup}
+                                    />
+                                )}
+                            </>
+                        )}
+                        {matchDetails.awayLineup?.substitutes && status !== 'future' && (
+                            <Box mt="xl">
+                                <Text size="sm" weight={500} mb="xs" align="center">Substitutes</Text>
+                                <Group position="center" spacing={8}>
+                                    {matchDetails.awayLineup.substitutes.map((player) => (
+                                        <Badge 
+                                            key={player.id} 
+                                            variant="dot" 
+                                            color="gray"
+                                            size="lg"
+                                        >
+                                            {player.name}
+                                        </Badge>
+                                    ))}
+                                </Group>
+                            </Box>
+                        )}
+                    </Box>
+                </Group>
+            </Paper>
         </Container>
     );
 }

@@ -39,14 +39,27 @@ export function AppWrapper() {
         <AppShell
             header={{
                 height: {
-                    base: 80,
-                    sm: 80
+                    base: 60,
+                    md: 70
                 }
             }}
-            navbar={{ width, breakpoint: width, collapsed }}
-            footer={{
-                height: 200
+            navbar={{ 
+                width: { base: width, md: width * 0.8 }, 
+                breakpoint: 'md', 
+                collapsed 
             }}
+            footer={{
+                height: { base: 60, md: 80 }
+            }}
+            padding="md"
+            // styles={(theme) => ({
+            //     main: {
+            //         backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+            //     },
+            //     root: {
+            //         minHeight: '100vh'
+            //     }
+            // })}
         >
             {/* Pass isLoggedIn to Header */}
             <Header showHeader={showHeader} isLoggedIn={isLoggedIn} />

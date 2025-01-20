@@ -16,8 +16,8 @@ import {
     Notification,
     SimpleGrid
 } from '@mantine/core';
-import { ErrorMessage } from '../shared/errorMessage';
-import { LoggedFixtureCard } from '../components/cards/fixture.card';
+import {ErrorMessage} from '../shared/errorMessage';
+import {LoggedFixtureCard} from '../components/cards/fixture.card';
 
 interface Competition {
     id: string;
@@ -61,6 +61,11 @@ interface UserGame {
     events?: MatchEvent[];
 }
 
+interface Team {
+    id: string;
+    name: string;
+}
+
 export function LogsPage() {
     // States for searching and adding matches
     const [competitions, setCompetitions] = useState<Competition[]>([]);
@@ -71,9 +76,9 @@ export function LogsPage() {
     const [selectedCompetition, setSelectedCompetition] = useState<string | null>(null);
     const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
 
-    const [homeTeamFilter, setHomeTeamFilter] = useState('');
-    const [awayTeamFilter, setAwayTeamFilter] = useState('');
-    const [selectedFixture, setSelectedFixture] = useState<string | null>(null);
+    const [teams, setTeams] = useState<Team[]>([]);
+    const [selectedHomeTeam, setSelectedHomeTeam] = useState<string | null>(null);
+    const [selectedAwayTeam, setSelectedAwayTeam] = useState<string | null>(null);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -84,8 +89,8 @@ export function LogsPage() {
     useEffect(() => {
         setLoading(true);
         const mockCompetitions = [
-            { id: 'comp1', name: 'Premier League' },
-            { id: 'comp2', name: 'Champions League' }
+            {id: 'comp1', name: 'Premier League'},
+            {id: 'comp2', name: 'Champions League'}
         ];
         setCompetitions(mockCompetitions);
         setLoading(false);
@@ -95,8 +100,8 @@ export function LogsPage() {
         if (selectedCompetition) {
             setLoading(true);
             const mockSeasons = [
-                { id: 'season2023', year: '2023/2024' },
-                { id: 'season2022', year: '2022/2023' }
+                {id: 'season2023', year: '2023/2024'},
+                {id: 'season2022', year: '2022/2023'}
             ];
             setSeasons(mockSeasons);
             setLoading(false);
@@ -104,27 +109,64 @@ export function LogsPage() {
     }, [selectedCompetition]);
 
     useEffect(() => {
-        if (selectedCompetition && selectedSeason) {
+        setLoading(true);
+        const mockTeams = [
+            { id: 'team1', name: 'Arsenal' },
+            { id: 'team2', name: 'Chelsea' },
+            { id: 'team3', name: 'Liverpool' },
+            { id: 'team4', name: 'Manchester City' },
+            { id: 'team5', name: 'Manchester United' },
+            { id: 'team6', name: 'Tottenham' },
+            { id: 'team7', name: 'Newcastle' },
+            { id: 'team8', name: 'Brighton' },
+        ];
+        setTeams(mockTeams);
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        if (selectedCompetition && selectedSeason && selectedHomeTeam && selectedAwayTeam) {
             setLoading(true);
+            const homeTeamName = teams.find(t => t.id === selectedHomeTeam)?.name;
+            const awayTeamName = teams.find(t => t.id === selectedAwayTeam)?.name;
+            
             const mockFixtures: Fixture[] = [
-                { id: 'fix1', homeTeam: 'Team A', awayTeam: 'Team B', date: '2023-09-10', competitionId: selectedCompetition, seasonId: selectedSeason, venue: 'Stadium A' },
-                { id: 'fix2', homeTeam: 'Team C', awayTeam: 'Team D', date: '2023-09-11', competitionId: selectedCompetition, seasonId: selectedSeason, venue: 'Stadium B' }
+                {
+                    id: 'fix1',
+                    homeTeam: homeTeamName || '',
+                    awayTeam: awayTeamName || '',
+                    date: '2023-09-10',
+                    competitionId: selectedCompetition,
+                    seasonId: selectedSeason,
+                    venue: 'Home Stadium'
+                },
+                {
+                    id: 'fix2',
+                    homeTeam: homeTeamName || '',
+                    awayTeam: awayTeamName || '',
+                    date: '2024-01-15',
+                    competitionId: selectedCompetition,
+                    seasonId: selectedSeason,
+                    venue: 'Away Stadium'
+                }
             ];
             setFixtures(mockFixtures);
             setLoading(false);
         }
-    }, [selectedCompetition, selectedSeason]);
+    }, [selectedCompetition, selectedSeason, selectedHomeTeam, selectedAwayTeam, teams]);
 
     useEffect(() => {
         let updated = fixtures;
-        if (homeTeamFilter) {
-            updated = updated.filter((f) => f.homeTeam.toLowerCase().includes(homeTeamFilter.toLowerCase()));
-        }
-        if (awayTeamFilter) {
-            updated = updated.filter((f) => f.awayTeam.toLowerCase().includes(awayTeamFilter.toLowerCase()));
+        if (selectedHomeTeam && selectedAwayTeam) {
+            // Only show fixtures where the selected teams played against each other
+            updated = updated.filter((f) => 
+                teams.find(t => t.id === selectedHomeTeam)?.name === f.homeTeam && 
+                teams.find(t => t.id === selectedAwayTeam)?.name === f.awayTeam
+            );
         }
         setFilteredFixtures(updated);
-    }, [fixtures, homeTeamFilter, awayTeamFilter]);
+        setSelectedFixture(null);
+    }, [fixtures, selectedHomeTeam, selectedAwayTeam, teams]);
 
     useEffect(() => {
         setLoading(true);
@@ -144,10 +186,10 @@ export function LogsPage() {
                 userTeam: 'home',
                 stage: 'League Game',
                 events: [
-                    { time: 10, description: 'Goal by Team A striker', team: 'home' },
-                    { time: 45, description: 'Yellow card for Team B defender', team: 'away' },
-                    { time: 60, description: 'Substitution: Team A midfielder off, new midfielder on', team: 'home' },
-                    { time: 75, description: 'Goal by Team B winger', team: 'away' }
+                    {time: 10, description: 'Goal by Team A striker', team: 'home'},
+                    {time: 45, description: 'Yellow card for Team B defender', team: 'away'},
+                    {time: 60, description: 'Substitution: Team A midfielder off, new midfielder on', team: 'home'},
+                    {time: 75, description: 'Goal by Team B winger', team: 'away'}
                 ]
             },
             {
@@ -164,9 +206,9 @@ export function LogsPage() {
                 userTeam: 'away',
                 stage: 'Semi-Finals',
                 events: [
-                    { time: 5, description: 'Kick-off', team: 'home' },
-                    { time: 30, description: 'Team D missed penalty', team: 'away' },
-                    { time: 90, description: 'Final whistle', team: 'home' }
+                    {time: 5, description: 'Kick-off', team: 'home'},
+                    {time: 30, description: 'Team D missed penalty', team: 'away'},
+                    {time: 90, description: 'Final whistle', team: 'home'}
                 ]
             }
         ];
@@ -208,8 +250,8 @@ export function LogsPage() {
                 userTeam: 'home',
                 stage: 'League Game',
                 events: [
-                    { time: 10, description: 'Goal by home team player', team: 'home' },
-                    { time: 30, description: 'Yellow card for away team', team: 'away' }
+                    {time: 10, description: 'Goal by home team player', team: 'home'},
+                    {time: 30, description: 'Yellow card for away team', team: 'away'}
                 ]
             };
 
@@ -221,8 +263,8 @@ export function LogsPage() {
             setSelectedSeason(null);
             setFixtures([]);
             setFilteredFixtures([]);
-            setHomeTeamFilter('');
-            setAwayTeamFilter('');
+            setSelectedHomeTeam(null);
+            setSelectedAwayTeam(null);
             setSelectedFixture(null);
 
         } catch (err) {
@@ -231,131 +273,235 @@ export function LogsPage() {
         }
     };
 
+    const [selectedFixture, setSelectedFixture] = useState<string | null>(null);
+
     return (
-        <Container size={600} my={40} pos="relative">
-            <LoadingOverlay visible={loading} overlayBlur={2} />
-            <Title order={2} mb="lg">
-                My Logged Games
-            </Title>
-            {error && <ErrorMessage message={error} />}
+        <Container size="xl" my={40}>
+            <LoadingOverlay visible={loading} overlayBlur={2}/>
+
+            <Box mb={40}>
+                <Title order={2} mb="xs" sx={(theme) => ({
+                    color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
+                    fontSize: '2rem',
+                    fontWeight: 600
+                })}>
+                    My Logged Games
+                </Title>
+                <Text color="dimmed" size="sm">
+                    Track and manage your match history across different competitions
+                </Text>
+            </Box>
+
+            {error && (
+                <Notification title="Error" color="red" onClose={() => setError(null)} mb="lg" sx={{borderRadius: 8}}>
+                    {error}
+                </Notification>
+            )}
+
             {successMessage && (
-                <Notification title="Success" color="green" onClose={() => setSuccessMessage(null)} mb="lg">
+                <Notification
+                    title="Success"
+                    color="green"
+                    onClose={() => setSuccessMessage(null)}
+                    mb="lg"
+                    sx={{borderRadius: 8}}
+                >
                     {successMessage}
                 </Notification>
             )}
 
-            <Paper p="xl" radius="md" shadow="lg" withBorder mb="xl">
-                <Title order={3} mb="md">Add New Match to Logs</Title>
-                <Text color="dimmed" size="sm" mb="lg">
-                    Search for a fixture by choosing a competition, season, and filtering teams. Then add it to your logs.
-                </Text>
+            <SimpleGrid cols={2} spacing="xl" breakpoints={[{maxWidth: 'md', cols: 1}]}>
+                <Box sx={{ position: 'fixed', width: 'calc(50% - 40px)', maxWidth: '600px' }}>
+                    <Paper p="xl" radius="lg" shadow="md" withBorder sx={(theme) => ({
+                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: theme.shadows.lg
+                        }
+                    })}>
+                        <Title order={3} mb="md" sx={(theme) => ({
+                            color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
+                            fontSize: '1.5rem',
+                            fontWeight: 600
+                        })}>Add New Match</Title>
 
-                <Box mb="md">
-                    <Text size="sm" mb="xs">Competition</Text>
-                    <Select
-                        placeholder="Select competition"
-                        data={competitions.map((c) => ({ value: c.id, label: c.name }))}
-                        value={selectedCompetition}
-                        onChange={(val) => {
-                            setSelectedCompetition(val);
-                            setSelectedSeason(null);
-                            setFixtures([]);
-                            setFilteredFixtures([]);
-                            setHomeTeamFilter('');
-                            setAwayTeamFilter('');
-                            setSelectedFixture(null);
-                        }}
-                    />
-                </Box>
+                        <Text color="dimmed" size="sm" mb="xl">
+                            Search for a fixture by selecting competition, season, and filtering teams
+                        </Text>
 
-                {selectedCompetition && (
-                    <Box mb="md">
-                        <Text size="sm" mb="xs">Season</Text>
-                        <Select
-                            placeholder="Select season"
-                            data={seasons.map((s) => ({ value: s.id, label: s.year }))}
-                            value={selectedSeason}
-                            onChange={(val) => {
-                                setSelectedSeason(val);
-                                setFixtures([]);
-                                setFilteredFixtures([]);
-                                setHomeTeamFilter('');
-                                setAwayTeamFilter('');
-                                setSelectedFixture(null);
-                            }}
-                        />
-                    </Box>
-                )}
-
-                {selectedSeason && (
-                    <>
                         <Box mb="md">
-                            <Text size="sm" mb="xs">Home Team Filter</Text>
-                            <TextInput
-                                placeholder="e.g. Team A"
-                                value={homeTeamFilter}
-                                onChange={(e) => setHomeTeamFilter(e.currentTarget.value)}
+                            <Text weight={500} size="sm" mb="xs">Competition</Text>
+                            <Select
+                                placeholder="Select competition"
+                                data={competitions.map((c) => ({value: c.id, label: c.name}))}
+                                value={selectedCompetition}
+                                onChange={(val) => {
+                                    setSelectedCompetition(val);
+                                    setSelectedSeason(null);
+                                    setFixtures([]);
+                                    setFilteredFixtures([]);
+                                    setSelectedHomeTeam(null);
+                                    setSelectedAwayTeam(null);
+                                    setSelectedFixture(null);
+                                }}
+                                searchable
+                                clearable
+                                sx={{width: '100%'}}
                             />
                         </Box>
-                        <Box mb="md">
-                            <Text size="sm" mb="xs">Away Team Filter</Text>
-                            <TextInput
-                                placeholder="e.g. Team B"
-                                value={awayTeamFilter}
-                                onChange={(e) => setAwayTeamFilter(e.currentTarget.value)}
-                            />
-                        </Box>
-                        {filteredFixtures.length > 0 && (
+
+                        {selectedCompetition && (
                             <Box mb="md">
-                                <Text size="sm" mb="xs">Select a Fixture</Text>
+                                <Text weight={500} size="sm" mb="xs">Season</Text>
                                 <Select
-                                    placeholder="Choose a fixture"
-                                    data={filteredFixtures.map((f) => ({
-                                        value: f.id,
-                                        label: `${f.homeTeam} vs ${f.awayTeam} (${f.date})`
-                                    }))}
-                                    value={selectedFixture}
-                                    onChange={setSelectedFixture}
+                                    placeholder="Select season"
+                                    data={seasons.map((s) => ({value: s.id, label: s.year}))}
+                                    value={selectedSeason}
+                                    onChange={(val) => {
+                                        setSelectedSeason(val);
+                                        setFixtures([]);
+                                        setFilteredFixtures([]);
+                                        setSelectedHomeTeam(null);
+                                        setSelectedAwayTeam(null);
+                                        setSelectedFixture(null);
+                                    }}
+                                    searchable
+                                    clearable
+                                    sx={{width: '100%'}}
                                 />
                             </Box>
                         )}
 
-                        <Button onClick={handleAddToLog} disabled={!selectedFixture} fullWidth mt="md">
-                            Add Match
-                        </Button>
-                    </>
-                )}
-            </Paper>
+                        {selectedSeason && (
+                            <>
+                                <SimpleGrid cols={2} spacing="md" mb="md">
+                                    <Box>
+                                        <Text weight={500} size="sm" mb="xs">Home Team</Text>
+                                        <Select
+                                            placeholder="Select home team"
+                                            data={teams
+                                                .filter(team => team.id !== selectedAwayTeam)
+                                                .map((team) => ({
+                                                    value: team.id,
+                                                    label: team.name
+                                                }))}
+                                            value={selectedHomeTeam}
+                                            onChange={(value) => {
+                                                setSelectedHomeTeam(value);
+                                                setSelectedFixture(null);
+                                            }}
+                                            searchable
+                                            clearable
+                                            sx={{width: '100%'}}
+                                        />
+                                    </Box>
+                                    <Box>
+                                        <Text weight={500} size="sm" mb="xs">Away Team</Text>
+                                        <Select
+                                            placeholder="Select away team"
+                                            data={teams
+                                                .filter(team => team.id !== selectedHomeTeam)
+                                                .map((team) => ({
+                                                    value: team.id,
+                                                    label: team.name
+                                                }))}
+                                            value={selectedAwayTeam}
+                                            onChange={(value) => {
+                                                setSelectedAwayTeam(value);
+                                                setSelectedFixture(null);
+                                            }}
+                                            searchable
+                                            clearable
+                                            sx={{width: '100%'}}
+                                        />
+                                    </Box>
+                                </SimpleGrid>
 
-            {loggedFixtures.length === 0 && !loading ? (
-                <Notification title="No Logs Found" disallowClose>
-                    You have not logged any fixtures yet.
-                </Notification>
-            ) : (
-                <SimpleGrid
-                    cols={1}
-                    spacing="lg"
-                    breakpoints={[{ maxWidth: 'sm', cols: 1 }]}
-                >
-                    {loggedFixtures.map((fixture) => (
-                        <LoggedFixtureCard
-                            key={fixture.fixtureId}
-                            homeTeam={fixture.homeTeam}
-                            awayTeam={fixture.awayTeam}
-                            homeScore={fixture.homeScore}
-                            awayScore={fixture.awayScore}
-                            date={fixture.date}
-                            competitionName={fixture.competitionName}
-                            leaguePosition={fixture.leaguePosition}
-                            isVerified={fixture.isVerified}
-                            venue={fixture.venue}
-                            userTeam={fixture.userTeam}
-                            stage={fixture.stage}
-                            events={fixture.events} // Pass events here
-                        />
-                    ))}
-                </SimpleGrid>
-            )}
+                                {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
+                                    <Box mb="xl">
+                                        <Text weight={500} size="sm" mb="xs">Select Fixture</Text>
+                                        <Select
+                                            placeholder="Choose a fixture"
+                                            data={filteredFixtures.map((f) => ({
+                                                value: f.id,
+                                                label: `${f.homeTeam} vs ${f.awayTeam} (${new Date(f.date).toLocaleDateString()})`
+                                            }))}
+                                            value={selectedFixture}
+                                            onChange={setSelectedFixture}
+                                            searchable
+                                            clearable
+                                            sx={{width: '100%'}}
+                                        />
+                                        <Text color="dimmed" size="xs" mt="xs">
+                                            {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
+                                        </Text>
+                                    </Box>
+                                )}
+
+                                {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
+                                    <Text color="dimmed" size="sm" mb="xl" align="center">
+                                        No matches found between these teams
+                                    </Text>
+                                )}
+
+                                <Button
+                                    onClick={handleAddToLog}
+                                    disabled={!selectedFixture}
+                                    fullWidth
+                                    size="md"
+                                    sx={(theme) => ({
+                                        backgroundColor: theme.colors.blue[6],
+                                        '&:hover': {
+                                            backgroundColor: theme.colors.blue[7],
+                                        }
+                                    })}
+                                >
+                                    Add Match to Logs
+                                </Button>
+                            </>
+                        )}
+                    </Paper>
+                </Box>
+
+                <Box sx={{ marginLeft: 'auto', width: '50%', '@media (max-width: 992px)': { width: '100%', marginLeft: 0 } }}>
+                    {loggedFixtures.length === 0 && !loading ? (
+                        <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
+                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+                            textAlign: 'center'
+                        })}>
+                            <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
+                            <Text color="dimmed" size="sm">
+                                Start by adding your first match using the form on the left
+                            </Text>
+                        </Paper>
+                    ) : (
+                        <SimpleGrid
+                            cols={1}
+                            spacing="lg"
+                            sx={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
+                        >
+                            {loggedFixtures.map((fixture) => (
+                                <LoggedFixtureCard
+                                    key={fixture.fixtureId}
+                                    homeTeam={fixture.homeTeam}
+                                    awayTeam={fixture.awayTeam}
+                                    homeScore={fixture.homeScore}
+                                    awayScore={fixture.awayScore}
+                                    date={fixture.date}
+                                    competitionName={fixture.competitionName}
+                                    leaguePosition={fixture.leaguePosition}
+                                    isVerified={fixture.isVerified}
+                                    venue={fixture.venue}
+                                    userTeam={fixture.userTeam}
+                                    stage={fixture.stage}
+                                    events={fixture.events}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    )}
+                </Box>
+            </SimpleGrid>
         </Container>
     );
 }
