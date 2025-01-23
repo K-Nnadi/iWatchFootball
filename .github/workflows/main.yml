@@ -1,4 +1,4 @@
-name: FootyTrackr CI/CD
+name: I Watch Football CI/CD
 
 on:
   push:
