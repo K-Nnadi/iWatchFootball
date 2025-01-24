@@ -1,108 +1,97 @@
-import React from 'react';
-import { Box, Group, Paper, Title, Badge, Text } from '@mantine/core';
-import {FormationView} from "./formation";
+import React, { useState } from 'react';
+import { Box, Paper, Title, Tabs, Text } from '@mantine/core';
+import { FormationView } from "./formation";
+import { Lineup, MatchDetails, Player } from "./match.page";  // Verify import paths
 
-function TeamLineups({ matchDetails, status }) {
+interface TeamLineupsProps {
+    matchDetails: MatchDetails;
+    status: 'past' | 'today' | 'future';
+}
+
+export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }) => {
+    const isFuture = status === 'future';
+
+
     return (
         <Paper p="xl" radius="lg" withBorder mb="xl">
             <Title order={3} size="h4" mb="xl" align="center">Team Lineups</Title>
-            <Group align="flex-start" spacing={0} noWrap>
-                {/* Home Team */}
-                <Box sx={{ flex: 1, paddingRight: 40 }}>
-                    <Title order={4} size="h5" mb="xl" align="center">
+            <Tabs defaultValue={matchDetails.homeTeam}>
+                <Tabs.List>
+                    <Tabs.Tab value={matchDetails.homeTeam} name={matchDetails.homeTeam} >
                         {matchDetails.homeTeam}
-                    </Title>
-                    {status === 'future' ? (
-                        <>
-                            {matchDetails.homePredictedLineup && (
-                                <FormationView
-                                    lineup={matchDetails.homePredictedLineup}
-                                    isPredicted
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            {matchDetails.homeLineup && (
+                    </Tabs.Tab>
+                    <Tabs.Tab value={matchDetails.awayTeam} name={matchDetails.awayTeam} >
+                        {matchDetails.awayTeam}
+                    </Tabs.Tab>
+                </Tabs.List>
+
+                <Tabs.Panel value={matchDetails.homeTeam} pt="xs">
+                    <Box p="md">
+                        <Title order={4} size="h5" mb="xl" align="center">
+                            {matchDetails.homeTeam}
+                        </Title>
+                        {isFuture && matchDetails.homePredictedLineup ? (
+                            <FormationView
+                                lineup={matchDetails.homePredictedLineup}
+                                isPredicted={true}
+                            />
+                        ) : (
+                            matchDetails.homeLineup && (
                                 <FormationView
                                     lineup={matchDetails.homeLineup}
                                 />
-                            )}
-                        </>
-                    )}
-                    {matchDetails.homeLineup?.substitutes && status !== 'future' && (
-                        <Box mt="xl">
-                            <Text size="sm" weight={500} mb="xs" align="center">Substitutes</Text>
-                            <Group position="center" spacing={8}>
-                                {matchDetails.homeLineup.substitutes.map((player) => (
-                                    <Badge
-                                        key={player.id}
-                                        variant="dot"
-                                        color="gray"
-                                        size="lg"
-                                    >
-                                        {player.name}
-                                    </Badge>
-                                ))}
-                            </Group>
-                        </Box>
-                    )}
-                </Box>
+                            )
+                        )}
+                        {matchDetails.homeLineup?.substitutes && !isFuture && (
+                            <SubstitutesList substitutes={matchDetails.homeLineup.substitutes}/>
+                        )}
+                    </Box>
+                </Tabs.Panel>
 
-                {/* Central Divider */}
-                <Box
-                    sx={(theme) => ({
-                        width: 2,
-                        alignSelf: 'stretch',
-                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3],
-                        margin: '0 40px'
-                    })}
-                />
-
-                {/* Away Team */}
-                <Box sx={{ flex: 1, paddingLeft: 40 }}>
-                    <Title order={4} size="h5" mb="xl" align="center">
-                        {matchDetails.awayTeam}
-                    </Title>
-                    {status === 'future' ? (
-                        <>
-                            {matchDetails.awayPredictedLineup && (
-                                <FormationView
-                                    lineup={matchDetails.awayPredictedLineup}
-                                    isPredicted
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            {matchDetails.awayLineup && (
+                <Tabs.Panel value={matchDetails.awayTeam} pt="xs">
+                    <Box p="md">
+                        <Title order={4} size="h5" mb="xl" align="center">
+                            {matchDetails.awayTeam}
+                        </Title>
+                        {isFuture && matchDetails.awayPredictedLineup ? (
+                            <FormationView
+                                lineup={matchDetails.awayPredictedLineup}
+                                isPredicted={true}
+                            />
+                        ) : (
+                            matchDetails.awayLineup && (
                                 <FormationView
                                     lineup={matchDetails.awayLineup}
                                 />
-                            )}
-                        </>
-                    )}
-                    {matchDetails.awayLineup?.substitutes && status !== 'future' && (
-                        <Box mt="xl">
-                            <Text size="sm" weight={500} mb="xs" align="center">Substitutes</Text>
-                            <Group position="center" spacing={8}>
-                                {matchDetails.awayLineup.substitutes.map((player) => (
-                                    <Badge
-                                        key={player.id}
-                                        variant="dot"
-                                        color="gray"
-                                        size="lg"
-                                    >
-                                        {player.name}
-                                    </Badge>
-                                ))}
-                            </Group>
-                        </Box>
-                    )}
-                </Box>
-            </Group>
+                            )
+                        )}
+                        {matchDetails.awayLineup?.substitutes && !isFuture && (
+                            <SubstitutesList substitutes={matchDetails.awayLineup.substitutes}/>
+                        )}
+                    </Box>
+                </Tabs.Panel>
+            </Tabs>
         </Paper>
     );
 }
+
+interface SubstitutesListProps {
+    substitutes?: Player[];
+}
+
+function SubstitutesList({ substitutes }: SubstitutesListProps) {
+    return (
+        <Box mt="xl">
+            <Title size="sm" weight={500} mb="xs" align="center">Substitutes</Title>
+            {substitutes ? substitutes.map(substitute => (
+                <Text key={substitute.id} size="sm" style={{ margin: '4px' }}>
+                    {substitute.name}
+                </Text>
+            )) : (
+                <Text size="sm" style={{ margin: '4px' }}>No substitutes listed.</Text>
+            )}
+        </Box>
+    );
+};
 
 export default TeamLineups;
