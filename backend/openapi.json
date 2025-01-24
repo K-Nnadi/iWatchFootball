@@ -8642,12 +8642,16 @@
           "email": {
             "type": "string"
           },
+          "userName": {
+            "type": "string"
+          },
           "password": {
             "type": "string"
           }
         },
         "required": [
           "email",
+          "userName",
           "password"
         ]
       },

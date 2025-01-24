@@ -13,7 +13,7 @@ import {CompetitionPage} from "./pages/competition.page";
 import {CheckoutPage} from "./pages/checkout.page";
 import {ThankYouPage} from "./pages/thankYou.page";
 import {SeatSelectionPage} from "./pages/seatSelection.page";
-import {MatchPage} from "./pages/match.page";
+import {MatchPage} from "./pages/match/match.page";
 import {LandingPage} from "./pages/landing.page";
 
 export type ElementMap = {

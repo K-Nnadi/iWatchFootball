@@ -11,20 +11,21 @@ import {
     SimpleGrid
 } from '@mantine/core';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import TeamLineups from "./teamLineup";
 
-interface Player {
+export interface Player {
     id: string;
     name: string;
     position: string; // 'GK', 'DF', 'MF', 'FW'
 }
 
-interface Lineup {
+export interface Lineup {
     formation: string; // e.g. '4-3-3'
     players: Player[]; // 11 players in starting lineup
     substitutes?: Player[];
 }
 
-interface MatchDetails {
+export interface MatchDetails {
     matchId: string;
     homeTeam: string;
     awayTeam: string;
@@ -53,135 +54,6 @@ function getMatchStatus(matchDateStr: string): 'past' | 'today' | 'future' {
     }
 }
 
-/** Helper to arrange players in rows based on formation: e.g. 4-3-3 */
-function arrangePlayersByFormation(players: Player[], formation: string) {
-    const [defenders, midfielders, forwards] = formation.split('-').map(Number);
-    const gk = players.filter((p) => p.position === 'GK');
-    const df = players.filter((p) => p.position === 'DF');
-    const mf = players.filter((p) => p.position === 'MF');
-    const fw = players.filter((p) => p.position === 'FW');
-
-    return {
-        gk: gk.slice(0, 1),
-        defenders: df.slice(0, defenders),
-        midfielders: mf.slice(0, midfielders),
-        forwards: fw.slice(0, forwards),
-    };
-}
-
-/** Displays a formation (GK, DF, MF, FW) in rows */
-function FormationView({ lineup, isPredicted }: { lineup: Lineup; isPredicted?: boolean }) {
-    const arranged = arrangePlayersByFormation(lineup.players, lineup.formation);
-
-    return (
-        <Box>
-            <Paper 
-                p="md" 
-                radius="md" 
-                sx={(theme) => ({
-                    backgroundColor: theme.colorScheme === 'dark' 
-                        ? theme.fn.rgba(theme.colors.dark[8], 0.5) 
-                        : theme.fn.rgba(theme.colors.gray[1], 0.7),
-                    border: isPredicted ? `1px dashed ${theme.colors.gray[5]}` : undefined
-                })}
-            >
-                <Group position="apart" mb="md">
-                    <Text 
-                        color="dimmed" 
-                        size="sm" 
-                        sx={(theme) => ({
-                            fontFamily: theme.fontFamilyMonospace,
-                            letterSpacing: 1
-                        })}
-                    >
-                        {isPredicted ? 'Predicted Formation' : 'Formation'}: {lineup.formation}
-                    </Text>
-                    {isPredicted && (
-                        <Badge variant="dot" color="yellow">Predicted</Badge>
-                    )}
-                </Group>
-
-                <Box 
-                    sx={(theme) => ({
-                        background: theme.fn.linearGradient(180, 
-                            theme.colorScheme === 'dark' 
-                                ? theme.colors.dark[8] 
-                                : theme.colors.gray[1],
-                            'transparent'
-                        ),
-                        borderRadius: theme.radius.sm,
-                        padding: theme.spacing.md
-                    })}
-                >
-                    <Box mb={40}>
-                        <Group position="center">
-                            {arranged.gk.map((player) => (
-                                <Badge 
-                                    key={player.id} 
-                                    variant="filled" 
-                                    color="teal"
-                                    size="lg"
-                                    sx={{ minWidth: 120, textAlign: 'center' }}
-                                >
-                                    {player.name}
-                                </Badge>
-                            ))}
-                        </Group>
-                    </Box>
-
-                    <Box mb={40}>
-                        <Group position="center" spacing={20}>
-                            {arranged.defenders.map((player) => (
-                                <Badge 
-                                    key={player.id} 
-                                    variant="filled" 
-                                    color="blue"
-                                    size="lg"
-                                    sx={{ minWidth: 120, textAlign: 'center' }}
-                                >
-                                    {player.name}
-                                </Badge>
-                            ))}
-                        </Group>
-                    </Box>
-
-                    <Box mb={40}>
-                        <Group position="center" spacing={20}>
-                            {arranged.midfielders.map((player) => (
-                                <Badge 
-                                    key={player.id} 
-                                    variant="filled" 
-                                    color="violet"
-                                    size="lg"
-                                    sx={{ minWidth: 120, textAlign: 'center' }}
-                                >
-                                    {player.name}
-                                </Badge>
-                            ))}
-                        </Group>
-                    </Box>
-
-                    <Box>
-                        <Group position="center" spacing={20}>
-                            {arranged.forwards.map((player) => (
-                                <Badge 
-                                    key={player.id} 
-                                    variant="filled" 
-                                    color="red"
-                                    size="lg"
-                                    sx={{ minWidth: 120, textAlign: 'center' }}
-                                >
-                                    {player.name}
-                                </Badge>
-                            ))}
-                        </Group>
-                    </Box>
-                </Box>
-            </Paper>
-        </Box>
-    );
-}
-
 /** Mock function returning last 5 games form for a team. (W, D, L) */
 function getTeamForm(teamName: string): ('W'|'D'|'L')[] {
     const outcomes = ['W', 'D', 'L'];
@@ -203,7 +75,7 @@ export function MatchPage() {
         matchId: matchId || '1',
         homeTeam: 'Liverpool',
         awayTeam: 'Manchester City',
-        date: '2025-01-21T15:00:00Z', // Set to tomorrow for testing
+        date: '2025-01-24T15:00:00Z', // Set to tomorrow for testing
         venue: 'Anfield',
         homeLineup: {
             formation: '4-3-3',
@@ -321,8 +193,8 @@ export function MatchPage() {
                         <Title order={2} mb="md">{matchDetails.homeTeam}</Title>
                         <Group position="right" spacing={8}>
                             {homeForm.map((result, i) => (
-                                <Badge 
-                                    key={i} 
+                                <Badge
+                                    key={i}
                                     color={result === 'W' ? 'green' : result === 'D' ? 'yellow' : 'red'}
                                     size="lg"
                                 >
@@ -332,7 +204,7 @@ export function MatchPage() {
                         </Group>
                     </Box>
 
-                    <Box 
+                    <Box
                         sx={(theme) => ({
                             textAlign: 'center',
                             padding: '0 40px',
@@ -352,10 +224,10 @@ export function MatchPage() {
                         </Text>
                         <Text size="xl" weight={700} mb="xs">VS</Text>
                         <Text size="sm" color="dimmed">{matchDetails.venue}</Text>
-                        <Button 
-                            variant="light" 
-                            color="blue" 
-                            size="sm" 
+                        <Button
+                            variant="light"
+                            color="blue"
+                            size="sm"
                             mt="md"
                             onClick={handleViewTickets}
                         >
@@ -367,8 +239,8 @@ export function MatchPage() {
                         <Title order={2} mb="md">{matchDetails.awayTeam}</Title>
                         <Group position="left" spacing={8}>
                             {awayForm.map((result, i) => (
-                                <Badge 
-                                    key={i} 
+                                <Badge
+                                    key={i}
                                     color={result === 'W' ? 'green' : result === 'D' ? 'yellow' : 'red'}
                                     size="lg"
                                 >
@@ -440,104 +312,7 @@ export function MatchPage() {
             )}
 
             {/* Team Lineups */}
-            <Paper p="xl" radius="lg" withBorder mb="xl">
-                <Title order={3} size="h4" mb="xl" align="center">Team Lineups</Title>
-                <Group align="flex-start" spacing={0} noWrap>
-                    {/* Home Team */}
-                    <Box sx={{ flex: 1, paddingRight: 40 }}>
-                        <Title order={4} size="h5" mb="xl" align="center">
-                            {matchDetails.homeTeam}
-                        </Title>
-                        {status === 'future' ? (
-                            <>
-                                {matchDetails.homePredictedLineup && (
-                                    <FormationView 
-                                        lineup={matchDetails.homePredictedLineup} 
-                                        isPredicted 
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                {matchDetails.homeLineup && (
-                                    <FormationView 
-                                        lineup={matchDetails.homeLineup}
-                                    />
-                                )}
-                            </>
-                        )}
-                        {matchDetails.homeLineup?.substitutes && status !== 'future' && (
-                            <Box mt="xl">
-                                <Text size="sm" weight={500} mb="xs" align="center">Substitutes</Text>
-                                <Group position="center" spacing={8}>
-                                    {matchDetails.homeLineup.substitutes.map((player) => (
-                                        <Badge 
-                                            key={player.id} 
-                                            variant="dot" 
-                                            color="gray"
-                                            size="lg"
-                                        >
-                                            {player.name}
-                                        </Badge>
-                                    ))}
-                                </Group>
-                            </Box>
-                        )}
-                    </Box>
-
-                    {/* Central Divider */}
-                    <Box 
-                        sx={(theme) => ({
-                            width: 2,
-                            alignSelf: 'stretch',
-                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3],
-                            margin: '0 40px'
-                        })}
-                    />
-
-                    {/* Away Team */}
-                    <Box sx={{ flex: 1, paddingLeft: 40 }}>
-                        <Title order={4} size="h5" mb="xl" align="center">
-                            {matchDetails.awayTeam}
-                        </Title>
-                        {status === 'future' ? (
-                            <>
-                                {matchDetails.awayPredictedLineup && (
-                                    <FormationView 
-                                        lineup={matchDetails.awayPredictedLineup} 
-                                        isPredicted 
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                {matchDetails.awayLineup && (
-                                    <FormationView 
-                                        lineup={matchDetails.awayLineup}
-                                    />
-                                )}
-                            </>
-                        )}
-                        {matchDetails.awayLineup?.substitutes && status !== 'future' && (
-                            <Box mt="xl">
-                                <Text size="sm" weight={500} mb="xs" align="center">Substitutes</Text>
-                                <Group position="center" spacing={8}>
-                                    {matchDetails.awayLineup.substitutes.map((player) => (
-                                        <Badge 
-                                            key={player.id} 
-                                            variant="dot" 
-                                            color="gray"
-                                            size="lg"
-                                        >
-                                            {player.name}
-                                        </Badge>
-                                    ))}
-                                </Group>
-                            </Box>
-                        )}
-                    </Box>
-                </Group>
-            </Paper>
+                <TeamLineups matchDetails={matchDetails} status={status} />
         </Container>
     );
 }
