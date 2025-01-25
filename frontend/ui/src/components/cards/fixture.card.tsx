@@ -1,42 +1,32 @@
-import { useState } from 'react';
-import { Card, Text, Badge, Group, Box, Divider, Button, Modal, SimpleGrid, Stack, useMantineTheme, Paper } from '@mantine/core';
-import { IconCheck, IconCalendar, IconTrophy, IconFlag, IconMapPin } from '@tabler/icons-react';
+import {Badge, Box, Button, Card, Group, Modal, Paper, SimpleGrid, Stack, Text, useMantineTheme} from '@mantine/core';
+import {
+    IconAlertTriangle,
+    IconArrowBackUp,
+    IconBallFootball,
+    IconCalendar,
+    IconCheck,
+    IconFlag,
+    IconMapPin,
+    IconTrophy
+} from '@tabler/icons-react';
+import React, {useState} from "react";
 
-interface MatchEvent {
-    time: number;
-    description: string;
-    team: 'home' | 'away';
+
+// Define a function to select the icon based on the event type
+function eventIcon(type: string) {
+    switch (type) {
+        case 'goal':
+            return <IconBallFootball size={14} style={{ color: 'green' }} />;
+        case 'card':
+            return <IconAlertTriangle size={14} style={{ color: 'red' }} />;
+        case 'substitution':
+            return <IconArrowBackUp size={14} style={{ color: 'blue' }} />;
+        default:
+            return <IconFlag size={14} />;
+    }
 }
 
-interface LoggedFixtureProps {
-    homeTeam: string;
-    awayTeam: string;
-    homeScore: number;
-    awayScore: number;
-    date: string;
-    competitionName: string;
-    leaguePosition?: number;
-    isVerified: boolean;
-    venue?: string;
-    userTeam?: 'home' | 'away';
-    stage: string;
-    events?: MatchEvent[];
-}
-
-export function LoggedFixtureCard({
-    homeTeam,
-    awayTeam,
-    homeScore,
-    awayScore,
-    date,
-    competitionName,
-    leaguePosition,
-    isVerified,
-    venue,
-    userTeam,
-    stage,
-    events
-}: LoggedFixtureProps) {
+export function LoggedFixtureCard({ homeTeam, awayTeam, homeScore, awayScore, date, competitionName, leaguePosition, isVerified, venue, userTeam, stage, events }: LoggedFixtureProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const theme = useMantineTheme();
     const userTeamName = userTeam === 'home' ? homeTeam : awayTeam;
@@ -71,9 +61,9 @@ export function LoggedFixtureCard({
                         </Text>
                     </Box>
                     {isVerified && (
-                        <Badge 
-                            color="green" 
-                            variant="light" 
+                        <Badge
+                            color="green"
+                            variant="light"
                             leftSection={<IconCheck size={14} />}
                             sx={{ minWidth: 85 }}
                         >
@@ -89,7 +79,7 @@ export function LoggedFixtureCard({
                     <Stack align="center" spacing={4}>
                         <Group position="center" spacing={48}>
                             <Text weight={600} size="lg" align="right" sx={{ minWidth: 120 }}>{homeTeam}</Text>
-                            <Box sx={{ 
+                            <Box sx={{
                                 minWidth: 90,
                                 textAlign: 'center',
                                 padding: '4px 12px',
@@ -113,7 +103,7 @@ export function LoggedFixtureCard({
                             <Text size="sm">{venue}</Text>
                         </Group>
                     )}
-                    
+
                     {leaguePosition !== undefined && (
                         <Group spacing="xs" sx={{ color: theme.colors.gray[6] }}>
                             <IconTrophy size={16} />
@@ -133,10 +123,10 @@ export function LoggedFixtureCard({
 
                 {/* Events Button */}
                 {events && events.length > 0 && (
-                    <Button 
-                        variant="light" 
-                        color="blue" 
-                        size="sm" 
+                    <Button
+                        variant="light"
+                        color="blue"
+                        size="sm"
                         onClick={() => setModalOpen(true)}
                         fullWidth
                         mt="md"
@@ -167,7 +157,7 @@ export function LoggedFixtureCard({
                                 homeEvents.map((e, index) => (
                                     <Group key={index} spacing="xs" noWrap>
                                         <Text weight={600} size="sm" sx={{ minWidth: 35 }}>
-                                            {e.time}'
+                                            {e.time}' {eventIcon(e.type)}
                                         </Text>
                                         <Text size="sm">{e.description}</Text>
                                     </Group>
@@ -187,7 +177,7 @@ export function LoggedFixtureCard({
                                     <Group key={index} spacing="xs" position="right" noWrap>
                                         <Text size="sm">{e.description}</Text>
                                         <Text weight={600} size="sm" sx={{ minWidth: 35 }}>
-                                            {e.time}'
+                                            {e.time}' {eventIcon(e.type)}
                                         </Text>
                                     </Group>
                                 ))

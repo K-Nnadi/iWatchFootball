@@ -1,22 +1,16 @@
-import {
-    useState,
-    useEffect,
-    FormEvent
-} from 'react';
+import {FormEvent, useEffect, useState} from 'react';
 import {
     Box,
     Button,
     Container,
-    Title,
-    Text,
-    Paper,
-    Select,
-    TextInput,
     LoadingOverlay,
     Notification,
-    SimpleGrid
+    Paper,
+    Select,
+    SimpleGrid,
+    Text,
+    Title
 } from '@mantine/core';
-import {ErrorMessage} from '../shared/errorMessage';
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 
 interface Competition {
@@ -39,10 +33,11 @@ interface Fixture {
     venue: string;
 }
 
-interface MatchEvent {
+export interface MatchEvent {
     time: number;
     description: string;
     team: 'home' | 'away';
+    type: 'goal' | 'card' | 'substitution';
 }
 
 interface UserGame {
@@ -170,7 +165,7 @@ export function LogsPage() {
 
     useEffect(() => {
         setLoading(true);
-        // Mock logged fixtures with events
+        // Mock logged fixtures with detailed events including type
         const mockLoggedFixtures: UserGame[] = [
             {
                 fixtureId: 'fix1',
@@ -186,10 +181,10 @@ export function LogsPage() {
                 userTeam: 'home',
                 stage: 'League Game',
                 events: [
-                    {time: 10, description: 'Goal by Team A striker', team: 'home'},
-                    {time: 45, description: 'Yellow card for Team B defender', team: 'away'},
-                    {time: 60, description: 'Substitution: Team A midfielder off, new midfielder on', team: 'home'},
-                    {time: 75, description: 'Goal by Team B winger', team: 'away'}
+                    { time: 10, description: 'Goal by Team A striker', team: 'home', type: 'goal' },
+                    { time: 45, description: 'Yellow card for Team B defender', team: 'away', type: 'card' },
+                    { time: 60, description: 'Substitution: Team A midfielder off, new midfielder on', team: 'home', type: 'substitution' },
+                    { time: 75, description: 'Goal by Team B winger', team: 'away', type: 'goal' }
                 ]
             },
             {
@@ -206,9 +201,9 @@ export function LogsPage() {
                 userTeam: 'away',
                 stage: 'Semi-Finals',
                 events: [
-                    {time: 5, description: 'Kick-off', team: 'home'},
-                    {time: 30, description: 'Team D missed penalty', team: 'away'},
-                    {time: 90, description: 'Final whistle', team: 'home'}
+                    { time: 5, description: 'Kick-off', team: 'home', type: 'other' },
+                    { time: 30, description: 'Team D missed penalty', team: 'away', type: 'penalty' },
+                    { time: 90, description: 'Final whistle', team: 'home', type: 'other' }
                 ]
             }
         ];
@@ -236,12 +231,13 @@ export function LogsPage() {
                 throw new Error('Fixture not found');
             }
 
+            // Creating a new log with detailed events including the type
             const newLog: UserGame = {
                 fixtureId: addedFixture.id,
                 homeTeam: addedFixture.homeTeam,
                 awayTeam: addedFixture.awayTeam,
-                homeScore: 2,
-                awayScore: 1,
+                homeScore: 2, // Mock score, consider making this dynamic if necessary
+                awayScore: 1, // Mock score
                 date: addedFixture.date,
                 competitionName: competitions.find((c) => c.id === addedFixture.competitionId)?.name || 'Unknown',
                 leaguePosition: Math.floor(Math.random() * 10) + 1,
@@ -250,8 +246,9 @@ export function LogsPage() {
                 userTeam: 'home',
                 stage: 'League Game',
                 events: [
-                    {time: 10, description: 'Goal by home team player', team: 'home'},
-                    {time: 30, description: 'Yellow card for away team', team: 'away'}
+                    {time: 10, description: 'Goal by home team player', team: 'home', type: 'goal'},
+                    {time: 30, description: 'Yellow card for away team', team: 'away', type: 'card'},
+                    {time: 45, description: 'Substitution: Home team midfielder off, new midfielder on', team: 'home', type: 'substitution'}
                 ]
             };
 
@@ -259,6 +256,7 @@ export function LogsPage() {
             setLoading(false);
             setSuccessMessage('Match successfully added to your logs!');
 
+            // Reset all selection fields after successfully logging a game
             setSelectedCompetition(null);
             setSelectedSeason(null);
             setFixtures([]);
@@ -274,6 +272,24 @@ export function LogsPage() {
     };
 
     const [selectedFixture, setSelectedFixture] = useState<string | null>(null);
+
+    const [showTopButton, setShowTopButton] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 300) {  // Show button when scrolled more than 300px
+                setShowTopButton(true);
+            } else {
+                setShowTopButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     return (
         <Container size="xl" my={40}>
@@ -311,7 +327,7 @@ export function LogsPage() {
             )}
 
             <SimpleGrid cols={2} spacing="xl" breakpoints={[{maxWidth: 'md', cols: 1}]}>
-                <Box sx={{ position: 'fixed', width: 'calc(50% - 40px)', maxWidth: '600px' }}>
+                <Box sx={{ position: 'sticky', top:20, width: 'calc(50% - 40px)', maxWidth: '600px' }}>
                     <Paper p="xl" radius="lg" shadow="md" withBorder sx={(theme) => ({
                         backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
                         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -501,6 +517,19 @@ export function LogsPage() {
                         </SimpleGrid>
                     )}
                 </Box>
+                <Button
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    style={{
+                        display: showTopButton ? 'block' : 'none',
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        zIndex: 1000
+                    }}
+                >
+                    Go to Top
+                </Button>
+
             </SimpleGrid>
         </Container>
     );
