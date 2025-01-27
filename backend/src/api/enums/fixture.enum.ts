@@ -4,7 +4,7 @@ export enum FixtureStatus {
     CANCELLED = 'Cancelled',
     POSTPONED = 'Postponed',
     SUSPENDED = 'Suspended',
-    IN_PLAY = 'In Play'
+    LIVE = 'Live'
 }
 export enum FixtureStage {
     FINAL = 'Final',
