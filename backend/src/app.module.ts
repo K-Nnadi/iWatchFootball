@@ -25,7 +25,7 @@ import {SeasonModule} from "./api/modules/season/season.module";
 import {ManagerModule} from "./api/modules/manager/manager.module";
 import {PlayerLineUpModule} from "./api/modules/playerLineUp/playerLineUp.module";
 import {PredictionModule} from "./api/modules/prediction/prediction.module";
-import {AuthModule} from "./api/complexModules/auth.controller";
+import {AuthModule} from "./api/complexControllers/auth.controller";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
 

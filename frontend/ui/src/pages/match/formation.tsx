@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Box, Paper, Text, Grid } from "@mantine/core";
+import {Avatar, Box, Paper, Text, Grid, Stack} from "@mantine/core";
 import { Lineup, Player } from "./match.page"; // Verify import path
 
 interface FormationViewProps {
@@ -73,10 +73,10 @@ function renderPlayerGroup(players: Player[], span: number) {
                 maxWidth: '120px',
                 textAlign: 'center'
             }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <Stack align="center">
                     <Avatar src={`/path/to/player/image/${player.id}.jpg`} alt={player.name} size="lg" >{player.number}</Avatar>
-                    <Text size="sm" weight={500} mt="xs" align="center">{player.name}</Text>
-                </Box>
+                    <Text size="sm" weight={500} mt="xs" >{player.name}</Text>
+                </Stack>
 
             </Box>
         </Grid.Col>

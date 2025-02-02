@@ -2,10 +2,10 @@ import {FormEvent, useEffect, useState} from 'react';
 import {
     Box,
     Button,
-    Container,
+    Container, Grid,
     LoadingOverlay,
     Notification,
-    Paper,
+    Paper, ScrollArea,
     Select,
     SimpleGrid,
     Text,
@@ -124,7 +124,7 @@ export function LogsPage() {
             setLoading(true);
             const homeTeamName = teams.find(t => t.id === selectedHomeTeam)?.name;
             const awayTeamName = teams.find(t => t.id === selectedAwayTeam)?.name;
-            
+
             const mockFixtures: Fixture[] = [
                 {
                     id: 'fix1',
@@ -154,8 +154,8 @@ export function LogsPage() {
         let updated = fixtures;
         if (selectedHomeTeam && selectedAwayTeam) {
             // Only show fixtures where the selected teams played against each other
-            updated = updated.filter((f) => 
-                teams.find(t => t.id === selectedHomeTeam)?.name === f.homeTeam && 
+            updated = updated.filter((f) =>
+                teams.find(t => t.id === selectedHomeTeam)?.name === f.homeTeam &&
                 teams.find(t => t.id === selectedAwayTeam)?.name === f.awayTeam
             );
         }
@@ -292,90 +292,69 @@ export function LogsPage() {
     }, []);
 
     return (
-        <Container size="xl" my={40}>
-            <LoadingOverlay visible={loading} overlayBlur={2}/>
+        <Container>
+            <Grid size="xl" my={40}>
+                <LoadingOverlay visible={loading} overlayBlur={2}/>
+                <Grid.Col span={6}>
 
-            <Box mb={40}>
-                <Title order={2} mb="xs" sx={(theme) => ({
-                    color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
-                    fontSize: '2rem',
-                    fontWeight: 600
-                })}>
-                    My Logged Games
-                </Title>
-                <Text color="dimmed" size="sm">
-                    Track and manage your match history across different competitions
-                </Text>
-            </Box>
-
-            {error && (
-                <Notification title="Error" color="red" onClose={() => setError(null)} mb="lg" sx={{borderRadius: 8}}>
-                    {error}
-                </Notification>
-            )}
-
-            {successMessage && (
-                <Notification
-                    title="Success"
-                    color="green"
-                    onClose={() => setSuccessMessage(null)}
-                    mb="lg"
-                    sx={{borderRadius: 8}}
-                >
-                    {successMessage}
-                </Notification>
-            )}
-
-            <SimpleGrid cols={2} spacing="xl" breakpoints={[{maxWidth: 'md', cols: 1}]}>
-                <Box sx={{ position: 'sticky', top:20, width: 'calc(50% - 40px)', maxWidth: '600px' }}>
-                    <Paper p="xl" radius="lg" shadow="md" withBorder sx={(theme) => ({
-                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                        '&:hover': {
-                            transform: 'translateY(-2px)',
-                            boxShadow: theme.shadows.lg
-                        }
-                    })}>
-                        <Title order={3} mb="md" sx={(theme) => ({
+                    <Box mb={40}>
+                        <Title order={2} mb="xs" sx={(theme) => ({
                             color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
-                            fontSize: '1.5rem',
+                            fontSize: '2rem',
                             fontWeight: 600
-                        })}>Add New Match</Title>
-
-                        <Text color="dimmed" size="sm" mb="xl">
-                            Search for a fixture by selecting competition, season, and filtering teams
+                        })}>
+                            My Logged Games
+                        </Title>
+                        <Text color="dimmed" size="sm">
+                            Track and manage your match history across different competitions
                         </Text>
+                    </Box>
 
-                        <Box mb="md">
-                            <Text weight={500} size="sm" mb="xs">Competition</Text>
-                            <Select
-                                placeholder="Select competition"
-                                data={competitions.map((c) => ({value: c.id, label: c.name}))}
-                                value={selectedCompetition}
-                                onChange={(val) => {
-                                    setSelectedCompetition(val);
-                                    setSelectedSeason(null);
-                                    setFixtures([]);
-                                    setFilteredFixtures([]);
-                                    setSelectedHomeTeam(null);
-                                    setSelectedAwayTeam(null);
-                                    setSelectedFixture(null);
-                                }}
-                                searchable
-                                clearable
-                                sx={{width: '100%'}}
-                            />
-                        </Box>
+                    {error && (
+                        <Notification title="Error" color="red" onClose={() => setError(null)} mb="lg" sx={{borderRadius: 8}}>
+                            {error}
+                        </Notification>
+                    )}
 
-                        {selectedCompetition && (
+                    {successMessage && (
+                        <Notification
+                            title="Success"
+                            color="green"
+                            onClose={() => setSuccessMessage(null)}
+                            mb="lg"
+                            sx={{borderRadius: 8}}
+                        >
+                            {successMessage}
+                        </Notification>
+                    )}
+                    <Box sx={{ position: 'sticky', top:20, width: 'calc(50% - 40px)', maxWidth: '600px' }}>
+                        <Paper p="xl" radius="lg" shadow="md" withBorder sx={(theme) => ({
+                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                            '&:hover': {
+                                transform: 'translateY(-2px)',
+                                boxShadow: theme.shadows.lg
+                            }
+                        })}>
+                            <Title order={3} mb="md" sx={(theme) => ({
+                                color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
+                                fontSize: '1.5rem',
+                                fontWeight: 600
+                            })}>Add New Match</Title>
+
+                            <Text color="dimmed" size="sm" mb="xl">
+                                Search for a fixture by selecting competition, season, and filtering teams
+                            </Text>
+
                             <Box mb="md">
-                                <Text weight={500} size="sm" mb="xs">Season</Text>
+                                <Text weight={500} size="sm" mb="xs">Competition</Text>
                                 <Select
-                                    placeholder="Select season"
-                                    data={seasons.map((s) => ({value: s.id, label: s.year}))}
-                                    value={selectedSeason}
+                                    placeholder="Select competition"
+                                    data={competitions.map((c) => ({value: c.id, label: c.name}))}
+                                    value={selectedCompetition}
                                     onChange={(val) => {
-                                        setSelectedSeason(val);
+                                        setSelectedCompetition(val);
+                                        setSelectedSeason(null);
                                         setFixtures([]);
                                         setFilteredFixtures([]);
                                         setSelectedHomeTeam(null);
@@ -387,150 +366,174 @@ export function LogsPage() {
                                     sx={{width: '100%'}}
                                 />
                             </Box>
-                        )}
 
-                        {selectedSeason && (
-                            <>
-                                <SimpleGrid cols={2} spacing="md" mb="md">
-                                    <Box>
-                                        <Text weight={500} size="sm" mb="xs">Home Team</Text>
-                                        <Select
-                                            placeholder="Select home team"
-                                            data={teams
-                                                .filter(team => team.id !== selectedAwayTeam)
-                                                .map((team) => ({
-                                                    value: team.id,
-                                                    label: team.name
-                                                }))}
-                                            value={selectedHomeTeam}
-                                            onChange={(value) => {
-                                                setSelectedHomeTeam(value);
-                                                setSelectedFixture(null);
-                                            }}
-                                            searchable
-                                            clearable
-                                            sx={{width: '100%'}}
-                                        />
-                                    </Box>
-                                    <Box>
-                                        <Text weight={500} size="sm" mb="xs">Away Team</Text>
-                                        <Select
-                                            placeholder="Select away team"
-                                            data={teams
-                                                .filter(team => team.id !== selectedHomeTeam)
-                                                .map((team) => ({
-                                                    value: team.id,
-                                                    label: team.name
-                                                }))}
-                                            value={selectedAwayTeam}
-                                            onChange={(value) => {
-                                                setSelectedAwayTeam(value);
-                                                setSelectedFixture(null);
-                                            }}
-                                            searchable
-                                            clearable
-                                            sx={{width: '100%'}}
-                                        />
-                                    </Box>
-                                </SimpleGrid>
+                            {selectedCompetition && (
+                                <Box mb="md">
+                                    <Text weight={500} size="sm" mb="xs">Season</Text>
+                                    <Select
+                                        placeholder="Select season"
+                                        data={seasons.map((s) => ({value: s.id, label: s.year}))}
+                                        value={selectedSeason}
+                                        onChange={(val) => {
+                                            setSelectedSeason(val);
+                                            setFixtures([]);
+                                            setFilteredFixtures([]);
+                                            setSelectedHomeTeam(null);
+                                            setSelectedAwayTeam(null);
+                                            setSelectedFixture(null);
+                                        }}
+                                        searchable
+                                        clearable
+                                        sx={{width: '100%'}}
+                                    />
+                                </Box>
+                            )}
 
-                                {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
-                                    <Box mb="xl">
-                                        <Text weight={500} size="sm" mb="xs">Select Fixture</Text>
-                                        <Select
-                                            placeholder="Choose a fixture"
-                                            data={filteredFixtures.map((f) => ({
-                                                value: f.id,
-                                                label: `${f.homeTeam} vs ${f.awayTeam} (${new Date(f.date).toLocaleDateString()})`
-                                            }))}
-                                            value={selectedFixture}
-                                            onChange={setSelectedFixture}
-                                            searchable
-                                            clearable
-                                            sx={{width: '100%'}}
-                                        />
-                                        <Text color="dimmed" size="xs" mt="xs">
-                                            {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
+                            {selectedSeason && (
+                                <>
+                                    <SimpleGrid cols={2} spacing="md" mb="md">
+                                        <Box>
+                                            <Text weight={500} size="sm" mb="xs">Home Team</Text>
+                                            <Select
+                                                placeholder="Select home team"
+                                                data={teams
+                                                    .filter(team => team.id !== selectedAwayTeam)
+                                                    .map((team) => ({
+                                                        value: team.id,
+                                                        label: team.name
+                                                    }))}
+                                                value={selectedHomeTeam}
+                                                onChange={(value) => {
+                                                    setSelectedHomeTeam(value);
+                                                    setSelectedFixture(null);
+                                                }}
+                                                searchable
+                                                clearable
+                                                sx={{width: '100%'}}
+                                            />
+                                        </Box>
+                                        <Box>
+                                            <Text weight={500} size="sm" mb="xs">Away Team</Text>
+                                            <Select
+                                                placeholder="Select away team"
+                                                data={teams
+                                                    .filter(team => team.id !== selectedHomeTeam)
+                                                    .map((team) => ({
+                                                        value: team.id,
+                                                        label: team.name
+                                                    }))}
+                                                value={selectedAwayTeam}
+                                                onChange={(value) => {
+                                                    setSelectedAwayTeam(value);
+                                                    setSelectedFixture(null);
+                                                }}
+                                                searchable
+                                                clearable
+                                                sx={{width: '100%'}}
+                                            />
+                                        </Box>
+                                    </SimpleGrid>
+
+                                    {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
+                                        <Box mb="xl">
+                                            <Text weight={500} size="sm" mb="xs">Select Fixture</Text>
+                                            <Select
+                                                placeholder="Choose a fixture"
+                                                data={filteredFixtures.map((f) => ({
+                                                    value: f.id,
+                                                    label: `${f.homeTeam} vs ${f.awayTeam} (${new Date(f.date).toLocaleDateString()})`
+                                                }))}
+                                                value={selectedFixture}
+                                                onChange={setSelectedFixture}
+                                                searchable
+                                                clearable
+                                                sx={{width: '100%'}}
+                                            />
+                                            <Text color="dimmed" size="xs" mt="xs">
+                                                {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
+                                            </Text>
+                                        </Box>
+                                    )}
+
+                                    {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
+                                        <Text color="dimmed" size="sm" mb="xl" align="center">
+                                            No matches found between these teams
                                         </Text>
-                                    </Box>
-                                )}
+                                    )}
 
-                                {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
-                                    <Text color="dimmed" size="sm" mb="xl" align="center">
-                                        No matches found between these teams
-                                    </Text>
-                                )}
-
-                                <Button
-                                    onClick={handleAddToLog}
-                                    disabled={!selectedFixture}
-                                    fullWidth
-                                    size="md"
-                                    sx={(theme) => ({
-                                        backgroundColor: theme.colors.blue[6],
-                                        '&:hover': {
-                                            backgroundColor: theme.colors.blue[7],
-                                        }
-                                    })}
-                                >
-                                    Add Match to Logs
-                                </Button>
-                            </>
-                        )}
-                    </Paper>
-                </Box>
-
-                <Box sx={{ marginLeft: 'auto', width: '50%', '@media (max-width: 992px)': { width: '100%', marginLeft: 0 } }}>
-                    {loggedFixtures.length === 0 && !loading ? (
-                        <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
-                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                            textAlign: 'center'
-                        })}>
-                            <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
-                            <Text color="dimmed" size="sm">
-                                Start by adding your first match using the form on the left
-                            </Text>
+                                    <Button
+                                        onClick={handleAddToLog}
+                                        disabled={!selectedFixture}
+                                        fullWidth
+                                        size="md"
+                                        sx={(theme) => ({
+                                            backgroundColor: theme.colors.blue[6],
+                                            '&:hover': {
+                                                backgroundColor: theme.colors.blue[7],
+                                            }
+                                        })}
+                                    >
+                                        Add Match to Logs
+                                    </Button>
+                                </>
+                            )}
                         </Paper>
-                    ) : (
-                        <SimpleGrid
-                            cols={1}
-                            spacing="lg"
-                            sx={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
-                        >
-                            {loggedFixtures.map((fixture) => (
-                                <LoggedFixtureCard
-                                    key={fixture.fixtureId}
-                                    homeTeam={fixture.homeTeam}
-                                    awayTeam={fixture.awayTeam}
-                                    homeScore={fixture.homeScore}
-                                    awayScore={fixture.awayScore}
-                                    date={fixture.date}
-                                    competitionName={fixture.competitionName}
-                                    leaguePosition={fixture.leaguePosition}
-                                    isVerified={fixture.isVerified}
-                                    venue={fixture.venue}
-                                    userTeam={fixture.userTeam}
-                                    stage={fixture.stage}
-                                    events={fixture.events}
-                                />
-                            ))}
-                        </SimpleGrid>
-                    )}
-                </Box>
-                <Button
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    style={{
-                        display: showTopButton ? 'block' : 'none',
-                        position: 'fixed',
-                        bottom: '20px',
-                        right: '20px',
-                        zIndex: 1000
-                    }}
-                >
-                    Go to Top
-                </Button>
+                    </Box>
 
-            </SimpleGrid>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                    <ScrollArea h={400} type="never" scrollbarSize={2} scrollHideDelay={0}>
+                        {loggedFixtures.length === 0 && !loading ? (
+                            <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
+                                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+                                textAlign: 'center'
+                            })}>
+                                <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
+                                <Text color="dimmed" size="sm">
+                                    Start by adding your first match using the form on the left
+                                </Text>
+                            </Paper>
+                        ) : (
+                            <SimpleGrid
+                                cols={1}
+                                spacing="lg"
+                                sx={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
+                            >
+                                {loggedFixtures.map((fixture) => (
+                                    <LoggedFixtureCard
+                                        key={fixture.fixtureId}
+                                        homeTeam={fixture.homeTeam}
+                                        awayTeam={fixture.awayTeam}
+                                        homeScore={fixture.homeScore}
+                                        awayScore={fixture.awayScore}
+                                        date={fixture.date}
+                                        competitionName={fixture.competitionName}
+                                        leaguePosition={fixture.leaguePosition}
+                                        isVerified={fixture.isVerified}
+                                        venue={fixture.venue}
+                                        userTeam={fixture.userTeam}
+                                        stage={fixture.stage}
+                                        events={fixture.events}
+                                    />
+                                ))}
+                            </SimpleGrid>
+                        )}
+                    </ScrollArea>
+                    <Button
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        style={{
+                            display: showTopButton ? 'block' : 'none',
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 1000
+                        }}
+                    >
+                        Go to Top
+                    </Button>
+                </Grid.Col>
+            </Grid>
+
         </Container>
     );
 }

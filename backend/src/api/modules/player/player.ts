@@ -5,6 +5,7 @@ import {Goal} from "../goal/goal";
 import {Transfer} from "../transfer/transfer";
 import {Team} from "../team/team";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {Trophy} from "../trophy/trophy";
 
 
 @Entity('player')
@@ -61,8 +62,12 @@ export class Player extends BaseDbEntity{
     ownGoals!: Promise<Goal[]>;
 
     @ApiProperty()
-    @OneToMany(() => Transfer, transfer => transfer.player)
+    @OneToMany(() => Transfer, transfer => transfer.player, {lazy: true})
     transfers!: Transfer[];
+
+    @ApiProperty({nullable: true})
+    @OneToMany(() => Trophy, trophy => trophy.player, {lazy: true, nullable: true})
+    trophies?: Trophy[];
 
 }
 

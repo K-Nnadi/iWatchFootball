@@ -12,6 +12,7 @@ import {
     OptionalEntityColumn
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {Fixture} from "../fixture/fixture";
+import {Trophy} from "../trophy/trophy";
 
 
 @Entity('team')
@@ -75,6 +76,10 @@ export class Team extends BaseDbEntity {
     @ApiProperty()
     @OneToMany(() => Fixture, (fixture) => fixture.awayTeam, {lazy: true})
     awayFixtures?: Promise<Fixture[]>;
+
+    @ApiProperty({nullable: true})
+    @OneToMany(() => Trophy, trophy => trophy.player, {lazy: true, nullable: true})
+    trophies?: Trophy[];
 
 }
 

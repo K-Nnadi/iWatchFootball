@@ -1,9 +1,8 @@
 {
 	"name": "@iWatchFootball",
 	"scripts": {
-		"dev:frontend": "pnpm --filter @my-monorepo/frontend dev",
-		"dev:api": "pnpm  @monorepo/api dev",
-		"dev": "pnpm -r run dev"
+		"run:frontend": "pnpm --filter ./frontend/ui dev",
+		"run:backend": "pnpm --filter ./backend start:dev"
 	},
 	"dependencies": {
 		"@casl/ability": "6.3.3",

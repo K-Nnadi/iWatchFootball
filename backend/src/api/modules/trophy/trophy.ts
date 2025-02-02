@@ -1,8 +1,10 @@
-import {ApiProperty, PickType} from '@nestjs/swagger';
-import {Column, Entity, ManyToOne, OneToOne} from 'typeorm';
-import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
+import {Entity, ManyToOne, OneToOne} from 'typeorm';
+import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Competition} from "../competition/competition";
+import {Player} from "../player/player";
+import {Team} from "../team/team";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {PickType} from "@nestjs/swagger";
 
 @Entity('trophy')
 export class Trophy extends BaseDbEntity {
@@ -10,17 +12,36 @@ export class Trophy extends BaseDbEntity {
     name!: string;
 
     @OptionalEntityColumn({db: {type: "varchar"}})
-    description?: string;  // Optional: Description of the trophy
+    description?: string;
 
     @OptionalEntityColumn({db: {type: "timestamp"}})
-    yearIntroduced?: Date; // Year the trophy was first awarded
+    yearIntroduced?: Date;
 
-    @EntityColumn({db: {type: "int"}})
-    competitionId!: number;
+    @OptionalEntityColumn({db: {type: "int"}})
+    competitionId?: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Competition, competition => competition.trophies, { lazy: true })
-    competition!: Promise<Competition>;
+    @OptionalEntityColumn({db: {type: "int"}})
+    teamId?: number;
+
+    @OptionalEntityColumn({db: {type: "int"}})
+    playerId?: number;
+
+    @ManyToOne(() => Competition, competition => competition.trophies, {lazy: true, nullable: true})
+    competition?: Promise<Competition>;
+
+    @ManyToOne(() => Team, team => team.trophies, {lazy: true, nullable: true})
+    team?: Team;
+
+    @ManyToOne(() => Player, player => player.trophies, {lazy: true, nullable: true})
+    player?: Player;
 }
 
-export class CreateTrophyDTO extends PickType(Trophy, ['name', 'description', 'yearIntroduced'] as const) {}
+export class CreateTrophyDTO extends PickType(Trophy, [
+    'name',
+    'description',
+    'yearIntroduced',
+    'competitionId',
+    'teamId',
+    'playerId'
+] as const) {
+}
