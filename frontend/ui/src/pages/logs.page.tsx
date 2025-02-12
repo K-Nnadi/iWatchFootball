@@ -1,16 +1,19 @@
-import {FormEvent, useEffect, useState} from 'react';
+import React, {FormEvent, useEffect, useRef, useState} from 'react';
 import {
     Box,
     Button,
-    Container, Grid,
+    Container,
+    Grid,
     LoadingOverlay,
-    Notification,
-    Paper, ScrollArea,
+    Paper,
+    ScrollArea,
     Select,
     SimpleGrid,
+    Tabs,
     Text,
     Title
 } from '@mantine/core';
+
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 
 interface Competition {
@@ -291,11 +294,49 @@ export function LogsPage() {
         };
     }, []);
 
+    const [columnSpan, setColumnSpan] = useState(6);
+    useEffect(() => {
+        // Function to handle resizing
+        const handleResize = () => {
+            if (window.innerWidth < 786) {
+                setColumnSpan(12);
+            } else {
+                setColumnSpan(6);
+            }
+        };
+
+        // Set the initial span based on the current window size
+        handleResize();
+
+        // Add event listener on mount
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup event listener on unmount
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const tabsRef = useRef<HTMLDivElement>(null);
+    const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
+
+    useEffect(() => {
+        const updateHeight = () => {
+            const headerHeight = headerRef.current?.offsetHeight || 0;
+            const tabsHeight = tabsRef.current?.offsetHeight || 0;
+            const padding = 40; // Account for container padding
+            setScrollAreaHeight(window.innerHeight - headerHeight - tabsHeight - padding);
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+        return () => window.removeEventListener('resize', updateHeight);
+    }, []);
     return (
         <Container>
             <Grid size="xl" my={40}>
                 <LoadingOverlay visible={loading} overlayBlur={2}/>
-                <Grid.Col span={6}>
+                <Grid.Col span={columnSpan}>
 
                     <Box mb={40}>
                         <Title order={2} mb="xs" sx={(theme) => ({
@@ -310,23 +351,6 @@ export function LogsPage() {
                         </Text>
                     </Box>
 
-                    {error && (
-                        <Notification title="Error" color="red" onClose={() => setError(null)} mb="lg" sx={{borderRadius: 8}}>
-                            {error}
-                        </Notification>
-                    )}
-
-                    {successMessage && (
-                        <Notification
-                            title="Success"
-                            color="green"
-                            onClose={() => setSuccessMessage(null)}
-                            mb="lg"
-                            sx={{borderRadius: 8}}
-                        >
-                            {successMessage}
-                        </Notification>
-                    )}
                     <Box sx={{ position: 'sticky', top:20, width: 'calc(50% - 40px)', maxWidth: '600px' }}>
                         <Paper p="xl" radius="lg" shadow="md" withBorder sx={(theme) => ({
                             backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
@@ -481,44 +505,72 @@ export function LogsPage() {
                     </Box>
 
                 </Grid.Col>
-                <Grid.Col span={6}>
-                    <ScrollArea h={400} type="never" scrollbarSize={2} scrollHideDelay={0}>
-                        {loggedFixtures.length === 0 && !loading ? (
-                            <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
-                                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                                textAlign: 'center'
-                            })}>
-                                <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
-                                <Text color="dimmed" size="sm">
-                                    Start by adding your first match using the form on the left
-                                </Text>
-                            </Paper>
-                        ) : (
-                            <SimpleGrid
-                                cols={1}
-                                spacing="lg"
-                                sx={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
+                <Grid.Col span={columnSpan}>
+                    <Tabs defaultValue={'matches'} styles={(theme) => ({
+                        tab: {
+                            flex: 1,
+                            '&:first-of-type': {
+                                marginLeft: 0,
+                            },
+                            '&:last-of-type': {
+                                marginRight: 0,
+                            },
+                        },
+                        tabsList: {
+                            display: 'flex',
+                            width: '100%',
+                        }
+                    })}>
+                        <Tabs.List>
+                            <Tabs.Tab value={'matches'}> Matches</Tabs.Tab>
+                            <Tabs.Tab value={'stats'}>Stats</Tabs.Tab>
+                        </Tabs.List>
+                        <Tabs.Panel value={'matches'}>
+                            <ScrollArea
+                                style={{ height: `${scrollAreaHeight}px` }}
+                                type="never"
+                                scrollbarSize={2}
+                                scrollHideDelay={0}
                             >
-                                {loggedFixtures.map((fixture) => (
-                                    <LoggedFixtureCard
-                                        key={fixture.fixtureId}
-                                        homeTeam={fixture.homeTeam}
-                                        awayTeam={fixture.awayTeam}
-                                        homeScore={fixture.homeScore}
-                                        awayScore={fixture.awayScore}
-                                        date={fixture.date}
-                                        competitionName={fixture.competitionName}
-                                        leaguePosition={fixture.leaguePosition}
-                                        isVerified={fixture.isVerified}
-                                        venue={fixture.venue}
-                                        userTeam={fixture.userTeam}
-                                        stage={fixture.stage}
-                                        events={fixture.events}
-                                    />
-                                ))}
-                            </SimpleGrid>
-                        )}
-                    </ScrollArea>
+                                {loggedFixtures.length === 0 && !loading ? (
+                                    <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
+                                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+                                        textAlign: 'center'
+                                    })}>
+                                        <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
+                                        <Text color="dimmed" size="sm">
+                                            Start by adding your first match using the form on the left
+                                        </Text>
+                                    </Paper>
+                                ) : (
+                                    <SimpleGrid
+                                        cols={1}
+                                        spacing="lg"
+                                        sx={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
+                                    >
+                                        {loggedFixtures.map((fixture) => (
+                                            <LoggedFixtureCard
+                                                key={fixture.fixtureId}
+                                                homeTeam={fixture.homeTeam}
+                                                awayTeam={fixture.awayTeam}
+                                                homeScore={fixture.homeScore}
+                                                awayScore={fixture.awayScore}
+                                                date={fixture.date}
+                                                competitionName={fixture.competitionName}
+                                                leaguePosition={fixture.leaguePosition}
+                                                isVerified={fixture.isVerified}
+                                                venue={fixture.venue}
+                                                userTeam={fixture.userTeam}
+                                                stage={fixture.stage}
+                                                events={fixture.events}
+                                            />
+                                        ))}
+                                    </SimpleGrid>
+                                )}
+                            </ScrollArea>
+                        </Tabs.Panel>
+
+                    </Tabs>
                     <Button
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         style={{

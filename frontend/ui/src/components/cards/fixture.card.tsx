@@ -44,9 +44,18 @@ export function LoggedFixtureCard({ homeTeam, awayTeam, homeScore, awayScore, da
                             <Text weight={600} size="lg" color={theme.primaryColor}>
                                 {competitionName}
                             </Text>
-                            <Badge size="sm" variant="dot" color="gray">
-                                {stage}
+                            <Badge size="sm" color="gray">{stage}
                             </Badge>
+                            {isVerified && (
+                                <Badge
+                                    color="green"
+                                    variant="light"
+                                    leftSection={<IconCheck size={14} />}
+                                    sx={{ minWidth: 85 }}
+                                >
+                                    Verified
+                                </Badge>
+                            )}
                         </Group>
                         <Text size="xs" color="dimmed" mt={4}>
                             <Group spacing="xs">
@@ -60,16 +69,7 @@ export function LoggedFixtureCard({ homeTeam, awayTeam, homeScore, awayScore, da
                             </Group>
                         </Text>
                     </Box>
-                    {isVerified && (
-                        <Badge
-                            color="green"
-                            variant="light"
-                            leftSection={<IconCheck size={14} />}
-                            sx={{ minWidth: 85 }}
-                        >
-                            Verified
-                        </Badge>
-                    )}
+
                 </Group>
 
                 {/* Score Section */}
