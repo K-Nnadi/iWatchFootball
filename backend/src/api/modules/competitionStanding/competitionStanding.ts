@@ -6,16 +6,13 @@ import {Season} from '../season/season';
 import {
     EntityColumn,
     EntityRelation,
-    OptionalEntityColumn,
+    OptionalEntityColumn, RelationshipType,
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {PickType} from "@nestjs/swagger";
 
 @Entity('competitionStanding')
 export class CompetitionStanding extends BaseDbEntity {
-    @EntityRelation({
-        db: {type: 'many-to-one', target: () => Competition},
-        api: {description: 'Competition', type: () => Competition},
-    })
+    @EntityRelation({type: RelationshipType.MANY_TO_ONE, entity: () => Competition, joinOptions: {name: 'competitionId'}})
     competition?: Competition;
 
     @EntityColumn({
@@ -24,19 +21,13 @@ export class CompetitionStanding extends BaseDbEntity {
     })
     competitionId!: number;
 
-    @EntityRelation({
-        db: {type: 'many-to-one', target: () => Season},
-        api: {description: 'Season', type: () => Season},
-    })
+    @EntityRelation({type: RelationshipType.MANY_TO_ONE, entity: () => Season, joinOptions: {name: 'seasonId'}})
     season?: Season;
 
     @EntityColumn({db: {type: 'int'}})
     seasonId!: number;
 
-    @EntityRelation({
-        db: {type: 'many-to-one', target: () => Team},
-        api: {description: 'Team', type: () => Team},
-    })
+    @EntityRelation({type: RelationshipType.MANY_TO_ONE, entity: () => Team, joinOptions: {name: 'teamId'}})
     team!: Team;
 
     @EntityColumn({db: {type: 'int'}})

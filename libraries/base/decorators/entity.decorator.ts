@@ -16,10 +16,10 @@ interface EntityDecorator {
 
 interface RelationshipOptions {
 	type: RelationshipType;
-	entity: Function;  // The target entity function reference
+	entity: () => Function | Function;  // ✅ Allow both direct and function-based references
 	inverseSide?: Function | string;  // Used in one-to-many and many-to-many
-	description: string;
 	joinOptions?: any;  // Options for JoinColumn or JoinTable
+	description?: string;
 }
 
 export enum RelationshipType {
@@ -66,29 +66,38 @@ export function EntityEnumColumn(opts?: EntityDecorator): ReturnType<typeof appl
 export function EntityRelation(options: RelationshipOptions) {
 	const { type, entity, inverseSide, description, joinOptions } = options;
 
+
+	console.log("EntityRelation - Type:", type);
+	console.log("EntityRelation - Entity:", entity);
+	console.log("EntityRelation - InverseSide:", inverseSide);
+
+	if (!entity) {
+		throw new Error("EntityRelation: 'entity' is undefined. Make sure you're passing the correct class reference.");
+	}
+
+
 	switch (type) {
 		case RelationshipType.ONE_TO_ONE:
 			return applyDecorators(
-				OneToOne(() => entity, { eager: true }),
+				OneToOne(entity, { lazy: true, nullable: true }), // ✅ Ensure it's nullable
 				JoinColumn(joinOptions),
 				ApiProperty({ description, type: () => entity })
 			);
 		case RelationshipType.ONE_TO_MANY:
 			return applyDecorators(
 				// @ts-ignore
-				OneToMany(() => entity, inverseSide),
+				OneToMany(entity, inverseSide ? () => inverseSide : undefined, { lazy: true }), // ✅ Ensure inverseSide is a function
 				ApiProperty({ description, type: () => [entity] })
 			);
 		case RelationshipType.MANY_TO_ONE:
 			return applyDecorators(
-				ManyToOne(() => entity, { lazy: true }),
+				ManyToOne(entity, { lazy: true, nullable: true }), // ✅ Removed lazy: true, added nullable
 				JoinColumn(joinOptions),
 				ApiProperty({ description, type: () => entity })
 			);
 		case RelationshipType.MANY_TO_MANY:
 			return applyDecorators(
-				// @ts-ignore
-				ManyToMany(() => entity, inverseSide, { eager: true }),
+				ManyToMany(() => entity, inverseSide ? () => inverseSide : undefined, { lazy: true }), // ✅ Removed eager: true
 				JoinTable(joinOptions),
 				ApiProperty({ description, type: () => [entity] })
 			);

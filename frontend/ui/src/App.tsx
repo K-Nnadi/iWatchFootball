@@ -2,6 +2,8 @@ import React from 'react';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import {MantineProvider} from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+
 import {Router} from "./router";
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -19,6 +21,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <MantineProvider defaultColorScheme={'light'}>
+                <Notifications />
                 <Router/>
             </MantineProvider>
         </QueryClientProvider>

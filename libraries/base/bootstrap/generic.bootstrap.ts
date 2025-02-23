@@ -3,6 +3,7 @@ import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {FastifyAdapter, NestFastifyApplication} from "@nestjs/platform-fastify";
 import {NestApplicationOptions} from "@nestjs/common";
 import {writeFileSync} from "fs";
+import {getMetadataArgsStorage} from "typeorm";
 
 
 export const SWAGGER_DOCUMENT =  new DocumentBuilder()
@@ -13,6 +14,7 @@ export const SWAGGER_DOCUMENT =  new DocumentBuilder()
 
 export async function GenericBootstrap(module: any, port: number) {
     const fastifyAdapter = new FastifyAdapter() as NestApplicationOptions
+    console.log('Loaded Entities:', getMetadataArgsStorage().tables.map((tbl) => tbl.name));
 
     // @ts-ignore
     const app = await NestFactory.create<NestFastifyApplication>(

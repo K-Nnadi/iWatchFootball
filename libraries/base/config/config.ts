@@ -4,7 +4,7 @@ import {ConfigModule} from "@nestjs/config";
 
 const ENV = process.env.NODE_ENV;
 
-console.log("PROCESS.ENV", process.env )
+// console.log("PROCESS.ENV", process.env )
 
 export const TYPEORM_CONFIG = TypeOrmModule.forRootAsync({
     useClass: ConfigServiceProvider,

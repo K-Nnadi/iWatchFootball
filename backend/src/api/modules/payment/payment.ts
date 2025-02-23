@@ -1,12 +1,14 @@
-import {Entity, OneToMany} from 'typeorm';
+import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Ticket} from '../ticket/ticket';
 import {
     EntityColumn,
+    EntityEnumColumn,
+    EntityRelation,
     OptionalEntityColumn,
-    EntityEnumColumn
+    RelationshipType
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
-import {ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
+import {PickType} from '@nestjs/swagger';
 import {PaymentMethod} from "../../enums/payment.enum";
 
 @Entity('payment')
@@ -25,11 +27,11 @@ export class Payment extends BaseDbEntity {
     })
     amount?: number;
 
-    /**
-     * A payment can cover multiple tickets (especially if a user checks out multiple tickets)
-     */
-    @ApiProperty({description: 'List of tickets covered by this payment'})
-    @OneToMany(() => Ticket, (ticket) => ticket.payment)
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Ticket,
+        inverseSide: (ticket: Ticket) => ticket.payment, // Ensure this matches `Ticket.payment`
+    })
     tickets!: Ticket[];
 }
 

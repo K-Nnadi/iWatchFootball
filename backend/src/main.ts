@@ -3,5 +3,5 @@ import {GenericBootstrap} from "@iWatchFootball/base-tools/bootstrap/generic.boo
 import {config} from "dotenv";
 
 config();
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 void GenericBootstrap(AppModule, 3000);

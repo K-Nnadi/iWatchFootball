@@ -4,8 +4,8 @@ import {Fixture} from '../fixture/fixture';
 import {Payment} from '../payment/payment';
 import {User} from '../user/user';
 import {
-    EntityColumn,
-    OptionalEntityColumn,
+    EntityColumn, EntityRelation,
+    OptionalEntityColumn, RelationshipType,
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
 import {ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
 
@@ -45,8 +45,12 @@ export class Ticket extends BaseDbEntity {
     })
     paymentId?: number;
 
-    @ApiPropertyOptional({nullable: true})
-    @ManyToOne(() => Payment, (payment) => payment.tickets, {nullable: true})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Payment,
+        inverseSide: (payment: Payment) => payment.tickets,
+        joinOptions: {name: 'paymentId'}
+    })
     payment?: Payment;
 }
 
@@ -54,10 +58,6 @@ export class CreateTicketDTO extends PickType(Ticket, [
     'category',
     'price',
     'fixtureId',
-] as const) {
-    @ApiPropertyOptional({ description: 'User ID if purchased', example: 42 })
-    userId?: number;
-
-    @ApiPropertyOptional({ description: 'Payment ID if purchased', example: 84 })
-    paymentId?: number;
-}
+    'userId',
+    'paymentId',
+] as const) {}

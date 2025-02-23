@@ -3145,6 +3145,268 @@
         ]
       }
     },
+    "/payment": {
+      "post": {
+        "operationId": "create",
+        "summary": "Create Payment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "summary": "Get all Payments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/payment/query": {
+      "get": {
+        "operationId": "getQuery",
+        "summary": "Get all Payments",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/payment/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "summary": "Get one Payment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "summary": "Update one Payment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Payment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "summary": "Delete one Payment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/player": {
       "post": {
         "operationId": "create",
@@ -5765,6 +6027,268 @@
         ]
       }
     },
+    "/ticket": {
+      "post": {
+        "operationId": "create",
+        "summary": "Create Ticket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "summary": "Get all Tickets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/ticket/query": {
+      "get": {
+        "operationId": "getQuery",
+        "summary": "Get all Tickets",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/ticket/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "summary": "Get one Ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "summary": "Update one Ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ticket"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "summary": "Delete one Ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/transfer": {
       "post": {
         "operationId": "create",
@@ -6904,7 +7428,7 @@
               "Cancelled",
               "Postponed",
               "Suspended",
-              "In Play"
+              "Live"
             ]
           },
           "attendance": {
@@ -7112,7 +7636,7 @@
               "Cancelled",
               "Postponed",
               "Suspended",
-              "In Play"
+              "Live"
             ]
           },
           "stage": {
@@ -7758,6 +8282,66 @@
           "isCurrent"
         ]
       },
+      "CreatePaymentDTO": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Total amount paid",
+            "example": 199.99
+          }
+        },
+        "required": [
+          "method",
+          "status"
+        ]
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Total amount paid",
+            "example": 199.99
+          },
+          "tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "method",
+          "status",
+          "tickets"
+        ]
+      },
       "CreatePlayerDTO": {
         "type": "object",
         "properties": {
@@ -7875,6 +8459,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "trophies": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -7886,7 +8477,8 @@
           "goals",
           "assists",
           "ownGoals",
-          "transfers"
+          "transfers",
+          "trophies"
         ]
       },
       "CreatePlayerLineUpDTO": {
@@ -8366,6 +8958,13 @@
           },
           "awayFixtures": {
             "$ref": "#/components/schemas/Promise"
+          },
+          "trophies": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -8376,7 +8975,8 @@
           "players",
           "type",
           "homeFixtures",
-          "awayFixtures"
+          "awayFixtures",
+          "trophies"
         ]
       },
       "CreateTeamCompetitionSeasonDTO": {
@@ -8402,6 +9002,143 @@
           "teamId",
           "competitionId",
           "seasonId"
+        ]
+      },
+      "CreateTicketDTO": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "paymentId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "category",
+          "price",
+          "fixtureId"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ]
+          },
+          "logs": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "predictions": {
+            "$ref": "#/components/schemas/Promise"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "userName",
+          "email",
+          "password",
+          "type",
+          "logs"
+        ]
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "fixture": {
+            "$ref": "#/components/schemas/Fixture"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "user": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ]
+          },
+          "paymentId": {
+            "type": "number"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "price",
+          "fixtureId",
+          "fixture",
+          "payment"
         ]
       },
       "CreateTransferDTO": {
@@ -8501,6 +9238,15 @@
           "yearIntroduced": {
             "format": "date-time",
             "type": "string"
+          },
+          "competitionId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "playerId": {
+            "type": "number"
           }
         },
         "required": [
@@ -8535,15 +9281,16 @@
           "competitionId": {
             "type": "number"
           },
-          "competition": {
-            "$ref": "#/components/schemas/Promise"
+          "teamId": {
+            "type": "number"
+          },
+          "playerId": {
+            "type": "number"
           }
         },
         "required": [
           "id",
-          "name",
-          "competitionId",
-          "competition"
+          "name"
         ]
       },
       "CreateUserDTO": {
@@ -8576,64 +9323,6 @@
           "userName",
           "email",
           "type"
-        ]
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 32
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "USER",
-              "ADMIN"
-            ]
-          },
-          "logs": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "predictions": {
-            "$ref": "#/components/schemas/Promise"
-          }
-        },
-        "required": [
-          "id",
-          "firstName",
-          "lastName",
-          "userName",
-          "email",
-          "password",
-          "type",
-          "logs"
         ]
       },
       "LoginBody": {
