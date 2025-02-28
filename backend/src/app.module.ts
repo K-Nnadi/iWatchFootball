@@ -1,4 +1,5 @@
 import {Module} from '@nestjs/common';
+import {BullModule} from '@nestjs/bullmq';
 import {CONFIG, TYPEORM_CONFIG} from "@iWatchFootball/base-tools/config/config";
 import {PlayerModule} from "./api/modules/player/player.module";
 import {ManagerEmploymentModule} from "./api/modules/managerEmployment/managerEmployment.module";
@@ -28,6 +29,13 @@ import {PredictionModule} from "./api/modules/prediction/prediction.module";
 import {AuthModule} from "./api/complexControllers/auth.controller";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
+
+const BULL_MODULE = BullModule.forRoot({
+    connection: {
+        host: 'localhost',
+        port: 6379
+    }
+})
 
 const Modules = [
     AddressModule,
@@ -64,7 +72,13 @@ const ComplexModules = [
 ];
 
 @Module({
-    imports: [CONFIG, TYPEORM_CONFIG, ...Modules, ...ComplexModules],
+    imports: [
+        CONFIG,
+        TYPEORM_CONFIG,
+        BULL_MODULE,
+        ...Modules,
+        ...ComplexModules
+    ],
 })
 export class AppModule {
 }

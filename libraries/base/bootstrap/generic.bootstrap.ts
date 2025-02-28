@@ -4,6 +4,8 @@ import {FastifyAdapter, NestFastifyApplication} from "@nestjs/platform-fastify";
 import {NestApplicationOptions} from "@nestjs/common";
 import {writeFileSync} from "fs";
 import {getMetadataArgsStorage} from "typeorm";
+import * as fs from 'fs';
+
 
 
 export const SWAGGER_DOCUMENT =  new DocumentBuilder()
@@ -29,7 +31,7 @@ export async function GenericBootstrap(module: any, port: number) {
 
     const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
     SwaggerModule.setup('api-docs', app, document);
-    writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+    fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
 
     await app.listen(port);
 }

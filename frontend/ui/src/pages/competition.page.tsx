@@ -1,15 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-    Container,
-    Title,
-    Tabs,
-    LoadingOverlay,
-    Text,
-    SimpleGrid,
-    Card,
-    Image
-} from '@mantine/core';
+import { Card, Container, Image, LoadingOverlay, SimpleGrid, Tabs, Text, Title } from '@mantine/core';
+import { LeagueTable } from "../components/tables/leagueTable";
 
 // Example interfaces
 interface Competition {
@@ -88,7 +80,9 @@ export function CompetitionPage() {
 
             const mockFixtures: Fixture[] = [
                 { id: 'fix1', homeTeam: 'Team A', awayTeam: 'Team D', date: '2023-09-15' },
-                { id: 'fix2', homeTeam: 'Team B', awayTeam: 'Team C', date: '2023-09-16' }
+                { id: 'fix2', homeTeam: 'Team B', awayTeam: 'Team C', date: '2023-09-16' },
+                { id: 'fix3', homeTeam: 'Team A', awayTeam: 'Team C', date: '2023-09-15' },
+                { id: 'fix4', homeTeam: 'Team D', awayTeam: 'Team B', date: '2023-09-16' }
             ];
 
             setTimeout(() => {
@@ -99,6 +93,20 @@ export function CompetitionPage() {
             }, 1000);
         }
     }, [competition]);
+
+    // Group fixtures by match day
+    const groupFixturesByDate = (fixtures: Fixture[]) => {
+        return fixtures.reduce((groups, fixture) => {
+            const date = fixture.date;
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+            groups[date].push(fixture);
+            return groups;
+        }, {} as Record<string, Fixture[]>);
+    };
+
+    const groupedFixtures = groupFixturesByDate(fixtures);
 
     if (loading || !competition) {
         return (
@@ -159,32 +167,31 @@ export function CompetitionPage() {
                     {standings.length === 0 ? (
                         <Text>No table data available.</Text>
                     ) : (
-                        <SimpleGrid cols={1} spacing="xs">
-                            {standings.map((entry) => (
-                                <Card key={entry.team} shadow="sm" padding="md" radius="md" withBorder>
-                                    <Text>
-                                        {entry.position}. {entry.team} - {entry.points} pts
-                                    </Text>
-                                </Card>
-                            ))}
-                        </SimpleGrid>
+                        <LeagueTable />
                     )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="fixtures" pt="xl">
-                    {fixtures.length === 0 ? (
+                    {Object.keys(groupedFixtures).length === 0 ? (
                         <Text>No fixtures scheduled.</Text>
                     ) : (
-                        <SimpleGrid cols={1} spacing="md">
-                            {fixtures.map((fix) => (
-                                <Card key={fix.id} shadow="sm" padding="md" radius="md" withBorder>
-                                    <Text weight={500}>
-                                        {fix.homeTeam} vs {fix.awayTeam}
-                                    </Text>
-                                    <Text size="sm" color="dimmed">{fix.date}</Text>
-                                </Card>
-                            ))}
-                        </SimpleGrid>
+                        Object.keys(groupedFixtures).map((date) => (
+                            <div key={date}>
+                                <Title order={3} mb="md">
+                                    {new Date(date).toLocaleDateString()}
+                                </Title>
+                                <SimpleGrid cols={1} spacing="md">
+                                    {groupedFixtures[date].map((fix) => (
+                                        <Card key={fix.id} shadow="sm" padding="md" radius="md" withBorder>
+                                            <Text weight={500}>
+                                                {fix.homeTeam} vs {fix.awayTeam}
+                                            </Text>
+                                            <Text size="sm" color="dimmed">{fix.date}</Text>
+                                        </Card>
+                                    ))}
+                                </SimpleGrid>
+                            </div>
+                        ))
                     )}
                 </Tabs.Panel>
             </Tabs>

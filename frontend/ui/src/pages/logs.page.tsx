@@ -15,6 +15,7 @@ import {
 } from '@mantine/core';
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
+import StatsTab from "../tabs/stats.tab";
 
 interface Competition {
     id: string;
@@ -539,7 +540,7 @@ export function LogsPage() {
                                     })}>
                                         <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
                                         <Text color="dimmed" size="sm">
-                                            Start by adding your first match using the form on the left
+                                            Start by adding your first match using the form
                                         </Text>
                                     </Paper>
                                 ) : (
@@ -566,6 +567,27 @@ export function LogsPage() {
                                             />
                                         ))}
                                     </SimpleGrid>
+                                )}
+                            </ScrollArea>
+                        </Tabs.Panel><Tabs.Panel value={'stats'}>
+                            <ScrollArea
+                                style={{ height: `${scrollAreaHeight}px` }}
+                                type="never"
+                                scrollbarSize={2}
+                                scrollHideDelay={0}
+                            >
+                                {loggedFixtures.length === 0 && !loading ? (
+                                    <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
+                                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+                                        textAlign: 'center'
+                                    })}>
+                                        <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
+                                        <Text color="dimmed" size="sm">
+                                            Start by adding your first match using the form
+                                        </Text>
+                                    </Paper>
+                                ) : (
+                                    <StatsTab loggedFixtures={loggedFixtures}/>
                                 )}
                             </ScrollArea>
                         </Tabs.Panel>
