@@ -16,6 +16,7 @@ import {
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 import StatsTab from "../tabs/stats.tab";
+import NewStatsTab from "../tabs/newStats.tab";
 
 interface Competition {
     id: string;
@@ -587,7 +588,8 @@ export function LogsPage() {
                                         </Text>
                                     </Paper>
                                 ) : (
-                                    <StatsTab loggedFixtures={loggedFixtures}/>
+                                    // <StatsTab loggedFixtures={loggedFixtures}/>
+                                    <NewStatsTab />
                                 )}
                             </ScrollArea>
                         </Tabs.Panel>

@@ -10,13 +10,15 @@ import {
     Patch,
     Post,
     Query,
-    Req,
-    Type
+    Req, Res,
+    Type, UploadedFile, UseInterceptors
 } from '@nestjs/common';
-import {ApiBody, ApiOkResponse, ApiOperation, ApiPropertyOptional} from '@nestjs/swagger';
+import {ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiPropertyOptional} from '@nestjs/swagger';
 import {CrudInterface} from "./crud.interface";
-import {FastifyRequest} from "fastify";
+import {FastifyReply, FastifyRequest} from "fastify";
 import {QS_OPTIONS} from "./query.options";
+import * as fs from 'fs';
+import * as path from 'path';
 import qs from 'qs';
 
 
@@ -103,7 +105,41 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         delete(@Param('id') id: number) {
             return this.service.delete(+id);
         }
-    }
+
+        // File Upload (FastifyMultipart)
+        @Post('upload')
+        @ApiOperation({summary: `Upload a file for ${entity.name}`, operationId: `upload`})
+        @ApiConsumes('multipart/form-data')
+        async uploadFile(@Req() request: FastifyRequest) {
+            const data = await (request as any).file(); // FastifyMultipart handles this
+            const uploadDir = path.join(__dirname, '..', 'uploads');
+
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, {recursive: true});
+            }
+
+            const filePath = path.join(uploadDir, data.filename);
+            const writeStream = fs.createWriteStream(filePath);
+            await data.toBuffer().then((buffer: any) => writeStream.write(buffer));
+            writeStream.end();
+
+            return {message: 'File uploaded successfully', filename: data.filename};
+        }
+
+        // File Download (Fastify Static)
+        @Get('download/:filename')
+        @ApiOperation({summary: `Download file related to ${entity.name}`, operationId: `download`})
+        async downloadFile(@Param('filename') filename: string, @Res() response: FastifyReply) {
+            const filePath = path.join(__dirname, '..', 'uploads', filename);
+
+            if (!fs.existsSync(filePath)) {
+                return response.status(404).send({message: 'File not found'});
+            }
+
+            response.header('Content-Disposition', `attachment; filename=${filename}`);
+            response.send(fs.createReadStream(filePath));
+        }
+        }
 
     return crudController
 }
