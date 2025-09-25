@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Title, Accordion, Card, Text, SimpleGrid, Button } from '@mantine/core';
+import {Container, Title, Accordion, Card, Text, SimpleGrid, Button, Grid} from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import {DateNavigation} from "../components/carousel/dateNavigation.carousel";
 
@@ -139,11 +139,41 @@ export function MatchesPage() {
                 },
                 {
                     id: 'match3',
-                    competitionName: 'Champions League',
+                    competitionName: 'Premier League',
                     homeTeam: 'Team E',
                     awayTeam: 'Team F',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 45).toISOString(),
+                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 30).toISOString(),
                     venue: 'Stadium C',
+                    homeScore: isPast ? 0 : undefined,
+                    awayScore: isPast ? 0 : undefined
+                },
+                {
+                    id: 'match4',
+                    competitionName: 'Premier League',
+                    homeTeam: 'Team G',
+                    awayTeam: 'Team H',
+                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 30).toISOString(),
+                    venue: 'Stadium D',
+                    homeScore: isPast ? 0 : undefined,
+                    awayScore: isPast ? 0 : undefined
+                },
+                {
+                    id: 'match5',
+                    competitionName: 'Champions League',
+                    homeTeam: 'Team I',
+                    awayTeam: 'Team J',
+                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 45).toISOString(),
+                    venue: 'Stadium E',
+                    homeScore: isPast ? 3 : undefined,
+                    awayScore: isPast ? 2 : undefined
+                },
+                {
+                    id: 'match6',
+                    competitionName: 'FA Cup',
+                    homeTeam: 'Team K',
+                    awayTeam: 'Team L',
+                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 45).toISOString(),
+                    venue: 'Stadium F',
                     homeScore: isPast ? 3 : undefined,
                     awayScore: isPast ? 2 : undefined
                 }
@@ -193,74 +223,73 @@ export function MatchesPage() {
                         <Accordion.Item value={competitionName} key={competitionName}>
                             <Accordion.Control>{competitionName}</Accordion.Control>
                             <Accordion.Panel>
-                                <SimpleGrid cols={1} spacing="md" breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+                                <Grid gutter="md">
                                     {compMatches.map((m) => {
                                         const status = getMatchStatus(m.date);
                                         const resultText =
-                                            status === 'past' &&
-                                            m.homeScore !== undefined &&
-                                            m.awayScore !== undefined
+                                            status === 'past' && m.homeScore !== undefined && m.awayScore !== undefined
                                                 ? `${m.homeTeam} ${m.homeScore} - ${m.awayScore} ${m.awayTeam}`
                                                 : `${m.homeTeam} vs ${m.awayTeam}`;
 
                                         return (
-                                            <Card
-                                                key={m.id}
-                                                shadow="sm"
-                                                padding="lg"
-                                                radius="md"
-                                                withBorder
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() =>
-                                                    navigate(`/match/${m.id}`, {
-                                                        state: {
-                                                            matchId: m.id,
-                                                            homeTeam: m.homeTeam,
-                                                            awayTeam: m.awayTeam,
-                                                            date: m.date,
-                                                            venue: m.venue
-                                                        }
-                                                    })
-                                                }
-                                            >
-                                                <Text weight={500} size="lg" mb="xs">
-                                                    {resultText}
-                                                </Text>
-                                                <Text size="sm" color="dimmed" mb="xs">
-                                                    {new Date(m.date).toLocaleTimeString(undefined, {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </Text>
-                                                <Text size="sm" color="dimmed">
-                                                    Venue: {m.venue}
-                                                </Text>
+                                            <Grid.Col span={{ base: 12, sm: 6, md: 4 }}>                                                <Card
+                                                    shadow="sm"
+                                                    padding="lg"
+                                                    radius="md"
+                                                    withBorder
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() =>
+                                                        navigate(`/match/${m.id}`, {
+                                                            state: {
+                                                                matchId: m.id,
+                                                                homeTeam: m.homeTeam,
+                                                                awayTeam: m.awayTeam,
+                                                                date: m.date,
+                                                                venue: m.venue
+                                                            }
+                                                        })
+                                                    }
+                                                >
+                                                    <Text weight={500} size="lg" mb="xs">
+                                                        {resultText}
+                                                    </Text>
+                                                    <Text size="sm" color="dimmed" mb="xs">
+                                                        {new Date(m.date).toLocaleTimeString(undefined, {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </Text>
+                                                    <Text size="sm" color="dimmed">
+                                                        Venue: {m.venue}
+                                                    </Text>
 
-                                                {status === 'future' && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="xs"
-                                                        mt="md"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate(`/seat-selection/${m.id}`, {
-                                                                state: {
-                                                                    matchId: m.id,
-                                                                    homeTeam: m.homeTeam,
-                                                                    awayTeam: m.awayTeam,
-                                                                    date: m.date,
-                                                                    venue: m.venue
-                                                                }
-                                                            });
-                                                        }}
-                                                    >
-                                                        View Tickets
-                                                    </Button>
-                                                )}
-                                            </Card>
+                                                    {status === 'future' && (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="xs"
+                                                            mt="md"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(`/seat-selection/${m.id}`, {
+                                                                    state: {
+                                                                        matchId: m.id,
+                                                                        homeTeam: m.homeTeam,
+                                                                        awayTeam: m.awayTeam,
+                                                                        date: m.date,
+                                                                        venue: m.venue
+                                                                    }
+                                                                });
+                                                            }}
+                                                        >
+                                                            View Tickets
+                                                        </Button>
+                                                    )}
+                                                </Card>
+                                            </Grid.Col>
                                         );
                                     })}
-                                </SimpleGrid>
+                                </Grid>
+
                             </Accordion.Panel>
                         </Accordion.Item>
                     ))}

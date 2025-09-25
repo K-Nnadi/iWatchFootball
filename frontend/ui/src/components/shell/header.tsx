@@ -1,6 +1,5 @@
 import React from 'react';
-import { AppShell, Box, Burger, Button, Container, Divider, Flex, Group, Text } from '@mantine/core';
-import { DarkModeButton } from '../buttons/darkMode.button';
+import { AppShell, Box, Burger, Button, Container, Divider, Flex, Group, Text, Title } from '@mantine/core';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
@@ -15,45 +14,100 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
 
     const pages = [
-        { page: 'home', label: 'Home' },
         { page: 'competitions', label: 'Competitions' },
         { page: 'matches', label: 'Matches' },
         { page: 'logs', label: 'Logs' }
     ];
 
     return (
-        <AppShell.Header>
+        <AppShell.Header
+            sx={(theme) => ({
+                backgroundColor: 'white',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                borderBottom: 'none',
+                position: 'sticky',
+                top: 0,
+                zIndex: 1000
+            })}
+        >
             <Container px="md" h={'100%'}>
                 <Flex justify={'space-between'} align="center" h="100%">
-                    <Burger opened={navbarOpen} onClick={toggleNavbar} hiddenFrom="sm" size="md" />
-                    {
-                        showHeader && (
-                            <Flex justify="center" align="center" style={{ flexGrow: 1 }}>
-                                <Group gap="xl">
-                                    {pages.map(({ page, label }) => (
-                                        <Button key={page} variant="subtle" onClick={() => navigate(`/${page}`)}>
-                                            <Text>{label}</Text>
-                                        </Button>
-                                    ))}
-                                </Group>
-                            </Flex>
-                        )
-                    }
-                    {
-                        showHeader && (
-                            <Group visibleFrom="sm" gap='lg'>
-                                <Divider orientation={'vertical'} />
-                                <IoSettingsOutline size={28} onClick={() => navigate('/settings')} />
-                                {/*<DarkModeButton />*/}
+                    {/* Logo Section */}
+                    <Group spacing="xs">
+                        <Burger opened={navbarOpen} onClick={toggleNavbar} hiddenFrom="sm" size="md" />
+                        <Group spacing="xs" visibleFrom="sm">
+                            <Title order={3} size="xl" weight={700} color="blue" onClick={() => navigate('/')}>
+                                I Watch Football
+                            </Title>
+                        </Group>
+                    </Group>
+
+                    {/* Navigation Links */}
+                    {showHeader && (
+                        <Group gap="xl" visibleFrom="md">
+                            {pages.map(({ page, label }) => (
+                                <Button
+                                    key={label}
+                                    variant="subtle"
+                                    onClick={() => navigate(`/${page}`)}
+                                    sx={{
+                                        color: label === 'Home' ? '#1e40af' : '#6b7280',
+                                        fontWeight: label === 'Home' ? 500 : 400,
+                                        '&:hover': {
+                                            color: '#1e40af',
+                                            backgroundColor: 'transparent'
+                                        }
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            ))}
+                        </Group>
+                    )}
+
+                    {/* Right Section */}
+                    <Group gap="lg">
+                        {showHeader && (
+                            <>
+                                <IoSettingsOutline
+                                    size={24}
+                                    onClick={() => navigate('/settings')}
+                                    style={{ cursor: 'pointer', color: '#6b7280' }}
+                                />
                                 {!isLoggedIn && (
                                     <>
-                                        <Button variant="outline" onClick={() => navigate('/signIn')}>Sign In</Button>
-                                        <Button variant="light" onClick={() => navigate('/join')}>Join</Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => navigate('/signIn')}
+                                            sx={{
+                                                borderColor: '#d1d5db',
+                                                color: '#6b7280',
+                                                '&:hover': {
+                                                    borderColor: '#1e40af',
+                                                    color: '#1e40af'
+                                                }
+                                            }}
+                                        >
+                                            Sign In
+                                        </Button>
+                                        <Button
+                                            variant="filled"
+                                            color="blue"
+                                            onClick={() => navigate('/join')}
+                                            sx={{
+                                                backgroundColor: '#1e40af',
+                                                '&:hover': {
+                                                    backgroundColor: '#1e3a8a'
+                                                }
+                                            }}
+                                        >
+                                            Join
+                                        </Button>
                                     </>
                                 )}
-                            </Group>
-                        )
-                    }
+                            </>
+                        )}
+                    </Group>
                 </Flex>
             </Container>
         </AppShell.Header>

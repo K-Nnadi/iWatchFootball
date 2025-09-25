@@ -4,7 +4,6 @@
     "/address": {
       "post": {
         "operationId": "create",
-        "summary": "Create Address",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -31,18 +30,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "address"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Address",
+        "tags": [
+          "address"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Addresss",
         "parameters": [],
         "responses": {
           "200": {
@@ -62,20 +61,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "address"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Addresss",
+        "tags": [
+          "address"
         ]
       }
     },
     "/address/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Addresss",
         "parameters": [
           {
             "name": "skip",
@@ -144,20 +143,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "address"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Addresss",
+        "tags": [
+          "address"
         ]
       }
     },
     "/address/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Address",
         "parameters": [
           {
             "name": "id",
@@ -183,18 +182,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "address"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Address",
+        "tags": [
+          "address"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Address",
         "parameters": [
           {
             "name": "id",
@@ -223,18 +222,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "address"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Address",
+        "tags": [
+          "address"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Address",
         "parameters": [
           {
             "name": "id",
@@ -253,20 +252,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "address"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Address",
+        "tags": [
+          "address"
         ]
       }
     },
     "/card": {
       "post": {
         "operationId": "create",
-        "summary": "Create Card",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -293,18 +292,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "card"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Card",
+        "tags": [
+          "card"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Cards",
         "parameters": [],
         "responses": {
           "200": {
@@ -324,20 +323,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "card"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Cards",
+        "tags": [
+          "card"
         ]
       }
     },
     "/card/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Cards",
         "parameters": [
           {
             "name": "skip",
@@ -406,20 +405,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "card"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Cards",
+        "tags": [
+          "card"
         ]
       }
     },
     "/card/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Card",
         "parameters": [
           {
             "name": "id",
@@ -445,18 +444,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "card"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Card",
+        "tags": [
+          "card"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Card",
         "parameters": [
           {
             "name": "id",
@@ -485,18 +484,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "card"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Card",
+        "tags": [
+          "card"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Card",
         "parameters": [
           {
             "name": "id",
@@ -515,20 +514,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "card"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Card",
+        "tags": [
+          "card"
         ]
       }
     },
     "/competition": {
       "post": {
         "operationId": "create",
-        "summary": "Create Competition",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -555,18 +554,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "competition"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Competition",
+        "tags": [
+          "competition"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Competitions",
         "parameters": [],
         "responses": {
           "200": {
@@ -586,20 +585,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "competition"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Competitions",
+        "tags": [
+          "competition"
         ]
       }
     },
     "/competition/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Competitions",
         "parameters": [
           {
             "name": "skip",
@@ -668,20 +667,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "competition"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Competitions",
+        "tags": [
+          "competition"
         ]
       }
     },
     "/competition/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Competition",
         "parameters": [
           {
             "name": "id",
@@ -707,18 +706,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "competition"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Competition",
+        "tags": [
+          "competition"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Competition",
         "parameters": [
           {
             "name": "id",
@@ -747,18 +746,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "competition"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Competition",
+        "tags": [
+          "competition"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Competition",
         "parameters": [
           {
             "name": "id",
@@ -777,20 +776,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "competition"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Competition",
+        "tags": [
+          "competition"
         ]
       }
     },
     "/fixture": {
       "post": {
         "operationId": "create",
-        "summary": "Create Fixture",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -817,18 +816,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixture"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Fixture",
+        "tags": [
+          "fixture"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Fixtures",
         "parameters": [],
         "responses": {
           "200": {
@@ -848,20 +847,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixture"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Fixtures",
+        "tags": [
+          "fixture"
         ]
       }
     },
     "/fixture/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Fixtures",
         "parameters": [
           {
             "name": "skip",
@@ -930,20 +929,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixture"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Fixtures",
+        "tags": [
+          "fixture"
         ]
       }
     },
     "/fixture/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Fixture",
         "parameters": [
           {
             "name": "id",
@@ -969,18 +968,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixture"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Fixture",
+        "tags": [
+          "fixture"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Fixture",
         "parameters": [
           {
             "name": "id",
@@ -1009,18 +1008,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixture"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Fixture",
+        "tags": [
+          "fixture"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Fixture",
         "parameters": [
           {
             "name": "id",
@@ -1039,20 +1038,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixture"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Fixture",
+        "tags": [
+          "fixture"
         ]
       }
     },
     "/fixtureReferee": {
       "post": {
         "operationId": "create",
-        "summary": "Create FixtureReferee",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1079,18 +1078,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixtureReferee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create FixtureReferee",
+        "tags": [
+          "fixtureReferee"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all FixtureReferees",
         "parameters": [],
         "responses": {
           "200": {
@@ -1110,20 +1109,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixtureReferee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all FixtureReferees",
+        "tags": [
+          "fixtureReferee"
         ]
       }
     },
     "/fixtureReferee/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all FixtureReferees",
         "parameters": [
           {
             "name": "skip",
@@ -1192,20 +1191,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixtureReferee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all FixtureReferees",
+        "tags": [
+          "fixtureReferee"
         ]
       }
     },
     "/fixtureReferee/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one FixtureReferee",
         "parameters": [
           {
             "name": "id",
@@ -1231,18 +1230,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixtureReferee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one FixtureReferee",
+        "tags": [
+          "fixtureReferee"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one FixtureReferee",
         "parameters": [
           {
             "name": "id",
@@ -1271,18 +1270,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixtureReferee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one FixtureReferee",
+        "tags": [
+          "fixtureReferee"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one FixtureReferee",
         "parameters": [
           {
             "name": "id",
@@ -1301,20 +1300,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "fixtureReferee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one FixtureReferee",
+        "tags": [
+          "fixtureReferee"
         ]
       }
     },
     "/genericToken": {
       "post": {
         "operationId": "create",
-        "summary": "Create GenericToken",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1341,18 +1340,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "genericToken"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create GenericToken",
+        "tags": [
+          "genericToken"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all GenericTokens",
         "parameters": [],
         "responses": {
           "200": {
@@ -1372,20 +1371,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "genericToken"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all GenericTokens",
+        "tags": [
+          "genericToken"
         ]
       }
     },
     "/genericToken/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all GenericTokens",
         "parameters": [
           {
             "name": "skip",
@@ -1454,20 +1453,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "genericToken"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all GenericTokens",
+        "tags": [
+          "genericToken"
         ]
       }
     },
     "/genericToken/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one GenericToken",
         "parameters": [
           {
             "name": "id",
@@ -1493,18 +1492,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "genericToken"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one GenericToken",
+        "tags": [
+          "genericToken"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one GenericToken",
         "parameters": [
           {
             "name": "id",
@@ -1533,18 +1532,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "genericToken"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one GenericToken",
+        "tags": [
+          "genericToken"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one GenericToken",
         "parameters": [
           {
             "name": "id",
@@ -1563,20 +1562,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "genericToken"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one GenericToken",
+        "tags": [
+          "genericToken"
         ]
       }
     },
     "/goal": {
       "post": {
         "operationId": "create",
-        "summary": "Create Goal",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1603,18 +1602,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "goal"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Goal",
+        "tags": [
+          "goal"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Goals",
         "parameters": [],
         "responses": {
           "200": {
@@ -1634,20 +1633,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "goal"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Goals",
+        "tags": [
+          "goal"
         ]
       }
     },
     "/goal/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Goals",
         "parameters": [
           {
             "name": "skip",
@@ -1716,20 +1715,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "goal"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Goals",
+        "tags": [
+          "goal"
         ]
       }
     },
     "/goal/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Goal",
         "parameters": [
           {
             "name": "id",
@@ -1755,18 +1754,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "goal"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Goal",
+        "tags": [
+          "goal"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Goal",
         "parameters": [
           {
             "name": "id",
@@ -1795,18 +1794,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "goal"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Goal",
+        "tags": [
+          "goal"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Goal",
         "parameters": [
           {
             "name": "id",
@@ -1825,20 +1824,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "goal"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Goal",
+        "tags": [
+          "goal"
         ]
       }
     },
     "/injury": {
       "post": {
         "operationId": "create",
-        "summary": "Create Injury",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1865,18 +1864,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "injury"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Injury",
+        "tags": [
+          "injury"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Injurys",
         "parameters": [],
         "responses": {
           "200": {
@@ -1896,20 +1895,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "injury"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Injurys",
+        "tags": [
+          "injury"
         ]
       }
     },
     "/injury/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Injurys",
         "parameters": [
           {
             "name": "skip",
@@ -1978,20 +1977,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "injury"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Injurys",
+        "tags": [
+          "injury"
         ]
       }
     },
     "/injury/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Injury",
         "parameters": [
           {
             "name": "id",
@@ -2017,18 +2016,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "injury"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Injury",
+        "tags": [
+          "injury"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Injury",
         "parameters": [
           {
             "name": "id",
@@ -2057,18 +2056,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "injury"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Injury",
+        "tags": [
+          "injury"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Injury",
         "parameters": [
           {
             "name": "id",
@@ -2087,20 +2086,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "injury"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Injury",
+        "tags": [
+          "injury"
         ]
       }
     },
     "/lineUp": {
       "post": {
         "operationId": "create",
-        "summary": "Create LineUp",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2127,18 +2126,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "lineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create LineUp",
+        "tags": [
+          "lineUp"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all LineUps",
         "parameters": [],
         "responses": {
           "200": {
@@ -2158,20 +2157,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "lineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all LineUps",
+        "tags": [
+          "lineUp"
         ]
       }
     },
     "/lineUp/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all LineUps",
         "parameters": [
           {
             "name": "skip",
@@ -2240,20 +2239,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "lineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all LineUps",
+        "tags": [
+          "lineUp"
         ]
       }
     },
     "/lineUp/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one LineUp",
         "parameters": [
           {
             "name": "id",
@@ -2279,18 +2278,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "lineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one LineUp",
+        "tags": [
+          "lineUp"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one LineUp",
         "parameters": [
           {
             "name": "id",
@@ -2319,18 +2318,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "lineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one LineUp",
+        "tags": [
+          "lineUp"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one LineUp",
         "parameters": [
           {
             "name": "id",
@@ -2349,20 +2348,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "lineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one LineUp",
+        "tags": [
+          "lineUp"
         ]
       }
     },
     "/log": {
       "post": {
         "operationId": "create",
-        "summary": "Create Log",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2389,18 +2388,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "log"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Log",
+        "tags": [
+          "log"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Logs",
         "parameters": [],
         "responses": {
           "200": {
@@ -2420,20 +2419,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "log"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Logs",
+        "tags": [
+          "log"
         ]
       }
     },
     "/log/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Logs",
         "parameters": [
           {
             "name": "skip",
@@ -2502,20 +2501,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "log"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Logs",
+        "tags": [
+          "log"
         ]
       }
     },
     "/log/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Log",
         "parameters": [
           {
             "name": "id",
@@ -2541,18 +2540,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "log"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Log",
+        "tags": [
+          "log"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Log",
         "parameters": [
           {
             "name": "id",
@@ -2581,18 +2580,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "log"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Log",
+        "tags": [
+          "log"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Log",
         "parameters": [
           {
             "name": "id",
@@ -2611,20 +2610,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "log"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Log",
+        "tags": [
+          "log"
         ]
       }
     },
     "/manager": {
       "post": {
         "operationId": "create",
-        "summary": "Create Manager",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2651,18 +2650,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "manager"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Manager",
+        "tags": [
+          "manager"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Managers",
         "parameters": [],
         "responses": {
           "200": {
@@ -2682,20 +2681,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "manager"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Managers",
+        "tags": [
+          "manager"
         ]
       }
     },
     "/manager/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Managers",
         "parameters": [
           {
             "name": "skip",
@@ -2764,20 +2763,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "manager"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Managers",
+        "tags": [
+          "manager"
         ]
       }
     },
     "/manager/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Manager",
         "parameters": [
           {
             "name": "id",
@@ -2803,18 +2802,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "manager"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Manager",
+        "tags": [
+          "manager"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Manager",
         "parameters": [
           {
             "name": "id",
@@ -2843,18 +2842,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "manager"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Manager",
+        "tags": [
+          "manager"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Manager",
         "parameters": [
           {
             "name": "id",
@@ -2873,20 +2872,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "manager"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Manager",
+        "tags": [
+          "manager"
         ]
       }
     },
     "/managerEmployment": {
       "post": {
         "operationId": "create",
-        "summary": "Create ManagerEmployment",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2913,18 +2912,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "managerEmployment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create ManagerEmployment",
+        "tags": [
+          "managerEmployment"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all ManagerEmployments",
         "parameters": [],
         "responses": {
           "200": {
@@ -2944,20 +2943,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "managerEmployment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all ManagerEmployments",
+        "tags": [
+          "managerEmployment"
         ]
       }
     },
     "/managerEmployment/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all ManagerEmployments",
         "parameters": [
           {
             "name": "skip",
@@ -3026,20 +3025,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "managerEmployment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all ManagerEmployments",
+        "tags": [
+          "managerEmployment"
         ]
       }
     },
     "/managerEmployment/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one ManagerEmployment",
         "parameters": [
           {
             "name": "id",
@@ -3065,18 +3064,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "managerEmployment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one ManagerEmployment",
+        "tags": [
+          "managerEmployment"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one ManagerEmployment",
         "parameters": [
           {
             "name": "id",
@@ -3105,18 +3104,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "managerEmployment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one ManagerEmployment",
+        "tags": [
+          "managerEmployment"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one ManagerEmployment",
         "parameters": [
           {
             "name": "id",
@@ -3135,20 +3134,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "managerEmployment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one ManagerEmployment",
+        "tags": [
+          "managerEmployment"
         ]
       }
     },
     "/payment": {
       "post": {
         "operationId": "create",
-        "summary": "Create Payment",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3175,18 +3174,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "payment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Payment",
+        "tags": [
+          "payment"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Payments",
         "parameters": [],
         "responses": {
           "200": {
@@ -3206,20 +3205,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "payment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Payments",
+        "tags": [
+          "payment"
         ]
       }
     },
     "/payment/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Payments",
         "parameters": [
           {
             "name": "skip",
@@ -3288,20 +3287,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "payment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Payments",
+        "tags": [
+          "payment"
         ]
       }
     },
     "/payment/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Payment",
         "parameters": [
           {
             "name": "id",
@@ -3327,18 +3326,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "payment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Payment",
+        "tags": [
+          "payment"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Payment",
         "parameters": [
           {
             "name": "id",
@@ -3367,18 +3366,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "payment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Payment",
+        "tags": [
+          "payment"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Payment",
         "parameters": [
           {
             "name": "id",
@@ -3397,20 +3396,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "payment"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Payment",
+        "tags": [
+          "payment"
         ]
       }
     },
     "/player": {
       "post": {
         "operationId": "create",
-        "summary": "Create Player",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3437,18 +3436,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "player"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Player",
+        "tags": [
+          "player"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Players",
         "parameters": [],
         "responses": {
           "200": {
@@ -3468,20 +3467,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "player"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Players",
+        "tags": [
+          "player"
         ]
       }
     },
     "/player/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Players",
         "parameters": [
           {
             "name": "skip",
@@ -3550,20 +3549,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "player"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Players",
+        "tags": [
+          "player"
         ]
       }
     },
     "/player/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Player",
         "parameters": [
           {
             "name": "id",
@@ -3589,18 +3588,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "player"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Player",
+        "tags": [
+          "player"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Player",
         "parameters": [
           {
             "name": "id",
@@ -3629,18 +3628,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "player"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Player",
+        "tags": [
+          "player"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Player",
         "parameters": [
           {
             "name": "id",
@@ -3659,20 +3658,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "player"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Player",
+        "tags": [
+          "player"
         ]
       }
     },
     "/playerLineUp": {
       "post": {
         "operationId": "create",
-        "summary": "Create PlayerLineUp",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3699,18 +3698,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "playerLineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create PlayerLineUp",
+        "tags": [
+          "playerLineUp"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all PlayerLineUps",
         "parameters": [],
         "responses": {
           "200": {
@@ -3730,20 +3729,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "playerLineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all PlayerLineUps",
+        "tags": [
+          "playerLineUp"
         ]
       }
     },
     "/playerLineUp/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all PlayerLineUps",
         "parameters": [
           {
             "name": "skip",
@@ -3812,20 +3811,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "playerLineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all PlayerLineUps",
+        "tags": [
+          "playerLineUp"
         ]
       }
     },
     "/playerLineUp/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one PlayerLineUp",
         "parameters": [
           {
             "name": "id",
@@ -3851,18 +3850,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "playerLineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one PlayerLineUp",
+        "tags": [
+          "playerLineUp"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one PlayerLineUp",
         "parameters": [
           {
             "name": "id",
@@ -3891,18 +3890,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "playerLineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one PlayerLineUp",
+        "tags": [
+          "playerLineUp"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one PlayerLineUp",
         "parameters": [
           {
             "name": "id",
@@ -3921,20 +3920,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "playerLineUp"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one PlayerLineUp",
+        "tags": [
+          "playerLineUp"
         ]
       }
     },
     "/position": {
       "post": {
         "operationId": "create",
-        "summary": "Create Position",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3961,18 +3960,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "position"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Position",
+        "tags": [
+          "position"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Positions",
         "parameters": [],
         "responses": {
           "200": {
@@ -3992,20 +3991,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "position"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Positions",
+        "tags": [
+          "position"
         ]
       }
     },
     "/position/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Positions",
         "parameters": [
           {
             "name": "skip",
@@ -4074,20 +4073,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "position"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Positions",
+        "tags": [
+          "position"
         ]
       }
     },
     "/position/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Position",
         "parameters": [
           {
             "name": "id",
@@ -4113,18 +4112,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "position"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Position",
+        "tags": [
+          "position"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Position",
         "parameters": [
           {
             "name": "id",
@@ -4153,18 +4152,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "position"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Position",
+        "tags": [
+          "position"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Position",
         "parameters": [
           {
             "name": "id",
@@ -4183,20 +4182,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "position"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Position",
+        "tags": [
+          "position"
         ]
       }
     },
     "/prediction": {
       "post": {
         "operationId": "create",
-        "summary": "Create Prediction",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4223,18 +4222,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "prediction"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Prediction",
+        "tags": [
+          "prediction"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Predictions",
         "parameters": [],
         "responses": {
           "200": {
@@ -4254,20 +4253,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "prediction"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Predictions",
+        "tags": [
+          "prediction"
         ]
       }
     },
     "/prediction/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Predictions",
         "parameters": [
           {
             "name": "skip",
@@ -4336,20 +4335,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "prediction"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Predictions",
+        "tags": [
+          "prediction"
         ]
       }
     },
     "/prediction/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Prediction",
         "parameters": [
           {
             "name": "id",
@@ -4375,18 +4374,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "prediction"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Prediction",
+        "tags": [
+          "prediction"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Prediction",
         "parameters": [
           {
             "name": "id",
@@ -4415,18 +4414,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "prediction"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Prediction",
+        "tags": [
+          "prediction"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Prediction",
         "parameters": [
           {
             "name": "id",
@@ -4445,20 +4444,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "prediction"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Prediction",
+        "tags": [
+          "prediction"
         ]
       }
     },
     "/referee": {
       "post": {
         "operationId": "create",
-        "summary": "Create Referee",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4485,18 +4484,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "referee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Referee",
+        "tags": [
+          "referee"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Referees",
         "parameters": [],
         "responses": {
           "200": {
@@ -4516,20 +4515,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "referee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Referees",
+        "tags": [
+          "referee"
         ]
       }
     },
     "/referee/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Referees",
         "parameters": [
           {
             "name": "skip",
@@ -4598,20 +4597,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "referee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Referees",
+        "tags": [
+          "referee"
         ]
       }
     },
     "/referee/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Referee",
         "parameters": [
           {
             "name": "id",
@@ -4637,18 +4636,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "referee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Referee",
+        "tags": [
+          "referee"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Referee",
         "parameters": [
           {
             "name": "id",
@@ -4677,18 +4676,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "referee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Referee",
+        "tags": [
+          "referee"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Referee",
         "parameters": [
           {
             "name": "id",
@@ -4707,20 +4706,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "referee"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Referee",
+        "tags": [
+          "referee"
         ]
       }
     },
     "/season": {
       "post": {
         "operationId": "create",
-        "summary": "Create Season",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4747,18 +4746,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "season"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Season",
+        "tags": [
+          "season"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Seasons",
         "parameters": [],
         "responses": {
           "200": {
@@ -4778,20 +4777,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "season"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Seasons",
+        "tags": [
+          "season"
         ]
       }
     },
     "/season/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Seasons",
         "parameters": [
           {
             "name": "skip",
@@ -4860,20 +4859,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "season"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Seasons",
+        "tags": [
+          "season"
         ]
       }
     },
     "/season/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Season",
         "parameters": [
           {
             "name": "id",
@@ -4899,18 +4898,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "season"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Season",
+        "tags": [
+          "season"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Season",
         "parameters": [
           {
             "name": "id",
@@ -4939,18 +4938,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "season"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Season",
+        "tags": [
+          "season"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Season",
         "parameters": [
           {
             "name": "id",
@@ -4969,20 +4968,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "season"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Season",
+        "tags": [
+          "season"
         ]
       }
     },
     "/stadium": {
       "post": {
         "operationId": "create",
-        "summary": "Create Stadium",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5009,18 +5008,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "stadium"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Stadium",
+        "tags": [
+          "stadium"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Stadiums",
         "parameters": [],
         "responses": {
           "200": {
@@ -5040,20 +5039,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "stadium"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Stadiums",
+        "tags": [
+          "stadium"
         ]
       }
     },
     "/stadium/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Stadiums",
         "parameters": [
           {
             "name": "skip",
@@ -5122,20 +5121,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "stadium"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Stadiums",
+        "tags": [
+          "stadium"
         ]
       }
     },
     "/stadium/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Stadium",
         "parameters": [
           {
             "name": "id",
@@ -5161,18 +5160,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "stadium"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Stadium",
+        "tags": [
+          "stadium"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Stadium",
         "parameters": [
           {
             "name": "id",
@@ -5201,18 +5200,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "stadium"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Stadium",
+        "tags": [
+          "stadium"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Stadium",
         "parameters": [
           {
             "name": "id",
@@ -5231,20 +5230,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "stadium"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Stadium",
+        "tags": [
+          "stadium"
         ]
       }
     },
     "/substitution": {
       "post": {
         "operationId": "create",
-        "summary": "Create Substitution",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5271,18 +5270,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "substitution"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Substitution",
+        "tags": [
+          "substitution"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Substitutions",
         "parameters": [],
         "responses": {
           "200": {
@@ -5302,20 +5301,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "substitution"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Substitutions",
+        "tags": [
+          "substitution"
         ]
       }
     },
     "/substitution/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Substitutions",
         "parameters": [
           {
             "name": "skip",
@@ -5384,20 +5383,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "substitution"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Substitutions",
+        "tags": [
+          "substitution"
         ]
       }
     },
     "/substitution/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Substitution",
         "parameters": [
           {
             "name": "id",
@@ -5423,18 +5422,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "substitution"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Substitution",
+        "tags": [
+          "substitution"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Substitution",
         "parameters": [
           {
             "name": "id",
@@ -5463,18 +5462,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "substitution"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Substitution",
+        "tags": [
+          "substitution"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Substitution",
         "parameters": [
           {
             "name": "id",
@@ -5493,20 +5492,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "substitution"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Substitution",
+        "tags": [
+          "substitution"
         ]
       }
     },
     "/team": {
       "post": {
         "operationId": "create",
-        "summary": "Create Team",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5533,18 +5532,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "team"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Team",
+        "tags": [
+          "team"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Teams",
         "parameters": [],
         "responses": {
           "200": {
@@ -5564,20 +5563,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "team"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Teams",
+        "tags": [
+          "team"
         ]
       }
     },
     "/team/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Teams",
         "parameters": [
           {
             "name": "skip",
@@ -5646,20 +5645,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "team"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Teams",
+        "tags": [
+          "team"
         ]
       }
     },
     "/team/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Team",
         "parameters": [
           {
             "name": "id",
@@ -5685,18 +5684,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "team"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Team",
+        "tags": [
+          "team"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Team",
         "parameters": [
           {
             "name": "id",
@@ -5725,18 +5724,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "team"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Team",
+        "tags": [
+          "team"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Team",
         "parameters": [
           {
             "name": "id",
@@ -5755,20 +5754,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "team"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Team",
+        "tags": [
+          "team"
         ]
       }
     },
     "/teamCompetitionSeason": {
       "post": {
         "operationId": "create",
-        "summary": "Create TeamCompetitionSeason",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5795,18 +5794,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "teamCompetitionSeason"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create TeamCompetitionSeason",
+        "tags": [
+          "teamCompetitionSeason"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all TeamCompetitionSeasons",
         "parameters": [],
         "responses": {
           "200": {
@@ -5826,20 +5825,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "teamCompetitionSeason"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all TeamCompetitionSeasons",
+        "tags": [
+          "teamCompetitionSeason"
         ]
       }
     },
     "/teamCompetitionSeason/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all TeamCompetitionSeasons",
         "parameters": [
           {
             "name": "skip",
@@ -5908,20 +5907,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "teamCompetitionSeason"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all TeamCompetitionSeasons",
+        "tags": [
+          "teamCompetitionSeason"
         ]
       }
     },
     "/teamCompetitionSeason/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one TeamCompetitionSeason",
         "parameters": [
           {
             "name": "id",
@@ -5947,18 +5946,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "teamCompetitionSeason"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one TeamCompetitionSeason",
+        "tags": [
+          "teamCompetitionSeason"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one TeamCompetitionSeason",
         "parameters": [
           {
             "name": "id",
@@ -5987,18 +5986,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "teamCompetitionSeason"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one TeamCompetitionSeason",
+        "tags": [
+          "teamCompetitionSeason"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one TeamCompetitionSeason",
         "parameters": [
           {
             "name": "id",
@@ -6017,20 +6016,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "teamCompetitionSeason"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one TeamCompetitionSeason",
+        "tags": [
+          "teamCompetitionSeason"
         ]
       }
     },
     "/ticket": {
       "post": {
         "operationId": "create",
-        "summary": "Create Ticket",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6057,18 +6056,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "ticket"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Ticket",
+        "tags": [
+          "ticket"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Tickets",
         "parameters": [],
         "responses": {
           "200": {
@@ -6088,20 +6087,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "ticket"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Tickets",
+        "tags": [
+          "ticket"
         ]
       }
     },
     "/ticket/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Tickets",
         "parameters": [
           {
             "name": "skip",
@@ -6170,20 +6169,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "ticket"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Tickets",
+        "tags": [
+          "ticket"
         ]
       }
     },
     "/ticket/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Ticket",
         "parameters": [
           {
             "name": "id",
@@ -6209,18 +6208,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "ticket"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Ticket",
+        "tags": [
+          "ticket"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Ticket",
         "parameters": [
           {
             "name": "id",
@@ -6249,18 +6248,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "ticket"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Ticket",
+        "tags": [
+          "ticket"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Ticket",
         "parameters": [
           {
             "name": "id",
@@ -6279,20 +6278,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "ticket"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Ticket",
+        "tags": [
+          "ticket"
         ]
       }
     },
     "/transfer": {
       "post": {
         "operationId": "create",
-        "summary": "Create Transfer",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6319,18 +6318,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "transfer"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Transfer",
+        "tags": [
+          "transfer"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Transfers",
         "parameters": [],
         "responses": {
           "200": {
@@ -6350,20 +6349,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "transfer"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Transfers",
+        "tags": [
+          "transfer"
         ]
       }
     },
     "/transfer/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Transfers",
         "parameters": [
           {
             "name": "skip",
@@ -6432,20 +6431,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "transfer"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Transfers",
+        "tags": [
+          "transfer"
         ]
       }
     },
     "/transfer/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Transfer",
         "parameters": [
           {
             "name": "id",
@@ -6471,18 +6470,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "transfer"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Transfer",
+        "tags": [
+          "transfer"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Transfer",
         "parameters": [
           {
             "name": "id",
@@ -6511,18 +6510,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "transfer"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Transfer",
+        "tags": [
+          "transfer"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Transfer",
         "parameters": [
           {
             "name": "id",
@@ -6541,20 +6540,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "transfer"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Transfer",
+        "tags": [
+          "transfer"
         ]
       }
     },
     "/trophy": {
       "post": {
         "operationId": "create",
-        "summary": "Create Trophy",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6581,18 +6580,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "trophy"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create Trophy",
+        "tags": [
+          "trophy"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Trophys",
         "parameters": [],
         "responses": {
           "200": {
@@ -6612,20 +6611,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "trophy"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Trophys",
+        "tags": [
+          "trophy"
         ]
       }
     },
     "/trophy/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Trophys",
         "parameters": [
           {
             "name": "skip",
@@ -6694,20 +6693,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "trophy"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Trophys",
+        "tags": [
+          "trophy"
         ]
       }
     },
     "/trophy/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one Trophy",
         "parameters": [
           {
             "name": "id",
@@ -6733,18 +6732,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "trophy"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one Trophy",
+        "tags": [
+          "trophy"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one Trophy",
         "parameters": [
           {
             "name": "id",
@@ -6773,18 +6772,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "trophy"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one Trophy",
+        "tags": [
+          "trophy"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one Trophy",
         "parameters": [
           {
             "name": "id",
@@ -6803,20 +6802,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "trophy"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one Trophy",
+        "tags": [
+          "trophy"
         ]
       }
     },
     "/user": {
       "post": {
         "operationId": "create",
-        "summary": "Create User",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6843,18 +6842,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "user"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create User",
+        "tags": [
+          "user"
         ]
       },
       "get": {
         "operationId": "getAll",
-        "summary": "Get all Users",
         "parameters": [],
         "responses": {
           "200": {
@@ -6874,20 +6873,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "user"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Users",
+        "tags": [
+          "user"
         ]
       }
     },
     "/user/query": {
       "get": {
         "operationId": "getQuery",
-        "summary": "Get all Users",
         "parameters": [
           {
             "name": "skip",
@@ -6956,20 +6955,20 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "user"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get all Users",
+        "tags": [
+          "user"
         ]
       }
     },
     "/user/{id}": {
       "get": {
         "operationId": "getOne",
-        "summary": "Get one User",
         "parameters": [
           {
             "name": "id",
@@ -6995,18 +6994,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "user"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get one User",
+        "tags": [
+          "user"
         ]
       },
       "patch": {
         "operationId": "updateOne",
-        "summary": "Update one User",
         "parameters": [
           {
             "name": "id",
@@ -7035,18 +7034,18 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "user"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update one User",
+        "tags": [
+          "user"
         ]
       },
       "delete": {
         "operationId": "deleteOne",
-        "summary": "Delete one User",
         "parameters": [
           {
             "name": "id",
@@ -7065,13 +7064,14 @@
             "description": "Unauthorized"
           }
         },
-        "tags": [
-          "user"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete one User",
+        "tags": [
+          "user"
         ]
       }
     },

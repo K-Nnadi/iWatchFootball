@@ -14,14 +14,12 @@ import {CheckoutPage} from "./pages/checkout.page";
 import {ThankYouPage} from "./pages/thankYou.page";
 import {SeatSelectionPage} from "./pages/seatSelection.page";
 import {MatchPage} from "./pages/match/match.page";
-import {LandingPage} from "./pages/landing.page";
 
 export type ElementMap = {
     [x: any]: Element;
 }
 
 const IWatchFootballElements: ElementMap = {
-    home: <HomePage/>,
     logs: <LogsPage/>,
     matches: <MatchesPage/>,
     settings: <SettingsPage/>,
@@ -40,7 +38,7 @@ const childrenRoutes = Object.entries(IWatchFootballElements).map(([path, elemen
 const additionalRoutes = [
     {
         path: '/',
-        element: <LandingPage />
+        element: <HomePage />
     },
     {
         path: '/competition/:id',
