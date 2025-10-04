@@ -39,4 +39,4 @@ export class Substitution extends BaseDbEntity {
     minute!: number;
 }
 
-export class CreateSubstitutionDTO extends PickType(Substitution, ["fixtureId", "teamId", "playerInId", "playerOutId", "minute"] as const) {}
+export class CreateSubstitutionDTO extends PickType(Substitution, ["fixtureId", "teamId", "playerInId", "playerOutId", "minute", "metadata"] as const) {}
