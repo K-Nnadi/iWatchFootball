@@ -37,4 +37,4 @@ export class ManagerEmployment extends BaseDbEntity {
 
 
 
-export class CreateManagerEmploymentDTO extends PickType(ManagerEmployment, [] as const) {}
+export class CreateManagerEmploymentDTO extends PickType(ManagerEmployment, ['managerId', 'teamId', 'startDate', 'endDate', 'isCurrent', 'metadata'] as const) {}
