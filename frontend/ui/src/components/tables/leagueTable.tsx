@@ -20,7 +20,7 @@ const initialTeams: Team[] = [
     { id: 1, position: 1, name: 'Manchester City', played: 25, won: 19, drawn: 4, lost: 2, goalDifference: 38, points: 61, previousPosition: 2 },
     { id: 2, position: 2, name: 'Arsenal', played: 25, won: 18, drawn: 5, lost: 2, goalDifference: 35, points: 59, previousPosition: 1 },
     { id: 3, position: 3, name: 'Liverpool', played: 25, won: 17, drawn: 6, lost: 2, goalDifference: 30, points: 57, previousPosition: 3 },
-    { id: 4, position: 4, name: 'Aston Villa', played: 25, won: 15, drawn: 6, lost: 4, goalDifference: 20, points: 51, previousPosition: 4 },
+    { id: 4, position: 4, name: 'Chelsea', played: 25, won: 15, drawn: 6, lost: 4, goalDifference: 20, points: 51, previousPosition: 4 },
     { id: 5, position: 5, name: 'Tottenham', played: 25, won: 14, drawn: 5, lost: 6, goalDifference: 18, points: 47, previousPosition: 5 },
 ];
 

@@ -83,5 +83,5 @@ export class Team extends BaseDbEntity {
 
 }
 
-export class CreateTeamDTO extends PickType(Team, ["name", "founded", "stadiumIds", "managerId", "website", "logoUrl", "city", "country", "type", "parentId"] as const) {
+export class CreateTeamDTO extends PickType(Team, ["name", "founded", "stadiumIds", "managerId", "website", "logoUrl", "city", "country", "type", "parentId", 'metadata'] as const) {
 }

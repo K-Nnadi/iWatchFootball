@@ -15,6 +15,10 @@ export class Stadium extends BaseDbEntity{
     @EntityColumn({db: {type: "varchar"}})
     name!: string
 
+
+    @EntityColumn({db: {type: "varchar"}})
+    country!: string
+
     @OptionalEntityColumn({db: {type: "timestamp"}})
     opened?: Date
 
@@ -42,4 +46,4 @@ export class Stadium extends BaseDbEntity{
     fixtures?: Promise<Fixture[]>
 }
 
-export class CreateStadiumDTO extends PickType(Stadium, ["name", "opened", "teamIds", "capacity", "addressId"] as const){}
+export class CreateStadiumDTO extends PickType(Stadium, ["name", "country", "opened", "teamIds", "capacity", "addressId", 'metadata'] as const){}

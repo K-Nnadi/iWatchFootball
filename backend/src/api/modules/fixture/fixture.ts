@@ -117,5 +117,7 @@ export class CreateFixtureDTO extends PickType(Fixture, [
     'date',
     'attendance',
     'status',
+    'stage',
     'seasonId',
+    'metadata'
 ] as const) {}

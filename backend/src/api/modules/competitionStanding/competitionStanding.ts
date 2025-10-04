@@ -81,6 +81,7 @@ export class CreateCompetitionStandingDTO extends PickType(CompetitionStanding, 
     'goalDifference',
     'points',
     'form',            // Include optional fields if creation allows specifying them
-    'positionChange'   // Include optional fields if creation allows specifying them
+    'positionChange',   // Include optional fields if creation allows specifying them
+    "metadata"
 ] as const) {
 }

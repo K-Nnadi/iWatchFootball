@@ -35,5 +35,5 @@ export class Log extends BaseDbEntity {
 
 }
 
-export class CreateLogDTO extends PickType(Log, ["userId", "fixtureId", "ticketNumber", "notes", "isVerified"] as const) {
+export class CreateLogDTO extends PickType(Log, ["userId", "fixtureId", "ticketNumber", "notes", "isVerified", "metadata"] as const) {
 }

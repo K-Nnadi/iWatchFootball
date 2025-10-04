@@ -53,4 +53,4 @@ export class Address extends BaseDbEntity {
     stadium?: Promise<Stadium>;
 }
 
-export class CreateAddressDTO extends PickType(Address, ['address1', 'address2', 'townOrCity', 'postcode', 'location', "stadiumId"] as const) {}
+export class CreateAddressDTO extends PickType(Address, ['address1', 'address2', 'townOrCity', 'postcode', 'location', "stadiumId", "metadata"] as const) {}

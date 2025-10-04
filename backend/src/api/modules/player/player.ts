@@ -24,8 +24,8 @@ export class Player extends BaseDbEntity{
     @EntityColumn({db: {type: "varchar"}})
     nationality!: string
 
-    @EntityColumn({db: {type: "int"}})
-    positionId!: number
+    @EntityColumn({db: {type: "int", array: true}})
+    positionIds?: number[]
 
     @OptionalEntityColumn({db: {type: "varchar"}})
     bio?: string
@@ -73,4 +73,4 @@ export class Player extends BaseDbEntity{
 
 
 
-export class CreatePlayerDTO extends PickType(Player, ["name", "nickname", "dateOfBirth", "nationality", "bio", "positionId", "teamIds", "height", "weight", "kitNumber", "photoUrl" ] as const) {}
+export class CreatePlayerDTO extends PickType(Player, ["name", "nickname", "dateOfBirth", "nationality", "bio", "positionIds", "teamIds", "height", "weight", "kitNumber", "photoUrl", 'metadata' ] as const) {}

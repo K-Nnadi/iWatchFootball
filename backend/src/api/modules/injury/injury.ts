@@ -22,4 +22,4 @@ export class Injury extends BaseDbEntity {
     status!: string; // e.g., injured, recovered
 }
 
-export class CreateInjuryDTO extends PickType(Injury, ["playerId", "injuryType", "startDate", "endDate", "status"] as const) {}
+export class CreateInjuryDTO extends PickType(Injury, ["playerId", "injuryType", "startDate", "endDate", "status", "metadata"] as const) {}

@@ -31,4 +31,4 @@ export class Manager extends BaseDbEntity{
 }
 
 
-export class CreateManagerDTO extends PickType(Manager, ["name", "nickname","nationality", "teamIds"] as const) {}
+export class CreateManagerDTO extends PickType(Manager, ["name", "nickname","nationality", "teamIds", "metadata"] as const) {}

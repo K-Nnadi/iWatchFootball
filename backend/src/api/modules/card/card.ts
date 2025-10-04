@@ -22,4 +22,4 @@ export class Card extends BaseDbEntity {
     minute!: number;
 }
 
-export class CreateCardDTO extends PickType(Card, ["fixtureId", "playerId", "type", "minute"] as const) {}
+export class CreateCardDTO extends PickType(Card, ["fixtureId", "playerId", "type", "minute", "metadata"] as const) {}

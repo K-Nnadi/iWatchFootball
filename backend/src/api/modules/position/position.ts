@@ -21,4 +21,4 @@ export class Position extends BaseDbEntity {
     abbreviation?: string; // e.g., FW, MF
 }
 
-export class CreatePositionDTO extends PickType(Position, ["name", "abbreviation"] as const) {}
+export class CreatePositionDTO extends PickType(Position, ["name", "abbreviation", "metadata"] as const) {}

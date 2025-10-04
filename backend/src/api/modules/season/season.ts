@@ -17,4 +17,4 @@ export class Season extends BaseDbEntity {
     teamCompetitionSeasons!: TeamCompetitionSeason[];
 }
 
-export class CreateSeasonDTO extends PickType(Season, ['yearStart', 'yearEnd'] as const) {}
+export class CreateSeasonDTO extends PickType(Season, ['yearStart', 'yearEnd', "metadata"] as const) {}

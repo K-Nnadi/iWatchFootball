@@ -41,6 +41,6 @@ export class Competition extends BaseDbEntity {
     trophies!: Promise<Trophy[]>;
 }
 
-export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country"] as const) {
+export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country", 'metadata'] as const) {
 }
 

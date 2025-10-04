@@ -42,6 +42,7 @@ export class CreateTrophyDTO extends PickType(Trophy, [
     'yearIntroduced',
     'competitionId',
     'teamId',
-    'playerId'
+    'playerId',
+    'metadata'
 ] as const) {
 }

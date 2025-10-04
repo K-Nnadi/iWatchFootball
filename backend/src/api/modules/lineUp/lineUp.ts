@@ -38,4 +38,4 @@ export class LineUp extends BaseDbEntity {
     formation?: string; // e.g., 4-4-2, 3-5-2
 }
 
-export class CreateLineUpDTO extends PickType(LineUp, ["fixtureId", "teamId", "managerId", "formation"] as const) {}
+export class CreateLineUpDTO extends PickType(LineUp, ["fixtureId", "teamId", "managerId", "formation", "metadata"] as const) {}

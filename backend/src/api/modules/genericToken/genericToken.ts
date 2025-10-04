@@ -24,5 +24,5 @@ export class GenericToken extends BaseDbEntity {
 
 }
 
-export class CreateGenericTokenDTO extends PickType(GenericToken, ["token", "type", "expiry", "userEmail", "userId"] as const) {
+export class CreateGenericTokenDTO extends PickType(GenericToken, ["token", "type", "expiry", "userEmail", "userId", "metadata"] as const) {
 }

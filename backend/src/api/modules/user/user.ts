@@ -42,5 +42,5 @@ export class User extends BaseDbEntity {
     predictions?: Promise<Prediction[]>;
 }
 
-export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type"] as const) {
+export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {
 }
