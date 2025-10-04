@@ -2,7 +2,8 @@
 	"name": "@iWatchFootball",
 	"scripts": {
 		"run:frontend": "pnpm --filter ./frontend/ui dev",
-		"run:backend": "pnpm --filter ./backend start:dev"
+		"run:backend": "pnpm --filter ./backend start:dev",
+		"run:clients": "pnpm --filter ./backend generate:client-gen"
 	},
 	"dependencies": {
 		"@casl/ability": "6.3.3",
