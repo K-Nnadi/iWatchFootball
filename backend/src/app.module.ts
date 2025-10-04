@@ -29,6 +29,7 @@ import {PredictionModule} from "./api/modules/prediction/prediction.module";
 import {AuthModule} from "./api/complexControllers/auth.controller";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
+import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 
 const BULL_MODULE = BullModule.forRoot({
     connection: {
@@ -64,7 +65,8 @@ const Modules = [
     TicketModule,
     TransferModule,
     TrophyModule,
-    UserModule
+    UserModule,
+    StatsBombAdapterModule
 ];
 
 const ComplexModules = [
