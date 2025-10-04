@@ -18,4 +18,4 @@ export class Referee extends BaseDbEntity {
     fixtures!: FixtureReferee[];
 }
 
-export class CreateRefereeDTO extends PickType(Referee, ["name", "nationality"] as const) {}
+export class CreateRefereeDTO extends PickType(Referee, ["name", "nationality", "metadata"] as const) {}

@@ -60,4 +60,5 @@ export class CreateTicketDTO extends PickType(Ticket, [
     'fixtureId',
     'userId',
     'paymentId',
+    'metadata'
 ] as const) {}

@@ -39,5 +39,5 @@ export class Transfer extends BaseDbEntity {
     isLoan?: boolean
 }
 
-export class CreateTransferDTO extends PickType(Transfer, ["playerId", "sourceTeamId", "destinationTeamId", "transferFee", "date", "isLoan"] as const) {
+export class CreateTransferDTO extends PickType(Transfer, ["playerId", "sourceTeamId", "destinationTeamId", "transferFee", "date", "isLoan", "metadata"] as const) {
 }

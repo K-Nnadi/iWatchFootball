@@ -42,4 +42,4 @@ export class TeamCompetitionSeason extends BaseDbEntity {
     position?: number; // Optional: Store the position in the competition for that season
 }
 
-export class CreateTeamCompetitionSeasonDTO extends PickType(TeamCompetitionSeason, ['teamId', 'competitionId', 'seasonId', 'points', 'position'] as const) {}
+export class CreateTeamCompetitionSeasonDTO extends PickType(TeamCompetitionSeason, ['teamId', 'competitionId', 'seasonId', 'points', 'position', 'metadata'] as const) {}

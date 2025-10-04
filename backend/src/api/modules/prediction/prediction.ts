@@ -27,4 +27,4 @@ export class Prediction extends BaseDbEntity {
     predicted?: PredictedResult;
 }
 
-export class CreatePredictionDTO extends PickType(Prediction, ["fixtureId", "userId", "fixture", "user", "predicted"] as const) {}
+export class CreatePredictionDTO extends PickType(Prediction, ["fixtureId", "userId", "fixture", "user", "predicted", "metadata"] as const) {}
