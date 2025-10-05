@@ -63,6 +63,15 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 		return resp.raw
 	}
 
+	async count(query?: FindManyOptions<T>): Promise<number> {
+		this.logger.log(`count - ${this.repository.metadata.name} - ${JSON.stringify(query)}`)
+		if (query) {
+			const finalQuery = await this.parseQueryOptions(query)
+			return this.repository.count(finalQuery);
+		}
+		return this.repository.count();
+	}
+
 	parseQueryOptions = async (query: FindManyOptions<T>): Promise<FindManyOptions<T>> => {
 		let parsedRelations: object | FindOptionsRelations<T>;
 

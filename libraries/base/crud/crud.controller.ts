@@ -27,13 +27,13 @@ export class QueryOptions<T> {
     skip?: number;
     @ApiPropertyOptional({type: Number})
     take?: number;
-    @ApiPropertyOptional({type: 'object'})
+    @ApiPropertyOptional({type: 'object', additionalProperties: { type: 'boolean' }})
     select?: { [P in keyof T]?: boolean };
     @ApiPropertyOptional()
     where?: { [P in keyof T]?: T[P] } | { [P in keyof T]?: T[P] }[];
-    @ApiPropertyOptional()
+    @ApiPropertyOptional({type: 'object', additionalProperties: { type: 'boolean' }})
     relations?: { [P in keyof T]?: boolean };
-    @ApiPropertyOptional()
+    @ApiPropertyOptional({type: 'object', additionalProperties: { type: 'boolean' }})
     order?: { [P in keyof T]?: boolean };
     @ApiPropertyOptional()
     withDeleted?: boolean;
@@ -48,6 +48,7 @@ export class QueryOptions<T> {
 
 export interface ControllerInterface<T, U> extends Omit<CrudInterface<T, U>, "getQuery"> {
     getQuery(request: FastifyRequest, skip?: number, take?: number, withDeleted?: boolean, loadEagerRelations?: boolean, transaction?: boolean, comment?: string, where?: any): Promise<T[]>
+    getCount(request: FastifyRequest, withDeleted?: boolean, transaction?: boolean, comment?: string, where?: any): Promise<number>
 }
 
 
@@ -84,6 +85,25 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
 
             const query = qs.parse(request.url.split('?')[1], QS_OPTIONS)
             return this.service.getQuery({...query, skip, take, withDeleted, loadEagerRelations, transaction});
+        }
+
+        @Get('count')
+        @ApiOperation({summary: `Get count of ${entity.name}s`, operationId: `getCount`})
+        @ApiOkResponse({type: Number, description: 'Total count of entities'})
+        getCount(@Req() request: FastifyRequest,
+                 @Query('withDeleted', new DefaultValuePipe(false), ParseBoolPipe) withDeleted: boolean,
+                 @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction: boolean,
+                 @Query('comment') comment: string) {
+
+            const query = qs.parse(request.url.split('?')[1], QS_OPTIONS)
+            // Remove pagination parameters for count
+            const { skip, take, loadEagerRelations, ...countQuery } = query;
+            return this.service.count({...countQuery, withDeleted, transaction});
+        }
+
+        // Add the count method to satisfy the interface
+        async count(query?: any): Promise<number> {
+            return this.service.count(query);
         }
 
         @Get(':id')

@@ -29,7 +29,7 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 			}
 		}
 
-		// console.log(typeORMConfig)
+		// console.log('TypeORM Config:', JSON.stringify(typeORMConfig, null, 2));
 		return  typeORMConfig;
 	}
 }

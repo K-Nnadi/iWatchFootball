@@ -17,11 +17,13 @@ export const CrudService = <T, U>(entity: any, createDTO: any): Type<CrudInterfa
             return this.service.create(entity);
         }
 
-
         getAll() {
             return this.service.getAll();
         }
 
+        getQuery(query: any) {
+            return this.service.getQuery(query);
+        }
 
         getOne(@Param('id') id: number) {
             return this.service.getOne(+id);
@@ -33,6 +35,10 @@ export const CrudService = <T, U>(entity: any, createDTO: any): Type<CrudInterfa
 
         delete(@Param('id') id: number) {
             return this.service.delete(+id);
+        }
+
+        count(query?: any) {
+            return this.service.count(query);
         }
     }
 

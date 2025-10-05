@@ -12,6 +12,6 @@ export const TYPEORM_CONFIG = TypeOrmModule.forRootAsync({
 });
 
 export const CONFIG = ConfigModule.forRoot({
-    envFilePath: ENV === 'development' ? '.env': 'SUI',
+    envFilePath: ENV === 'development' ? '.env': undefined,
     isGlobal: true
 })

@@ -154,6 +154,61 @@
         ]
       }
     },
+    "/address/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Addresss",
+        "tags": [
+          "address"
+        ]
+      }
+    },
     "/address/{id}": {
       "get": {
         "operationId": "getOne",
@@ -258,6 +313,61 @@
           }
         ],
         "summary": "Delete one Address",
+        "tags": [
+          "address"
+        ]
+      }
+    },
+    "/address/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Address",
+        "tags": [
+          "address"
+        ]
+      }
+    },
+    "/address/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Address",
         "tags": [
           "address"
         ]
@@ -416,6 +526,61 @@
         ]
       }
     },
+    "/card/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Cards",
+        "tags": [
+          "card"
+        ]
+      }
+    },
     "/card/{id}": {
       "get": {
         "operationId": "getOne",
@@ -520,6 +685,61 @@
           }
         ],
         "summary": "Delete one Card",
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/card/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Card",
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/card/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Card",
         "tags": [
           "card"
         ]
@@ -678,6 +898,61 @@
         ]
       }
     },
+    "/competition/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Competitions",
+        "tags": [
+          "competition"
+        ]
+      }
+    },
     "/competition/{id}": {
       "get": {
         "operationId": "getOne",
@@ -782,6 +1057,61 @@
           }
         ],
         "summary": "Delete one Competition",
+        "tags": [
+          "competition"
+        ]
+      }
+    },
+    "/competition/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Competition",
+        "tags": [
+          "competition"
+        ]
+      }
+    },
+    "/competition/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Competition",
         "tags": [
           "competition"
         ]
@@ -940,6 +1270,61 @@
         ]
       }
     },
+    "/fixture/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Fixtures",
+        "tags": [
+          "fixture"
+        ]
+      }
+    },
     "/fixture/{id}": {
       "get": {
         "operationId": "getOne",
@@ -1044,6 +1429,61 @@
           }
         ],
         "summary": "Delete one Fixture",
+        "tags": [
+          "fixture"
+        ]
+      }
+    },
+    "/fixture/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Fixture",
+        "tags": [
+          "fixture"
+        ]
+      }
+    },
+    "/fixture/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Fixture",
         "tags": [
           "fixture"
         ]
@@ -1202,6 +1642,61 @@
         ]
       }
     },
+    "/fixtureReferee/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of FixtureReferees",
+        "tags": [
+          "fixtureReferee"
+        ]
+      }
+    },
     "/fixtureReferee/{id}": {
       "get": {
         "operationId": "getOne",
@@ -1306,6 +1801,61 @@
           }
         ],
         "summary": "Delete one FixtureReferee",
+        "tags": [
+          "fixtureReferee"
+        ]
+      }
+    },
+    "/fixtureReferee/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for FixtureReferee",
+        "tags": [
+          "fixtureReferee"
+        ]
+      }
+    },
+    "/fixtureReferee/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to FixtureReferee",
         "tags": [
           "fixtureReferee"
         ]
@@ -1464,6 +2014,61 @@
         ]
       }
     },
+    "/genericToken/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of GenericTokens",
+        "tags": [
+          "genericToken"
+        ]
+      }
+    },
     "/genericToken/{id}": {
       "get": {
         "operationId": "getOne",
@@ -1568,6 +2173,61 @@
           }
         ],
         "summary": "Delete one GenericToken",
+        "tags": [
+          "genericToken"
+        ]
+      }
+    },
+    "/genericToken/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for GenericToken",
+        "tags": [
+          "genericToken"
+        ]
+      }
+    },
+    "/genericToken/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to GenericToken",
         "tags": [
           "genericToken"
         ]
@@ -1726,6 +2386,61 @@
         ]
       }
     },
+    "/goal/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Goals",
+        "tags": [
+          "goal"
+        ]
+      }
+    },
     "/goal/{id}": {
       "get": {
         "operationId": "getOne",
@@ -1830,6 +2545,61 @@
           }
         ],
         "summary": "Delete one Goal",
+        "tags": [
+          "goal"
+        ]
+      }
+    },
+    "/goal/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Goal",
+        "tags": [
+          "goal"
+        ]
+      }
+    },
+    "/goal/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Goal",
         "tags": [
           "goal"
         ]
@@ -1988,6 +2758,61 @@
         ]
       }
     },
+    "/injury/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Injurys",
+        "tags": [
+          "injury"
+        ]
+      }
+    },
     "/injury/{id}": {
       "get": {
         "operationId": "getOne",
@@ -2092,6 +2917,61 @@
           }
         ],
         "summary": "Delete one Injury",
+        "tags": [
+          "injury"
+        ]
+      }
+    },
+    "/injury/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Injury",
+        "tags": [
+          "injury"
+        ]
+      }
+    },
+    "/injury/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Injury",
         "tags": [
           "injury"
         ]
@@ -2250,6 +3130,61 @@
         ]
       }
     },
+    "/lineUp/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of LineUps",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
     "/lineUp/{id}": {
       "get": {
         "operationId": "getOne",
@@ -2354,6 +3289,61 @@
           }
         ],
         "summary": "Delete one LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to LineUp",
         "tags": [
           "lineUp"
         ]
@@ -2512,6 +3502,61 @@
         ]
       }
     },
+    "/log/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Logs",
+        "tags": [
+          "log"
+        ]
+      }
+    },
     "/log/{id}": {
       "get": {
         "operationId": "getOne",
@@ -2616,6 +3661,61 @@
           }
         ],
         "summary": "Delete one Log",
+        "tags": [
+          "log"
+        ]
+      }
+    },
+    "/log/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Log",
+        "tags": [
+          "log"
+        ]
+      }
+    },
+    "/log/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Log",
         "tags": [
           "log"
         ]
@@ -2774,6 +3874,61 @@
         ]
       }
     },
+    "/manager/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Managers",
+        "tags": [
+          "manager"
+        ]
+      }
+    },
     "/manager/{id}": {
       "get": {
         "operationId": "getOne",
@@ -2878,6 +4033,61 @@
           }
         ],
         "summary": "Delete one Manager",
+        "tags": [
+          "manager"
+        ]
+      }
+    },
+    "/manager/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Manager",
+        "tags": [
+          "manager"
+        ]
+      }
+    },
+    "/manager/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Manager",
         "tags": [
           "manager"
         ]
@@ -3036,6 +4246,61 @@
         ]
       }
     },
+    "/managerEmployment/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of ManagerEmployments",
+        "tags": [
+          "managerEmployment"
+        ]
+      }
+    },
     "/managerEmployment/{id}": {
       "get": {
         "operationId": "getOne",
@@ -3140,6 +4405,61 @@
           }
         ],
         "summary": "Delete one ManagerEmployment",
+        "tags": [
+          "managerEmployment"
+        ]
+      }
+    },
+    "/managerEmployment/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for ManagerEmployment",
+        "tags": [
+          "managerEmployment"
+        ]
+      }
+    },
+    "/managerEmployment/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to ManagerEmployment",
         "tags": [
           "managerEmployment"
         ]
@@ -3298,6 +4618,61 @@
         ]
       }
     },
+    "/payment/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Payments",
+        "tags": [
+          "payment"
+        ]
+      }
+    },
     "/payment/{id}": {
       "get": {
         "operationId": "getOne",
@@ -3402,6 +4777,61 @@
           }
         ],
         "summary": "Delete one Payment",
+        "tags": [
+          "payment"
+        ]
+      }
+    },
+    "/payment/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Payment",
+        "tags": [
+          "payment"
+        ]
+      }
+    },
+    "/payment/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Payment",
         "tags": [
           "payment"
         ]
@@ -3560,6 +4990,61 @@
         ]
       }
     },
+    "/player/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Players",
+        "tags": [
+          "player"
+        ]
+      }
+    },
     "/player/{id}": {
       "get": {
         "operationId": "getOne",
@@ -3664,6 +5149,61 @@
           }
         ],
         "summary": "Delete one Player",
+        "tags": [
+          "player"
+        ]
+      }
+    },
+    "/player/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Player",
+        "tags": [
+          "player"
+        ]
+      }
+    },
+    "/player/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Player",
         "tags": [
           "player"
         ]
@@ -3822,6 +5362,61 @@
         ]
       }
     },
+    "/playerLineUp/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of PlayerLineUps",
+        "tags": [
+          "playerLineUp"
+        ]
+      }
+    },
     "/playerLineUp/{id}": {
       "get": {
         "operationId": "getOne",
@@ -3926,6 +5521,61 @@
           }
         ],
         "summary": "Delete one PlayerLineUp",
+        "tags": [
+          "playerLineUp"
+        ]
+      }
+    },
+    "/playerLineUp/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for PlayerLineUp",
+        "tags": [
+          "playerLineUp"
+        ]
+      }
+    },
+    "/playerLineUp/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to PlayerLineUp",
         "tags": [
           "playerLineUp"
         ]
@@ -4084,6 +5734,61 @@
         ]
       }
     },
+    "/position/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Positions",
+        "tags": [
+          "position"
+        ]
+      }
+    },
     "/position/{id}": {
       "get": {
         "operationId": "getOne",
@@ -4188,6 +5893,61 @@
           }
         ],
         "summary": "Delete one Position",
+        "tags": [
+          "position"
+        ]
+      }
+    },
+    "/position/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Position",
+        "tags": [
+          "position"
+        ]
+      }
+    },
+    "/position/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Position",
         "tags": [
           "position"
         ]
@@ -4346,6 +6106,61 @@
         ]
       }
     },
+    "/prediction/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Predictions",
+        "tags": [
+          "prediction"
+        ]
+      }
+    },
     "/prediction/{id}": {
       "get": {
         "operationId": "getOne",
@@ -4450,6 +6265,61 @@
           }
         ],
         "summary": "Delete one Prediction",
+        "tags": [
+          "prediction"
+        ]
+      }
+    },
+    "/prediction/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Prediction",
+        "tags": [
+          "prediction"
+        ]
+      }
+    },
+    "/prediction/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Prediction",
         "tags": [
           "prediction"
         ]
@@ -4608,6 +6478,61 @@
         ]
       }
     },
+    "/referee/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Referees",
+        "tags": [
+          "referee"
+        ]
+      }
+    },
     "/referee/{id}": {
       "get": {
         "operationId": "getOne",
@@ -4712,6 +6637,61 @@
           }
         ],
         "summary": "Delete one Referee",
+        "tags": [
+          "referee"
+        ]
+      }
+    },
+    "/referee/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Referee",
+        "tags": [
+          "referee"
+        ]
+      }
+    },
+    "/referee/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Referee",
         "tags": [
           "referee"
         ]
@@ -4870,6 +6850,61 @@
         ]
       }
     },
+    "/season/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Seasons",
+        "tags": [
+          "season"
+        ]
+      }
+    },
     "/season/{id}": {
       "get": {
         "operationId": "getOne",
@@ -4974,6 +7009,61 @@
           }
         ],
         "summary": "Delete one Season",
+        "tags": [
+          "season"
+        ]
+      }
+    },
+    "/season/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Season",
+        "tags": [
+          "season"
+        ]
+      }
+    },
+    "/season/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Season",
         "tags": [
           "season"
         ]
@@ -5132,6 +7222,61 @@
         ]
       }
     },
+    "/stadium/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Stadiums",
+        "tags": [
+          "stadium"
+        ]
+      }
+    },
     "/stadium/{id}": {
       "get": {
         "operationId": "getOne",
@@ -5236,6 +7381,61 @@
           }
         ],
         "summary": "Delete one Stadium",
+        "tags": [
+          "stadium"
+        ]
+      }
+    },
+    "/stadium/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Stadium",
+        "tags": [
+          "stadium"
+        ]
+      }
+    },
+    "/stadium/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Stadium",
         "tags": [
           "stadium"
         ]
@@ -5394,6 +7594,61 @@
         ]
       }
     },
+    "/substitution/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Substitutions",
+        "tags": [
+          "substitution"
+        ]
+      }
+    },
     "/substitution/{id}": {
       "get": {
         "operationId": "getOne",
@@ -5498,6 +7753,61 @@
           }
         ],
         "summary": "Delete one Substitution",
+        "tags": [
+          "substitution"
+        ]
+      }
+    },
+    "/substitution/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Substitution",
+        "tags": [
+          "substitution"
+        ]
+      }
+    },
+    "/substitution/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Substitution",
         "tags": [
           "substitution"
         ]
@@ -5656,6 +7966,61 @@
         ]
       }
     },
+    "/team/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Teams",
+        "tags": [
+          "team"
+        ]
+      }
+    },
     "/team/{id}": {
       "get": {
         "operationId": "getOne",
@@ -5760,6 +8125,61 @@
           }
         ],
         "summary": "Delete one Team",
+        "tags": [
+          "team"
+        ]
+      }
+    },
+    "/team/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Team",
+        "tags": [
+          "team"
+        ]
+      }
+    },
+    "/team/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Team",
         "tags": [
           "team"
         ]
@@ -5918,6 +8338,61 @@
         ]
       }
     },
+    "/teamCompetitionSeason/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of TeamCompetitionSeasons",
+        "tags": [
+          "teamCompetitionSeason"
+        ]
+      }
+    },
     "/teamCompetitionSeason/{id}": {
       "get": {
         "operationId": "getOne",
@@ -6022,6 +8497,61 @@
           }
         ],
         "summary": "Delete one TeamCompetitionSeason",
+        "tags": [
+          "teamCompetitionSeason"
+        ]
+      }
+    },
+    "/teamCompetitionSeason/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for TeamCompetitionSeason",
+        "tags": [
+          "teamCompetitionSeason"
+        ]
+      }
+    },
+    "/teamCompetitionSeason/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to TeamCompetitionSeason",
         "tags": [
           "teamCompetitionSeason"
         ]
@@ -6180,6 +8710,61 @@
         ]
       }
     },
+    "/ticket/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Tickets",
+        "tags": [
+          "ticket"
+        ]
+      }
+    },
     "/ticket/{id}": {
       "get": {
         "operationId": "getOne",
@@ -6284,6 +8869,61 @@
           }
         ],
         "summary": "Delete one Ticket",
+        "tags": [
+          "ticket"
+        ]
+      }
+    },
+    "/ticket/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Ticket",
+        "tags": [
+          "ticket"
+        ]
+      }
+    },
+    "/ticket/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Ticket",
         "tags": [
           "ticket"
         ]
@@ -6442,6 +9082,61 @@
         ]
       }
     },
+    "/transfer/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Transfers",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
     "/transfer/{id}": {
       "get": {
         "operationId": "getOne",
@@ -6546,6 +9241,61 @@
           }
         ],
         "summary": "Delete one Transfer",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Transfer",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Transfer",
         "tags": [
           "transfer"
         ]
@@ -6704,6 +9454,61 @@
         ]
       }
     },
+    "/trophy/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Trophys",
+        "tags": [
+          "trophy"
+        ]
+      }
+    },
     "/trophy/{id}": {
       "get": {
         "operationId": "getOne",
@@ -6808,6 +9613,61 @@
           }
         ],
         "summary": "Delete one Trophy",
+        "tags": [
+          "trophy"
+        ]
+      }
+    },
+    "/trophy/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Trophy",
+        "tags": [
+          "trophy"
+        ]
+      }
+    },
+    "/trophy/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Trophy",
         "tags": [
           "trophy"
         ]
@@ -6966,6 +9826,61 @@
         ]
       }
     },
+    "/user/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Users",
+        "tags": [
+          "user"
+        ]
+      }
+    },
     "/user/{id}": {
       "get": {
         "operationId": "getOne",
@@ -7072,6 +9987,234 @@
         "summary": "Delete one User",
         "tags": [
           "user"
+        ]
+      }
+    },
+    "/user/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/statsbomb/sync": {
+      "post": {
+        "description": "Fetches data from StatsBomb Open Data repository and syncs it with the local database",
+        "operationId": "StatsBombController_syncData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Data synchronization completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "StatsBomb data synchronization completed successfully"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "example": "2024-01-15T10:30:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error during synchronization"
+          }
+        },
+        "summary": "Sync StatsBomb data to database",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/status": {
+      "get": {
+        "description": "Returns current database statistics and sync status",
+        "operationId": "StatsBombController_getSyncStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sync status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "competitions": {
+                      "type": "number",
+                      "example": 15
+                    },
+                    "teams": {
+                      "type": "number",
+                      "example": 300
+                    },
+                    "players": {
+                      "type": "number",
+                      "example": 5000
+                    },
+                    "fixtures": {
+                      "type": "number",
+                      "example": 2000
+                    },
+                    "goals": {
+                      "type": "number",
+                      "example": 5000
+                    },
+                    "lastSync": {
+                      "type": "string",
+                      "example": "2024-01-15T10:30:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get sync status and statistics",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/sync/competitions": {
+      "post": {
+        "description": "Fetches and syncs only competition data from StatsBomb",
+        "operationId": "StatsBombController_syncCompetitions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Sync competitions only",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/sync/teams": {
+      "post": {
+        "description": "Fetches and syncs only team and player data from StatsBomb",
+        "operationId": "StatsBombController_syncTeams",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Sync teams and players only",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/sync/fixtures": {
+      "post": {
+        "description": "Fetches and syncs only fixture data from StatsBomb",
+        "operationId": "StatsBombController_syncFixtures",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Sync fixtures only",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/team-types": {
+      "get": {
+        "description": "Tests the team type detection logic with sample data to verify it correctly identifies club vs country teams",
+        "operationId": "StatsBombController_testTeamTypeDetection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Team type detection test results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "teamName": {
+                        "type": "string",
+                        "example": "Brazil"
+                      },
+                      "teamCountry": {
+                        "type": "string",
+                        "example": "Brazil"
+                      },
+                      "detectedType": {
+                        "type": "string",
+                        "example": "Country"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test team type detection",
+        "tags": [
+          "StatsBomb Adapter"
         ]
       }
     },
@@ -7431,6 +10574,23 @@
               "Live"
             ]
           },
+          "stage": {
+            "type": "string",
+            "description": "Stage of the fixture",
+            "example": "League",
+            "enum": [
+              "Final",
+              "Semi Final",
+              "Quarter Final",
+              "Last 16",
+              "Last 32",
+              "Group Stage",
+              "Third Place",
+              "Play Off",
+              "Round Robin",
+              "League"
+            ]
+          },
           "attendance": {
             "type": "number",
             "description": "Attendance for the fixture",
@@ -7442,7 +10602,8 @@
           "competitionId",
           "seasonId",
           "stadiumId",
-          "status"
+          "status",
+          "stage"
         ]
       },
       "TeamCompetitionSeason": {
@@ -7516,6 +10677,9 @@
           "name": {
             "type": "string"
           },
+          "country": {
+            "type": "string"
+          },
           "opened": {
             "format": "date-time",
             "type": "string"
@@ -7545,6 +10709,7 @@
         "required": [
           "id",
           "name",
+          "country",
           "teamIds"
         ]
       },
@@ -8232,7 +11397,30 @@
       },
       "CreateManagerEmploymentDTO": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "managerId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isCurrent": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "managerId",
+          "teamId",
+          "isCurrent"
+        ]
       },
       "ManagerEmployment": {
         "type": "object",
@@ -8358,8 +11546,11 @@
           "nationality": {
             "type": "string"
           },
-          "positionId": {
-            "type": "number"
+          "positionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "bio": {
             "type": "string"
@@ -8387,7 +11578,7 @@
           "name",
           "dateOfBirth",
           "nationality",
-          "positionId"
+          "positionIds"
         ]
       },
       "Player": {
@@ -8418,8 +11609,11 @@
           "nationality": {
             "type": "string"
           },
-          "positionId": {
-            "type": "number"
+          "positionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "bio": {
             "type": "string"
@@ -8473,7 +11667,7 @@
           "name",
           "dateOfBirth",
           "nationality",
-          "positionId",
+          "positionIds",
           "goals",
           "assists",
           "ownGoals",
@@ -8745,6 +11939,9 @@
           "name": {
             "type": "string"
           },
+          "country": {
+            "type": "string"
+          },
           "opened": {
             "format": "date-time",
             "type": "string"
@@ -8764,6 +11961,7 @@
         },
         "required": [
           "name",
+          "country",
           "teamIds"
         ]
       },
