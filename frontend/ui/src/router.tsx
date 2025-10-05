@@ -14,6 +14,7 @@ import {CheckoutPage} from "./pages/checkout.page";
 import {ThankYouPage} from "./pages/thankYou.page";
 import {SeatSelectionPage} from "./pages/seatSelection.page";
 import {MatchPage} from "./pages/match/match.page";
+import {TeamPage} from "./pages/team/team.page";
 
 export type ElementMap = {
     [x: any]: Element;
@@ -47,6 +48,10 @@ const additionalRoutes = [
     {
         path: '/match/:id',
         element: <MatchPage />
+    },
+    {
+        path: '/team/:id',
+        element: <TeamPage />
     },
     {
         path: '/seat-selection/:id',

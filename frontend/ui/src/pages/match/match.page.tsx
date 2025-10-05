@@ -190,8 +190,9 @@ export function MatchPage() {
         <Container size="xl" py="xl">
             {/* Match Header */}
             <Paper p="xl" radius="lg" withBorder mb="xl">
-                <Group position="apart" align="center" spacing={0}>
-                    <Box sx={{ flex: 1, textAlign: 'right', paddingRight: 40 }}>
+                <Group position="apart" align="center" noWrap sx={{ width: '100%' }}>
+                    {/* Home team */}
+                    <Box sx={{ flex: 1, textAlign: 'right' }}>
                         <Title order={2} mb="md">{matchDetails.homeTeam}</Title>
                         <Group position="right" spacing={8}>
                             {homeForm.map((result, i) => (
@@ -206,12 +207,14 @@ export function MatchPage() {
                         </Group>
                     </Box>
 
+                    {/* Center VS block */}
                     <Box
                         sx={(theme) => ({
                             textAlign: 'center',
-                            padding: '0 40px',
+                            padding: '0 24px',
+                            minWidth: 200,
                             borderLeft: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-                            borderRight: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+                            borderRight: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`
                         })}
                     >
                         <Text size="sm" color="dimmed" mb="xs">
@@ -237,7 +240,8 @@ export function MatchPage() {
                         </Button>
                     </Box>
 
-                    <Box sx={{ flex: 1, textAlign: 'left', paddingLeft: 40 }}>
+                    {/* Away team */}
+                    <Box sx={{ flex: 1, textAlign: 'left' }}>
                         <Title order={2} mb="md">{matchDetails.awayTeam}</Title>
                         <Group position="left" spacing={8}>
                             {awayForm.map((result, i) => (
@@ -253,6 +257,7 @@ export function MatchPage() {
                     </Box>
                 </Group>
             </Paper>
+
 
             {/* Predictions Section */}
             {status !== 'past' && (

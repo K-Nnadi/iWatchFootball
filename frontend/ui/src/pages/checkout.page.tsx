@@ -35,7 +35,6 @@ export function CheckoutPage() {
         price: 50
     };
 
-    // Guard against missing location.state
     if (!location.state) {
         console.error('No ticket details provided. Redirecting to matches page.');
         navigate('/matches');
@@ -48,12 +47,58 @@ export function CheckoutPage() {
         expiration: '',
         cvv: ''
     });
+
+    const [errors, setErrors] = useState({
+        name: '',
+        cardNumber: '',
+        expiration: '',
+        cvv: ''
+    });
+
     const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+    const validate = () => {
+        let valid = true;
+        const newErrors = {
+            name: '',
+            cardNumber: '',
+            expiration: '',
+            cvv: ''
+        };
+
+        if (!paymentInfo.name.trim()) {
+            newErrors.name = 'Name is required';
+            valid = false;
+        }
+
+        const cardRegex = /^\d{16}$/;
+        if (!cardRegex.test(paymentInfo.cardNumber.replace(/\s+/g, ''))) {
+            newErrors.cardNumber = 'Card number must be 16 digits';
+            valid = false;
+        }
+
+        const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+        if (!expiryRegex.test(paymentInfo.expiration)) {
+            newErrors.expiration = 'Invalid format (MM/YY)';
+            valid = false;
+        }
+
+        const cvvRegex = /^\d{3,4}$/;
+        if (!cvvRegex.test(paymentInfo.cvv)) {
+            newErrors.cvv = 'CVV must be 3 or 4 digits';
+            valid = false;
+        }
+
+        setErrors(newErrors);
+        return valid;
+    };
+
     const handlePaymentSubmit = () => {
+        if (!validate()) return;
+
         setPaymentStatus('idle');
         setTimeout(() => {
-            const isSuccessful = Math.random() > 0.1; // Simulate 90% success rate
+            const isSuccessful = Math.random() > 0.1;
             if (isSuccessful) {
                 setPaymentStatus('success');
                 setTimeout(() => navigate('/thank-you', { state: ticketDetails }), 2000);
@@ -64,7 +109,8 @@ export function CheckoutPage() {
     };
 
     const handleInputChange = (field: string, value: string) => {
-        setPaymentInfo({ ...paymentInfo, [field]: value });
+        setPaymentInfo((prev) => ({ ...prev, [field]: value }));
+        setErrors((prev) => ({ ...prev, [field]: '' }));
     };
 
     return (
@@ -89,27 +135,51 @@ export function CheckoutPage() {
                         label="Name on Card"
                         placeholder="John Doe"
                         value={paymentInfo.name}
+                        error={errors.name}
                         onChange={(e) => handleInputChange('name', e.currentTarget.value)}
                     />
                     <TextInput
                         label="Card Number"
                         placeholder="1234 5678 9012 3456"
-                        mt="md"
                         value={paymentInfo.cardNumber}
-                        onChange={(e) => handleInputChange('cardNumber', e.currentTarget.value)}
+                        onChange={(e) => {
+                            const raw = e.currentTarget.value.replace(/\D/g, ''); // strip non-digits
+                            const formatted = raw.match(/.{1,4}/g)?.join(' ') ?? '';
+                            if (raw.length <= 16) {
+                                handleInputChange('cardNumber', formatted);
+                            }
+                        }}
+                        error={errors.cardNumber}
                     />
+
                     <Group grow mt="md">
                         <TextInput
                             label="Expiration Date"
                             placeholder="MM/YY"
                             value={paymentInfo.expiration}
-                            onChange={(e) => handleInputChange('expiration', e.currentTarget.value)}
+                            onChange={(e) => {
+                                let val = e.currentTarget.value.replace(/\D/g, ''); // only digits
+                                if (val.length > 4) val = val.slice(0, 4);
+
+                                if (val.length >= 3) {
+                                    val = `${val.slice(0, 2)}/${val.slice(2)}`;
+                                }
+                                handleInputChange('expiration', val);
+                            }}
+                            error={errors.expiration}
                         />
+
                         <TextInput
                             label="CVV"
                             placeholder="123"
                             value={paymentInfo.cvv}
-                            onChange={(e) => handleInputChange('cvv', e.currentTarget.value)}
+                            onChange={(e) => {
+                                const raw = e.currentTarget.value.replace(/\D/g, ''); // only digits
+                                if (raw.length <= 4) {
+                                    handleInputChange('cvv', raw);
+                                }
+                            }}
+                            error={errors.cvv}
                         />
                     </Group>
                 </Box>
@@ -121,6 +191,7 @@ export function CheckoutPage() {
                 >
                     Pay ${ticketDetails.price?.toFixed(2) || '0.00'}
                 </Button>
+
                 {paymentStatus === 'success' && (
                     <Notification
                         mt="lg"
@@ -132,6 +203,7 @@ export function CheckoutPage() {
                         Thank you for your purchase! Redirecting...
                     </Notification>
                 )}
+
                 {paymentStatus === 'error' && (
                     <Notification
                         mt="lg"

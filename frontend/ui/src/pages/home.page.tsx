@@ -34,7 +34,7 @@ import {
     IconBrandInstagram,
     IconBrandYoutube
 } from '@tabler/icons-react';
-import { NewsCarousel } from '../components/carousel/news.carousel';
+import { Carousel } from '@mantine/carousel';
 import '../styles/homepage.css';
 import {useNavigate} from "react-router-dom";
 
@@ -122,7 +122,6 @@ function LiveMatchesSection() {
             awayTeam: 'Chelsea',
             homeScore: 2,
             awayScore: 1,
-            status: 'LIVE',
             statusColor: 'red',
             league: 'Premier League',
             time: '65\'',
@@ -133,12 +132,11 @@ function LiveMatchesSection() {
             id: 2,
             homeTeam: 'Barcelona',
             awayTeam: 'Real Madrid',
-            homeScore: null,
-            awayScore: null,
-            status: 'UPCOMING',
+            homeScore: 2,
+            awayScore: 2,
             statusColor: 'green',
             league: 'La Liga',
-            time: 'Tomorrow',
+            time: '86\'',
             homeLogo: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=120&q=80',
             awayLogo: 'https://images.unsplash.com/photo-1599245895529-3c0992ab3c91?auto=format&w=120&q=80',
         },
@@ -148,7 +146,6 @@ function LiveMatchesSection() {
             awayTeam: 'Inter',
             homeScore: 1,
             awayScore: 3,
-            status: 'FINISHED',
             statusColor: 'gray',
             league: 'Serie A',
             time: 'FT',
@@ -180,9 +177,6 @@ function LiveMatchesSection() {
                                 className="match-card"
                             >
                                 <Group position="apart" mb="md">
-                                    <Badge color={match.statusColor} size="sm">
-                                        {match.status}
-                                    </Badge>
                                     <Text size="sm" color="dimmed">
                                         {match.league}
                                     </Text>
@@ -240,7 +234,7 @@ function LatestNewsSection() {
             excerpt: 'FIFA has announced the 16 host cities for the expanded 48-team tournament in North America.',
             category: 'World Cup',
             time: '5 hours ago',
-            image: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=600&q=80'
+            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
         },
         {
             id: 3,
@@ -248,7 +242,23 @@ function LatestNewsSection() {
             excerpt: 'The English midfielder is reportedly close to completing a €120m transfer from Dortmund this summer.',
             category: 'Transfer News',
             time: 'Yesterday',
-            image: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=600&q=80'
+            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
+        },
+        {
+            id: 4,
+            title: 'Bellingham Set for Record Move to Real Madrid',
+            excerpt: 'The English midfielder is reportedly close to completing a €120m transfer from Dortmund this summer.',
+            category: 'Transfer News',
+            time: 'Yesterday',
+            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
+        },
+        {
+            id: 5,
+            title: 'Bellingham Set for Record Move to Real Madrid',
+            excerpt: 'The English midfielder is reportedly close to completing a €120m transfer from Dortmund this summer.',
+            category: 'Transfer News',
+            time: 'Yesterday',
+            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
         }
     ];
 
@@ -264,24 +274,35 @@ function LatestNewsSection() {
                     </Button>
                 </Group>
 
-                <Grid gutter="xl">
-                    {news.map((article) => (
-                        <Grid.Col key={article.id} span={{ base: 12, md: 4 }}>
+                <Carousel
+                    slideSize={{ base: '100%', sm: '50%', md: '33.333%' }}
+                    slideGap="md"
+                    align="start"
+                    slidesToScroll={1}
+                    withIndicators
+                    loop
+                    dragFree
+                    height="100%"
+                >
+                {news.map((article) => (
+                        <Carousel.Slide key={article.id}>
                             <Card
                                 shadow="md"
                                 radius="md"
                                 withBorder
                                 className="news-card"
+                                sx={{ height: '100%' }}
                             >
                                 <Box
                                     component="img"
                                     src={article.image}
                                     alt={article.title}
-                                    sx={{
+                                    style={{
                                         width: '100%',
-                                        height: '12rem',
+                                        height: '200px',
                                         objectFit: 'cover',
-                                        borderRadius: '0.5rem 0.5rem 0 0'
+                                        borderTopLeftRadius: '0.5rem',
+                                        borderTopRightRadius: '0.5rem',
                                     }}
                                 />
                                 <Stack spacing="md" p="xl">
@@ -305,9 +326,9 @@ function LatestNewsSection() {
                                     </Button>
                                 </Stack>
                             </Card>
-                        </Grid.Col>
+                        </Carousel.Slide>
                     ))}
-                </Grid>
+                </Carousel>
             </Container>
         </Box>
     );
