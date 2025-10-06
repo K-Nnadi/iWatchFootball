@@ -3,7 +3,7 @@ import {Entity, ManyToMany, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Stadium} from "../stadium/stadium";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
-import {TeamType} from "../../enums/team.enum";
+import {TeamGender, TeamType} from "../../enums/team.enum";
 import {Manager} from "../manager/manager";
 import {Player} from "../player/player";
 import {
@@ -59,7 +59,14 @@ export class Team extends BaseDbEntity {
     city?: string;
 
     @OptionalEntityColumn({db: {type: "varchar"}})
-    country!: string;
+    country?: string;
+
+
+    @EntityEnumColumn({
+        db: {enum: TeamGender, default: TeamGender.MALE, nullable: true},
+        api: {enum: TeamGender, nullable: true}
+    })
+    gender?: TeamGender;
 
     @EntityEnumColumn({
         db: {enum: TeamType, default: TeamType.CLUB}

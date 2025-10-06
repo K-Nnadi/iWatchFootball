@@ -1,3 +1,5 @@
+import {Raw} from "typeorm";
+
 export const isObject = (a: any) => (!!a && a.constructor === Object) || (!!a && typeof a === 'object');
 
 export const clone = (obj: any) => JSON.parse(JSON.stringify(obj));
@@ -128,4 +130,22 @@ export const recurseWithObjFunction = (obj: any, objCheckFunction: (obj: any) =>
 		return obj;
 	}
 	return obj;
+};
+
+export const JsonbWhere = (
+	path: string | string[],
+	operator: '=' | '!=' | 'LIKE' | 'ILIKE' | '>' | '<' | '>=' | '<=' = '=',
+	value: any,
+	castTo?: 'int' | 'float' | 'bool' | 'text'
+) => {
+	const pathExpr =
+		Array.isArray(path) && path.length > 1
+			? path.map((p, i, arr) => (i === arr.length - 1 ? `->>'${p}'` : `->'${p}'`)).join('')
+			: typeof path === 'string'
+				? `->>'${path}'`
+				: '';
+
+	const cast = castTo ? `::${castTo}` : '';
+
+	return Raw((alias) => `${alias}${pathExpr}${cast} ${operator} :value`, { value });
 };

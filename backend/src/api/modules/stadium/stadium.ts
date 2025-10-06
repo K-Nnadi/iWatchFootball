@@ -22,7 +22,7 @@ export class Stadium extends BaseDbEntity{
     @OptionalEntityColumn({db: {type: "timestamp"}})
     opened?: Date
 
-    @EntityColumn({db: {type: "int", array: true}})
+    @OptionalEntityColumn({db: {type: "int", array: true}})
     teamIds?: number[]
 
     @ApiPropertyOptional()

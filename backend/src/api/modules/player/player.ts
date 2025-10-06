@@ -68,7 +68,6 @@ export class Player extends BaseDbEntity{
     @ApiProperty({nullable: true})
     @OneToMany(() => Trophy, trophy => trophy.player, {lazy: true, nullable: true})
     trophies?: Trophy[];
-
 }
 
 

@@ -78,48 +78,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -160,24 +166,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -450,48 +459,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -532,24 +547,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -822,48 +840,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -904,24 +928,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -1194,48 +1221,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -1276,24 +1309,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -1566,48 +1602,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -1648,24 +1690,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -1938,48 +1983,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -2020,24 +2071,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -2310,48 +2364,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -2392,24 +2452,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -2682,48 +2745,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -2764,24 +2833,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -3054,48 +3126,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -3136,24 +3214,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -3426,48 +3507,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -3508,24 +3595,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -3798,48 +3888,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -3880,24 +3976,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -4170,48 +4269,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -4252,24 +4357,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -4542,48 +4650,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -4624,24 +4738,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -4914,48 +5031,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -4996,24 +5119,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -5286,48 +5412,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -5368,24 +5500,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -5658,48 +5793,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -5740,24 +5881,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -6030,48 +6174,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -6112,24 +6262,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -6402,48 +6555,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -6484,24 +6643,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -6774,48 +6936,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -6856,24 +7024,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -7146,48 +7317,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -7228,24 +7405,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -7518,48 +7698,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -7600,24 +7786,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -7890,48 +8079,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -7972,24 +8167,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -8262,48 +8460,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -8344,24 +8548,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -8634,48 +8841,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -8716,24 +8929,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -9006,48 +9222,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -9088,24 +9310,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -9378,48 +9603,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -9460,24 +9691,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -9750,48 +9984,54 @@
         "parameters": [
           {
             "name": "skip",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to skip",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Number of records to take",
             "schema": {
               "type": "number"
             }
           },
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "loadEagerRelations",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Load eager relations",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -9832,24 +10072,27 @@
         "parameters": [
           {
             "name": "withDeleted",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Include soft deleted records",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "transaction",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Use transaction",
             "schema": {
               "type": "boolean"
             }
           },
           {
             "name": "comment",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Query comment",
             "schema": {
               "type": "string"
             }
@@ -10213,6 +10456,245 @@
           }
         },
         "summary": "Test team type detection",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/team-creation": {
+      "post": {
+        "description": "Tests the team creation functionality to verify it works correctly",
+        "operationId": "StatsBombController_testTeamCreation",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Team creation test result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "team": {
+                      "type": "object"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test team creation",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/sync-teams-only": {
+      "post": {
+        "description": "Tests syncing only teams from StatsBomb data to verify the process works",
+        "operationId": "StatsBombController_testSyncTeamsOnly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Team sync test result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "teamsCreated": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test sync teams only",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/sync-events-only": {
+      "post": {
+        "description": "Tests syncing only events from StatsBomb data to verify the process works",
+        "operationId": "StatsBombController_testSyncEventsOnly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Events sync test result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "eventsCreated": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test sync events only",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/sync-players-only": {
+      "post": {
+        "description": "Tests syncing only players from StatsBomb data to verify the process works",
+        "operationId": "StatsBombController_testSyncPlayersOnly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Players sync test result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "playersCreated": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test sync players only",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/sync-single-match/{matchId}": {
+      "post": {
+        "description": "Tests syncing teams, players, and all events (goals, cards, substitutions) from a specific match ID to debug the process",
+        "operationId": "StatsBombController_testSyncSingleMatch",
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Single match sync test result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "matchId": {
+                      "type": "number"
+                    },
+                    "playersCreated": {
+                      "type": "number"
+                    },
+                    "eventsCreated": {
+                      "type": "number"
+                    },
+                    "details": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test sync complete match data from a single match",
+        "tags": [
+          "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/statsbomb/test/available-matches": {
+      "get": {
+        "description": "Returns a list of available match IDs that can be used for single match testing",
+        "operationId": "StatsBombController_getAvailableMatches",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of available match IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "matches": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "matchId": {
+                            "type": "number"
+                          },
+                          "homeTeam": {
+                            "type": "string"
+                          },
+                          "awayTeam": {
+                            "type": "string"
+                          },
+                          "competition": {
+                            "type": "string"
+                          },
+                          "season": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get available match IDs for testing",
         "tags": [
           "StatsBomb Adapter"
         ]
@@ -10709,8 +11191,7 @@
         "required": [
           "id",
           "name",
-          "country",
-          "teamIds"
+          "country"
         ]
       },
       "Fixture": {
@@ -11758,12 +12239,22 @@
           "name": {
             "type": "string"
           },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Goalkeeper",
+              "Defender",
+              "Midfielder",
+              "Forward"
+            ]
+          },
           "abbreviation": {
             "type": "string"
           }
         },
         "required": [
-          "name"
+          "name",
+          "type"
         ]
       },
       "Position": {
@@ -11961,8 +12452,7 @@
         },
         "required": [
           "name",
-          "country",
-          "teamIds"
+          "country"
         ]
       },
       "CreateSubstitutionDTO": {
@@ -12141,6 +12631,14 @@
           "country": {
             "type": "string"
           },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "Male",
+              "Female"
+            ],
+            "nullable": true
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -12171,6 +12669,7 @@
           "teamCompetitionSeasons",
           "manager",
           "players",
+          "gender",
           "type",
           "homeFixtures",
           "awayFixtures",

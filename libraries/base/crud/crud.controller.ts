@@ -13,7 +13,7 @@ import {
     Req, Res,
     Type, UploadedFile, UseInterceptors
 } from '@nestjs/common';
-import {ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiPropertyOptional} from '@nestjs/swagger';
+import {ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiPropertyOptional, ApiQuery} from '@nestjs/swagger';
 import {CrudInterface} from "./crud.interface";
 import {FastifyReply, FastifyRequest} from "fastify";
 import {QS_OPTIONS} from "./query.options";
@@ -75,13 +75,19 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         @Get('query')
         @ApiOperation({summary: `Get all ${entity.name}s`, operationId: `getQuery`})
         @ApiOkResponse({type: entity, isArray: true})
+        @ApiQuery({name: 'skip', required: false, type: Number, description: 'Number of records to skip'})
+        @ApiQuery({name: 'take', required: false, type: Number, description: 'Number of records to take'})
+        @ApiQuery({name: 'withDeleted', required: false, type: Boolean, description: 'Include soft deleted records'})
+        @ApiQuery({name: 'loadEagerRelations', required: false, type: Boolean, description: 'Load eager relations'})
+        @ApiQuery({name: 'transaction', required: false, type: Boolean, description: 'Use transaction'})
+        @ApiQuery({name: 'comment', required: false, type: String, description: 'Query comment'})
         getQuery(@Req() request: FastifyRequest,
-                 @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip: number,
-                 @Query('take', new DefaultValuePipe(100), ParseIntPipe) take: number,
-                 @Query('withDeleted', new DefaultValuePipe(false), ParseBoolPipe) withDeleted: boolean,
-                 @Query('loadEagerRelations', new DefaultValuePipe(true), ParseBoolPipe) loadEagerRelations: boolean,
-                 @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction: boolean,
-                 @Query('comment') comment: string) {
+                 @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip?: number,
+                 @Query('take', new DefaultValuePipe(100), ParseIntPipe) take?: number,
+                 @Query('withDeleted', new DefaultValuePipe(false), ParseBoolPipe) withDeleted?: boolean,
+                 @Query('loadEagerRelations', new DefaultValuePipe(true), ParseBoolPipe) loadEagerRelations?: boolean,
+                 @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction?: boolean,
+                 @Query('comment') comment?: string) {
 
             const query = qs.parse(request.url.split('?')[1], QS_OPTIONS)
             return this.service.getQuery({...query, skip, take, withDeleted, loadEagerRelations, transaction});
@@ -90,10 +96,13 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         @Get('count')
         @ApiOperation({summary: `Get count of ${entity.name}s`, operationId: `getCount`})
         @ApiOkResponse({type: Number, description: 'Total count of entities'})
+        @ApiQuery({name: 'withDeleted', required: false, type: Boolean, description: 'Include soft deleted records'})
+        @ApiQuery({name: 'transaction', required: false, type: Boolean, description: 'Use transaction'})
+        @ApiQuery({name: 'comment', required: false, type: String, description: 'Query comment'})
         getCount(@Req() request: FastifyRequest,
-                 @Query('withDeleted', new DefaultValuePipe(false), ParseBoolPipe) withDeleted: boolean,
-                 @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction: boolean,
-                 @Query('comment') comment: string) {
+                 @Query('withDeleted', new DefaultValuePipe(false), ParseBoolPipe) withDeleted?: boolean,
+                 @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction?: boolean,
+                 @Query('comment') comment?: string) {
 
             const query = qs.parse(request.url.split('?')[1], QS_OPTIONS)
             // Remove pagination parameters for count

@@ -39,5 +39,4 @@ export class CreatePaymentDTO extends PickType(Payment, [
     'method',
     'status',
     'amount',
-    'metadata'
 ] as const) {}
