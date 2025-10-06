@@ -30,6 +30,7 @@ import {AuthModule} from "./api/complexControllers/auth.controller";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
+import {HealthController} from "./health/health.controller";
 
 const BULL_MODULE = BullModule.forRoot({
     connection: {
@@ -81,6 +82,7 @@ const ComplexModules = [
         ...Modules,
         ...ComplexModules
     ],
+    controllers: [HealthController],
 })
 export class AppModule {
 }

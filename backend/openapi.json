@@ -1,6 +1,51 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          }
+        },
+        "summary": "Health check endpoint",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "HealthController_ready",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Service is ready to accept traffic"
+          }
+        },
+        "summary": "Readiness check endpoint",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "operationId": "HealthController_live",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Service is alive"
+          }
+        },
+        "summary": "Liveness check endpoint",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
     "/address": {
       "post": {
         "operationId": "create",
