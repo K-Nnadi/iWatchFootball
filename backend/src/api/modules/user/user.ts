@@ -29,7 +29,7 @@ export class User extends BaseDbEntity {
     password!: string
 
     @EntityEnumColumn({
-        db: {default: UserType.USER, enum: {user: UserType.USER, admin: UserType.ADMIN}},
+        db: {default: UserType.USER, enum: UserType},
     })
     type!: UserType
 
