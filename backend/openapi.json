@@ -12807,8 +12807,9 @@
           "type": {
             "type": "string",
             "enum": [
-              "USER",
-              "ADMIN"
+              "ADMIN",
+              "MODERATOR",
+              "USER"
             ]
           },
           "logs": {
@@ -13054,8 +13055,9 @@
           "type": {
             "type": "string",
             "enum": [
-              "USER",
-              "ADMIN"
+              "ADMIN",
+              "MODERATOR",
+              "USER"
             ]
           }
         },

@@ -114,23 +114,34 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
+      # ✅ Setup Node.js + PNPM cache
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'  # <— enables native caching for PNPM
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2
+      - name: Install PNPM
+        run: npm install -g pnpm
+
+      # ✅ Cache PNPM store (extra optimization)
+      - name: Restore PNPM store from cache
+        uses: actions/cache@v4
         with:
-          version: 8
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install
+        working-directory: frontend/ui
 
-      - name: Build Frontend
-        run: pnpm --filter frontend/ui build
+      - name: Build frontend
+        run: pnpm run build
+        working-directory: frontend/ui
 
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0

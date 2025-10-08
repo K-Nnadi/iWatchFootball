@@ -24,7 +24,10 @@ export async function GenericBootstrap(module: any, port: number) {
         fastifyAdapter
     );
     app.enableCors({
-        origin: 'http://localhost:3000',
+        origin: [
+            'http://localhost:3000',
+            'https://iwatchfootball.web.app',
+        ],
         credentials: true,
     })
 
@@ -33,5 +36,7 @@ export async function GenericBootstrap(module: any, port: number) {
     SwaggerModule.setup('api-docs', app, document);
     fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
 
-    await app.listen(port);
+    await app.listen(port, '0.0.0.0', () => {
+        console.log(`🚀 Server running on port ${port}`);
+    });
 }
