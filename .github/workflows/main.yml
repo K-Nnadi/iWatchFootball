@@ -108,6 +108,7 @@ jobs:
             --set-env-vars DATABASE_TYPE=${{ secrets.DATABASE_TYPE }} \
             --set-env-vars DATABASE_SYNCHRONIZE=${{ secrets.DATABASE_SYNCHRONIZE }}
 
+
   deploy-frontend:
     needs: ci
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
