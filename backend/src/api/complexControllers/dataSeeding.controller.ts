@@ -54,14 +54,14 @@ export class DataSeedingController {
             }
 
             for (const team of teamsData.response) {
-                await this.teamService.createOrUpdate({
-                    teamId: team.team.id,
-                    name: team.team.name,
-                    logo: team.team.logo,
-                    country: team.team.country,
-                    founded: team.team.founded,
-                    stadium: team.venue.name,
-                });
+                // await this.teamService.createOrUpdate({
+                //     teamId: team.team.id,
+                //     name: team.team.name,
+                //     logo: team.team.logo,
+                //     country: team.team.country,
+                //     founded: team.team.founded,
+                //     stadium: team.venue.name,
+                // });
             }
 
             return response.status(201).send({ message: 'Teams seeded successfully' });
@@ -82,14 +82,14 @@ export class DataSeedingController {
             }
 
             for (const league of leaguesData.response) {
-                await this.competitionService.createOrUpdate({
-                    leagueId: league.league.id,
-                    name: league.league.name,
-                    country: league.country.name,
-                    logo: league.league.logo,
-                    type: league.league.type,
-                    season: league.seasons.map(s => s.year),
-                });
+                // await this.competitionService.createOrUpdate({
+                //     leagueId: league.league.id,
+                //     name: league.league.name,
+                //     country: league.country.name,
+                //     logo: league.league.logo,
+                //     type: league.league.type,
+                //     season: league.seasons.map(s => s.year),
+                // });
             }
 
             return response.status(201).send({ message: 'Leagues seeded successfully' });
@@ -103,21 +103,21 @@ export class DataSeedingController {
     @ApiBody({ type: 'any' })
     async fixtures(@Response() response: FastifyReply) {
         try {
-            const fixturesData = await this.footballApi.getFixtures({ league: 39, season: 2023 });
+            const fixturesData = await this.footballApi.getFixtures( 39, 2023 )
 
             if (!fixturesData || !fixturesData.response) {
                 return response.status(400).send({ message: 'No fixtures found' });
             }
 
             for (const fixture of fixturesData.response) {
-                await this.fixtureService.createOrUpdate({
-                    fixtureId: fixture.fixture.id,
-                    date: fixture.fixture.date,
-                    venue: fixture.fixture.venue.name,
-                    referee: fixture.fixture.referee,
-                    homeTeam: fixture.teams.home.name,
-                    awayTeam: fixture.teams.away.name,
-                });
+                // await this.fixtureService.createOrUpdate({
+                //     fixtureId: fixture.fixture.id,
+                //     date: fixture.fixture.date,
+                //     venue: fixture.fixture.venue.name,
+                //     referee: fixture.fixture.referee,
+                //     homeTeam: fixture.teams.home.name,
+                //     awayTeam: fixture.teams.away.name,
+                // });
             }
 
             return response.status(201).send({ message: 'Fixtures seeded successfully' });
@@ -131,20 +131,20 @@ export class DataSeedingController {
     @ApiBody({ type: 'any' })
     async standings(@Response() response: FastifyReply) {
         try {
-            const standingsData = await this.footballApi.getStandings({ league: 39, season: 2023 });
+            const standingsData = await this.footballApi.getStandings( 39, 2023 );
 
             if (!standingsData || !standingsData.response) {
                 return response.status(400).send({ message: 'No standings found' });
             }
 
             for (const standing of standingsData.response[0].league.standings[0]) {
-                await this.competitionStandingService.createOrUpdate({
-                    teamId: standing.team.id,
-                    rank: standing.rank,
-                    points: standing.points,
-                    goalsFor: standing.all.goals.for,
-                    goalsAgainst: standing.all.goals.against,
-                });
+                // await this.competitionStandingService.createOrUpdate({
+                //     teamId: standing.team.id,
+                //     rank: standing.rank,
+                //     points: standing.points,
+                //     goalsFor: standing.all.goals.for,
+                //     goalsAgainst: standing.all.goals.against,
+                // });
             }
 
             return response.status(201).send({ message: 'Standings seeded successfully' });
@@ -165,13 +165,13 @@ export class DataSeedingController {
             }
 
             for (const player of playersData.response) {
-                await this.playerService.createOrUpdate({
-                    playerId: player.player.id,
-                    name: player.player.name,
-                    position: player.statistics[0].games.position,
-                    nationality: player.player.nationality,
-                    team: player.statistics[0].team.name,
-                });
+                // await this.playerService.createOrUpdate({
+                //     playerId: player.player.id,
+                //     name: player.player.name,
+                //     position: player.statistics[0].games.position,
+                //     nationality: player.player.nationality,
+                //     team: player.statistics[0].team.name,
+                // });
             }
 
             return response.status(201).send({ message: 'Players seeded successfully' });

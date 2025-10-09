@@ -42,6 +42,13 @@ export class FootballDataApiAdapter {
     }
 
     /**
+     * Fetch fixtures based on league and season
+     */
+    async getFixtures(league: number, season: number): Promise<any | undefined> {
+        return this.fetchData("fixtures", { league, season });
+    }
+
+    /**
      * Fetch players with optional filters
      */
     async getPlayers(params?: Record<string, any>): Promise<any | undefined> {
