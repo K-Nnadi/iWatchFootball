@@ -46,7 +46,9 @@
 		"typescript": "^5.1.3"
 	},
 	"workspaces": [
-		"backend/*",
-		"@/*"
+		"backend",
+		"clients",
+		"libraries/*",
+		"frontend/*"
 	]
 }

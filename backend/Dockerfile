@@ -18,8 +18,11 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
+# Build the base library first
+RUN pnpm --filter @iWatchFootball/base-tools build
+
 # Build the backend
-RUN pnpm --filter backend build
+RUN pnpm --filter @iWatchFootball/api build
 
 # Production stage
 FROM node:20-alpine AS production

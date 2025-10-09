@@ -17,7 +17,6 @@
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/shared/ormconfig.ts"
   },
   "dependencies": {
-    "-": "^0.0.1",
     "@iWatchFootball/base-tools": "workspace:*",
     "@nestjs/common": "10.3.2",
     "@nestjs/core": "^10.0.0",
