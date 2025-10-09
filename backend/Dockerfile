@@ -1,66 +1,68 @@
-# Multi-stage build for NestJS backend
+# =========================================
+# 🏗️  Stage 1: Builder
+# =========================================
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install specific PNPM version to match your local one
+# 👉 Run `pnpm -v` locally and use the same version here.
+# (Example: 9.7.1 — adjust if needed)
+RUN npm install -g pnpm@9.7.1
 
-# Copy package files
+# Copy workspace manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json ./backend/
 COPY clients/package.json ./clients/
 COPY libraries/base/package.json ./libraries/base/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install all dependencies
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source code
 COPY . .
 
-# Build the base library first
+# Build shared library first
 RUN pnpm --filter @iWatchFootball/base-tools build
 
-# Build the backend
+# Build the backend next
 RUN pnpm --filter @iWatchFootball/api build
 
-# Production stage
+
+# =========================================
+# 🚀 Stage 2: Production
+# =========================================
 FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install same PNPM version to match lockfile
+RUN npm install -g pnpm@9.7.1
 
-# Copy package files
+# Copy workspace manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json ./backend/
 COPY clients/package.json ./clients/
 COPY libraries/base/package.json ./libraries/base/
 
-# Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
+# Install only production dependencies
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
-# Copy built backend from builder stage
+# Copy compiled output & runtime files from builder
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/clients ./clients
 COPY --from=builder /app/libraries ./libraries
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
-
-# Change ownership of the app directory
-RUN chown -R nestjs:nodejs /app
+RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
 USER nestjs
 
-# Expose port (Cloud Run requires 8080)
+# Expose Cloud Run default port
 EXPOSE 8080
 
-# Health check
+# Health check (optional endpoint /health)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:8080/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Start the application
+# Run the backend service
 CMD ["node", "backend/dist/main.js"]
-
