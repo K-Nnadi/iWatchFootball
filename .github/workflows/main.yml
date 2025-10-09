@@ -79,8 +79,9 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker to use gcloud as a credential helper
-        run: gcloud auth configure-docker
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west4-docker.pkg.dev
+
 
       - name: Build and push Docker image
         run: |
@@ -90,7 +91,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy iwatchfootball-backend \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend:${{ github.sha }} \
+            --image europe-west4-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}
             --platform managed \
             --region ${{ secrets.GCP_REGION }} \
             --allow-unauthenticated \

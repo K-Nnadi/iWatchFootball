@@ -74,6 +74,7 @@ const ComplexModules = [
     AuthModule
 ];
 
+
 @Module({
     imports: [
         CONFIG,
