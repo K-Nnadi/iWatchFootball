@@ -33,7 +33,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json ./backend/
 COPY clients/package.json ./clients/
-COPY libraries/package.json ./libraries/
+COPY libraries/base/package.json ./libraries/
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
@@ -60,3 +60,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start the application
 CMD ["node", "backend/dist/main.js"]
+

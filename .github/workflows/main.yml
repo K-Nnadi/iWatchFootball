@@ -116,15 +116,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ✅ Setup Node.js + PNPM cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'  # <— enables native caching for PNPM
 
-      - name: Install PNPM
-        run: npm install -g pnpm
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
       # ✅ Cache PNPM store (extra optimization)
       - name: Restore PNPM store from cache
