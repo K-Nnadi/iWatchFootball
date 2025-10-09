@@ -10,7 +10,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json ./backend/
 COPY clients/package.json ./clients/
-COPY libraries/package.json ./libraries/
+COPY libraries/base/package.json ./libraries/base/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -33,7 +33,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json ./backend/
 COPY clients/package.json ./clients/
-COPY libraries/base/package.json ./libraries/
+COPY libraries/base/package.json ./libraries/base/
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
