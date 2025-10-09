@@ -17,7 +17,7 @@
     }
   ],
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir": "./dist",
     "baseUrl": "./"
   }
 }
