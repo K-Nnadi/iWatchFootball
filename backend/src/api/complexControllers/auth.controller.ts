@@ -2,7 +2,7 @@ import {ApiBody, ApiOkResponse, ApiProperty, ApiPropertyOptional, PickType} from
 import {Body, Module, Post, Response} from '@nestjs/common';
 import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
-import {IsEmail, IsNotEmpty, IsOptional} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsOptional, ValidateIf} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
@@ -26,7 +26,6 @@ export class LoginBody {
     @ApiProperty()
     email?: string;
 
-    @IsEmail()
     @IsOptional()
     @ApiProperty()
     userName?: string;
@@ -65,17 +64,36 @@ export class AuthController {
     @ApiBody({type: LoginBody})
     async login(@Body() auth: LoginBody, @Response() response: FastifyReply) {
 
-        const [user] = await this.userService.getQuery({
-            where: [
-                {email: auth.email},
-                {userName: auth.userName}
-            ],
-        }) || [];
+        // Validate that either email or userName is provided
+        if (!auth.email && !auth.userName) {
+            void response.code(400).send({message: 'Either email or userName must be provided'});
+            return;
+        }
+
+        // Find user by email or userName
+        let user = null;
+        if (auth.email) {
+            const users = await this.userService.getQuery({
+                where: {email: auth.email}
+            });
+            user = users[0];
+        } else if (auth.userName) {
+            const users = await this.userService.getQuery({
+                where: {userName: auth.userName}
+            });
+            user = users[0];
+        }
+
         console.log('user login', user);
+
+        if (!user) {
+            void response.code(401).send({message: 'Invalid Login'});
+            return;
+        }
 
         const passwordMatch = await compare(auth.password, user.password);
 
-        if (!user || !passwordMatch) {
+        if (!passwordMatch) {
             void response.code(401).send({message: 'Invalid Login'});
         } else {
             const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(user);
@@ -89,40 +107,48 @@ export class AuthController {
     @Public()
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: RegisterBody})
-    async register(@Body() register: RegisterBody, @Response() response: FastifyReply): Promise<User> {
+    async register(@Body() register: RegisterBody, @Response() response: FastifyReply): Promise<User | undefined> {
 
         const registerUser = register;
         registerUser.password = await hash(register.password, parseInt(process.env.SALT_ROUNDS || '10'));
 
-        let [user] = await this.userService.getQuery({where: {email: register.email}}) || [];
+        // Check if user with email already exists
+        let [existingUserByEmail] = await this.userService.getQuery({where: {email: register.email}}) || [];
+
+        // Check if user with userName already exists
+        let [existingUserByUserName] = await this.userService.getQuery({where: {userName: register.userName}}) || [];
+
+        if (existingUserByEmail) {
+            void response.code(400).send({message: 'User with this email already exists'});
+            return;
+        }
+
+        if (existingUserByUserName) {
+            void response.code(400).send({message: 'User with this username already exists'});
+            return;
+        }
+
+        let user = await this.userService.create({
+            ...registerUser, type: UserType.USER,
+        });
 
         if (user) {
-            void response.code(400).send({message: 'User already exists'});
-        } else {
-
-            user = await this.userService.create({
-                ...registerUser, type: UserType.USER,
+            await this.commsPreferenceService.create({
+                userId: user.id,
+                emailNotifications: CommunicationFrequency.DAILY,
+                inAppNotifications: CommunicationFrequency.IMMEDIATE,
+                smsNotifications: CommunicationFrequency.NEVER,
+                pushNotifications: CommunicationFrequency.IMMEDIATE,
+                marketingEmails: CommunicationFrequency.WEEKLY,
+                newsletterEmails: CommunicationFrequency.WEEKLY,
+                matchReminders: CommunicationFrequency.DAILY,
+                language: Language.EN
             });
-
-
-            if (user) {
-                await this.commsPreferenceService.create({
-                    userId: user.id,
-                    emailNotifications: CommunicationFrequency.DAILY,
-                    inAppNotifications: CommunicationFrequency.IMMEDIATE,
-                    smsNotifications: CommunicationFrequency.NEVER,
-                    pushNotifications: CommunicationFrequency.IMMEDIATE,
-                    marketingEmails: CommunicationFrequency.WEEKLY,
-                    newsletterEmails: CommunicationFrequency.WEEKLY,
-                    matchReminders: CommunicationFrequency.DAILY,
-                    language: Language.EN
-                });
-
-            } else {
-                void response.code(400).send({message: 'Something went wrong..'});
-            }
+        } else {
+            void response.code(400).send({message: 'Something went wrong..'});
         }
-        return user
+        
+        return user;
     }
 }
 

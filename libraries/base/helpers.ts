@@ -108,8 +108,7 @@ export const recurseWithAsyncKeyValueFunction = async (obj: any, keyValueFunctio
 
 export const recurseWithObjFunction = (obj: any, objCheckFunction: (obj: any) => boolean, objFunction: (obj: any) => any): any => {
 	if (Array.isArray(obj)) {
-		// @ts-ignore
-		return JSON.parse(obj).map((val) => recurseWithObjFunction(val, objCheckFunction, objFunction));
+		return obj.map((val) => recurseWithObjFunction(val, objCheckFunction, objFunction));
 	} else if (isObject(obj)) {
 		obj = Object.entries(obj).reduce((acc, [key, value]) => {
 			if (Array.isArray(value)) {

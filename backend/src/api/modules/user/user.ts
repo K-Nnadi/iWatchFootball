@@ -56,7 +56,7 @@ export class User extends BaseDbEntity {
     @EntityColumn()
     lastName!: string
 
-    @EntityColumn()
+    @EntityColumn({db: {unique: true}})
     userName!: string
 
     @EntityColumn({
