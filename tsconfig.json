@@ -20,7 +20,7 @@
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "skipLibCheck": false
+    "skipLibCheck": true
   },
   "include": [
     "libraries/**/*",
