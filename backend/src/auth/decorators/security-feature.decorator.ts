@@ -33,7 +33,7 @@ function expandRoleGroups<T>(config: SecurityRuleConfig<T>): SecurityRuleConfig<
   Object.entries(config).forEach(([opKey, opRules]) => {
     if (opKey === 'base') return; // Skip base, already processed
 
-    const operationType = opKey as unknown as OperationType;
+    const operationType = opKey as OperationType;
     result[operationType] = {} as Partial<RoleBasedRules<T>>;
 
     if (!opRules) return;
@@ -43,13 +43,15 @@ function expandRoleGroups<T>(config: SecurityRuleConfig<T>): SecurityRuleConfig<
         // This is a role group
         const roles = roleKey.split(',');
         roles.forEach(role => {
-          // @ts-ignore
-          result[operationType][role] = rules;
+          if (result[operationType]) {
+            result[operationType]![role] = rules as QueryModifier<T>;
+          }
         });
       } else {
         // Individual role or 'default'
-        // @ts-ignore
-        result[operationType][roleKey] = rules;
+        if (result[operationType]) {
+          result[operationType]![roleKey] = rules as QueryModifier<T>;
+        }
       }
     });
   });
