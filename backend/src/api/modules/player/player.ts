@@ -6,10 +6,60 @@ import {Transfer} from "../transfer/transfer";
 import {Team} from "../team/team";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {Trophy} from "../trophy/trophy";
+import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
+import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
+import { RequestWithUser } from "../../../auth/types/auth.types";
+import { FindOptionsWhere } from 'typeorm';
 
 
 @Entity('player')
-
+@SecurityFeature<Player>({
+  base: {
+    // READ operations - Public access for players (no authentication required)
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<Player> => {
+        // All users (including unauthenticated) can see all players
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'name', 'nickname', 'dateOfBirth', 'nationality',
+        'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'
+      ],
+    },
+    // Allow public access (no authentication required)
+    'public': {
+      filter: (): FindOptionsWhere<Player> => {
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'name', 'nickname', 'dateOfBirth', 'nationality',
+        'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'
+      ],
+    },
+    default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }), fields: ['id'] },
+  },
+  [OperationType.CREATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can create players
+      fields: ['name', 'nickname', 'dateOfBirth', 'nationality', 'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'],
+    },
+    default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }) },
+  },
+  [OperationType.UPDATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can update players
+      fields: ['name', 'nickname', 'dateOfBirth', 'nationality', 'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'],
+    },
+    default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }) },
+  },
+  [OperationType.DELETE]: {
+    [createRoleGroup(UserRole.ADMIN)]: {
+      // Only admin can delete players
+      fields: [],
+    },
+    default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }) },
+  },
+})
 export class Player extends BaseDbEntity{
 
     @EntityColumn({db: {type: "varchar"}})

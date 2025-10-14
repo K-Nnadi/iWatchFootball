@@ -27,6 +27,7 @@ import {ManagerModule} from "./api/modules/manager/manager.module";
 import {PlayerLineUpModule} from "./api/modules/playerLineUp/playerLineUp.module";
 import {PredictionModule} from "./api/modules/prediction/prediction.module";
 import {AuthModule} from "./api/complexControllers/auth.controller";
+import {AuthModule as CoreAuthModule} from "./auth/auth.module";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
@@ -71,7 +72,8 @@ const Modules = [
 ];
 
 const ComplexModules = [
-    AuthModule
+    AuthModule,
+    CoreAuthModule
 ];
 
 

@@ -9,6 +9,7 @@ import {compare, hash} from "bcryptjs";
 import {User} from "../modules/user/user";
 import {UserModule, UserService} from "../modules/user/user.module";
 import {LogModule, LogService} from "../modules/log/log.module";
+import { Public } from "../../auth/decorators/public.decorator";
 
 
 export class ValidateBody {
@@ -56,6 +57,7 @@ export class AuthController {
     }
 
     @Post('login')
+    @Public()
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: LoginBody})
     async login(@Body() auth: LoginBody, @Response() response: FastifyReply) {
@@ -81,6 +83,7 @@ export class AuthController {
     }
 
     @Post('register')
+    @Public()
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: RegisterBody})
     async register(@Body() register: RegisterBody, @Response() response: FastifyReply) {

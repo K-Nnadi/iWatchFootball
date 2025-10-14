@@ -5,10 +5,49 @@ import {Log} from "../log/log";
 import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Prediction} from "../prediction/prediction";
+import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
+import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
+import { RequestWithUser } from "../../../auth/types/auth.types";
+import { FindOptionsWhere } from 'typeorm';
 
 
 @Entity('user')
-
+@SecurityFeature<User>({
+  base: {
+    // READ operations - All authenticated users can read users (but with limited fields)
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<User> => {
+        // All authenticated users can see all users
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type'
+      ],
+    },
+    default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }), fields: ['id'] },
+  },
+  [OperationType.CREATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can create users
+      fields: ['firstName', 'lastName', 'userName', 'email', 'password', 'type'],
+    },
+    default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }) },
+  },
+  [OperationType.UPDATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can update users
+      fields: ['firstName', 'lastName', 'userName', 'email', 'type'],
+    },
+    default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }) },
+  },
+  [OperationType.DELETE]: {
+    [createRoleGroup(UserRole.ADMIN)]: {
+      // Only admin can delete users
+      fields: [],
+    },
+    default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }) },
+  },
+})
 export class User extends BaseDbEntity {
     @EntityColumn()
     firstName!: string

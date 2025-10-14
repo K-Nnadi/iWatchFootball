@@ -13,9 +13,60 @@ import {
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {Fixture} from "../fixture/fixture";
 import {Trophy} from "../trophy/trophy";
+import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
+import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
+import { RequestWithUser } from "../../../auth/types/auth.types";
+import { FindOptionsWhere } from 'typeorm';
 
 
 @Entity('team')
+@SecurityFeature<Team>({
+  base: {
+    // READ operations - Public access for teams (no authentication required)
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<Team> => {
+        // All users (including unauthenticated) can see all teams
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'name', 'founded', 'stadiumIds', 'managerId',
+        'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'
+      ],
+    },
+    // Allow public access (no authentication required)
+    'public': {
+      filter: (): FindOptionsWhere<Team> => {
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'name', 'founded', 'stadiumIds', 'managerId',
+        'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'
+      ],
+    },
+    default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }), fields: ['id'] },
+  },
+  [OperationType.CREATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can create teams
+      fields: ['name', 'founded', 'stadiumIds', 'managerId', 'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'],
+    },
+    default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }) },
+  },
+  [OperationType.UPDATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can update teams
+      fields: ['name', 'founded', 'stadiumIds', 'managerId', 'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'],
+    },
+    default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }) },
+  },
+  [OperationType.DELETE]: {
+    [createRoleGroup(UserRole.ADMIN)]: {
+      // Only admin can delete teams
+      fields: [],
+    },
+    default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }) },
+  },
+})
 export class Team extends BaseDbEntity {
 
     @EntityColumn({db: {type: "varchar"}})

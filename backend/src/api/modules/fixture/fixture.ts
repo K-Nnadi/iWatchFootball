@@ -15,8 +15,59 @@ import {
     OptionalEntityColumn,
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
+import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
+import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
+import { RequestWithUser } from "../../../auth/types/auth.types";
+import { FindOptionsWhere } from 'typeorm';
 
 @Entity('fixture')
+@SecurityFeature<Fixture>({
+  base: {
+    // READ operations - Public access for fixtures (no authentication required)
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<Fixture> => {
+        // All users (including unauthenticated) can see all fixtures
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'date', 'homeTeamId', 'awayTeamId',
+        'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'
+      ],
+    },
+    // Allow public access (no authentication required)
+    'public': {
+      filter: (): FindOptionsWhere<Fixture> => {
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'date', 'homeTeamId', 'awayTeamId',
+        'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'
+      ],
+    },
+    default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }), fields: ['id'] },
+  },
+  [OperationType.CREATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can create fixtures
+      fields: ['date', 'homeTeamId', 'awayTeamId', 'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'],
+    },
+    default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }) },
+  },
+  [OperationType.UPDATE]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      // Only admin and moderator can update fixtures
+      fields: ['date', 'homeTeamId', 'awayTeamId', 'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'],
+    },
+    default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }) },
+  },
+  [OperationType.DELETE]: {
+    [createRoleGroup(UserRole.ADMIN)]: {
+      // Only admin can delete fixtures
+      fields: [],
+    },
+    default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }) },
+  },
+})
 export class Fixture extends BaseDbEntity {
     @EntityColumn({
         db: { type: 'timestamp' },
