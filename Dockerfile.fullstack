@@ -28,7 +28,7 @@ FROM nginx:alpine AS frontend-production
 # Copy the built frontend assets to Nginx serve directory
 COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
-EXPOSE 3000
+EXPOSE 8080
 
 # Backend production stage
 FROM node:20-alpine AS production
