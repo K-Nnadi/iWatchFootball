@@ -1,5 +1,5 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, OneToMany} from "typeorm";
+import {Entity, OneToMany, OneToOne} from "typeorm";
 import {UserType} from "../../enums/user.enum";
 import {Log} from "../log/log";
 import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
@@ -9,6 +9,7 @@ import { SecurityFeature } from "../../../auth/decorators/security-feature.decor
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
+import { CommsPreference } from "../commsPreference/commsPreference";
 
 
 @Entity('user')
@@ -79,6 +80,10 @@ export class User extends BaseDbEntity {
     @ApiPropertyOptional()
     @OneToMany(() => Prediction, prediction => prediction.fixture, {lazy: true})
     predictions?: Promise<Prediction[]>;
+
+    @ApiPropertyOptional()
+    @OneToOne(() => CommsPreference, commsPreference => commsPreference.user, {lazy: true, nullable: true})
+    commsPreference?: Promise<CommsPreference>;
 }
 
 export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {

@@ -9,7 +9,9 @@ import {compare, hash} from "bcryptjs";
 import {User} from "../modules/user/user";
 import {UserModule, UserService} from "../modules/user/user.module";
 import {LogModule, LogService} from "../modules/log/log.module";
-import { Public } from "../../auth/decorators/public.decorator";
+import {Public} from "../../auth/decorators/public.decorator";
+import {CommsPreferenceModule, CommsPreferenceService} from "../modules/commsPreference/commsPreference.module";
+import {CommunicationFrequency, Language} from "../enums/commsPreference.enum";
 
 
 export class ValidateBody {
@@ -53,6 +55,7 @@ export class AuthController {
 
     constructor(
         private userService: UserService,
+        private commsPreferenceService: CommsPreferenceService
     ) {
     }
 
@@ -86,7 +89,7 @@ export class AuthController {
     @Public()
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: RegisterBody})
-    async register(@Body() register: RegisterBody, @Response() response: FastifyReply) {
+    async register(@Body() register: RegisterBody, @Response() response: FastifyReply): Promise<User> {
 
         const registerUser = register;
         registerUser.password = await hash(register.password, parseInt(process.env.SALT_ROUNDS || '10'));
@@ -103,17 +106,28 @@ export class AuthController {
 
 
             if (user) {
-                //todo add CommsPreference
+                await this.commsPreferenceService.create({
+                    userId: user.id,
+                    emailNotifications: CommunicationFrequency.DAILY,
+                    inAppNotifications: CommunicationFrequency.IMMEDIATE,
+                    smsNotifications: CommunicationFrequency.NEVER,
+                    pushNotifications: CommunicationFrequency.IMMEDIATE,
+                    marketingEmails: CommunicationFrequency.WEEKLY,
+                    newsletterEmails: CommunicationFrequency.WEEKLY,
+                    matchReminders: CommunicationFrequency.DAILY,
+                    language: Language.EN
+                });
 
             } else {
                 void response.code(400).send({message: 'Something went wrong..'});
             }
         }
+        return user
     }
 }
 
 @Module({
-    imports: [UserModule, LogModule],
+    imports: [UserModule, LogModule, CommsPreferenceModule],
     controllers: [AuthController]
 })
 export class AuthModule {

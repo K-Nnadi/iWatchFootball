@@ -8,6 +8,7 @@ import {StadiumModule} from "./api/modules/stadium/stadium.module";
 import {GenericTokenModule} from "./api/modules/genericToken/genericToken.module";
 import {LogModule} from "./api/modules/log/log.module";
 import {UserModule} from "./api/modules/user/user.module";
+import {CommsPreferenceModule} from "./api/modules/commsPreference/commsPreference.module";
 import {FixtureModule} from "./api/modules/fixture/fixture.module";
 import {CompetitionModule} from "./api/modules/competition/competition.module";
 import {TransferModule} from "./api/modules/transfer/transfer.module";
@@ -43,6 +44,7 @@ const BULL_MODULE = BullModule.forRoot({
 const Modules = [
     AddressModule,
     CardModule,
+    CommsPreferenceModule,
     CompetitionModule,
     FixtureModule,
     FixtureRefereeModule,

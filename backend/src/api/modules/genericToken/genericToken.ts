@@ -1,7 +1,12 @@
 import {PickType} from "@nestjs/swagger";
 import {Entity} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
-import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {
+    EntityColumn,
+    EntityEnumColumn,
+    OptionalEntityColumn
+} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {TokenType} from "../../enums/genericToken.enum";
 
 
 @Entity('genericToken')
@@ -10,8 +15,8 @@ export class GenericToken extends BaseDbEntity {
     @EntityColumn({db: {type: "varchar"}})
     token!: string
 
-    @EntityColumn({db: {type: "varchar"}})
-    type!: string
+    @EntityEnumColumn({db: {enum: TokenType}})
+    type!: TokenType
 
     @EntityColumn({db: {type: "varchar"}})
     expiry!: string
