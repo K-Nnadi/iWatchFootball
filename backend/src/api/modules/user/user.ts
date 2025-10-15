@@ -1,15 +1,19 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, OneToMany, OneToOne} from "typeorm";
+import {Entity, JoinColumn, OneToMany, OneToOne} from "typeorm";
 import {UserType} from "../../enums/user.enum";
 import {Log} from "../log/log";
-import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {
+    EntityColumn,
+    EntityEnumColumn,
+    OptionalEntityColumn
+} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Prediction} from "../prediction/prediction";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
-import { CommsPreference } from "../commsPreference/commsPreference";
+import {CommsPreference} from "../commsPreference/commsPreference";
 
 
 @Entity('user')
@@ -56,7 +60,7 @@ export class User extends BaseDbEntity {
     @EntityColumn()
     lastName!: string
 
-    @EntityColumn({db: {unique: true}})
+    @EntityColumn()
     userName!: string
 
     @EntityColumn({
@@ -81,8 +85,12 @@ export class User extends BaseDbEntity {
     @OneToMany(() => Prediction, prediction => prediction.fixture, {lazy: true})
     predictions?: Promise<Prediction[]>;
 
+    @OptionalEntityColumn({db: {type: "int"}})
+    commsPreferenceId?: number;
+
     @ApiPropertyOptional()
-    @OneToOne(() => CommsPreference, commsPreference => commsPreference.user, {lazy: true, nullable: true})
+    @OneToMany(() => CommsPreference, commsPreference => commsPreference.user, {lazy: true})
+    @JoinColumn({ name: 'commsPreferenceId' })
     commsPreference?: Promise<CommsPreference>;
 }
 

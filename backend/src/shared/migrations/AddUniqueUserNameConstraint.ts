@@ -60,3 +60,4 @@ export class AddUniqueUserNameConstraint1760406123456 implements MigrationInterf
         await queryRunner.query(`ALTER TABLE "user" DROP CONSTRAINT "UQ_da5934070b5f2726ebfd3122c80"`);
     }
 }
+
