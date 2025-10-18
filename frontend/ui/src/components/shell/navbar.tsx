@@ -4,10 +4,10 @@ import {useNavigate} from "react-router-dom";
 export function Navbar() {
     const navigate = useNavigate()
     return (
-        <AppShell.Navbar p="md" w={'25%'} style={{gap: '1px'}}>
+        <AppShell.Navbar p="md" style={{gap: '1px'}}>
             <NavLink
                 label={"Home"}
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/')}
                 style={{margin: "5px"}}
             />
 

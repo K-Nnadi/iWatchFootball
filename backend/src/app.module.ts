@@ -34,12 +34,13 @@ import {TicketModule} from "./api/modules/ticket/ticket.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {HealthController} from "./health/health.controller";
 
-const BULL_MODULE = BullModule.forRoot({
+// Only configure BullMQ if Redis is available
+const BULL_MODULE = process.env.REDIS_HOST ? BullModule.forRoot({
     connection: {
-        host: 'localhost',
-        port: 6379
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT || '6379'),
     }
-})
+}) : null
 
 const Modules = [
     AddressModule,
@@ -83,7 +84,7 @@ const ComplexModules = [
     imports: [
         CONFIG,
         TYPEORM_CONFIG,
-        BULL_MODULE,
+        ...(BULL_MODULE ? [BULL_MODULE] : []),
         ...Modules,
         ...ComplexModules
     ],

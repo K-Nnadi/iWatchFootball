@@ -1,0 +1,463 @@
+/* Modern Design System */
+
+:root {
+  /* Modern Color Palette */
+  --modern-black: #000000;
+  --modern-lime: #00ff88;
+  --modern-white: #ffffff;
+  --modern-gray: #666666;
+  --modern-dark-gray: #1a1a1a;
+  
+  /* Typography */
+  --modern-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --modern-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Spacing */
+  --modern-space-xs: 0.5rem;
+  --modern-space-sm: 1rem;
+  --modern-space-md: 2rem;
+  --modern-space-lg: 4rem;
+  --modern-space-xl: 8rem;
+  
+  /* Shadows */
+  --modern-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --modern-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --modern-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Global Reset for Modern Aesthetic */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure all Mantine components use our design system - only for dark theme */
+.dark-theme .mantine-Button-root {
+  font-family: var(--modern-font-primary) !important;
+}
+
+.dark-theme .mantine-Card-root {
+  font-family: var(--modern-font-primary) !important;
+}
+
+.dark-theme .mantine-Text-root {
+  font-family: var(--modern-font-primary) !important;
+}
+
+.dark-theme .mantine-Title-root {
+  font-family: var(--modern-font-primary) !important;
+}
+
+/* Override Mantine button styles to ensure consistency - only for dark theme */
+.dark-theme .mantine-Button-root {
+  font-family: var(--modern-font-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+  border-radius: 0 !important;
+  min-height: 2.5rem !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+/* Ensure our modern button classes take precedence - only for dark theme */
+.dark-theme .modern-btn {
+  font-family: var(--modern-font-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+  border-radius: 0 !important;
+}
+
+/* Override any Mantine card styles - only for dark theme */
+.dark-theme .mantine-Card-root {
+  border-radius: 0 !important;
+  font-family: var(--modern-font-primary) !important;
+}
+
+/* Navbar styling - keeping original Mantine styling */
+
+/* Header styling - keeping original Mantine styling */
+
+body {
+  font-family: var(--modern-font-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Only apply dark theme to specific pages that need it */
+.dark-theme {
+  background-color: var(--modern-black);
+  color: var(--modern-white);
+}
+
+.dark-theme * {
+  color: var(--modern-white);
+}
+
+/* Modern Typography System */
+.modern-h1 {
+  font-size: clamp(3rem, 8vw, 8rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.modern-h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.modern-h3 {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.modern-body {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--modern-gray);
+}
+
+.modern-caption {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--modern-lime);
+  font-weight: 600;
+}
+
+/* Modern Button System */
+.modern-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid var(--modern-lime);
+  color: var(--modern-lime);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 2.5rem;
+}
+
+/* Button Size Variants */
+.modern-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  min-height: 2rem;
+}
+
+.modern-btn-md {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  min-height: 2.5rem;
+}
+
+.modern-btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  min-height: 3rem;
+}
+
+/* Ensure button height consistency across all sizes */
+.modern-btn,
+.modern-btn-sm,
+.modern-btn-md,
+.modern-btn-lg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  line-height: 1.2 !important;
+}
+
+/* Override Mantine button size classes - only for dark theme */
+.dark-theme .mantine-Button-root[data-size="sm"] {
+  min-height: 2rem !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+}
+
+.dark-theme .mantine-Button-root[data-size="md"] {
+  min-height: 2.5rem !important;
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1rem !important;
+}
+
+.dark-theme .mantine-Button-root[data-size="lg"] {
+  min-height: 3rem !important;
+  padding: 1rem 2rem !important;
+  font-size: 1.125rem !important;
+}
+
+.modern-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--modern-lime);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.modern-btn:hover {
+  color: var(--modern-black) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3) !important;
+}
+
+.modern-btn:hover::before {
+  left: 0;
+}
+
+.modern-btn-primary {
+  background: var(--modern-lime) !important;
+  color: var(--modern-black) !important;
+  border-color: var(--modern-lime) !important;
+}
+
+.modern-btn-primary:hover {
+  background: transparent !important;
+  color: var(--modern-lime) !important;
+  border-color: var(--modern-lime) !important;
+}
+
+/* Modern Card System */
+.modern-card {
+  background: var(--modern-dark-gray);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--modern-lime);
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--modern-lime);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modern-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* Accent card styling */
+.modern-card-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--modern-lime);
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-card-accent:hover::before {
+  transform: scaleX(1);
+}
+
+/* Modern Grid System */
+.modern-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.modern-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.modern-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.modern-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Modern Hero Section */
+.modern-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--modern-black);
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 0%, rgba(0, 255, 136, 0.05) 100%);
+  pointer-events: none;
+}
+
+/* Modern Image Styles */
+.modern-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-image:hover {
+  transform: scale(1.05);
+}
+
+/* Modern Navigation */
+.modern-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 0;
+}
+
+.modern-nav-link {
+  color: var(--modern-white);
+  text-decoration: none;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.modern-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--modern-lime);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.modern-nav-link:hover {
+  color: var(--modern-lime);
+}
+
+.modern-nav-link:hover::after {
+  width: 100%;
+}
+
+/* Modern Animations */
+@keyframes modern-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modern-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes modern-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.modern-animate-fade-in {
+  animation: modern-fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modern-animate-slide-left {
+  animation: modern-slide-in-left 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modern-animate-slide-right {
+  animation: modern-slide-in-right 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .modern-h1 {
+    font-size: clamp(2rem, 6vw, 4rem);
+  }
+  
+  .modern-h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  
+  .modern-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Dark mode is default, but light mode support */
+@media (prefers-color-scheme: light) {
+  .modern-light-mode {
+    background-color: var(--modern-white);
+    color: var(--modern-black);
+  }
+  
+  .modern-light-mode .modern-card {
+    background: #f8f9fa;
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+}

@@ -1,106 +1,88 @@
 import React from 'react';
 import {
+    Avatar,
+    Box,
+    Center,
     Container,
-    Title,
-    Text,
-    Button,
+    Grid,
     Group,
     Stack,
-    Card,
-    Badge,
-    Avatar,
-    Grid,
-    Box,
-    Paper,
-    SimpleGrid,
-    ActionIcon,
-    TextInput,
-    Flex,
-    Divider,
-    Center
+    Text
 } from '@mantine/core';
 import {
-    IconTrophy,
     IconBell,
+    IconClock,
+    IconPlayerPlay,
     IconTicket,
-    IconVideo,
-    IconApple,
-    IconBrandGooglePlay,
-    IconChevronRight,
-    IconArrowRight,
-    IconSend,
-    IconBrandFacebook,
-    IconBrandTwitter,
-    IconBrandInstagram,
-    IconBrandYoutube
+    IconVideo
 } from '@tabler/icons-react';
-import { Carousel } from '@mantine/carousel';
+import {Carousel} from '@mantine/carousel';
 import '../styles/homepage.css';
 import {useNavigate} from "react-router-dom";
+import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
 
-// Hero Section Component
+// Hero Section Component - Lando Style
 function HeroSection() {
     return (
         <Box
-            sx={(theme) => ({
-                background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%)',
-                color: 'white',
-                padding: '4rem 0',
+            className="dark-theme"
+            style={{
+                padding: '6rem 0',
                 position: 'relative',
                 overflow: 'hidden',
-                maxHeight: '120px',
-            })}
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center'
+            }}
         >
+            {/* Background Pattern */}
+            <Box
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(45deg, transparent 0%, rgba(0, 255, 136, 0.05) 100%)',
+                    pointerEvents: 'none'
+                }}
+            />
+
             <Container size="xl">
                 <Grid align="center" gutter="xl">
-                    <Grid.Col span={{ base: 12, md: 6 }}>
-                        <Stack spacing="lg" className="hero-content">
-                            <Title order={1} size="3rem" weight={700}>
-                                Your Ultimate Football Companion
-                            </Title>
-                            <Text size="xl" opacity={0.9}>
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <Stack gap="xl" className="hero-content">
+                            <ModernCaption>Football Tracking Platform</ModernCaption>
+                            <ModernH1>
+                                Your Ultimate <span style={{color: 'var(--modern-lime)'}}>Football</span> Companion
+                            </ModernH1>
+                            <ModernBody>
                                 Live scores, personalised statistics, and ticket bookings all in one place.
-                            </Text>
-                            <Group spacing="md">
-                                <Button
-                                    size="lg"
-                                    variant="white"
-                                    color="blue"
-                                    className="btn-primary"
-                                    sx={{ color: '#1e3a8a' }}
-                                >
+                                Experience football like never before with our cutting-edge platform.
+                            </ModernBody>
+                            <Group gap="md">
+                                <ModernButton variant="primary" size="lg">
                                     Download App
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    color="white"
-                                    sx={{
-                                        borderColor: 'white',
-                                        color: 'white',
-                                        '&:hover': {
-                                            backgroundColor: 'white',
-                                            color: '#1e3a8a'
-                                        }
-                                    }}
-                                >
+                                </ModernButton>
+                                <ModernButton variant="secondary" size="lg">
                                     Explore Features
-                                </Button>
+                                </ModernButton>
                             </Group>
                         </Stack>
                     </Grid.Col>
-                    <Grid.Col span={{ base: 12, md: 6 }}>
+                    <Grid.Col span={{base: 12, md: 6}}>
                         <Center>
                             <Box
                                 component="img"
                                 src="https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80"
                                 alt="Football action"
                                 className="hero-image"
-                                sx={{
+                                style={{
                                     borderRadius: '1rem',
-                                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
                                     maxWidth: '100%',
-                                    height: '120px'
+                                    height: 'auto',
+                                    transition: 'transform 0.3s ease'
                                 }}
                             />
                         </Center>
@@ -155,60 +137,72 @@ function LiveMatchesSection() {
     ];
 
     return (
-        <Box py="4rem" bg="white">
+        <Box
+            py="6rem"
+        >
             <Container size="xl">
-                <Group position="apart" mb="2rem">
-                    <Title order={2} size="2.5rem" weight={700}>
-                        Live Matches
-                    </Title>
-                    <Button variant="subtle" rightIcon={<IconChevronRight size={16} onClick={() => navigate('/matches')}/>}>
+                <Group justify="space-between" mb="3rem">
+                    <ModernH2>
+                        Live <span style={{color: 'var(--modern-lime)'}}>Matches</span>
+                    </ModernH2>
+                    <ModernButton
+                        variant="secondary"
+                        onClick={() => navigate('/matches')}
+                    >
                         View All
-                    </Button>
+                    </ModernButton>
                 </Group>
 
                 <Grid gutter="xl">
                     {matches.map((match) => (
-                        <Grid.Col key={match.id} span={{ base: 12, md: 4 }}>
-                            <Card
-                                shadow="md"
-                                padding="xl"
-                                radius="md"
-                                withBorder
-                                className="match-card"
-                            >
-                                <Group position="apart" mb="md">
-                                    <Text size="sm" color="dimmed">
-                                        {match.league}
-                                    </Text>
-                                </Group>
+                        <Grid.Col key={match.id} span={{base: 12, md: 4}}>
+                            <ModernCard hover accent>
+                                <Stack gap="md">
+                                    <Group justify="space-between">
+                                        <ModernCaption>{match.league}</ModernCaption>
+                                        <Group gap="xs">
+                                            <IconPlayerPlay size={16} color="var(--modern-lime)"/>
+                                            <Text size="sm" color="var(--modern-lime)" fw={600}>
+                                                LIVE
+                                            </Text>
+                                        </Group>
+                                    </Group>
 
-                                <Group position="apart" align="center" mb="xl">
-                                    <Stack align="center" spacing="xs">
-                                        <Avatar
-                                            src={match.homeLogo}
-                                            size="xl"
-                                            radius="md"
-                                        />
-                                        <Text weight={500}>{match.homeTeam}</Text>
-                                    </Stack>
+                                    <Group justify="space-between" align="center">
+                                        <Stack align="center" gap="xs">
+                                            <Avatar
+                                                src={match.homeLogo}
+                                                size="xl"
+                                                radius="md"
+                                            />
+                                            <Text fw={600} size="sm">{match.homeTeam}</Text>
+                                        </Stack>
 
-                                    <Stack align="center" spacing="xs">
-                                        <Text size="2rem" weight={700}>
-                                            {match.homeScore !== null ? `${match.homeScore} - ${match.awayScore}` : '- -'}
-                                        </Text>
-                                        <Text size="sm" color="dimmed">{match.time}</Text>
-                                    </Stack>
+                                        <Stack align="center" gap="xs">
+                                            <Text
+                                                size="2.5rem"
+                                                fw={900}
+                                                style={{color: 'var(--modern-lime)'}}
+                                            >
+                                                {match.homeScore !== null ? `${match.homeScore} - ${match.awayScore}` : '- -'}
+                                            </Text>
+                                            <Group gap="xs">
+                                                <IconClock size={14}/>
+                                                <Text size="sm" c="dimmed">{match.time}</Text>
+                                            </Group>
+                                        </Stack>
 
-                                    <Stack align="center" spacing="xs">
-                                        <Avatar
-                                            src={match.awayLogo}
-                                            size="xl"
-                                            radius="md"
-                                        />
-                                        <Text weight={500}>{match.awayTeam}</Text>
-                                    </Stack>
-                                </Group>
-                            </Card>
+                                        <Stack align="center" gap="xs">
+                                            <Avatar
+                                                src={match.awayLogo}
+                                                size="xl"
+                                                radius="md"
+                                            />
+                                            <Text fw={600} size="sm">{match.awayTeam}</Text>
+                                        </Stack>
+                                    </Group>
+                                </Stack>
+                            </ModernCard>
                         </Grid.Col>
                     ))}
                 </Grid>
@@ -263,20 +257,23 @@ function LatestNewsSection() {
     ];
 
     return (
-        <Box py="4rem" bg="gray.0">
+        <Box
+            className="dark-theme"
+            py="6rem"
+        >
             <Container size="xl">
-                <Group position="apart" mb="2rem">
-                    <Title order={2} size="2.5rem" weight={700}>
-                        Latest News
-                    </Title>
-                    <Button variant="subtle" rightIcon={<IconChevronRight size={16} />}>
+                <Group justify="space-between" mb="3rem">
+                    <ModernH2>
+                        Latest <span style={{color: 'var(--modern-lime)'}}>News</span>
+                    </ModernH2>
+                    <ModernButton variant="secondary">
                         View All
-                    </Button>
+                    </ModernButton>
                 </Group>
 
                 <Carousel
-                    slideSize={{ base: '100%', sm: '50%', md: '33.333%' }}
-                    slideGap="md"
+                    slideSize={{base: '100%', sm: '50%', md: '33.333%'}}
+                    slideGap="lg"
                     align="start"
                     slidesToScroll={1}
                     withIndicators
@@ -284,48 +281,40 @@ function LatestNewsSection() {
                     dragFree
                     height="100%"
                 >
-                {news.map((article) => (
+                    {news.map((article) => (
                         <Carousel.Slide key={article.id}>
-                            <Card
-                                shadow="md"
-                                radius="md"
-                                withBorder
-                                className="news-card"
-                                sx={{ height: '100%' }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={article.image}
-                                    alt={article.title}
-                                    style={{
-                                        width: '100%',
-                                        height: '200px',
-                                        objectFit: 'cover',
-                                        borderTopLeftRadius: '0.5rem',
-                                        borderTopRightRadius: '0.5rem',
-                                    }}
-                                />
-                                <Stack spacing="md" p="xl">
-                                    <Group spacing="xs">
-                                        <Text size="sm" color="dimmed">{article.category}</Text>
-                                        <Text size="sm" color="dimmed">•</Text>
-                                        <Text size="sm" color="dimmed">{article.time}</Text>
-                                    </Group>
-                                    <Title order={3} size="lg" weight={600}>
-                                        {article.title}
-                                    </Title>
-                                    <Text color="dimmed" lineClamp={3}>
-                                        {article.excerpt}
-                                    </Text>
-                                    <Button
-                                        variant="subtle"
-                                        rightIcon={<IconArrowRight size={16} />}
-                                        color="blue"
-                                    >
-                                        Read More
-                                    </Button>
+                            <ModernCard hover>
+                                <Stack gap="md">
+                                    <Box
+                                        component="img"
+                                        src={article.image}
+                                        alt={article.title}
+                                        style={{
+                                            width: '100%',
+                                            height: '200px',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                            transition: 'transform 0.3s ease'
+                                        }}
+                                    />
+                                    <Stack gap="md">
+                                        <Group gap="xs">
+                                            <ModernCaption>{article.category}</ModernCaption>
+                                            <Text size="sm" c="dimmed">•</Text>
+                                            <Text size="sm" c="dimmed">{article.time}</Text>
+                                        </Group>
+                                        <ModernH3>
+                                            {article.title}
+                                        </ModernH3>
+                                        <ModernBody>
+                                            {article.excerpt}
+                                        </ModernBody>
+                                        <ModernButton variant="secondary" size="sm">
+                                            Read More
+                                        </ModernButton>
+                                    </Stack>
                                 </Stack>
-                            </Card>
+                            </ModernCard>
                         </Carousel.Slide>
                     ))}
                 </Carousel>
@@ -355,37 +344,41 @@ function FeaturesSection() {
     ];
 
     return (
-        <Box py="4rem" bg="white">
+        <Box
+            py="6rem"
+        >
             <Container size="xl">
-                <Title order={2} size="2.5rem" weight={700} ta="center" mb="3rem">
-                    Why Choose I Watch Football?
-                </Title>
+                <ModernH2 style={{textAlign: 'center', marginBottom: '4rem'}}>
+                    Why Choose <span style={{color: 'var(--modern-lime)'}}>I Watch Football</span>?
+                </ModernH2>
 
                 <Grid gutter="xl">
                     {features.map((feature, index) => (
-                        <Grid.Col key={index} span={{ base: 12, md: 4 }}>
-                            <Stack align="center" spacing="md" p="xl">
-                                <Box
-                                    className="feature-icon"
-                                    sx={(theme) => ({
-                                        backgroundColor: theme.colors.blue[0],
-                                        borderRadius: '50%',
-                                        width: '4rem',
-                                        height: '4rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    })}
-                                >
-                                    <feature.icon size={32} color="#1e40af" />
-                                </Box>
-                                <Title order={3} size="xl" weight={600} ta="center">
-                                    {feature.title}
-                                </Title>
-                                <Text color="dimmed" ta="center">
-                                    {feature.description}
-                                </Text>
-                            </Stack>
+                        <Grid.Col key={index} span={{base: 12, md: 4}}>
+                            <ModernCard hover accent>
+                                <Stack align="center" gap="lg" p="xl">
+                                    <Box
+                                        style={{
+                                            backgroundColor: 'var(--modern-lime)',
+                                            borderRadius: '50%',
+                                            width: '5rem',
+                                            height: '5rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        <feature.icon size={32} color="var(--lando-black)"/>
+                                    </Box>
+                                    <ModernH3 style={{textAlign: 'center'}}>
+                                        {feature.title}
+                                    </ModernH3>
+                                    <ModernBody style={{textAlign: 'center'}}>
+                                        {feature.description}
+                                    </ModernBody>
+                                </Stack>
+                            </ModernCard>
                         </Grid.Col>
                     ))}
                 </Grid>
@@ -397,10 +390,10 @@ function FeaturesSection() {
 export function HomePage() {
     return (
         <>
-            <HeroSection />
-            <LiveMatchesSection />
-            <LatestNewsSection />
-            <FeaturesSection />
+            <HeroSection/>
+            <LiveMatchesSection/>
+            <LatestNewsSection/>
+            <FeaturesSection/>
         </>
     );
 }

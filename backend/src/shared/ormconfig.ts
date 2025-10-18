@@ -4,17 +4,20 @@ import { config } from 'dotenv';
 config(); // This ensures .env variables are loaded early
 
 
-const entities = [join(__dirname, '../../', 'src/api/modules/**/*{.ts,.js}')];
+const entities = [
+    join(__dirname, '../../', 'src/api/modules/**/*{.ts,.js}'),
+    join(__dirname, '../../../libraries/base/**/*{.ts,.js}')
+];
 console.log('PATH:',entities);
 export default new DataSource({
 	// @ts-ignore
-	type: process.env.DATABASE_TYPE,
-	host: process.env.DATABASE_HOST,
+	type: process.env.DATABASE_TYPE || 'postgres',
+	host: process.env.DATABASE_HOST || 'localhost',
 	// @ts-ignore
-	port: process.env.DATABASE_PORT,
-	username: process.env.DATABASE_USERNAME,
-	password: process.env.DATABASE_PASSWORD,
-	database: process.env.DATABASE_NAME,
+	port: process.env.DATABASE_PORT || 5432,
+	username: process.env.DATABASE_USERNAME || 'postgres',
+	password: process.env.DATABASE_PASSWORD || 'postgres',
+	database: process.env.DATABASE_NAME || 'monorepo',
 	entities,
 	autoLoadEntities: false,
 	migrationsRun: false,
@@ -23,5 +26,9 @@ export default new DataSource({
 	migrations: ['src/shared/migrations/*{.ts,.js}'],
 	cli: {
 		migrationsDir: 'src/shared/migrations'
-	}
+	},
+	// SSL configuration for remote PostgreSQL connections
+	ssl: process.env.DATABASE_SSL === 'true' ? {
+		rejectUnauthorized: false
+	} : false
 });

@@ -44,8 +44,8 @@ export function AppWrapper() {
                 }
             }}
             navbar={{ 
-                width: { base: width, md: width * 0.8 }, 
-                breakpoint: 'md', 
+                width: { base: 300, sm: 350, md: 400, lg: 450, xl: 500 }, 
+                breakpoint: 'sm', 
                 collapsed 
             }}
             footer={{

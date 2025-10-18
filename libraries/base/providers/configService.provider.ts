@@ -35,7 +35,11 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 			migrations: [`src/shared/migrations/*{.ts,.js}`],
 			cli: {
 				migrationsDir: 'src/shared/migrations'
-			}
+			},
+			// SSL configuration for remote PostgreSQL connections
+			ssl: this.configService.get('DATABASE_SSL') === 'true' ? {
+				rejectUnauthorized: false
+			} : false
 		}
 
 		// console.log('TypeORM Config:', JSON.stringify(typeORMConfig, null, 2));
