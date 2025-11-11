@@ -808,6 +808,387 @@
         ]
       }
     },
+    "/comms-preference": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommsPreferenceDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommsPreference"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create CommsPreference",
+        "tags": [
+          "comms-preference"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommsPreference"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all CommsPreferences",
+        "tags": [
+          "comms-preference"
+        ]
+      }
+    },
+    "/comms-preference/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommsPreference"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all CommsPreferences",
+        "tags": [
+          "comms-preference"
+        ]
+      }
+    },
+    "/comms-preference/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of CommsPreferences",
+        "tags": [
+          "comms-preference"
+        ]
+      }
+    },
+    "/comms-preference/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommsPreference"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one CommsPreference",
+        "tags": [
+          "comms-preference"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommsPreference"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one CommsPreference",
+        "tags": [
+          "comms-preference"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one CommsPreference",
+        "tags": [
+          "comms-preference"
+        ]
+      }
+    },
+    "/comms-preference/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for CommsPreference",
+        "tags": [
+          "comms-preference"
+        ]
+      }
+    },
+    "/comms-preference/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to CommsPreference",
+        "tags": [
+          "comms-preference"
+        ]
+      }
+    },
     "/competition": {
       "post": {
         "operationId": "create",
@@ -4996,6 +5377,387 @@
         "summary": "Download file related to Payment",
         "tags": [
           "payment"
+        ]
+      }
+    },
+    "/payment-provider": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentProviderDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentProvider"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create PaymentProvider",
+        "tags": [
+          "payment-provider"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentProvider"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all PaymentProviders",
+        "tags": [
+          "payment-provider"
+        ]
+      }
+    },
+    "/payment-provider/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentProvider"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all PaymentProviders",
+        "tags": [
+          "payment-provider"
+        ]
+      }
+    },
+    "/payment-provider/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of PaymentProviders",
+        "tags": [
+          "payment-provider"
+        ]
+      }
+    },
+    "/payment-provider/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentProvider"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one PaymentProvider",
+        "tags": [
+          "payment-provider"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentProvider"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one PaymentProvider",
+        "tags": [
+          "payment-provider"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one PaymentProvider",
+        "tags": [
+          "payment-provider"
+        ]
+      }
+    },
+    "/payment-provider/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for PaymentProvider",
+        "tags": [
+          "payment-provider"
+        ]
+      }
+    },
+    "/payment-provider/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to PaymentProvider",
+        "tags": [
+          "payment-provider"
         ]
       }
     },
@@ -10817,6 +11579,13 @@
   "tags": [],
   "servers": [],
   "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
     "schemas": {
       "CreateAddressDTO": {
         "type": "object",
@@ -10978,6 +11747,229 @@
           "playerId",
           "type",
           "minute"
+        ]
+      },
+      "CommsPreferenceDTO": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number"
+          },
+          "emailNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "smsNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "pushNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "inAppNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "marketingEmails": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "newsletterEmails": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "matchReminders": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "EN",
+              "ES",
+              "FR",
+              "DE",
+              "IT",
+              "PT"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "emailNotifications",
+          "smsNotifications",
+          "pushNotifications",
+          "inAppNotifications",
+          "marketingEmails",
+          "newsletterEmails",
+          "matchReminders",
+          "language"
+        ]
+      },
+      "CommsPreference": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "emailNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "smsNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "pushNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "inAppNotifications": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "marketingEmails": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "newsletterEmails": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "matchReminders": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "NEVER"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "EN",
+              "ES",
+              "FR",
+              "DE",
+              "IT",
+              "PT"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "user",
+          "emailNotifications",
+          "smsNotifications",
+          "pushNotifications",
+          "inAppNotifications",
+          "marketingEmails",
+          "newsletterEmails",
+          "matchReminders",
+          "language"
         ]
       },
       "CreateCompetitionDTO": {
@@ -11494,7 +12486,10 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "FORGOT_PASSWORD"
+            ]
           },
           "expiry": {
             "type": "string"
@@ -11532,7 +12527,10 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "FORGOT_PASSWORD"
+            ]
           },
           "expiry": {
             "type": "string"
@@ -12009,11 +13007,82 @@
             "type": "number",
             "description": "Total amount paid",
             "example": 199.99
+          },
+          "paymentProviderId": {
+            "type": "number",
+            "description": "ID of the payment provider used",
+            "example": 1
           }
         },
         "required": [
           "method",
           "status"
+        ]
+      },
+      "PaymentProvider": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the payment provider",
+            "example": "Stripe"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Unique slug identifier",
+            "example": "stripe"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of payment provider",
+            "example": "CARD",
+            "enum": [
+              "CARD",
+              "WALLET",
+              "BANK_TRANSFER",
+              "CRYPTO"
+            ]
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API key or secret (encrypted in production)",
+            "example": "sk_live_..."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this provider is enabled and available",
+            "example": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "URL to the provider logo",
+            "example": "/logos/stripe.svg"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional configuration/metadata as JSON",
+            "example": {}
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "type",
+          "apiKey",
+          "enabled"
         ]
       },
       "Payment": {
@@ -12042,6 +13111,19 @@
             "description": "Total amount paid",
             "example": 199.99
           },
+          "paymentProviderId": {
+            "type": "number",
+            "description": "ID of the payment provider used",
+            "example": 1
+          },
+          "paymentProvider": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentProvider"
+              }
+            ]
+          },
           "tickets": {
             "type": "array",
             "items": {
@@ -12054,6 +13136,59 @@
           "method",
           "status",
           "tickets"
+        ]
+      },
+      "CreatePaymentProviderDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name of the payment provider",
+            "example": "Stripe"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Unique slug identifier",
+            "example": "stripe"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of payment provider",
+            "example": "CARD",
+            "enum": [
+              "CARD",
+              "WALLET",
+              "BANK_TRANSFER",
+              "CRYPTO"
+            ]
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API key or secret (encrypted in production)",
+            "example": "sk_live_..."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this provider is enabled and available",
+            "example": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "URL to the provider logo",
+            "example": "/logos/stripe.svg"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional configuration/metadata as JSON",
+            "example": {}
+          }
+        },
+        "required": [
+          "name",
+          "slug",
+          "type",
+          "apiKey",
+          "enabled"
         ]
       },
       "CreatePlayerDTO": {
@@ -12816,6 +13951,12 @@
             "$ref": "#/components/schemas/Promise"
           },
           "predictions": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "commsPreferenceId": {
+            "type": "number"
+          },
+          "commsPreference": {
             "$ref": "#/components/schemas/Promise"
           }
         },

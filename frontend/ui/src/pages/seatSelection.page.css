@@ -1,0 +1,60 @@
+.seat-selection-page {
+    background-color: var(--modern-black);
+}
+
+.seat-selection-page .mantine-Select-input {
+    background-color: var(--modern-black) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: var(--modern-white) !important;
+}
+
+.seat-selection-page .mantine-Select-input:focus {
+    border-color: var(--modern-lime) !important;
+    box-shadow: 0 0 0 1px var(--modern-lime) !important;
+}
+
+.seat-selection-page .mantine-Select-dropdown {
+    background-color: var(--modern-dark-gray) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.seat-selection-page .mantine-Select-option {
+    color: var(--modern-white) !important;
+}
+
+.seat-selection-page .mantine-Select-option:hover {
+    background-color: var(--modern-lime) !important;
+    color: var(--modern-black) !important;
+}
+
+.seat-selection-page .mantine-Slider-track {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.seat-selection-page .mantine-Slider-bar {
+    background-color: var(--modern-lime) !important;
+}
+
+.seat-selection-page .mantine-Slider-thumb {
+    border-color: var(--modern-lime) !important;
+    background-color: var(--modern-lime) !important;
+}
+
+.seat-selection-page .mantine-Radio-root {
+    color: var(--modern-white);
+}
+
+.seat-selection-page .mantine-Radio-label {
+    color: var(--modern-white);
+    font-family: var(--modern-font-primary);
+}
+
+.seat-selection-page .mantine-Radio-inner {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.seat-selection-page .mantine-Radio-inner[data-checked] {
+    background-color: var(--modern-lime);
+    border-color: var(--modern-lime);
+}
+

@@ -13,23 +13,83 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
 
 
     return (
-        <Paper p="xl" radius="lg" withBorder mb="xl">
-            <Title order={3} size="h4" mb="xl" align="center">Team Lineups</Title>
-            <Tabs defaultValue={matchDetails.homeTeam}>
-                <Tabs.List>
-                    <Tabs.Tab value={matchDetails.homeTeam} name={matchDetails.homeTeam} >
-                        {matchDetails.homeTeam}
+        <Paper 
+            p={{ base: 'md', sm: 'xl' }} 
+            radius="lg" 
+            withBorder 
+            mb={{ base: 'md', sm: 'xl' }} 
+            style={{ backgroundColor: 'var(--modern-dark-gray)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+        >
+            <Title 
+                order={3} 
+                size={{ base: 'h5', sm: 'h4' }} 
+                mb={{ base: 'md', sm: 'xl' }} 
+                align="center" 
+                style={{ color: 'var(--modern-white)' }}
+            >
+                Team Lineups
+            </Title>
+            <Tabs 
+                defaultValue={matchDetails.homeTeam}
+                styles={{
+                    tab: {
+                        flex: '1 1 auto',
+                        minWidth: '120px',
+                        borderBottom: '2px solid transparent',
+                        transition: 'all 0.2s ease',
+                    },
+                    tabLabel: {
+                        color: 'var(--modern-white)',
+                    }
+                }}
+            >
+                <Tabs.List style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <Tabs.Tab 
+                        value={matchDetails.homeTeam}
+                        styles={{
+                            root: {
+                                borderBottom: '2px solid transparent',
+                                '&[data-active]': {
+                                    borderBottomColor: 'var(--modern-lime)',
+                                }
+                            },
+                            label: {
+                                color: 'var(--modern-white)',
+                                '&[data-active]': {
+                                    color: 'var(--modern-lime)',
+                                }
+                            }
+                        }}
+                    >
+                        <Text size={{ base: 'xs', sm: 'sm' }} style={{ wordBreak: 'break-word' }}>
+                            {matchDetails.homeTeam}
+                        </Text>
                     </Tabs.Tab>
-                    <Tabs.Tab value={matchDetails.awayTeam} name={matchDetails.awayTeam} >
-                        {matchDetails.awayTeam}
+                    <Tabs.Tab 
+                        value={matchDetails.awayTeam}
+                        styles={{
+                            root: {
+                                borderBottom: '2px solid transparent',
+                                '&[data-active]': {
+                                    borderBottomColor: 'var(--modern-lime)',
+                                }
+                            },
+                            label: {
+                                color: 'var(--modern-white)',
+                                '&[data-active]': {
+                                    color: 'var(--modern-lime)',
+                                }
+                            }
+                        }}
+                    >
+                        <Text size={{ base: 'xs', sm: 'sm' }} style={{ wordBreak: 'break-word' }}>
+                            {matchDetails.awayTeam}
+                        </Text>
                     </Tabs.Tab>
                 </Tabs.List>
 
-                <Tabs.Panel value={matchDetails.homeTeam} pt="xs">
-                    <Box p="md">
-                        <Title order={4} size="h5" mb="xl" align="center">
-                            {matchDetails.homeTeam}
-                        </Title>
+                <Tabs.Panel value={matchDetails.homeTeam} pt={{ base: 'md', sm: 'xl' }}>
+                    <Box p={{ base: 'xs', sm: 'md' }}>
                         {isFuture && matchDetails.homePredictedLineup ? (
                             <FormationView
                                 lineup={matchDetails.homePredictedLineup}
@@ -48,11 +108,8 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                     </Box>
                 </Tabs.Panel>
 
-                <Tabs.Panel value={matchDetails.awayTeam} pt="xs">
-                    <Box p="md">
-                        <Title order={4} size="h5" mb="xl" align="center">
-                            {matchDetails.awayTeam}
-                        </Title>
+                <Tabs.Panel value={matchDetails.awayTeam} pt={{ base: 'md', sm: 'xl' }}>
+                    <Box p={{ base: 'xs', sm: 'md' }}>
                         {isFuture && matchDetails.awayPredictedLineup ? (
                             <FormationView
                                 lineup={matchDetails.awayPredictedLineup}
@@ -82,14 +139,16 @@ interface SubstitutesListProps {
 function SubstitutesList({ substitutes }: SubstitutesListProps) {
     return (
         <Box mt="xl">
-            <Title size="sm" weight={500} mb="xs" align="center">Substitutes</Title>
-            {substitutes ? substitutes.map(substitute => (
-                <Text key={substitute.id} size="sm" style={{ margin: '4px' }}>
-                    {substitute.name}
-                </Text>
-            )) : (
-                <Text size="sm" style={{ margin: '4px' }}>No substitutes listed.</Text>
-            )}
+            <Title size="sm" fw={500} mb="md" align="center" style={{ color: 'var(--modern-white)' }}>Substitutes</Title>
+            <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                {substitutes ? substitutes.map(substitute => (
+                    <Text key={substitute.id} size="sm" style={{ color: 'var(--modern-gray)', margin: '0.25rem' }}>
+                        {substitute.name}
+                    </Text>
+                )) : (
+                    <Text size="sm" style={{ color: 'var(--modern-gray)' }}>No substitutes listed.</Text>
+                )}
+            </Box>
         </Box>
     );
 };

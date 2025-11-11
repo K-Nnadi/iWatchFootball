@@ -1,6 +1,7 @@
-import {Entity} from 'typeorm';
+import {Entity, ManyToOne} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Ticket} from '../ticket/ticket';
+import {PaymentProvider} from '../paymentProvider/paymentProvider';
 import {
     EntityColumn,
     EntityEnumColumn,
@@ -8,7 +9,7 @@ import {
     OptionalEntityColumn,
     RelationshipType
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
-import {PickType} from '@nestjs/swagger';
+import {ApiPropertyOptional, PickType} from '@nestjs/swagger';
 import {PaymentMethod} from "../../enums/payment.enum";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
@@ -25,7 +26,7 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'paymentProviderId', 'metadata'
       ],
     },
     [UserRole.USER]: {
@@ -35,25 +36,25 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'paymentProviderId', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }), fields: ['id'] },
   },
-  [OperationType.CREATE]: {
-    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
-      // All authenticated users can create payments
-      fields: ['method', 'status', 'amount', 'metadata'],
+    [OperationType.CREATE]: {
+      [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
+        // All authenticated users can create payments
+        fields: ['method', 'status', 'amount', 'paymentProviderId', 'metadata'],
+      },
+      default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }) },
     },
-    default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }) },
-  },
-  [OperationType.UPDATE]: {
-    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can update payments
-      fields: ['method', 'status', 'amount', 'metadata'],
+    [OperationType.UPDATE]: {
+      [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+        // Only admin and moderator can update payments
+        fields: ['method', 'status', 'amount', 'paymentProviderId', 'metadata'],
+      },
+      default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }) },
     },
-    default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }) },
-  },
   [OperationType.DELETE]: {
     [createRoleGroup(UserRole.ADMIN)]: {
       // Only admin can delete payments
@@ -77,6 +78,19 @@ export class Payment extends BaseDbEntity {
     })
     amount?: number;
 
+    /**
+     * Optional reference to the payment provider used for this payment
+     */
+    @OptionalEntityColumn({
+        db: {type: 'int'},
+        api: {description: 'ID of the payment provider used', example: 1},
+    })
+    paymentProviderId?: number;
+
+    @ApiPropertyOptional({nullable: true})
+    @ManyToOne(() => PaymentProvider, {nullable: true})
+    paymentProvider?: PaymentProvider;
+
     @EntityRelation({
         type: RelationshipType.ONE_TO_MANY,
         entity: () => Ticket,
@@ -89,4 +103,5 @@ export class CreatePaymentDTO extends PickType(Payment, [
     'method',
     'status',
     'amount',
+    'paymentProviderId',
 ] as const) {}

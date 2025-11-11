@@ -11,11 +11,11 @@ import {
     useMantineTheme,
     rem,
 } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 export function LandingPage() {
     const theme = useMantineTheme();
-    const navigate = useNavigate();
+    const { navigateWithTransition } = usePageTransition();
 
     return (
         <Container size="xl" style={{ position: 'relative', padding: rem(50) }}>
@@ -43,7 +43,7 @@ export function LandingPage() {
                         variant="filled"
                         color="indigo"
                         size="md"
-                        onClick={() => navigate('/home')}
+                        onClick={() => navigateWithTransition('/home')}
                     >
                         Explore Now
                     </Button>
@@ -112,10 +112,10 @@ export function LandingPage() {
                     Sign up now and begin logging matches, analyzing your stats, and grabbing the best tickets for your next live experience.
                 </Text>
                 <Group position="center">
-                    <Button variant="outline" color="teal" size="md" onClick={() => navigate('/join')}>
+                    <Button variant="outline" color="teal" size="md" onClick={() => navigateWithTransition('/join')}>
                         Join
                     </Button>
-                    <Button variant="outline" color="teal" size="md" onClick={() => navigate('/signIn')}>
+                    <Button variant="outline" color="teal" size="md" onClick={() => navigateWithTransition('/signIn')}>
                         Sign In
                     </Button>
                 </Group>

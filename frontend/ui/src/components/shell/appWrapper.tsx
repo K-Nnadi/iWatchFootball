@@ -3,6 +3,7 @@ import { Header } from './header';
 import { Footer } from './footer';
 import { Navbar } from './navbar';
 import { Main } from "./main";
+import { PageTransition } from '../transitions/PageTransition';
 import React, { useEffect, useState } from "react";
 import { useHeaderNavbarStore } from "../../shared/stores/headerNavbar.store";
 // Assume we have an auth store or context that provides isLoggedIn
@@ -52,19 +53,13 @@ export function AppWrapper() {
                 height: { base: 60, md: 80 }
             }}
             padding="md"
-            // styles={(theme) => ({
-            //     main: {
-            //         backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-            //     },
-            //     root: {
-            //         minHeight: '100vh'
-            //     }
-            // })}
         >
             {/* Pass isLoggedIn to Header */}
             <Header showHeader={showHeader} isLoggedIn={isLoggedIn} />
             <Navbar />
-            <Main />
+            <PageTransition>
+                <Main />
+            </PageTransition>
         </AppShell>
     );
 }

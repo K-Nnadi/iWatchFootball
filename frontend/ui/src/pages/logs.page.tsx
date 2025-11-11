@@ -13,6 +13,7 @@ import {
     Text,
     Title
 } from '@mantine/core';
+import { ModernButton, ModernCard, ModernH1, ModernH2, ModernH3, ModernBody, ModernCaption } from '../components/modern';
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 import StatsTab from "../tabs/stats.tab";
@@ -326,7 +327,7 @@ export function LogsPage() {
         const updateHeight = () => {
             const headerHeight = headerRef.current?.offsetHeight || 0;
             const tabsHeight = tabsRef.current?.offsetHeight || 0;
-            const padding = 40; // Account for container padding
+            const padding = 80; // Increased padding to account for form and margins
             setScrollAreaHeight(window.innerHeight - headerHeight - tabsHeight - padding);
         };
 
@@ -335,45 +336,40 @@ export function LogsPage() {
         return () => window.removeEventListener('resize', updateHeight);
     }, []);
     return (
-        <Container>
-            <Grid size="xl" my={40}>
-                <LoadingOverlay visible={loading} overlayBlur={2}/>
-                <Grid.Col span={columnSpan}>
+        <Box className="dark-theme" style={{ 
+            minHeight: '100vh', 
+            backgroundColor: 'var(--modern-black)',
+            width: '100vw',
+            marginLeft: 'calc(-50vw + 50%)',
+            marginRight: 'calc(-50vw + 50%)',
+            marginTop: '-1rem'
+        }}>
+            <Container>
+                <Grid size="xl" my={10}>
+                    <LoadingOverlay visible={loading} overlayBlur={2}/>
+                    <Grid.Col span={columnSpan}>
 
-                    <Box mb={40}>
-                        <Title order={2} mb="xs" sx={(theme) => ({
-                            color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
-                            fontSize: '2rem',
-                            fontWeight: 600
-                        })}>
-                            My Logged Games
-                        </Title>
-                        <Text color="dimmed" size="sm">
-                            Track and manage your match history across different competitions
-                        </Text>
-                    </Box>
+                        <Box mb={10}>
+                            <ModernH2 style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>
+                                My Logged Games
+                            </ModernH2>
+                            <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
+                                Track and manage your match history across different competitions
+                            </ModernBody>
+                        </Box>
 
-                    <Box sx={{ position: 'sticky', top:20, width: 'calc(50% - 40px)', maxWidth: '600px' }}>
-                        <Paper p="xl" radius="lg" shadow="md" withBorder sx={(theme) => ({
-                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                            '&:hover': {
-                                transform: 'translateY(-2px)',
-                                boxShadow: theme.shadows.lg
-                            }
-                        })}>
-                            <Title order={3} mb="md" sx={(theme) => ({
-                                color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[8],
-                                fontSize: '1.5rem',
-                                fontWeight: 600
-                            })}>Add New Match</Title>
+                    <Box style={{ position: 'sticky', top:20, width: '100%', maxWidth: 'none', marginBottom: '2rem' }}>
+                        <ModernCard style={{ padding: '1.5rem', paddingBottom: '2rem', backgroundColor: 'var(--modern-dark-gray)' }}>
+                            <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>
+                                Add New Match
+                            </ModernH3>
 
-                            <Text color="dimmed" size="sm" mb="xl">
+                            <ModernBody style={{ color: 'var(--modern-light-gray)', marginBottom: '1.5rem' }}>
                                 Search for a fixture by selecting competition, season, and filtering teams
-                            </Text>
+                            </ModernBody>
 
-                            <Box mb="md">
-                                <Text weight={500} size="sm" mb="xs">Competition</Text>
+                            <Box mb="sm">
+                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Competition</ModernCaption>
                                 <Select
                                     placeholder="Select competition"
                                     data={competitions.map((c) => ({value: c.id, label: c.name}))}
@@ -389,13 +385,13 @@ export function LogsPage() {
                                     }}
                                     searchable
                                     clearable
-                                    sx={{width: '100%'}}
+                                    style={{width: '100%'}}
                                 />
                             </Box>
 
                             {selectedCompetition && (
-                                <Box mb="md">
-                                    <Text weight={500} size="sm" mb="xs">Season</Text>
+                                <Box mb="sm">
+                                    <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Season</ModernCaption>
                                     <Select
                                         placeholder="Select season"
                                         data={seasons.map((s) => ({value: s.id, label: s.year}))}
@@ -410,16 +406,16 @@ export function LogsPage() {
                                         }}
                                         searchable
                                         clearable
-                                        sx={{width: '100%'}}
+                                        style={{width: '100%'}}
                                     />
                                 </Box>
                             )}
 
                             {selectedSeason && (
                                 <>
-                                    <SimpleGrid cols={2} spacing="md" mb="md">
+                                    <SimpleGrid cols={2} gap="sm" mb="sm">
                                         <Box>
-                                            <Text weight={500} size="sm" mb="xs">Home Team</Text>
+                                            <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Home Team</ModernCaption>
                                             <Select
                                                 placeholder="Select home team"
                                                 data={teams
@@ -435,11 +431,11 @@ export function LogsPage() {
                                                 }}
                                                 searchable
                                                 clearable
-                                                sx={{width: '100%'}}
+                                                style={{width: '100%'}}
                                             />
                                         </Box>
                                         <Box>
-                                            <Text weight={500} size="sm" mb="xs">Away Team</Text>
+                                            <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Away Team</ModernCaption>
                                             <Select
                                                 placeholder="Select away team"
                                                 data={teams
@@ -455,14 +451,14 @@ export function LogsPage() {
                                                 }}
                                                 searchable
                                                 clearable
-                                                sx={{width: '100%'}}
+                                                style={{width: '100%'}}
                                             />
                                         </Box>
                                     </SimpleGrid>
 
                                     {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
-                                        <Box mb="xl">
-                                            <Text weight={500} size="sm" mb="xs">Select Fixture</Text>
+                                        <Box mb="md">
+                                            <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Select Fixture</ModernCaption>
                                             <Select
                                                 placeholder="Choose a fixture"
                                                 data={filteredFixtures.map((f) => ({
@@ -473,42 +469,39 @@ export function LogsPage() {
                                                 onChange={setSelectedFixture}
                                                 searchable
                                                 clearable
-                                                sx={{width: '100%'}}
+                                                style={{width: '100%'}}
                                             />
-                                            <Text color="dimmed" size="xs" mt="xs">
+                                            <ModernCaption style={{ color: 'var(--modern-light-gray)', marginTop: '0.5rem' }}>
                                                 {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
-                                            </Text>
+                                            </ModernCaption>
                                         </Box>
                                     )}
 
                                     {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
-                                        <Text color="dimmed" size="sm" mb="xl" align="center">
+                                        <ModernBody style={{ color: 'var(--modern-light-gray)', marginBottom: '1rem', textAlign: 'center' }}>
                                             No matches found between these teams
-                                        </Text>
+                                        </ModernBody>
                                     )}
 
-                                    <Button
-                                        onClick={handleAddToLog}
-                                        disabled={!selectedFixture}
-                                        fullWidth
-                                        size="md"
-                                        sx={(theme) => ({
-                                            backgroundColor: theme.colors.blue[6],
-                                            '&:hover': {
-                                                backgroundColor: theme.colors.blue[7],
-                                            }
-                                        })}
-                                    >
-                                        Add Match to Logs
-                                    </Button>
+                                    {selectedHomeTeam && selectedAwayTeam && (
+                                        <ModernButton
+                                            onClick={handleAddToLog}
+                                            disabled={!selectedFixture}
+                                            fullWidth
+                                            size="md"
+                                            variant="filled"
+                                        >
+                                            Add Match to Logs
+                                        </ModernButton>
+                                    )}
                                 </>
                             )}
-                        </Paper>
+                        </ModernCard>
                     </Box>
 
                 </Grid.Col>
                 <Grid.Col span={columnSpan}>
-                    <Tabs defaultValue={'matches'} styles={(theme) => ({
+                    <Tabs defaultValue={'matches'} style={{
                         tab: {
                             flex: 1,
                             '&:first-of-type': {
@@ -522,33 +515,30 @@ export function LogsPage() {
                             display: 'flex',
                             width: '100%',
                         }
-                    })}>
+                    }}>
                         <Tabs.List>
                             <Tabs.Tab value={'matches'}> Matches</Tabs.Tab>
                             <Tabs.Tab value={'stats'}>Stats</Tabs.Tab>
                         </Tabs.List>
                         <Tabs.Panel value={'matches'}>
                             <ScrollArea
-                                style={{ height: `${scrollAreaHeight}px` }}
+                                style={{ height: `${scrollAreaHeight}px`, minHeight: '400px' }}
                                 type="never"
                                 scrollbarSize={2}
                                 scrollHideDelay={0}
                             >
                                 {loggedFixtures.length === 0 && !loading ? (
-                                    <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
-                                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                                        textAlign: 'center'
-                                    })}>
-                                        <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
-                                        <Text color="dimmed" size="sm">
+                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-dark-gray)' }}>
+                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>No Matches Logged Yet</ModernH3>
+                                        <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
                                             Start by adding your first match using the form
-                                        </Text>
-                                    </Paper>
+                                        </ModernBody>
+                                    </ModernCard>
                                 ) : (
                                     <SimpleGrid
                                         cols={1}
-                                        spacing="lg"
-                                        sx={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
+                                        gap="lg"
+                                        style={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
                                     >
                                         {loggedFixtures.map((fixture) => (
                                             <LoggedFixtureCard
@@ -570,7 +560,7 @@ export function LogsPage() {
                                     </SimpleGrid>
                                 )}
                             </ScrollArea>
-                        </Tabs.Panel><Tabs.Panel value={'stats'}>
+                        </Tabs.Panel>                        <Tabs.Panel value={'stats'}>
                             <ScrollArea
                                 style={{ height: `${scrollAreaHeight}px` }}
                                 type="never"
@@ -578,15 +568,12 @@ export function LogsPage() {
                                 scrollHideDelay={0}
                             >
                                 {loggedFixtures.length === 0 && !loading ? (
-                                    <Paper p="xl" radius="lg" withBorder sx={(theme) => ({
-                                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                                        textAlign: 'center'
-                                    })}>
-                                        <Text size="lg" weight={500} mb="md">No Matches Logged Yet</Text>
-                                        <Text color="dimmed" size="sm">
+                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-dark-gray)' }}>
+                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>No Matches Logged Yet</ModernH3>
+                                        <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
                                             Start by adding your first match using the form
-                                        </Text>
-                                    </Paper>
+                                        </ModernBody>
+                                    </ModernCard>
                                 ) : (
                                     // <StatsTab loggedFixtures={loggedFixtures}/>
                                     <NewStatsTab />
@@ -595,7 +582,7 @@ export function LogsPage() {
                         </Tabs.Panel>
 
                     </Tabs>
-                    <Button
+                    <ModernButton
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         style={{
                             display: showTopButton ? 'block' : 'none',
@@ -604,12 +591,14 @@ export function LogsPage() {
                             right: '20px',
                             zIndex: 1000
                         }}
+                        variant="filled"
                     >
                         Go to Top
-                    </Button>
+                    </ModernButton>
                 </Grid.Col>
             </Grid>
 
-        </Container>
+            </Container>
+        </Box>
     );
 }

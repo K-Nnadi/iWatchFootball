@@ -9,11 +9,11 @@ import {
 	useMantineTheme
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useNavigate } from "react-router-dom";
+import { usePageTransition } from "../hooks/usePageTransition";
 
 export function SignUpPage() {
 	const theme = useMantineTheme();
-	const navigate = useNavigate();
+	const { navigateWithTransition } = usePageTransition();
 
 	const form = useForm({
 		initialValues: {
@@ -95,7 +95,7 @@ export function SignUpPage() {
 						variant="outline"
 						size="md"
 						fullWidth
-						onClick={() => navigate('/signIn')}
+						onClick={() => navigateWithTransition('/signIn')}
 					>
 						Login
 					</Button>

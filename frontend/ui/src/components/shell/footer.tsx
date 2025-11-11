@@ -16,7 +16,7 @@ import {
     IconMapPin
 } from '@tabler/icons-react';
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { usePageTransition } from "../../hooks/usePageTransition";
 
 // CTA Section Component - OneFootball Style
 function CTASection() {
@@ -65,7 +65,7 @@ function CTASection() {
 
 // OneFootball Style Footer
 function OneFootballStyleFooter() {
-    const navigate = useNavigate();
+    const { navigateWithTransition } = usePageTransition();
 
     const quickLinks = [
         { label: 'All matches', path: '/matches' },
@@ -155,7 +155,7 @@ function OneFootballStyleFooter() {
                                             '&:hover': { color: 'white' },
                                             textDecoration: 'none'
                                         }}
-                                        onClick={() => navigate(link.path)}
+                                        onClick={() => navigateWithTransition(link.path)}
                                     >
                                         {link.label}
                                     </Anchor>

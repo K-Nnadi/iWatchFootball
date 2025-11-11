@@ -30,6 +30,7 @@ import {PredictionModule} from "./api/modules/prediction/prediction.module";
 import {AuthModule} from "./api/complexControllers/auth.controller";
 import {AuthModule as CoreAuthModule} from "./auth/auth.module";
 import {PaymentModule} from "./api/modules/payment/payment.module";
+import {PaymentProviderModule} from "./api/modules/paymentProvider/paymentProvider.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {HealthController} from "./health/health.controller";
@@ -57,6 +58,7 @@ const Modules = [
     ManagerModule,
     ManagerEmploymentModule,
     PaymentModule,
+    PaymentProviderModule,
     PlayerModule,
     PlayerLineUpModule,
     PositionModule,

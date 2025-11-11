@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button as MantineButton, ButtonProps as MantineButtonProps } from '@mantine/core';
 
-interface ModernButtonProps extends Omit<MantineButtonProps, 'variant' | 'color'> {
+interface ModernButtonProps extends MantineButtonProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
 }

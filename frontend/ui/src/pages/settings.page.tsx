@@ -11,13 +11,13 @@ import {
 } from '@mantine/core';
 import { useMantineColorScheme } from '@mantine/core';
 import { useLocalStorage } from "@mantine/hooks";
-import { useNavigate } from 'react-router-dom';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 // Example: If you have a global store for user preferences
 // import { useUserPreferencesStore } from '../stores/userPreferences.store';
 
 export function SettingsPage() {
-    const navigate = useNavigate();
+    const { navigateWithTransition } = usePageTransition();
 
     const [appColourScheme, setAppColourScheme] = useLocalStorage({
         key: 'color-scheme',
@@ -91,7 +91,7 @@ export function SettingsPage() {
                 </Group>
 
                 <Group position="right" mt="lg">
-                    <Button variant="outline" onClick={() => navigate(-1)}>
+                    <Button variant="outline" onClick={() => navigateWithTransition(-1, { transitionType: 'loading', duration: 1000 })}>
                         Cancel
                     </Button>
                     <Button onClick={handleSave}>Save Changes</Button>

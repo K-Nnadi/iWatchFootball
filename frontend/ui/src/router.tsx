@@ -7,6 +7,7 @@ import {SettingsPage} from "./pages/settings.page";
 import {SignUpPage} from "./pages/signUp.page";
 import {LoginPage} from "./pages/login.page";
 import {CompetitionsPage} from "./pages/competitions.page";
+import {TransitionDemoPage} from "./pages/transition-demo.page";
 import {AppWrapper} from "./components/shell/appWrapper";
 import React from "react";
 import {CompetitionPage} from "./pages/competition.page";

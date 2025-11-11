@@ -1,6 +1,6 @@
 import React from 'react';
-import {Avatar, Box, Paper, Text, Grid, Stack} from "@mantine/core";
-import { Lineup, Player } from "./match.page"; // Verify import path
+import {Avatar, Box, Paper, Text, Stack} from "@mantine/core";
+import { Lineup, Player } from "./match.page";
 
 interface FormationViewProps {
     lineup: Lineup;
@@ -9,77 +9,231 @@ interface FormationViewProps {
 
 function arrangePlayersByFormation(players: Player[], formation: string) {
     const formationParts = formation.split('-').map(Number);
-    const defenders = formationParts[0];
-    const forwards = formationParts[formationParts.length - 1];
     
-    // Get all midfield numbers (everything between first and last number)
+    // Separate players by position for easier access
+    const gk = players.filter(p => p.position === 'GK');
+    const df = players.filter(p => p.position === 'DF');
+    const mf = players.filter(p => p.position === 'MF');
+    const fw = players.filter(p => p.position === 'FW');
+    
+    // Build formation structure based on formation string
+    // Format: "4-2-3-1" means: 4 defenders, 2 midfielders, 3 midfielders, 1 forward
+    const rows: Player[][] = [];
+    
+    // Goalkeeper (always first, always 1)
+    if (gk.length > 0) {
+        rows.push([gk[0]]);
+    } else {
+        rows.push([]);
+    }
+    
+    // Defenders (first number in formation)
+    const defendersCount = formationParts[0];
+    rows.push(df.slice(0, defendersCount));
+    
+    // Midfield rows (all numbers between first and last)
     const midfieldRows = formationParts.slice(1, -1);
-    
-    const gk = players.filter(p => p.position === 'GK').slice(0, 1);
-    const df = players.filter(p => p.position === 'DF').slice(0, defenders);
-    const fw = players.filter(p => p.position === 'FW').slice(0, forwards);
-    
-    // Filter midfielders and distribute them according to the formation
-    const allMidfielders = players.filter(p => p.position === 'MF');
-    const mf: Player[][] = [];
-    let currentMfIndex = 0;
-    
+    let mfIndex = 0;
     midfieldRows.forEach(count => {
-        mf.push(allMidfielders.slice(currentMfIndex, currentMfIndex + count));
-        currentMfIndex += count;
+        const row = mf.slice(mfIndex, mfIndex + count);
+        rows.push(row);
+        mfIndex += count;
     });
-
-    return { gk, df, mf, fw };
+    
+    // Forwards (last number in formation)
+    const forwardsCount = formationParts[formationParts.length - 1];
+    rows.push(fw.slice(0, forwardsCount));
+    
+    // Return structured data
+    const result = {
+        gk: rows[0] || [],
+        df: rows[1] || [],
+        mf: rows.slice(2, -1).filter(row => row.length > 0), // All rows except first (GK), second (DF), and last (FW)
+        fw: rows[rows.length - 1] || []
+    };
+    
+    // Debug log
+    console.log('Formation arrangement:', {
+        formation,
+        totalPlayers: players.length,
+        arranged: result.gk.length + result.df.length + result.mf.reduce((sum, row) => sum + row.length, 0) + result.fw.length,
+        breakdown: {
+            gk: result.gk.length,
+            df: result.df.length,
+            mf: result.mf.map(r => r.length),
+            fw: result.fw.length
+        }
+    });
+    
+    return result;
 }
 
 export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
     const { gk, df, mf, fw } = arrangePlayersByFormation(lineup.players, lineup.formation);
+    
+    // Debug: Log to ensure all players are accounted for
+    const totalPlayers = gk.length + df.length + mf.reduce((sum, row) => sum + row.length, 0) + fw.length;
+    const expectedPlayers = 11;
+    
+    if (totalPlayers !== expectedPlayers) {
+        console.warn(`Formation mismatch: Expected ${expectedPlayers} players, got ${totalPlayers}`, {
+            gk: gk.length,
+            df: df.length,
+            mf: mf.map(row => row.length),
+            fw: fw.length,
+            formation: lineup.formation
+        });
+    }
 
     return (
         <Box>
             <Paper
-                p="md"
+                p={{ base: 'md', sm: 'xl' }}
                 radius="md"
-                sx={(theme) => ({
-                    backgroundColor: theme.colorScheme === 'dark' ? theme.fn.rgba(theme.colors.dark[8], 0.5) : theme.fn.rgba(theme.colors.gray[1], 0.7),
-                    border: isPredicted ? `1px dashed ${theme.colors.gray[5]}` : undefined,
-                })}
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    border: isPredicted ? '1px dashed rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    height: 'clamp(500px, 60vh, 600px)',
+                    minHeight: 'clamp(500px, 60vh, 600px)',
+                    maxHeight: 'clamp(500px, 60vh, 600px)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
             >
-                <Text color="dimmed" size="sm" sx={{ textAlign: 'center', width: '100%', marginBottom: '20px' }}>
+                {/* Pitch background effect */}
+                <Box
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(to bottom, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 50%, rgba(0, 255, 136, 0.05) 100%)',
+                        pointerEvents: 'none',
+                    }}
+                />
+                
+                <Text 
+                    size={{ base: 'xs', sm: 'sm' }}
+                    style={{ 
+                        textAlign: 'center', 
+                        width: '100%', 
+                        marginBottom: 'clamp(1rem, 3vw, 2rem)',
+                        color: 'var(--modern-gray)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        fontWeight: 600,
+                        position: 'relative',
+                        zIndex: 1,
+                    }}
+                >
                     {isPredicted ? 'Predicted Formation' : 'Formation'}: {lineup.formation}
                 </Text>
 
-                <Grid>
-                    {renderPlayerGroup(gk, 12)}
-                    {renderPlayerGroup(df, 12 / df.length)}
-                    {mf.map((row) => renderPlayerGroup(row, 12 / row.length))}
-                    {renderPlayerGroup(fw, 12 / fw.length)}
-                </Grid>
+                <Box style={{ 
+                    position: 'relative', 
+                    zIndex: 1,
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                }}>
+                    {/* Goalkeeper */}
+                    <Box style={{ display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+                        {renderPlayerRow(gk)}
+                    </Box>
+
+                    {/* Defenders */}
+                    <Box style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(0.5rem, 2vw, 1rem)', flexShrink: 0, flexWrap: 'wrap' }}>
+                        {renderPlayerRow(df)}
+                    </Box>
+
+                    {/* Midfield rows - flex grow to fill space */}
+                    <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(0.5rem, 2vw, 1rem)' }}>
+                        {mf.map((row, index) => (
+                            <Box 
+                                key={index} 
+                                style={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'center', 
+                                    gap: 'clamp(0.5rem, 2vw, 1rem)',
+                                    flexWrap: 'wrap',
+                                }}
+                            >
+                                {renderPlayerRow(row)}
+                            </Box>
+                        ))}
+                    </Box>
+
+                    {/* Forwards */}
+                    <Box style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(0.5rem, 2vw, 1rem)', flexShrink: 0, flexWrap: 'wrap' }}>
+                        {fw.length > 0 ? renderPlayerRow(fw) : (
+                            <Text size="sm" c="dimmed" style={{ padding: '1rem' }}>
+                                No forwards in formation
+                            </Text>
+                        )}
+                    </Box>
+                    
+                    {/* Debug info - remove in production */}
+                    {totalPlayers !== expectedPlayers && (
+                        <Text size="xs" c="red" ta="center" mt="md">
+                            Warning: {totalPlayers} players displayed (expected {expectedPlayers})
+                        </Text>
+                    )}
+                </Box>
             </Paper>
         </Box>
     );
 };
 
-function renderPlayerGroup(players: Player[], span: number) {
+function renderPlayerRow(players: Player[]) {
     return players.map(player => (
-        <Grid.Col span={Math.floor(span)} key={player.id} sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
+        <Box
+            key={player.id}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '10px',
-                width: '100%',
-                maxWidth: '120px',
-                textAlign: 'center'
-            }}>
-                <Stack align="center">
-                    <Avatar src={`/path/to/player/image/${player.id}.jpg`} alt={player.name} size="lg" >{player.number}</Avatar>
-                    <Text size="sm" weight={500} mt="xs" >{player.name}</Text>
-                </Stack>
-
-            </Box>
-        </Grid.Col>
+                padding: 'clamp(0.25rem, 1.5vw, 0.75rem)',
+                minWidth: 'clamp(50px, 12vw, 100px)',
+                maxWidth: 'clamp(60px, 18vw, 120px)',
+                textAlign: 'center',
+            }}
+        >
+            <Stack align="center" gap={4}>
+                <Avatar
+                    size={{ base: 'sm', sm: 'md', md: 'lg' }}
+                    radius="xl"
+                    style={{
+                        backgroundColor: 'var(--modern-dark-gray)',
+                        border: '2px solid var(--modern-lime)',
+                        color: 'var(--modern-white)',
+                        fontWeight: 700,
+                        fontSize: 'clamp(0.65rem, 1.5vw, 1.1rem)',
+                    }}
+                >
+                    {player.number}
+                </Avatar>
+                <Text 
+                    size={{ base: '10px', sm: 'xs', md: 'sm' }}
+                    fw={500}
+                    style={{ 
+                        color: 'var(--modern-white)',
+                        maxWidth: 'clamp(50px, 12vw, 100px)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: 'clamp(0.6rem, 1.2vw, 0.875rem)',
+                        lineHeight: 1.2,
+                    }}
+                >
+                    {player.name}
+                </Text>
+            </Stack>
+        </Box>
     ));
 }
 

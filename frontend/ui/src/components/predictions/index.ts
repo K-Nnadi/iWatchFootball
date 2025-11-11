@@ -1,0 +1,2 @@
+export { ScorePredictionCard } from './ScorePredictionCard';
+

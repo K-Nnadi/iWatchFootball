@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { usePageTransition } from '../../hooks/usePageTransition';
 import { IconChevronUp, IconChevronDown, IconMinus, IconSelector } from '@tabler/icons-react';
 import { Center, Group, ScrollArea, Table, Text, UnstyledButton } from '@mantine/core';
 
@@ -57,7 +57,7 @@ export function LeagueTable() {
     const [sortBy, setSortBy] = useState<keyof Team | null>(null);
     const [reverseSortDirection, setReverseSortDirection] = useState(false);
 
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const { navigateWithTransition } = usePageTransition();
 
     const setSorting = (field: keyof Team) => {
         const reversed = field === sortBy ? !reverseSortDirection : false;
@@ -76,7 +76,7 @@ export function LeagueTable() {
 
     const handleTeamClick = (id: number) => {
         // Navigate to the page of the clicked team
-        navigate(`/team/${id}`);
+        navigateWithTransition(`/team/${id}`);
     };
 
     return (

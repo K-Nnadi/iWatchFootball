@@ -2,6 +2,7 @@ import React from 'react';
 import {
     Avatar,
     Box,
+    Button,
     Center,
     Container,
     Grid,
@@ -18,7 +19,7 @@ import {
 } from '@tabler/icons-react';
 import {Carousel} from '@mantine/carousel';
 import '../styles/homepage.css';
-import {useNavigate} from "react-router-dom";
+import {usePageTransition} from "../hooks/usePageTransition";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
 
 // Hero Section Component - Lando Style
@@ -32,7 +33,10 @@ function HeroSection() {
                 overflow: 'hidden',
                 minHeight: '100vh',
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                width: '100vw',
+                marginLeft: 'calc(-50vw + 50%)',
+                marginRight: 'calc(-50vw + 50%)'
             }}
         >
             {/* Background Pattern */}
@@ -95,7 +99,7 @@ function HeroSection() {
 
 // Live Matches Section Component
 function LiveMatchesSection() {
-    const navigate = useNavigate();
+    const { navigateWithTransition } = usePageTransition();
 
     const matches = [
         {
@@ -145,12 +149,18 @@ function LiveMatchesSection() {
                     <ModernH2>
                         Live <span style={{color: 'var(--modern-lime)'}}>Matches</span>
                     </ModernH2>
-                    <ModernButton
-                        variant="secondary"
-                        onClick={() => navigate('/matches')}
+                    <Button
+                        variant="outline"
+                        style={{ 
+                            cursor: 'pointer',
+                            borderColor: 'var(--modern-lime)',
+                            color: 'var(--modern-lime)',
+                            backgroundColor: 'transparent'
+                        }}
+                        onClick={() => navigateWithTransition('/matches')}
                     >
                         View All
-                    </ModernButton>
+                    </Button>
                 </Group>
 
                 <Grid gutter="xl">
@@ -260,6 +270,11 @@ function LatestNewsSection() {
         <Box
             className="dark-theme"
             py="6rem"
+            style={{
+                width: '100vw',
+                marginLeft: 'calc(-50vw + 50%)',
+                marginRight: 'calc(-50vw + 50%)'
+            }}
         >
             <Container size="xl">
                 <Group justify="space-between" mb="3rem">

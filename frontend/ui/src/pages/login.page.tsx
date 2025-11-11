@@ -16,7 +16,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const upperCase = /[A-Z]/;
@@ -26,7 +26,7 @@ export const passwordValidation = (value: string) => {
 };
 
 export function LoginPage() {
-	const navigate = useNavigate();
+	const { navigateWithTransition } = usePageTransition();
 	const theme = useMantineTheme();
 	const [rememberMe, setRememberMe] = useState(false);
 	const rememberMeLocalStorage = localStorage.getItem('rememberMe');
@@ -116,7 +116,7 @@ export function LoginPage() {
 							fullWidth
 							variant="outline"
 							size="md"
-							onClick={() => navigate('/auth/sign-up')}
+							onClick={() => navigateWithTransition('/auth/sign-up')}
 						>
 							Sign up
 						</Button>

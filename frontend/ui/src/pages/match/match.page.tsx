@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Container,
     Title,
@@ -8,9 +8,14 @@ import {
     Text,
     Group,
     Button,
-    SimpleGrid
+    SimpleGrid,
+    Stack,
+    Image,
 } from '@mantine/core';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import { usePageTransition } from '../../hooks/usePageTransition';
+import { ModernButton } from '../../components/modern';
+import { ScorePredictionCard } from '../../components/predictions';
 import TeamLineups from "./teamLineup";
 
 export interface Player {
@@ -32,6 +37,9 @@ export interface MatchDetails {
     awayTeam: string;
     date: string;
     venue: string;
+    competition?: string;
+    homeTeamLogo?: string;
+    awayTeamLogo?: string;
     homeLineup?: Lineup;
     awayLineup?: Lineup;
     homePredictedLineup?: Lineup;
@@ -69,7 +77,7 @@ function getTeamForm(teamName: string): ('W'|'D'|'L')[] {
 export function MatchPage() {
     const { matchId } = useParams<{ matchId: string }>();
     const location = useLocation();
-    const navigate = useNavigate();
+    const { navigateWithTransition } = usePageTransition();
 
     // Mock match data
     const mockMatchDetails: MatchDetails = {
@@ -78,6 +86,9 @@ export function MatchPage() {
         awayTeam: 'Manchester City',
         date: '2025-01-24T15:00:00Z', // Set to tomorrow for testing
         venue: 'Anfield',
+        competition: 'Premier League',
+        homeTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png',
+        awayTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png',
         homeLineup: {
             formation: '4-3-3',
             players: [
@@ -113,7 +124,7 @@ export function MatchPage() {
                 { id: 'a7', name: 'De Bruyne', number: 17, position: 'MF' },
                 { id: 'a8', name: 'Bernardo', number: 20, position: 'MF' },
                 { id: 'a9', name: 'Foden', number: 47, position: 'MF' },
-                { id: 'a10', name: 'Grealish', number: 10, position: 'FW' },
+                { id: 'a10', name: 'Grealish', number: 10, position: 'MF' },
                 { id: 'a11', name: 'Haaland', number: 9, position: 'FW' }
             ],
             substitutes: [
@@ -152,7 +163,7 @@ export function MatchPage() {
                 { id: 'ap7', name: 'De Bruyne', number: 17, position: 'MF' },
                 { id: 'ap8', name: 'Bernardo', number: 20, position: 'MF' },
                 { id: 'ap9', name: 'Foden', number: 47, position: 'MF' },
-                { id: 'ap10', name: 'Grealish', number: 10, position: 'FW' },
+                { id: 'ap10', name: 'Grealish', number: 10, position: 'MF' },
                 { id: 'ap11', name: 'Haaland', number: 9, position: 'FW' }
             ]
         }
@@ -160,163 +171,286 @@ export function MatchPage() {
 
 
     const [matchDetails, setMatchDetails] = useState<MatchDetails>(mockMatchDetails);
-    const [homeVotes, setHomeVotes] = useState(Math.floor(Math.random() * 100));
-    const [awayVotes, setAwayVotes] = useState(Math.floor(Math.random() * 100));
-    const [userVote, setUserVote] = useState<'home' | 'away' | null>(null);
     const status = getMatchStatus(matchDetails.date);
 
     // Retrieve last 5 games form for each team
-    const homeForm = getTeamForm(matchDetails.homeTeam);
-    const awayForm = getTeamForm(matchDetails.awayTeam);
+    const homeForm = useMemo(() => getTeamForm(matchDetails.homeTeam), [matchDetails.homeTeam]);
+    const awayForm = useMemo(() => getTeamForm(matchDetails.awayTeam), [matchDetails.awayTeam]);
 
-    function handlePrediction(result: 'win' | 'draw' | 'lose') {
-        console.log(`User predicted a ${result}`);
-        setUserVote(result === 'win' ? 'home' : result === 'lose' ? 'away' : null);
-        // Fake updating stats
-        const newHomeVotes = result === 'win' ? homeVotes + 1 : homeVotes;
-        const newAwayVotes = result === 'lose' ? awayVotes + 1 : awayVotes;
-        setHomeVotes(newHomeVotes);
-        setAwayVotes(newAwayVotes);
-    }
+
 
     function handleViewTickets() {
         // Navigate to seat selection or ticket purchase page
-        navigate(`/seat-selection/${matchDetails.matchId}`, {
-            state: matchDetails, // pass match details if needed
+        navigateWithTransition(`/seat-selection/${matchDetails.matchId}`, { 
+            transitionType: 'loading', 
+            duration: 1200,
+            state: {
+                homeTeam: matchDetails.homeTeam,
+                awayTeam: matchDetails.awayTeam,
+                homeTeamLogo: matchDetails.homeTeamLogo,
+                awayTeamLogo: matchDetails.awayTeamLogo,
+                date: matchDetails.date,
+                venue: matchDetails.venue,
+                competition: matchDetails.competition,
+            }
         });
     }
 
     return (
-        <Container size="xl" py="xl">
+        <Container size="xl" py={{ base: 'md', sm: 'xl' }} px={{ base: 'xs', sm: 'md' }}>
             {/* Match Header */}
-            <Paper p="xl" radius="lg" withBorder mb="xl">
-                <Group position="apart" align="center" noWrap sx={{ width: '100%' }}>
-                    {/* Home team */}
-                    <Box sx={{ flex: 1, textAlign: 'right' }}>
-                        <Title order={2} mb="md">{matchDetails.homeTeam}</Title>
-                        <Group position="right" spacing={8}>
-                            {homeForm.map((result, i) => (
-                                <Badge
-                                    key={i}
-                                    color={result === 'W' ? 'green' : result === 'D' ? 'yellow' : 'red'}
-                                    size="lg"
-                                >
-                                    {result}
-                                </Badge>
-                            ))}
-                        </Group>
-                    </Box>
+            <Paper 
+                p={{ base: 'md', sm: 'xl' }}
+                mb={{ base: 'md', sm: 'xl' }}
+                style={{ 
+                    backgroundColor: 'var(--modern-dark-gray)', 
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
+            >
+                {/* Background decorative elements */}
+                <Box
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '200px',
+                        height: '200px',
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
+                        borderRadius: '0 0 100% 0',
+                    }}
+                />
+                <Box
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '200px',
+                        height: '200px',
+                        background: 'linear-gradient(225deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
+                        borderRadius: '0 0 0 100%',
+                    }}
+                />
 
-                    {/* Center VS block */}
-                    <Box
-                        sx={(theme) => ({
-                            textAlign: 'center',
-                            padding: '0 24px',
-                            minWidth: 200,
-                            borderLeft: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-                            borderRight: `2px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`
-                        })}
+                <Stack spacing={{ base: 'md', sm: 'lg' }} align="center" style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Competition/Event Badge */}
+                    <Badge
+                        size={{ base: 'md', sm: 'lg' }}
+                        variant="outline"
+                        style={{
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            backgroundColor: 'transparent',
+                            color: 'var(--modern-white)',
+                            padding: '0.5rem 1rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            fontWeight: 600,
+                        }}
                     >
-                        <Text size="sm" color="dimmed" mb="xs">
+                        {matchDetails.competition || 'Match'}
+                    </Badge>
+
+                    {/* Date and Time */}
+                    <Stack spacing={4} align="center">
+                        <Text
+                            size="xl"
+                            weight={900}
+                            style={{
+                                color: 'var(--modern-white)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                            }}
+                        >
                             {new Date(matchDetails.date).toLocaleDateString('en-GB', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
+                                weekday: 'short',
                                 day: 'numeric',
+                                month: 'short',
+                            }).toUpperCase()}
+                        </Text>
+                        <Text
+                            size="md"
+                            weight={600}
+                            style={{
+                                color: 'var(--modern-white)',
+                                fontSize: '1.25rem',
+                            }}
+                        >
+                            {new Date(matchDetails.date).toLocaleTimeString('en-GB', {
                                 hour: '2-digit',
-                                minute: '2-digit'
+                                minute: '2-digit',
+                                hour12: false,
                             })}
                         </Text>
-                        <Text size="xl" weight={700} mb="xs">VS</Text>
-                        <Text size="sm" color="dimmed">{matchDetails.venue}</Text>
-                        <Button
-                            variant="light"
-                            color="blue"
-                            size="sm"
-                            mt="md"
-                            onClick={handleViewTickets}
-                        >
-                            View Tickets
-                        </Button>
-                    </Box>
+                    </Stack>
 
-                    {/* Away team */}
-                    <Box sx={{ flex: 1, textAlign: 'left' }}>
-                        <Title order={2} mb="md">{matchDetails.awayTeam}</Title>
-                        <Group position="left" spacing={8}>
-                            {awayForm.map((result, i) => (
-                                <Badge
-                                    key={i}
-                                    color={result === 'W' ? 'green' : result === 'D' ? 'yellow' : 'red'}
-                                    size="lg"
-                                >
-                                    {result}
-                                </Badge>
-                            ))}
-                        </Group>
-                    </Box>
-                </Group>
+                    {/* Teams */}
+                    <Group 
+                        position="apart" 
+                        style={{ width: '100%', maxWidth: '700px' }} 
+                        align="flex-end"
+                        wrap="nowrap"
+                        gap={{ base: 'xs', sm: 'md' }}
+                    >
+                        {/* Home Team */}
+                        <Stack spacing="sm" align="center" style={{ flex: 1, minWidth: 0 }}>
+                            <Box
+                                style={{
+                                    width: 'clamp(50px, 12vw, 80px)',
+                                    height: 'clamp(50px, 12vw, 80px)',
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: 'var(--modern-black)',
+                                }}
+                            >
+                                <Image
+                                    src={matchDetails.homeTeamLogo || 'https://via.placeholder.com/70'}
+                                    width="clamp(40px, 10vw, 70px)"
+                                    height="clamp(40px, 10vw, 70px)"
+                                    fit="contain"
+                                    style={{ borderRadius: '50%' }}
+                                />
+                            </Box>
+                            <Text
+                                size={{ base: 'xs', sm: 'md' }}
+                                fw={700}
+                                style={{
+                                    color: 'var(--modern-white)',
+                                    textAlign: 'center',
+                                    wordBreak: 'break-word',
+                                }}
+                            >
+                                {matchDetails.homeTeam}
+                            </Text>
+                            <Group spacing={4} gap={4}>
+                                {homeForm.map((result, i) => (
+                                    <Badge
+                                        key={i}
+                                        size="xs"
+                                        style={{
+                                            backgroundColor:
+                                                result === 'W'
+                                                    ? '#00ff88'
+                                                    : result === 'D'
+                                                    ? '#ffaa00'
+                                                    : '#ff4444',
+                                            color: 'var(--modern-black)',
+                                            fontWeight: 700,
+                                            minWidth: '20px',
+                                            fontSize: '0.7rem',
+                                        }}
+                                    >
+                                        {result}
+                                    </Badge>
+                                ))}
+                            </Group>
+                        </Stack>
+
+                        {/* Center VS block */}
+                        <Stack spacing="xs" align="center" style={{ padding: '0 clamp(0.5rem, 2vw, 1.5rem)' }}>
+                            <Text
+                                size={{ base: 'md', sm: 'xl' }}
+                                fw={900}
+                                style={{
+                                    color: 'var(--modern-lime)',
+                                }}
+                            >
+                                VS
+                            </Text>
+                            <ModernButton
+                                variant="primary"
+                                size={{ base: 'xs', sm: 'sm' }}
+                                onClick={handleViewTickets}
+                            >
+                                View Tickets
+                            </ModernButton>
+                        </Stack>
+
+                        {/* Away Team */}
+                        <Stack spacing="sm" align="center" style={{ flex: 1, minWidth: 0 }}>
+                            <Box
+                                style={{
+                                    width: 'clamp(50px, 12vw, 80px)',
+                                    height: 'clamp(50px, 12vw, 80px)',
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: 'var(--modern-black)',
+                                }}
+                            >
+                                <Image
+                                    src={matchDetails.awayTeamLogo || 'https://via.placeholder.com/70'}
+                                    width="clamp(40px, 10vw, 70px)"
+                                    height="clamp(40px, 10vw, 70px)"
+                                    fit="contain"
+                                    style={{ borderRadius: '50%' }}
+                                />
+                            </Box>
+                            <Text
+                                size={{ base: 'xs', sm: 'md' }}
+                                fw={700}
+                                style={{
+                                    color: 'var(--modern-white)',
+                                    textAlign: 'center',
+                                    wordBreak: 'break-word',
+                                }}
+                            >
+                                {matchDetails.awayTeam}
+                            </Text>
+                            <Group spacing={4} gap={4}>
+                                {awayForm.map((result, i) => (
+                                    <Badge
+                                        key={i}
+                                        size="xs"
+                                        style={{
+                                            backgroundColor:
+                                                result === 'W'
+                                                    ? '#00ff88'
+                                                    : result === 'D'
+                                                    ? '#ffaa00'
+                                                    : '#ff4444',
+                                            color: 'var(--modern-black)',
+                                            fontWeight: 700,
+                                            minWidth: '20px',
+                                            fontSize: '0.7rem',
+                                        }}
+                                    >
+                                        {result}
+                                    </Badge>
+                                ))}
+                            </Group>
+                        </Stack>
+                    </Group>
+
+                    {/* Venue */}
+                    <Text
+                        size="sm"
+                        style={{
+                            color: 'var(--modern-gray)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                        }}
+                    >
+                        {matchDetails.venue}
+                    </Text>
+                </Stack>
             </Paper>
 
 
-            {/* Predictions Section */}
-            {status !== 'past' && (
-                <Paper p="xl" radius="lg" withBorder mb="xl">
-                    <Title order={3} size="h4" mb="md" align="center">Match Prediction</Title>
-                    <SimpleGrid cols={3} spacing={0}>
-                        <Box sx={{ paddingRight: 20, borderRight: '1px solid', borderColor: 'gray.3' }}>
-                            <Button
-                                fullWidth
-                                variant={userVote === 'home' ? 'filled' : 'outline'}
-                                size="lg"
-                                color="blue"
-                                onClick={() => handlePrediction('win')}
-                                disabled={userVote !== null}
-                            >
-                                {matchDetails.homeTeam} Win
-                            </Button>
-                            <Text align="center" mt="xs" size="sm" color="dimmed">
-                                {homeVotes}%
-                            </Text>
-                        </Box>
-
-                        <Box sx={{ padding: '0 20px' }}>
-                            <Button
-                                fullWidth
-                                variant={userVote === null ? 'filled' : 'outline'}
-                                size="lg"
-                                color="yellow"
-                                onClick={() => handlePrediction('draw')}
-                                disabled={userVote !== null}
-                            >
-                                Draw
-                            </Button>
-                            <Text align="center" mt="xs" size="sm" color="dimmed">
-                                {100 - homeVotes - awayVotes}%
-                            </Text>
-                        </Box>
-
-                        <Box sx={{ paddingLeft: 20, borderLeft: '1px solid', borderColor: 'gray.3' }}>
-                            <Button
-                                fullWidth
-                                variant={userVote === 'away' ? 'filled' : 'outline'}
-                                size="lg"
-                                color="red"
-                                onClick={() => handlePrediction('lose')}
-                                disabled={userVote !== null}
-                            >
-                                {matchDetails.awayTeam} Win
-                            </Button>
-                            <Text align="center" mt="xs" size="sm" color="dimmed">
-                                {awayVotes}%
-                            </Text>
-                        </Box>
-                    </SimpleGrid>
-                    <Text size="sm" color="dimmed" align="center" mt="md">
-                        Total Predictions: {homeVotes + awayVotes}
-                    </Text>
-                </Paper>
-            )}
+            {/* Score Prediction Section */}
+            <ScorePredictionCard
+                homeTeam={matchDetails.homeTeam}
+                awayTeam={matchDetails.awayTeam}
+                date={matchDetails.date}
+            />
 
             {/* Team Lineups */}
                 <TeamLineups matchDetails={matchDetails} status={status} />

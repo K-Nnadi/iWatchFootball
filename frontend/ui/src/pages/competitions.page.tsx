@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Container, SimpleGrid, Card, Image, Text, Group, Title, LoadingOverlay, useMantineTheme } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 interface Competition {
     id: string;
@@ -10,7 +10,7 @@ interface Competition {
     isInternational?: boolean;
 }
 export function CompetitionsPage() {
-    const navigate = useNavigate();
+    const { navigateWithTransition } = usePageTransition();
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -41,7 +41,7 @@ export function CompetitionsPage() {
                         padding="lg"
                         radius="md"
                         withBorder
-                        onClick={() => navigate(`/competition/${comp.id}`)}
+                        onClick={() => navigateWithTransition(`/competition/${comp.id}`, { transitionType: 'loading', duration: 1200 })}
                         style={{ cursor: 'pointer' }}
                     >
                         {comp.logoUrl && (
