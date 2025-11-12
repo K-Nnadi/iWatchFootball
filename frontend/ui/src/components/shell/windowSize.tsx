@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const WindowSizeContext = createContext({ columnSpan: 6 });
 
 // Context Provider Component
-export function WindowSizeProvider({ children }) {
+export function WindowSizeProvider({ children }: { children: React.ReactNode }) {
     const [columnSpan, setColumnSpan] = useState(6);
 
     useEffect(() => {

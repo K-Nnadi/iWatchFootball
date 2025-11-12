@@ -78,7 +78,7 @@ export function PaymentStep({
                                 key={provider.id}
                                 value={provider.id.toString()}
                                 label={
-                                    <Group spacing="sm">
+                                    <Group gap="sm">
                                         {provider.logoUrl && (
                                             <Image
                                                 src={provider.logoUrl}
@@ -88,7 +88,7 @@ export function PaymentStep({
                                                 fit="contain"
                                             />
                                         )}
-                                        <Text weight={500}>{provider.name}</Text>
+                                        <Text fw={500}>{provider.name}</Text>
                                         <Badge size="sm" variant="light">
                                             {provider.type}
                                         </Badge>
@@ -116,7 +116,7 @@ export function PaymentStep({
                     </Title>
 
                     {selectedProvider.type === 'CARD' && (
-                        <Stack spacing="md">
+                        <Stack gap="md">
                             <TextInput
                                 label="Name on Card"
                                 placeholder="John Doe"
@@ -172,7 +172,7 @@ export function PaymentStep({
                     )}
 
                     {selectedProvider.type === 'WALLET' && (
-                        <Stack spacing="md">
+                        <Stack gap="md">
                             <TextInput
                                 label="Email"
                                 placeholder="your.email@example.com"

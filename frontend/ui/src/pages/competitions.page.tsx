@@ -31,9 +31,9 @@ export function CompetitionsPage() {
 
     return (
         <Container size="md" my="xl" pos="relative">
-            <LoadingOverlay visible={loading} overlayBlur={2} />
+            <LoadingOverlay visible={loading} />
             <Title order={2} mb="lg">Competitions</Title>
-            <SimpleGrid cols={2} spacing="lg" breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} style={{ gap: 'var(--mantine-spacing-lg)' }}>
                 {competitions.map((comp) => (
                     <Card
                         key={comp.id}
@@ -51,13 +51,12 @@ export function CompetitionsPage() {
                                     alt={`${comp.name} logo`}
                                     fit="contain"
                                     height={120}
-                                    withPlaceholder
                                 />
                             </Card.Section>
                         )}
 
-                        <Group position="apart" mt="md" mb="xs">
-                            <Text weight={500} size="lg">{comp.name}</Text>
+                        <Group justify="space-between" mt="md" mb="xs">
+                            <Text fw={500} size="lg">{comp.name}</Text>
                         </Group>
 
                         {!comp.isInternational && comp.nation && (

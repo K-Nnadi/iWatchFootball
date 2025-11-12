@@ -62,7 +62,7 @@ export function LandingPage() {
             <Space h="xl" />
 
             {/* Feature Highlights */}
-            <Group position="center" spacing="xl" align="start">
+            <Group justify="center" gap="xl" align="flex-start">
                 {/* Personal Stats */}
                 <Paper shadow="xs" radius="md" p="md" style={{ maxWidth: rem(280) }}>
                     <Title order={3} mb="xs">
@@ -111,7 +111,7 @@ export function LandingPage() {
                 <Text size="md" color="dimmed" mb="md">
                     Sign up now and begin logging matches, analyzing your stats, and grabbing the best tickets for your next live experience.
                 </Text>
-                <Group position="center">
+                <Group justify="center">
                     <Button variant="outline" color="teal" size="md" onClick={() => navigateWithTransition('/join')}>
                         Join
                     </Button>

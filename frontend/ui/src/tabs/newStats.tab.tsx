@@ -38,21 +38,21 @@ const NewStatsTab = () => {
     ];
     return (
         <ScrollArea h="100vh" p="md">
-            <Stack spacing="xl">
+            <Stack gap="xl">
                 {stats.map((category) => (
-                    <Stack key={category.title} spacing="md">
+                    <Stack key={category.title} gap="md">
                         <Title order={3}>{category.title}</Title>
                         <Card shadow="sm" radius="md" withBorder>
-                            <Stack spacing="sm">
+                            <Stack gap="sm">
                                 {category.topPlayers.map((player, index) => (
                                     <Card key={player.rank} p="md" shadow={index === 0 ? 'md' : 'xs'} radius="md">
                                         <Group>
                                             <Image src={player.playerImage} width={50} height={50} radius="50%" />
-                                            <Stack spacing={0}>
+                                            <Stack gap={0}>
                                                 <Text fw={700} size="lg">
                                                     {player.name}
                                                 </Text>
-                                                <Group spacing="xs">
+                                                <Group gap="xs">
                                                     <Image src={player.teamLogo} width={20} height={20} />
                                                     <Text size="sm" color="dimmed">
                                                         {player.team}

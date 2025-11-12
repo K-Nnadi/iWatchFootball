@@ -37,8 +37,8 @@ export function LoginPage() {
 			password: ''
 		},
 		validate: {
-			email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-			password: (value) =>
+			email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+			password: (value: string) =>
 				passwordValidation(value)
 					? null
 					: 'Password must contain at least 8 characters, one uppercase letter and one special character'
@@ -63,10 +63,10 @@ export function LoginPage() {
 			<Paper p="xl" radius="md" shadow="lg" withBorder>
 				<form onSubmit={form.onSubmit((values) => formSubmit(values))}>
 					<Box mb="xl">
-						<Title order={2} align="center" mt="md" mb="lg">
+						<Title order={2} ta="center" mt="md" mb="lg">
 							Login
 						</Title>
-						<Text size="sm" color="dimmed" align="center" mb="lg">
+						<Text size="sm" color="dimmed" ta="center" mb="lg">
 							Welcome back! Please enter your credentials to sign in.
 						</Text>
 					</Box>
@@ -108,7 +108,7 @@ export function LoginPage() {
 						</Anchor>
 					</Flex>
 
-					<Group position="center" mt="xl" spacing="md">
+					<Group justify="center" mt="xl" gap="md">
 						<Button type="submit" fullWidth variant="filled" size="md">
 							Login
 						</Button>

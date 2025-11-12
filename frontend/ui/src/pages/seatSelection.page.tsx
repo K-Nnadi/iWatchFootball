@@ -276,7 +276,7 @@ export function SeatSelectionPage() {
                         }}
                     />
 
-                    <Stack spacing="lg" align="center" style={{ position: 'relative', zIndex: 1 }}>
+                    <Stack gap="lg" align="center" style={{ position: 'relative', zIndex: 1 }}>
                         {/* Competition/Event Badge */}
                         <Badge
                             size="lg"
@@ -295,10 +295,10 @@ export function SeatSelectionPage() {
                         </Badge>
 
                         {/* Date and Time */}
-                        <Stack spacing={4} align="center">
+                        <Stack gap={4} align="center">
                             <Text
                                 size="xl"
-                                weight={900}
+                                fw={900}
                                 style={{
                                     color: 'var(--modern-white)',
                                     textTransform: 'uppercase',
@@ -314,7 +314,7 @@ export function SeatSelectionPage() {
                             </Text>
                             <Text
                                 size="md"
-                                weight={600}
+                                fw={600}
                                 style={{
                                     color: 'var(--modern-white)',
                                     fontSize: '1.25rem',
@@ -329,9 +329,9 @@ export function SeatSelectionPage() {
                         </Stack>
 
                         {/* Teams */}
-                        <Group position="apart" style={{ width: '100%', maxWidth: '600px' }} align="flex-end">
+                        <Group justify="space-between" style={{ width: '100%', maxWidth: '600px' }} align="flex-end">
                             {/* Home Team */}
-                            <Stack spacing="sm" align="center" style={{ flex: 1 }}>
+                            <Stack gap="sm" align="center" style={{ flex: 1 }}>
                                 <Box
                                     onClick={() => matchDetails.homeTeamId && navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
                                     style={{
@@ -370,7 +370,7 @@ export function SeatSelectionPage() {
                                 </Box>
                                 <Text
                                     size="md"
-                                    weight={700}
+                                    fw={700}
                                     style={{
                                         color: 'var(--modern-white)',
                                         textAlign: 'center',
@@ -383,7 +383,7 @@ export function SeatSelectionPage() {
                             {/* VS Divider */}
                             <Text
                                 size="xl"
-                                weight={900}
+                                fw={900}
                                 style={{
                                     color: 'var(--modern-lime)',
                                     marginBottom: '1rem',
@@ -393,7 +393,7 @@ export function SeatSelectionPage() {
                             </Text>
 
                             {/* Away Team */}
-                            <Stack spacing="sm" align="center" style={{ flex: 1 }}>
+                            <Stack gap="sm" align="center" style={{ flex: 1 }}>
                                 <Box
                                     onClick={() => matchDetails.awayTeamId && navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
                                     style={{
@@ -432,7 +432,7 @@ export function SeatSelectionPage() {
                                 </Box>
                                 <Text
                                     size="md"
-                                    weight={700}
+                                    fw={700}
                                     style={{
                                         color: 'var(--modern-white)',
                                         textAlign: 'center',
@@ -462,8 +462,8 @@ export function SeatSelectionPage() {
                     backgroundColor: 'var(--modern-dark-gray)',
                     border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
-                    <Group position="apart" mb="md">
-                        <Text size="md" weight={600} style={{color: 'var(--modern-white)'}}>
+                    <Group justify="space-between" mb="md">
+                        <Text size="md" fw={600} style={{color: 'var(--modern-white)'}}>
                             Filters
                         </Text>
                         <ActionIcon
@@ -477,8 +477,8 @@ export function SeatSelectionPage() {
                     <Collapse in={filtersOpen}>
                         <Grid gutter="md">
                             <Grid.Col span={{base: 12, sm: 6, md: 2.4}}>
-                                <Group position="apart" mb="xs">
-                                    <Text size="sm" weight={500} style={{color: 'var(--modern-white)'}}>
+                                <Group justify="space-between" mb="xs">
+                                    <Text size="sm" fw={500} style={{color: 'var(--modern-white)'}}>
                                         Price
                                     </Text>
                                     <Text size="xs" style={{color: 'var(--modern-gray)'}}>
@@ -509,9 +509,9 @@ export function SeatSelectionPage() {
                                 <Select
                                     label="Location"
                                     placeholder="All"
-                                    data={Array.from(new Set(allTickets.map((t) => t.block).filter(Boolean)))}
+                                    data={Array.from(new Set(allTickets.map((t) => t.block).filter((block): block is string => Boolean(block)))).map(block => ({ value: block, label: block }))}
                                     value={blockLocation}
-                                    onChange={setBlockLocation}
+                                    onChange={(value) => value && setBlockLocation(value)}
                                 />
                             </Grid.Col>
                             <Grid.Col span={{base: 12, sm: 6, md: 1.9}}>
@@ -581,7 +581,7 @@ export function SeatSelectionPage() {
                                 flexDirection: 'column',
                             }}
                         >
-                            <Group position="apart" mb="md">
+                            <Group justify="space-between" mb="md">
                                 <ModernH3 style={{color: 'var(--modern-white)', margin: 0}}>
                                     Available Tickets
                                 </ModernH3>
@@ -591,7 +591,7 @@ export function SeatSelectionPage() {
                             </Group>
 
                             <ScrollArea style={{flex: 1}}>
-                                <Stack spacing="md">
+                                <Stack gap="md">
                                     {filteredTickets.map((ticket) => (
                                         <Paper
                                             key={ticket.id}
@@ -609,7 +609,7 @@ export function SeatSelectionPage() {
                                                 e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                                             }}
                                         >
-                                            <Group position="apart" mb="xs">
+                                            <Group justify="space-between" mb="xs">
                                                 <Badge
                                                     color={
                                                         ticket.category === 1
@@ -623,7 +623,7 @@ export function SeatSelectionPage() {
                                                 >
                                                     Category {ticket.category}
                                                 </Badge>
-                                                <Group spacing="xs">
+                                                <Group gap="xs">
                                                     <ActionIcon size="sm" variant="subtle">
                                                         <IconInfoCircle size={16}/>
                                                     </ActionIcon>
@@ -636,7 +636,7 @@ export function SeatSelectionPage() {
                                                 </Group>
                         </Group>
 
-                                            <Stack spacing="xs">
+                                            <Stack gap="xs">
                                                 {ticket.row && (
                                                     <Text size="xs" style={{color: 'var(--modern-gray)'}}>
                                                         Row: {ticket.row}
@@ -666,7 +666,7 @@ export function SeatSelectionPage() {
                         </Text>
                                                 )}
 
-                                                <Group position="apart" mt="sm">
+                                                <Group justify="space-between" mt="sm">
                                                     <Select
                                                         placeholder="Qty"
                                                         data={Array.from({length: Math.min(ticket.available, 10)}, (_, i) => ({
@@ -677,7 +677,7 @@ export function SeatSelectionPage() {
                                                         size="xs"
                                                         style={{width: 80}}
                                                     />
-                                                    <Text size="lg" weight={700} style={{color: 'var(--modern-lime)'}}>
+                                                    <Text size="lg" fw={700} style={{color: 'var(--modern-lime)'}}>
                                                         £{ticket.price.toFixed(2)} per ticket
                                                     </Text>
             </Group>

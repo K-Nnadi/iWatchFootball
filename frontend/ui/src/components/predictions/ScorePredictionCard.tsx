@@ -103,9 +103,8 @@ export function ScorePredictionCard({
         >
             <Title 
                 order={3} 
-                size={{ base: 'h5', sm: 'h4' }} 
                 mb="lg" 
-                align="center"
+                ta="center"
                 style={{ color: 'var(--modern-white)', textTransform: 'uppercase', letterSpacing: '0.1em' }}
             >
                 Who Will Win?
@@ -231,13 +230,13 @@ export function ScorePredictionCard({
                     )}
                 </Box>
                 {(userScorePrediction || status === 'past') && (
-                    <Text size="sm" c="dimmed" align="center" mt="md">
+                    <Text size="sm" c="dimmed" ta="center" mt="md">
                         Based on <Text span fw={700} c="var(--modern-white)">{totalPredictions}</Text> predictions
                     </Text>
                 )}
                 
                 {userScorePrediction && status !== 'past' && (
-                    <Text size="sm" c="var(--modern-lime)" align="center" mt="md" fw={600}>
+                    <Text size="sm" c="var(--modern-lime)" ta="center" mt="md" fw={600}>
                         Your prediction: {userScorePrediction === 'home' ? homeTeam : 
                          userScorePrediction === 'away' ? awayTeam : 'Draw'}
                     </Text>

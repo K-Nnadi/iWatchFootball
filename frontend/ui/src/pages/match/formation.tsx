@@ -116,8 +116,9 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                 />
                 
                 <Text 
-                    size={{ base: 'xs', sm: 'sm' }}
-                    style={{ 
+                    size="sm"
+                    style={{
+                        fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', 
                         textAlign: 'center', 
                         width: '100%', 
                         marginBottom: 'clamp(1rem, 3vw, 2rem)',
@@ -205,7 +206,7 @@ function renderPlayerRow(players: Player[]) {
         >
             <Stack align="center" gap={4}>
                 <Avatar
-                    size={{ base: 'sm', sm: 'md', md: 'lg' }}
+                    size="lg"
                     radius="xl"
                     style={{
                         backgroundColor: 'var(--modern-dark-gray)',
@@ -213,20 +214,22 @@ function renderPlayerRow(players: Player[]) {
                         color: 'var(--modern-white)',
                         fontWeight: 700,
                         fontSize: 'clamp(0.65rem, 1.5vw, 1.1rem)',
+                        width: 'clamp(2.5rem, 5vw, 3.5rem)',
+                        height: 'clamp(2.5rem, 5vw, 3.5rem)',
                     }}
                 >
                     {player.number}
                 </Avatar>
                 <Text 
-                    size={{ base: '10px', sm: 'xs', md: 'sm' }}
+                    size="sm"
                     fw={500}
-                    style={{ 
+                    style={{
+                        fontSize: 'clamp(0.6rem, 1.2vw, 0.875rem)', 
                         color: 'var(--modern-white)',
                         maxWidth: 'clamp(50px, 12vw, 100px)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
-                        fontSize: 'clamp(0.6rem, 1.2vw, 0.875rem)',
                         lineHeight: 1.2,
                     }}
                 >

@@ -23,12 +23,12 @@ export function AdditionalInfoStep({
                 Additional Information
             </Title>
 
-            <Stack spacing="md">
+            <Stack gap="md">
                 <Box>
                     <Checkbox
                         label="I have read and agree to the Terms and Conditions & Privacy Policy"
                         checked={additionalInfo.agreeToTerms}
-                        onChange={(checked) => onAdditionalInfoChange('agreeToTerms', checked)}
+                        onChange={(event) => onAdditionalInfoChange('agreeToTerms', event.currentTarget.checked)}
                     />
                     {errors.agreeToTerms && (
                         <Text size="xs" color="red" mt={4}>
@@ -40,12 +40,12 @@ export function AdditionalInfoStep({
                 <Checkbox
                     label="I agree to receive relevant emails with event updates and offers"
                     checked={additionalInfo.agreeToMarketing}
-                    onChange={(checked) => onAdditionalInfoChange('agreeToMarketing', checked)}
+                    onChange={(event) => onAdditionalInfoChange('agreeToMarketing', event.currentTarget.checked)}
                 />
             </Stack>
 
             <Group mt="xl">
-                <Button variant="default" onClick={onBack} style={{ flex: 1 }}>
+                <Button variant="outline" onClick={onBack} style={{ flex: 1 }}>
                     Back
                 </Button>
                 <ModernButton variant="primary" onClick={onNext} style={{ flex: 1 }}>

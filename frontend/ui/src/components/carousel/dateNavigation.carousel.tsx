@@ -80,8 +80,8 @@ export function DateNavigation({
 
     return (
         <Container size="xs" mb={20}>
-            <Stack spacing="xs">
-                <Text size="md" weight={500}>
+            <Stack gap="xs">
+                <Text size="md" fw={500}>
                     {formatSelectedDate(selectedDate)}
                     {canReturnToToday && (
                         <>

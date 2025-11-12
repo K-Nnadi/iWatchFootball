@@ -30,7 +30,7 @@ export function DetailsStep({
                 Your Details
             </Title>
 
-            <Stack spacing="md">
+            <Stack gap="md">
                 <TextInput
                     label="Email Address"
                     placeholder="Email address"

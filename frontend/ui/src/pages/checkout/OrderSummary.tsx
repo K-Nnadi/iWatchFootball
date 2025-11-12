@@ -99,38 +99,38 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                 />
             )}
 
-            <Stack spacing="md" p="md">
+            <Stack gap="md" p="md">
                 {ticketDetails.competition && (
-                    <Text size="xs" color="dimmed" weight={500}>
+                    <Text size="xs" color="dimmed" fw={500}>
                         {ticketDetails.competition.toUpperCase()}
                     </Text>
                 )}
 
-                <Title order={3} size="h4" weight={700}>
+                <Title order={3} size="h4" fw={700}>
                     {ticketDetails.homeTeam} vs {ticketDetails.awayTeam}
                 </Title>
 
-                <Group spacing="xs">
+                <Group gap="xs">
                     <IconCalendar size={16} />
                     <Text size="sm">{formatDate(ticketDetails.date)}</Text>
                 </Group>
 
-                <Group spacing="xs">
+                <Group gap="xs">
                     <IconMapPin size={16} />
                     <Text size="sm">{ticketDetails.venue}</Text>
                 </Group>
 
                 <Divider variant="dashed" />
 
-                <Stack spacing="xs">
-                    <Group spacing="xs">
+                <Stack gap="xs">
+                    <Group gap="xs">
                         <IconCheck size={16} color="green" />
                         <Text size="sm">Excellent 4.7 out of 5</Text>
                         <Badge size="xs" color="green" variant="light">
                             Trustpilot
                         </Badge>
                     </Group>
-                    <Group spacing="xs">
+                    <Group gap="xs">
                         <IconCheck size={16} color="green" />
                         <Text size="sm">150% Money Back Guarantee</Text>
                         <Tooltip label="Full refund guarantee if tickets are not delivered">
@@ -139,13 +139,13 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                             </ActionIcon>
                         </Tooltip>
                     </Group>
-                    <Group spacing="xs">
+                    <Group gap="xs">
                         <IconCheck size={16} color="green" />
                         <Text size="sm">Easy and secure payments</Text>
                     </Group>
                 </Stack>
 
-                <Group spacing="xs" mt="xs">
+                <Group gap="xs" mt="xs">
                     <Text size="xs" color="dimmed">
                         PayPal • VISA • Mastercard • AMEX • Klarna • Apple Pay • Google Pay
                     </Text>
@@ -153,11 +153,11 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
 
                 <Divider variant="dashed" />
 
-                <Stack spacing="xs">
-                    <Group spacing="xs">
+                <Stack gap="xs">
+                    <Group gap="xs">
                         <IconTicket size={16} />
                         <Box>
-                            <Text size="sm" weight={500}>
+                            <Text size="sm" fw={500}>
                                 E-ticket(s)
                             </Text>
                             <Text size="xs" color="dimmed">
@@ -168,8 +168,8 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                     </Group>
 
                     {ticketDetails.section && (
-                        <Group spacing="xs" position="apart">
-                            <Group spacing="xs">
+                        <Group gap="xs" justify="space-between">
+                            <Group gap="xs">
                                 <IconFlag size={16} />
                                 <Box>
                                     <Text size="sm">
@@ -196,7 +196,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                     )}
 
                     {ticketDetails.seatsTogether && (
-                        <Group spacing="xs">
+                        <Group gap="xs">
                             <IconUsers size={16} />
                             <Box>
                                 <Text size="sm">
@@ -212,7 +212,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                     )}
 
                     {ticketDetails.unrestrictedView !== false && (
-                        <Group spacing="xs">
+                        <Group gap="xs">
                             <IconCheck size={16} color="green" />
                             <Text size="sm">Unrestricted view</Text>
                             <Tooltip label="Clear view of the pitch">
@@ -226,7 +226,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
 
                 <Divider variant="dashed" />
 
-                <Group position="apart" align="flex-start">
+                <Group justify="space-between" align="flex-start">
                     <NumberInput
                         value={quantity}
                         onChange={(val) => setQuantity(typeof val === 'number' ? val : 1)}
@@ -236,7 +236,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                         style={{ width: '80px' }}
                     />
                     <Box style={{ flex: 1, textAlign: 'right' }}>
-                        <Text size="sm" weight={500}>
+                        <Text size="sm" fw={500}>
                             £{pricePerTicket.toFixed(2)}
                         </Text>
                         <Text size="xs" color="dimmed">
@@ -245,7 +245,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                     </Box>
                 </Group>
 
-                <Group position="apart">
+                <Group justify="space-between">
                     <Text size="sm" color="dimmed">
                         Service Fee + Tax
                     </Text>
@@ -261,16 +261,16 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
 
                 <Divider variant="dashed" />
 
-                <Group position="apart">
+                <Group justify="space-between">
                     <Box>
-                        <Text size="lg" weight={700}>
+                        <Text size="lg" fw={700}>
                             Total
                         </Text>
                         <Anchor size="xs" color="blue" component="button">
                             Voucher code?
                         </Anchor>
                     </Box>
-                    <Text size="xl" weight={700}>
+                    <Text size="xl" fw={700}>
                         £{total.toFixed(2)}
                     </Text>
                 </Group>

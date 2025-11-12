@@ -23,10 +23,10 @@ export function SignUpPage() {
 			password: ''
 		},
 		validate: {
-			firstName: (value) => (value ? null : 'First name is required'),
-			lastName: (value) => (value ? null : 'Last name is required'),
-			email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-			password: (value) => {
+			firstName: (value: string) => (value ? null : 'First name is required'),
+			lastName: (value: string) => (value ? null : 'Last name is required'),
+			email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+			password: (value: string) => {
 				// Add your password validation logic here. For example:
 				const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 				const upperCase = /[A-Z]/;
@@ -46,10 +46,10 @@ export function SignUpPage() {
 			<Paper p="xl" radius="md" shadow="lg" withBorder>
 				<form onSubmit={form.onSubmit((values) => formSubmit(values))}>
 					<Box mb="xl">
-						<Title order={2} align="center" mt="md" mb="lg">
+						<Title order={2} ta="center" mt="md" mb="lg">
 							Sign Up
 						</Title>
-						<Text size="sm" color="dimmed" align="center" mb="lg">
+						<Text size="sm" color="dimmed" ta="center" mb="lg">
 							Create an account to start tracking your games!
 						</Text>
 					</Box>

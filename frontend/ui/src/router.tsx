@@ -7,7 +7,7 @@ import {SettingsPage} from "./pages/settings.page";
 import {SignUpPage} from "./pages/signUp.page";
 import {LoginPage} from "./pages/login.page";
 import {CompetitionsPage} from "./pages/competitions.page";
-import {TransitionDemoPage} from "./pages/transition-demo.page";
+// import {TransitionDemoPage} from "./pages/transition-demo.page"; // File not found
 import {AppWrapper} from "./components/shell/appWrapper";
 import React from "react";
 import {CompetitionPage} from "./pages/competition.page";
@@ -18,7 +18,7 @@ import {MatchPage} from "./pages/match/match.page";
 import {TeamPage} from "./pages/team/team.page";
 
 export type ElementMap = {
-    [x: any]: Element;
+    [x: string]: React.ReactElement;
 }
 
 const IWatchFootballElements: ElementMap = {
@@ -34,7 +34,7 @@ const IWatchFootballElements: ElementMap = {
 
 const childrenRoutes = Object.entries(IWatchFootballElements).map(([path, element]) => ({
     path: `/${path}`,
-    element: element as JSX.Element
+    element: element
 }));
 
 const additionalRoutes = [

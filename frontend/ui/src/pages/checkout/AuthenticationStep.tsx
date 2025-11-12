@@ -20,7 +20,7 @@ export function AuthenticationStep({ onContinueAsGuest }: AuthenticationStepProp
                 You can also continue as a guest, but your games won't be saved.
             </Text>
 
-            <Stack spacing="md">
+            <Stack gap="md">
                 <ModernButton
                     variant="primary"
                     fullWidth
@@ -44,7 +44,7 @@ export function AuthenticationStep({ onContinueAsGuest }: AuthenticationStepProp
                 <Divider label="OR" labelPosition="center" my="md" />
 
                 <ModernButton
-                    variant="default"
+                    variant="outline"
                     fullWidth
                     size="md"
                     onClick={onContinueAsGuest}

@@ -1,4 +1,4 @@
-import {ActionIcon, AppShell, Box, Button, Container, Divider, Grid, Group, Stack, Text, TextInput, Title, Anchor, Image} from '@mantine/core';
+import {ActionIcon, AppShell, Box, Button, Container, Divider, Grid, Group, Stack, Text, Title, Anchor, useMantineTheme} from '@mantine/core';
 import {
     IconApple,
     IconBrandFacebook,
@@ -6,44 +6,41 @@ import {
     IconBrandInstagram,
     IconBrandTwitter,
     IconBrandYoutube,
-    IconSend,
     IconTrophy,
     IconBrandTiktok,
-    IconBrandTwitch,
-    IconExternalLink,
     IconMail,
-    IconPhone,
-    IconMapPin
+    IconPhone
 } from '@tabler/icons-react';
 import React from "react";
 import { usePageTransition } from "../../hooks/usePageTransition";
 
 // CTA Section Component - OneFootball Style
 function CTASection() {
+    const theme = useMantineTheme();
     return (
         <Box
-            sx={(theme) => ({
+            style={{
                 backgroundColor: theme.colors.blue[6],
                 color: 'white',
                 padding: '3rem 0',
                 textAlign: 'center'
-            })}
+            }}
         >
             <Container size="xl">
-                <Stack align="center" spacing="lg">
-                    <Title order={2} size="2rem" weight={700}>
+                <Stack align="center" gap="lg">
+                    <Title order={2} size="2rem" fw={700}>
                         Download I Watch Football
                     </Title>
                     <Text size="lg" maw="500px">
                         Stay connected with live scores, news, and tickets. Available on all platforms.
                     </Text>
-                    <Group spacing="md">
+                    <Group gap="md">
                         <Button
                             size="md"
                             variant="white"
                             color="blue"
-                            leftIcon={<IconApple size={18} />}
-                            sx={{ color: '#1e40af' }}
+                            leftSection={<IconApple size={18} />}
+                            style={{ color: '#1e40af' }}
                         >
                             App Store
                         </Button>
@@ -51,8 +48,8 @@ function CTASection() {
                             size="md"
                             variant="white"
                             color="blue"
-                            leftIcon={<IconBrandGooglePlay size={18} />}
-                            sx={{ color: '#1e40af' }}
+                            leftSection={<IconBrandGooglePlay size={18} />}
+                            style={{ color: '#1e40af' }}
                         >
                             Google Play
                         </Button>
@@ -66,6 +63,7 @@ function CTASection() {
 // OneFootball Style Footer
 function OneFootballStyleFooter() {
     const { navigateWithTransition } = usePageTransition();
+    const theme = useMantineTheme();
 
     const quickLinks = [
         { label: 'All matches', path: '/matches' },
@@ -106,31 +104,31 @@ function OneFootballStyleFooter() {
 
     return (
         <Box
-            sx={(theme) => ({
+            style={{
                 backgroundColor: theme.colors.dark[9],
                 color: 'white',
                 padding: '3rem 0 1rem'
-            })}
+            }}
         >
             <Container size="xl">
                 {/* Main Footer Content */}
                 <Grid gutter="xl" mb="xl">
                     {/* Brand Section */}
                     <Grid.Col span={{ base: 12, md: 3 }}>
-                        <Stack spacing="md">
-                            <Group spacing="xs">
+                        <Stack gap="md">
+                            <Group gap="xs">
                                 <IconTrophy color="#60a5fa" size={28} />
-                                <Text size="xl" weight={700}>I Watch Football</Text>
+                                <Text size="xl" fw={700}>I Watch Football</Text>
                             </Group>
                             <Text color="dimmed" size="sm">
                                 Your ultimate football companion for live scores, news, statistics, and ticket bookings.
                             </Text>
-                            <Stack spacing="xs">
-                                <Group spacing="xs">
+                            <Stack gap="xs">
+                                <Group gap="xs">
                                     <IconMail size={16} color="#9ca3af" />
                                     <Text size="sm" color="dimmed">contact@iwatchfootball.com</Text>
                                 </Group>
-                                <Group spacing="xs">
+                                <Group gap="xs">
                                     <IconPhone size={16} color="#9ca3af" />
                                     <Text size="sm" color="dimmed">+1 (555) 123-4567</Text>
                                 </Group>
@@ -140,22 +138,23 @@ function OneFootballStyleFooter() {
 
                     {/* Quick Links */}
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-                        <Stack spacing="md">
-                            <Title order={5} weight={600} size="sm" color="white">
+                        <Stack gap="md">
+                            <Title order={5} fw={600} size="sm" c="white">
                                 Quick Links
                             </Title>
-                            <Stack spacing="xs">
+                            <Stack gap="xs">
                                 {quickLinks.map((link) => (
                                     <Anchor
                                         key={link.label}
                                         color="dimmed"
                                         size="sm"
-                                        sx={{ 
+                                        style={{ 
                                             cursor: 'pointer', 
-                                            '&:hover': { color: 'white' },
                                             textDecoration: 'none'
                                         }}
                                         onClick={() => navigateWithTransition(link.path)}
+                                        onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.color = ''; }}
                                     >
                                         {link.label}
                                     </Anchor>
@@ -166,21 +165,22 @@ function OneFootballStyleFooter() {
 
                     {/* Leagues */}
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-                        <Stack spacing="md">
-                            <Title order={5} weight={600} size="sm" color="white">
+                        <Stack gap="md">
+                            <Title order={5} fw={600} size="sm" c="white">
                                 Leagues
                             </Title>
-                            <Stack spacing="xs">
+                            <Stack gap="xs">
                                 {leagues.map((league) => (
                                     <Anchor
                                         key={league}
                                         color="dimmed"
                                         size="sm"
-                                        sx={{ 
+                                        style={{ 
                                             cursor: 'pointer', 
-                                            '&:hover': { color: 'white' },
                                             textDecoration: 'none'
                                         }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.color = ''; }}
                                     >
                                         {league}
                                     </Anchor>
@@ -191,21 +191,22 @@ function OneFootballStyleFooter() {
 
                     {/* About Us */}
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-                        <Stack spacing="md">
-                            <Title order={5} weight={600} size="sm" color="white">
+                        <Stack gap="md">
+                            <Title order={5} fw={600} size="sm" c="white">
                                 About Us
                             </Title>
-                            <Stack spacing="xs">
+                            <Stack gap="xs">
                                 {aboutLinks.map((link) => (
                                     <Anchor
                                         key={link}
                                         color="dimmed"
                                         size="sm"
-                                        sx={{ 
+                                        style={{ 
                                             cursor: 'pointer', 
-                                            '&:hover': { color: 'white' },
                                             textDecoration: 'none'
                                         }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.color = ''; }}
                                     >
                                         {link}
                                     </Anchor>
@@ -216,21 +217,22 @@ function OneFootballStyleFooter() {
 
                     {/* Partner With Us */}
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-                        <Stack spacing="md">
-                            <Title order={5} weight={600} size="sm" color="white">
+                        <Stack gap="md">
+                            <Title order={5} fw={600} size="sm" c="white">
                                 Partner With Us
                             </Title>
-                            <Stack spacing="xs">
+                            <Stack gap="xs">
                                 {partnerLinks.map((link) => (
                                     <Anchor
                                         key={link}
                                         color="dimmed"
                                         size="sm"
-                                        sx={{ 
+                                        style={{ 
                                             cursor: 'pointer', 
-                                            '&:hover': { color: 'white' },
                                             textDecoration: 'none'
                                         }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.color = ''; }}
                                     >
                                         {link}
                                     </Anchor>
@@ -241,21 +243,22 @@ function OneFootballStyleFooter() {
 
                     {/* Legal */}
                     <Grid.Col span={{ base: 12, sm: 6, md: 1 }}>
-                        <Stack spacing="md">
-                            <Title order={5} weight={600} size="sm" color="white">
+                        <Stack gap="md">
+                            <Title order={5} fw={600} size="sm" c="white">
                                 Legal
                             </Title>
-                            <Stack spacing="xs">
+                            <Stack gap="xs">
                                 {legalLinks.map((link) => (
                                     <Anchor
                                         key={link}
                                         color="dimmed"
                                         size="sm"
-                                        sx={{ 
+                                        style={{ 
                                             cursor: 'pointer', 
-                                            '&:hover': { color: 'white' },
                                             textDecoration: 'none'
                                         }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.color = ''; }}
                                     >
                                         {link}
                                     </Anchor>
@@ -267,15 +270,17 @@ function OneFootballStyleFooter() {
 
                 {/* Social Media Section */}
                 <Box mb="xl">
-                    <Title order={5} weight={600} size="sm" color="white" mb="md">
+                    <Title order={5} fw={600} size="sm" c="white" mb="md">
                         Follow I Watch Football
                     </Title>
-                    <Group spacing="md">
+                    <Group gap="md">
                         <ActionIcon 
                             variant="subtle" 
                             color="gray" 
                             size="lg"
-                            sx={{ '&:hover': { backgroundColor: '#1877f2', color: 'white' } }}
+                            style={{ cursor: 'pointer' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1877f2'; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
                         >
                             <IconBrandFacebook size={20} />
                         </ActionIcon>
@@ -283,7 +288,9 @@ function OneFootballStyleFooter() {
                             variant="subtle" 
                             color="gray" 
                             size="lg"
-                            sx={{ '&:hover': { backgroundColor: '#1da1f2', color: 'white' } }}
+                            style={{ cursor: 'pointer' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1da1f2'; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
                         >
                             <IconBrandTwitter size={20} />
                         </ActionIcon>
@@ -291,7 +298,9 @@ function OneFootballStyleFooter() {
                             variant="subtle" 
                             color="gray" 
                             size="lg"
-                            sx={{ '&:hover': { backgroundColor: '#e4405f', color: 'white' } }}
+                            style={{ cursor: 'pointer' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e4405f'; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
                         >
                             <IconBrandInstagram size={20} />
                         </ActionIcon>
@@ -299,7 +308,9 @@ function OneFootballStyleFooter() {
                             variant="subtle" 
                             color="gray" 
                             size="lg"
-                            sx={{ '&:hover': { backgroundColor: '#ff0000', color: 'white' } }}
+                            style={{ cursor: 'pointer' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ff0000'; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
                         >
                             <IconBrandYoutube size={20} />
                         </ActionIcon>
@@ -307,7 +318,9 @@ function OneFootballStyleFooter() {
                             variant="subtle" 
                             color="gray" 
                             size="lg"
-                            sx={{ '&:hover': { backgroundColor: '#000000', color: 'white' } }}
+                            style={{ cursor: 'pointer' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#000000'; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
                         >
                             <IconBrandTiktok size={20} />
                         </ActionIcon>
@@ -324,7 +337,7 @@ function OneFootballStyleFooter() {
                         </Text>
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, md: 6 }}>
-                        <Group spacing="lg" position="right">
+                        <Group gap="lg" justify="flex-end">
                             <Anchor color="dimmed" size="sm" href="#privacy">
                                 Privacy Policy
                             </Anchor>

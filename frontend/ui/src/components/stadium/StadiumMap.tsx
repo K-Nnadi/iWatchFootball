@@ -125,7 +125,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     if (shouldUseSeatsio) {
         return (
             <Box className="stadium-map-container" ref={containerRef}>
-                <Group position="apart" mb="md">
+                <Group justify="space-between" mb="md">
                     {onViewModeChange && (
                         <Radio.Group
                             value={viewMode}
@@ -144,13 +144,12 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     style={{ height: '600px', minHeight: '500px' }}
                 >
                     <SeatsioSeatingChart
-                        workspaceKey={seatsioWorkspaceKey}
-                        event={seatsioEventKey}
-                        region={seatsioRegion}
-                        chart={seatsioChartJson}
+                        workspaceKey={seatsioWorkspaceKey || ''}
+                        event={seatsioEventKey || ''}
+                        {...(seatsioRegion && { region: seatsioRegion as 'eu' | 'us' | 'sg' })}
+                        {...(seatsioChartJson && { chart: seatsioChartJson })}
                         onObjectSelected={handleSeatsioObjectSelected}
                         onObjectDeselected={handleSeatsioObjectDeselected}
-                        pricing={undefined}
                         priceFormatter={(price: number) => `£${price.toFixed(2)}`}
                         showLegend={true}
                         showMinimap={true}
@@ -165,7 +164,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     // Render custom SVG implementation (legacy)
     return (
         <Box className="stadium-map-container" ref={containerRef}>
-            <Group position="apart" mb="md">
+            <Group justify="space-between" mb="md">
                 {onViewModeChange && (
                     <Radio.Group
                         value={viewMode}

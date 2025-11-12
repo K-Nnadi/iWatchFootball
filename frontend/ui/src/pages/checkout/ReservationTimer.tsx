@@ -50,11 +50,11 @@ export function ReservationTimer({ initialMinutes = 15, onExpire }: ReservationT
                 borderColor: isLowTime ? 'rgba(255, 0, 0, 0.3)' : undefined,
             }}
         >
-            <Group spacing="sm">
+            <Group gap="sm">
                 <IconClock size={20} color={isLowTime ? 'red' : undefined} />
-                <Text size="sm" weight={500}>
+                <Text size="sm" fw={500}>
                     The tickets are reserved for you.{' '}
-                    <Text component="span" weight={700} color={isLowTime ? 'red' : undefined}>
+                    <Text component="span" fw={700} color={isLowTime ? 'red' : undefined}>
                         {formatTime(timeRemaining)}
                     </Text>{' '}
                     remaining to finish your order.

@@ -43,10 +43,10 @@ export interface MatchEvent {
     time: number;
     description: string;
     team: 'home' | 'away';
-    type: 'goal' | 'card' | 'substitution';
+    type: 'goal' | 'card' | 'substitution' | 'other' | 'penalty';
 }
 
-interface UserGame {
+export interface UserGame {
     fixtureId: string;
     homeTeam: string;
     awayTeam: string;
@@ -345,8 +345,8 @@ export function LogsPage() {
             marginTop: '-1rem'
         }}>
             <Container>
-                <Grid size="xl" my={10}>
-                    <LoadingOverlay visible={loading} overlayBlur={2}/>
+                <Grid my={10}>
+                    <LoadingOverlay visible={loading} />
                     <Grid.Col span={columnSpan}>
 
                         <Box mb={10}>
@@ -413,7 +413,7 @@ export function LogsPage() {
 
                             {selectedSeason && (
                                 <>
-                                    <SimpleGrid cols={2} gap="sm" mb="sm">
+                                    <SimpleGrid cols={2} style={{ gap: 'var(--mantine-spacing-sm)' }} mb="sm">
                                         <Box>
                                             <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Home Team</ModernCaption>
                                             <Select
@@ -489,7 +489,7 @@ export function LogsPage() {
                                             disabled={!selectedFixture}
                                             fullWidth
                                             size="md"
-                                            variant="filled"
+                                            variant="primary"
                                         >
                                             Add Match to Logs
                                         </ModernButton>
@@ -537,8 +537,7 @@ export function LogsPage() {
                                 ) : (
                                     <SimpleGrid
                                         cols={1}
-                                        gap="lg"
-                                        style={{maxHeight: '80vh', overflowY: 'auto', padding: '0 8px'}}
+                                        style={{ gap: 'var(--mantine-spacing-lg)', maxHeight: '80vh', overflowY: 'auto', padding: '0 8px' }}
                                     >
                                         {loggedFixtures.map((fixture) => (
                                             <LoggedFixtureCard
@@ -591,7 +590,7 @@ export function LogsPage() {
                             right: '20px',
                             zIndex: 1000
                         }}
-                        variant="filled"
+                        variant="primary"
                     >
                         Go to Top
                     </ModernButton>

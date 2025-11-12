@@ -355,7 +355,7 @@ export function CheckoutPage() {
                 onStepClick={handleStepperClick}
             />
 
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
+            <SimpleGrid cols={{ base: 1, md: 2 }} style={{ gap: 'var(--mantine-spacing-xl)' }}>
                 {/* Left Panel - Form */}
                 <Box>
                     {activeStep === 0 && !isLoggedIn && (

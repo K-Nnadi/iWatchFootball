@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button as MantineButton, ButtonProps as MantineButtonProps } from '@mantine/core';
 
-interface ModernButtonProps extends MantineButtonProps {
+interface ModernButtonProps extends Omit<MantineButtonProps, 'variant' | 'size'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const ModernButton: React.FC<ModernButtonProps> = ({

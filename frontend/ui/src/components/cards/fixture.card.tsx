@@ -12,6 +12,28 @@ import {
 import React, {useState} from "react";
 import { ModernButton, ModernCard, ModernH3, ModernBody, ModernCaption } from '../modern';
 
+export interface MatchEvent {
+    time: number;
+    description: string;
+    team: 'home' | 'away';
+    type: 'goal' | 'card' | 'substitution' | 'other' | 'penalty';
+}
+
+export interface LoggedFixtureProps {
+    fixtureId?: string;
+    homeTeam: string;
+    awayTeam: string;
+    homeScore: number;
+    awayScore: number;
+    date: string;
+    competitionName: string;
+    leaguePosition?: number;
+    isVerified: boolean;
+    venue?: string;
+    userTeam?: 'home' | 'away';
+    stage: string;
+    events?: MatchEvent[];
+}
 
 // Define a function to select the icon based on the event type
 function eventIcon(type: string) {
@@ -32,8 +54,8 @@ export function LoggedFixtureCard({ homeTeam, awayTeam, homeScore, awayScore, da
     const theme = useMantineTheme();
     const userTeamName = userTeam === 'home' ? homeTeam : awayTeam;
 
-    const homeEvents = events?.filter((e) => e.team === 'home').sort((a, b) => a.time - b.time) || [];
-    const awayEvents = events?.filter((e) => e.team === 'away').sort((a, b) => a.time - b.time) || [];
+    const homeEvents = events?.filter((e: MatchEvent) => e.team === 'home').sort((a: MatchEvent, b: MatchEvent) => a.time - b.time) || [];
+    const awayEvents = events?.filter((e: MatchEvent) => e.team === 'away').sort((a: MatchEvent, b: MatchEvent) => a.time - b.time) || [];
 
     return (
         <>
@@ -155,13 +177,13 @@ export function LoggedFixtureCard({ homeTeam, awayTeam, homeScore, awayScore, da
                     }
                     size="lg"
                 >
-                    <SimpleGrid cols={2} gap="xl">
+                    <SimpleGrid cols={2} style={{ gap: 'var(--mantine-spacing-xl)' }}>
                         <Stack gap="md">
                             <ModernH3 style={{ color: '#374151', fontSize: '1rem', fontWeight: 600 }}>{homeTeam}</ModernH3>
                             {homeEvents.length === 0 ? (
                                 <ModernBody style={{ color: '#6b7280', fontSize: '0.875rem' }}>No events</ModernBody>
                             ) : (
-                                homeEvents.map((e, index) => (
+                                homeEvents.map((e: MatchEvent, index: number) => (
                                     <Group key={index} gap="xs" wrap="nowrap">
                                         <ModernBody style={{ fontWeight: 500, fontSize: '0.875rem', minWidth: 35, color: '#374151' }}>
                                             {e.time}' {eventIcon(e.type)}
@@ -180,7 +202,7 @@ export function LoggedFixtureCard({ homeTeam, awayTeam, homeScore, awayScore, da
                                     No events
                                 </ModernBody>
                             ) : (
-                                awayEvents.map((e, index) => (
+                                awayEvents.map((e: MatchEvent, index: number) => (
                                     <Group key={index} gap="xs" justify="flex-end" wrap="nowrap">
                                         <ModernBody style={{ fontSize: '0.875rem', color: '#374151' }}>{e.description}</ModernBody>
                                         <ModernBody style={{ fontWeight: 500, fontSize: '0.875rem', minWidth: 35, color: '#374151' }}>

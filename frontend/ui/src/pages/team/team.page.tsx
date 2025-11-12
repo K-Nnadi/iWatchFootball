@@ -42,8 +42,8 @@ export function TeamPage() {
 
     return (
         <Container size="lg" py="xl">
-            <Group position="apart" align="center" mb="lg">
-                <Group spacing="md">
+            <Group justify="space-between" align="center" mb="lg">
+                <Group gap="md">
                     <Image
                         src={team.crest}
                         alt={team.name}
@@ -64,7 +64,7 @@ export function TeamPage() {
                     <Image src={team.manager.image} width={50} radius="xl" />
                     <Box>
                         <Text size="sm">Manager</Text>
-                        <Text weight={600}>{team.manager.name}</Text>
+                        <Text fw={600}>{team.manager.name}</Text>
                         <Text size="xs" color="dimmed">{team.manager.nationality}</Text>
                     </Box>
                 </Group>
@@ -138,9 +138,9 @@ export function TeamPage() {
                                 return matchesComp && matchesVenue;
                             })
                             .map((f, i) => (
-                                <Group key={i} position="apart" mb="xs">
+                                <Group key={i} justify="space-between" mb="xs">
                                     <Box>
-                                        <Text weight={500}>{f.competition}</Text>
+                                        <Text fw={500}>{f.competition}</Text>
                                         <Text size="sm" color="dimmed">{f.date} – vs {f.opponent}</Text>
                                     </Box>
                                     <Badge>{f.home ? 'Home' : 'Away'}</Badge>

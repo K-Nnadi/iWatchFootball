@@ -60,7 +60,7 @@ export function SettingsPage() {
             </Title>
 
             <Paper withBorder shadow="sm" p="md" radius="md">
-                <Group position="apart" mb="md">
+                <Group justify="space-between" mb="md">
                     <Text>Dark Mode</Text>
                     <Switch
                         checked={isDarkMode}
@@ -68,11 +68,11 @@ export function SettingsPage() {
                     />
                 </Group>
 
-                <Group position="apart" mb="md">
+                <Group justify="space-between" mb="md">
                     <Text>Language</Text>
                     <Select
                         value={language}
-                        onChange={setLanguage}
+                        onChange={(value) => value && setLanguage(value)}
                         data={[
                             { value: 'en', label: 'English' },
                             { value: 'es', label: 'Español' },
@@ -82,7 +82,7 @@ export function SettingsPage() {
                     />
                 </Group>
 
-                <Group position="apart" mb="md">
+                <Group justify="space-between" mb="md">
                     <Text>Match Notifications</Text>
                     <Switch
                         checked={notificationsEnabled}
@@ -90,8 +90,8 @@ export function SettingsPage() {
                     />
                 </Group>
 
-                <Group position="right" mt="lg">
-                    <Button variant="outline" onClick={() => navigateWithTransition(-1, { transitionType: 'loading', duration: 1000 })}>
+                <Group justify="flex-end" mt="lg">
+                    <Button variant="outline" onClick={() => window.history.back()}>
                         Cancel
                     </Button>
                     <Button onClick={handleSave}>Save Changes</Button>

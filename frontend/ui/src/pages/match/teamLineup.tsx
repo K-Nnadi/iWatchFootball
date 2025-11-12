@@ -22,9 +22,8 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
         >
             <Title 
                 order={3} 
-                size={{ base: 'h5', sm: 'h4' }} 
                 mb={{ base: 'md', sm: 'xl' }} 
-                align="center" 
+                ta="center" 
                 style={{ color: 'var(--modern-white)' }}
             >
                 Team Lineups
@@ -47,13 +46,13 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                     <Tabs.Tab 
                         value={matchDetails.homeTeam}
                         styles={{
-                            root: {
+                            tab: {
                                 borderBottom: '2px solid transparent',
                                 '&[data-active]': {
                                     borderBottomColor: 'var(--modern-lime)',
                                 }
                             },
-                            label: {
+                            tabLabel: {
                                 color: 'var(--modern-white)',
                                 '&[data-active]': {
                                     color: 'var(--modern-lime)',
@@ -61,20 +60,20 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             }
                         }}
                     >
-                        <Text size={{ base: 'xs', sm: 'sm' }} style={{ wordBreak: 'break-word' }}>
+                        <Text size="sm" style={{ wordBreak: 'break-word', fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>
                             {matchDetails.homeTeam}
                         </Text>
                     </Tabs.Tab>
                     <Tabs.Tab 
                         value={matchDetails.awayTeam}
                         styles={{
-                            root: {
+                            tab: {
                                 borderBottom: '2px solid transparent',
                                 '&[data-active]': {
                                     borderBottomColor: 'var(--modern-lime)',
                                 }
                             },
-                            label: {
+                            tabLabel: {
                                 color: 'var(--modern-white)',
                                 '&[data-active]': {
                                     color: 'var(--modern-lime)',
@@ -82,7 +81,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             }
                         }}
                     >
-                        <Text size={{ base: 'xs', sm: 'sm' }} style={{ wordBreak: 'break-word' }}>
+                        <Text size="sm" style={{ wordBreak: 'break-word', fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>
                             {matchDetails.awayTeam}
                         </Text>
                     </Tabs.Tab>
@@ -139,7 +138,7 @@ interface SubstitutesListProps {
 function SubstitutesList({ substitutes }: SubstitutesListProps) {
     return (
         <Box mt="xl">
-            <Title size="sm" fw={500} mb="md" align="center" style={{ color: 'var(--modern-white)' }}>Substitutes</Title>
+            <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-white)' }}>Substitutes</Title>
             <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
                 {substitutes ? substitutes.map(substitute => (
                     <Text key={substitute.id} size="sm" style={{ color: 'var(--modern-gray)', margin: '0.25rem' }}>

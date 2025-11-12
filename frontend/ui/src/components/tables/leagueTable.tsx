@@ -33,14 +33,14 @@ function PositionChangeIcon({ position, previousPosition }: { position: number; 
     return <IconMinus color="gray" size={16} />;
 }
 
-function Th({ children, sortKey, sortBy, reversed, onSort }: { children: React.ReactNode; sortKey: keyof Team; sortBy: keyof Team | null; reversed: boolean; onSort: (key: keyof Team) => void }) {
+function Th({ children, sortKey, sortBy, reversed, onSort, style }: { children: React.ReactNode; sortKey: keyof Team; sortBy: keyof Team | null; reversed: boolean; onSort: (key: keyof Team) => void; style?: React.CSSProperties }) {
     const isSorted = sortBy === sortKey;
     const Icon = isSorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
     return (
-        <Table.Th>
+        <Table.Th style={style}>
             <UnstyledButton onClick={() => onSort(sortKey)}>
                 <Group justify="space-between">
-                    <Text fw={500} fz="sm">
+                    <Text fw={500} fz="sm" style={style}>
                         {children}
                     </Text>
                     <Center>

@@ -111,7 +111,7 @@ export function CompetitionPage() {
     if (loading || !competition) {
         return (
             <Container size="md" my="xl" pos="relative">
-                <LoadingOverlay visible overlayBlur={2} />
+                <LoadingOverlay visible />
             </Container>
         );
     }
@@ -127,7 +127,6 @@ export function CompetitionPage() {
                     alt={`${competition.name} logo`}
                     fit="contain"
                     height={100}
-                    withPlaceholder
                     mb="xl"
                 />
             )}
@@ -143,15 +142,15 @@ export function CompetitionPage() {
                     {news.length === 0 ? (
                         <Text>No news available.</Text>
                     ) : (
-                        <SimpleGrid cols={1} spacing="md">
+                        <SimpleGrid cols={1} style={{ gap: 'var(--mantine-spacing-md)' }}>
                             {news.map((item) => (
                                 <Card key={item.id} shadow="sm" padding="lg" radius="md" withBorder>
                                     {item.imageUrl && (
                                         <Card.Section>
-                                            <Image src={item.imageUrl} alt={item.title} height={160} withPlaceholder />
+                                            <Image src={item.imageUrl} alt={item.title} height={160} />
                                         </Card.Section>
                                     )}
-                                    <Text weight={500} size="lg" mt="md">
+                                    <Text fw={500} size="lg" mt="md">
                                         {item.title}
                                     </Text>
                                     <Text size="sm" color="dimmed" mt="xs">
@@ -180,10 +179,10 @@ export function CompetitionPage() {
                                 <Title order={3} mb="md">
                                     {new Date(date).toLocaleDateString()}
                                 </Title>
-                                <SimpleGrid cols={1} spacing="md">
+                                <SimpleGrid cols={1} style={{ gap: 'var(--mantine-spacing-md)' }}>
                                     {groupedFixtures[date].map((fix) => (
                                         <Card key={fix.id} shadow="sm" padding="md" radius="md" withBorder>
-                                            <Text weight={500}>
+                                            <Text fw={500}>
                                                 {fix.homeTeam} vs {fix.awayTeam}
                                             </Text>
                                             <Text size="sm" color="dimmed">{fix.date}</Text>

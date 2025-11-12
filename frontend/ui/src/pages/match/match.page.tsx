@@ -238,10 +238,10 @@ export function MatchPage() {
                     }}
                 />
 
-                <Stack spacing={{base: 'md', sm: 'lg'}} align="center" style={{position: 'relative', zIndex: 1}}>
+                <Stack gap="lg" align="center" style={{position: 'relative', zIndex: 1}}>
                     {/* Competition/Event Badge */}
                     <Badge
-                        size={{base: 'md', sm: 'lg'}}
+                        size="lg"
                         variant="outline"
                         style={{
                             borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -257,10 +257,10 @@ export function MatchPage() {
                     </Badge>
 
                     {/* Date and Time */}
-                    <Stack spacing={4} align="center">
+                    <Stack gap={4} align="center">
                         <Text
                             size="xl"
-                            weight={900}
+                            fw={900}
                             style={{
                                 color: 'var(--modern-white)',
                                 textTransform: 'uppercase',
@@ -276,7 +276,7 @@ export function MatchPage() {
                         </Text>
                         <Text
                             size="md"
-                            weight={600}
+                            fw={600}
                             style={{
                                 color: 'var(--modern-white)',
                                 fontSize: '1.25rem',
@@ -292,14 +292,14 @@ export function MatchPage() {
 
                     {/* Teams */}
                     <Group
-                        position="apart"
+                        justify="space-between"
                         style={{width: '100%', maxWidth: '700px'}}
                         align="flex-end"
                         wrap="nowrap"
-                        gap={{base: 'xs', sm: 'md'}}
+                        gap="md"
                     >
                         {/* Home Team */}
-                        <Stack spacing="sm" align="center" style={{flex: 1, minWidth: 0}}>
+                        <Stack gap="sm" align="center" style={{flex: 1, minWidth: 0}}>
                             <Box
                                 onClick={() => matchDetails.homeTeamId && navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
                                 style={{
@@ -337,17 +337,18 @@ export function MatchPage() {
                                 />
                             </Box>
                             <Text
-                                size={{base: 'xs', sm: 'md'}}
+                                size="md"
                                 fw={700}
                                 style={{
                                     color: 'var(--modern-white)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
+                                    fontSize: 'clamp(0.75rem, 2vw, 1rem)',
                                 }}
                             >
                                 {matchDetails.homeTeam}
                             </Text>
-                            <Group spacing={4} gap={4}>
+                            <Group gap={4}>
                                 {homeForm.map((result, i) => (
                                     <Badge
                                         key={i}
@@ -372,19 +373,20 @@ export function MatchPage() {
                         </Stack>
 
                         {/* Center VS block */}
-                        <Stack spacing="xs" align="center" style={{padding: '0 clamp(0.5rem, 2vw, 1.5rem)'}}>
+                        <Stack gap="xs" align="center" style={{padding: '0 clamp(0.5rem, 2vw, 1.5rem)'}}>
                             <Text
-                                size={{base: 'md', sm: 'xl'}}
+                                size="xl"
                                 fw={900}
                                 style={{
                                     color: 'var(--modern-lime)',
+                                    fontSize: 'clamp(1rem, 3vw, 1.5rem)',
                                 }}
                             >
                                 VS
                             </Text>
                             <ModernButton
                                 variant="primary"
-                                size={{base: 'xs', sm: 'sm'}}
+                                size="sm"
                                 onClick={handleViewTickets}
                             >
                                 View Tickets
@@ -392,7 +394,7 @@ export function MatchPage() {
                         </Stack>
 
                         {/* Away Team */}
-                        <Stack spacing="sm" align="center" style={{flex: 1, minWidth: 0}}>
+                        <Stack gap="sm" align="center" style={{flex: 1, minWidth: 0}}>
                             <Box
                                 onClick={() => matchDetails.awayTeamId && navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
                                 style={{
@@ -430,17 +432,18 @@ export function MatchPage() {
                                 />
                             </Box>
                             <Text
-                                size={{base: 'xs', sm: 'md'}}
+                                size="md"
                                 fw={700}
                                 style={{
                                     color: 'var(--modern-white)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
+                                    fontSize: 'clamp(0.75rem, 2vw, 1rem)',
                                 }}
                             >
                                 {matchDetails.awayTeam}
                             </Text>
-                            <Group spacing={4} gap={4}>
+                            <Group gap={4}>
                                 {awayForm.map((result, i) => (
                                     <Badge
                                         key={i}
