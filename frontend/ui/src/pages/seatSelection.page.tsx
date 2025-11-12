@@ -60,6 +60,8 @@ export function SeatSelectionPage() {
     const matchDetails = routerLocation.state || {
         homeTeam: 'Inter Milan',
         awayTeam: 'AC Milan',
+        homeTeamId: 3,
+        awayTeamId: 4,
         homeTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/Inter-Milan-Logo.png',
         awayTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/AC-Milan-Logo.png',
         date: '2025-01-25T18:00:00',
@@ -331,6 +333,7 @@ export function SeatSelectionPage() {
                             {/* Home Team */}
                             <Stack spacing="sm" align="center" style={{ flex: 1 }}>
                                 <Box
+                                    onClick={() => matchDetails.homeTeamId && navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
                                     style={{
                                         width: 80,
                                         height: 80,
@@ -341,6 +344,20 @@ export function SeatSelectionPage() {
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         backgroundColor: 'var(--modern-black)',
+                                        cursor: matchDetails.homeTeamId ? 'pointer' : 'default',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (matchDetails.homeTeamId) {
+                                            e.currentTarget.style.borderColor = 'var(--modern-lime)';
+                                            e.currentTarget.style.transform = 'scale(1.05)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (matchDetails.homeTeamId) {
+                                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                            e.currentTarget.style.transform = 'scale(1)';
+                                        }
                                     }}
                                 >
                                     <Image
@@ -378,6 +395,7 @@ export function SeatSelectionPage() {
                             {/* Away Team */}
                             <Stack spacing="sm" align="center" style={{ flex: 1 }}>
                                 <Box
+                                    onClick={() => matchDetails.awayTeamId && navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
                                     style={{
                                         width: 80,
                                         height: 80,
@@ -388,6 +406,20 @@ export function SeatSelectionPage() {
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         backgroundColor: 'var(--modern-black)',
+                                        cursor: matchDetails.awayTeamId ? 'pointer' : 'default',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (matchDetails.awayTeamId) {
+                                            e.currentTarget.style.borderColor = 'var(--modern-lime)';
+                                            e.currentTarget.style.transform = 'scale(1.05)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (matchDetails.awayTeamId) {
+                                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                            e.currentTarget.style.transform = 'scale(1)';
+                                        }
                                     }}
                                 >
                                     <Image

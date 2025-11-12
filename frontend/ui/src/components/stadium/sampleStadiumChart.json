@@ -1,0 +1,380 @@
+{
+  "name": "San Siro Stadium - Test Chart",
+  "venueType": "STADIUM",
+  "categories": [
+    {
+      "key": 1,
+      "label": "Category 1 - Premium",
+      "color": "#1e3a8a",
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "key": 2,
+      "label": "Category 2 - Upper Premium",
+      "color": "#1e40af",
+      "pricing": {
+        "price": 420.75
+      }
+    },
+    {
+      "key": 3,
+      "label": "Category 3 - Standard",
+      "color": "#3b82f6",
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "key": 4,
+      "label": "Category 4 - Economy",
+      "color": "#60a5fa",
+      "pricing": {
+        "price": 245.50
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "tribuna",
+      "label": "TRIBUNA",
+      "x": 50,
+      "y": 50,
+      "width": 300,
+      "height": 500
+    },
+    {
+      "id": "stampa",
+      "label": "STAMPA",
+      "x": 450,
+      "y": 50,
+      "width": 300,
+      "height": 500
+    }
+  ],
+  "objects": [
+    {
+      "id": "101",
+      "label": "101",
+      "type": "section",
+      "category": 1,
+      "x": 150,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "102",
+      "label": "102",
+      "type": "section",
+      "category": 1,
+      "x": 200,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "103",
+      "label": "103",
+      "type": "section",
+      "category": 1,
+      "x": 250,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "104",
+      "label": "104",
+      "type": "section",
+      "category": 1,
+      "x": 300,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "105",
+      "label": "105",
+      "type": "section",
+      "category": 1,
+      "x": 350,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "106",
+      "label": "106",
+      "type": "section",
+      "category": 1,
+      "x": 400,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "107",
+      "label": "107",
+      "type": "section",
+      "category": 1,
+      "x": 450,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "108",
+      "label": "108",
+      "type": "section",
+      "category": 1,
+      "x": 500,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "109",
+      "label": "109",
+      "type": "section",
+      "category": 1,
+      "x": 550,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "110",
+      "label": "110",
+      "type": "section",
+      "category": 1,
+      "x": 600,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "111",
+      "label": "111",
+      "type": "section",
+      "category": 1,
+      "x": 150,
+      "y": 420,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "112",
+      "label": "112",
+      "type": "section",
+      "category": 1,
+      "x": 200,
+      "y": 420,
+      "width": 40,
+      "height": 30,
+      "pricing": {
+        "price": 485.00
+      }
+    },
+    {
+      "id": "201",
+      "label": "201",
+      "type": "section",
+      "category": 2,
+      "x": 150,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 420.75
+      }
+    },
+    {
+      "id": "218",
+      "label": "218",
+      "type": "section",
+      "category": 3,
+      "x": 250,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "219",
+      "label": "219",
+      "type": "section",
+      "category": 3,
+      "x": 300,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "220",
+      "label": "220",
+      "type": "section",
+      "category": 3,
+      "x": 350,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "241",
+      "label": "241",
+      "type": "section",
+      "category": 3,
+      "x": 450,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "242",
+      "label": "242",
+      "type": "section",
+      "category": 3,
+      "x": 500,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "276",
+      "label": "276",
+      "type": "section",
+      "category": 2,
+      "x": 600,
+      "y": 250,
+      "width": 35,
+      "height": 25,
+      "pricing": {
+        "price": 420.75
+      }
+    },
+    {
+      "id": "315",
+      "label": "315",
+      "type": "section",
+      "category": 3,
+      "x": 200,
+      "y": 150,
+      "width": 30,
+      "height": 20,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "320",
+      "label": "320",
+      "type": "section",
+      "category": 3,
+      "x": 300,
+      "y": 150,
+      "width": 30,
+      "height": 20,
+      "pricing": {
+        "price": 374.33
+      }
+    },
+    {
+      "id": "327",
+      "label": "327",
+      "type": "section",
+      "category": 4,
+      "x": 400,
+      "y": 150,
+      "width": 30,
+      "height": 20,
+      "pricing": {
+        "price": 245.50
+      }
+    },
+    {
+      "id": "334",
+      "label": "334",
+      "type": "section",
+      "category": 4,
+      "x": 500,
+      "y": 150,
+      "width": 30,
+      "height": 20,
+      "pricing": {
+        "price": 231.23
+      }
+    },
+    {
+      "id": "345",
+      "label": "345",
+      "type": "section",
+      "category": 3,
+      "x": 550,
+      "y": 150,
+      "width": 30,
+      "height": 20,
+      "pricing": {
+        "price": 374.33
+      }
+    }
+  ],
+  "pitch": {
+    "x": 200,
+    "y": 200,
+    "width": 400,
+    "height": 200,
+    "fill": "#00a651",
+    "stroke": "#ffffff",
+    "strokeWidth": 2
+  }
+}
+

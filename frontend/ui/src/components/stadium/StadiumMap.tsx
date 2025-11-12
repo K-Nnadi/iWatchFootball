@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Box, Group, Button, Radio } from '@mantine/core';
+import { SeatsioSeatingChart } from '@seatsio/seatsio-react';
 import './StadiumMap.css';
 
 interface StadiumSection {
@@ -16,19 +17,43 @@ interface StadiumSection {
 }
 
 interface StadiumMapProps {
-    sections: StadiumSection[];
+    // Legacy props for custom SVG implementation
+    sections?: StadiumSection[];
     onSectionClick?: (sectionId: string) => void;
     selectedSectionId?: string;
     viewMode?: 'zone' | 'block';
     onViewModeChange?: (mode: 'zone' | 'block') => void;
+    
+    // New props for Seats.io integration
+    /** Seats.io workspace key (public key) */
+    seatsioWorkspaceKey?: string;
+    /** Seats.io event key */
+    seatsioEventKey?: string;
+    /** Seats.io region (e.g., 'eu', 'us', 'sg') */
+    seatsioRegion?: string;
+    /** JSON configuration for the seating chart (can be stored in DB) */
+    seatsioChartJson?: any;
+    /** Callback when a seat/object is selected in Seats.io */
+    onSeatsioObjectSelected?: (object: any) => void;
+    /** Callback when a seat/object is deselected in Seats.io */
+    onSeatsioObjectDeselected?: (object: any) => void;
+    /** Use Seats.io instead of custom SVG implementation */
+    useSeatsio?: boolean;
 }
 
 export const StadiumMap: React.FC<StadiumMapProps> = ({
-    sections,
+    sections = [],
     onSectionClick,
     selectedSectionId,
     viewMode = 'zone',
     onViewModeChange,
+    seatsioWorkspaceKey,
+    seatsioEventKey,
+    seatsioRegion = 'eu',
+    seatsioChartJson,
+    onSeatsioObjectSelected,
+    onSeatsioObjectDeselected,
+    useSeatsio = false,
 }) => {
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -36,6 +61,9 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    
+    // Determine if we should use Seats.io
+    const shouldUseSeatsio = useSeatsio && (seatsioWorkspaceKey || seatsioChartJson);
 
     const handleZoomIn = () => {
         setZoom((prev) => Math.min(prev + 0.2, 3));
@@ -80,18 +108,75 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
         return '#93c5fd';
     };
 
+    // Seats.io event handlers
+    const handleSeatsioObjectSelected = (object: any) => {
+        onSeatsioObjectSelected?.(object);
+        // Also call legacy handler if provided
+        if (object.label) {
+            onSectionClick?.(object.label);
+        }
+    };
+
+    const handleSeatsioObjectDeselected = (object: any) => {
+        onSeatsioObjectDeselected?.(object);
+    };
+
+    // Render Seats.io seating chart
+    if (shouldUseSeatsio) {
+        return (
+            <Box className="stadium-map-container" ref={containerRef}>
+                <Group position="apart" mb="md">
+                    {onViewModeChange && (
+                        <Radio.Group
+                            value={viewMode}
+                            onChange={(value) => onViewModeChange?.(value as 'zone' | 'block')}
+                        >
+                            <Group>
+                                <Radio value="zone" label="Tickets by Zone" />
+                                <Radio value="block" label="Tickets by Block" />
+                            </Group>
+                        </Radio.Group>
+                    )}
+                </Group>
+
+                <Box
+                    className="stadium-map-wrapper"
+                    style={{ height: '600px', minHeight: '500px' }}
+                >
+                    <SeatsioSeatingChart
+                        workspaceKey={seatsioWorkspaceKey}
+                        event={seatsioEventKey}
+                        region={seatsioRegion}
+                        chart={seatsioChartJson}
+                        onObjectSelected={handleSeatsioObjectSelected}
+                        onObjectDeselected={handleSeatsioObjectDeselected}
+                        pricing={undefined}
+                        priceFormatter={(price: number) => `£${price.toFixed(2)}`}
+                        showLegend={true}
+                        showMinimap={true}
+                        showFullScreenButton={true}
+                        language="en"
+                    />
+                </Box>
+            </Box>
+        );
+    }
+
+    // Render custom SVG implementation (legacy)
     return (
         <Box className="stadium-map-container" ref={containerRef}>
             <Group position="apart" mb="md">
-                <Radio.Group
-                    value={viewMode}
-                    onChange={(value) => onViewModeChange?.(value as 'zone' | 'block')}
-                >
-                    <Group>
-                        <Radio value="zone" label="Tickets by Zone" />
-                        <Radio value="block" label="Tickets by Block" />
-                    </Group>
-                </Radio.Group>
+                {onViewModeChange && (
+                    <Radio.Group
+                        value={viewMode}
+                        onChange={(value) => onViewModeChange?.(value as 'zone' | 'block')}
+                    >
+                        <Group>
+                            <Radio value="zone" label="Tickets by Zone" />
+                            <Radio value="block" label="Tickets by Block" />
+                        </Group>
+                    </Radio.Group>
+                )}
                 <Group>
                     <Button size="xs" variant="outline" onClick={handleZoomIn}>
                         +

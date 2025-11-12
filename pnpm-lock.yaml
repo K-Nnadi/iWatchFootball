@@ -288,6 +288,9 @@ importers:
       '@mantine/notifications':
         specifier: ^7.7.1
         version: 7.17.8(@mantine/core@7.17.8(@mantine/hooks@7.17.8(react@18.2.0))(@types/react@18.2.66)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@mantine/hooks@7.17.8(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@seatsio/seatsio-react':
+        specifier: ^15.17.0
+        version: 15.17.0(react@18.2.0)
       '@tabler/icons-react':
         specifier: ^3.2.0
         version: 3.2.0(react@18.2.0)
@@ -1759,6 +1762,14 @@ packages:
 
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
+
+  '@seatsio/seatsio-react@15.17.0':
+    resolution: {integrity: sha512-L53wg59Yy1zfmx2SzYV6NexGqsS66Yen3LVmDO1Qi2LjyXp1VFotRnGZYDUNSgUAGS8zZdrg2IQ0/B5YyYorTA==}
+    peerDependencies:
+      react: '>=18.0.0'
+
+  '@seatsio/seatsio-types@6.4.0':
+    resolution: {integrity: sha512-+2lg2M9qG7D1AjQ67jAJVPyKsgNdc0nEXf8aRsYYBE4ibhgwb9r6VACq8pslvmK7J8sQoP8Exv/QBb3s1BS5Ng==}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -7449,6 +7460,13 @@ snapshots:
     optional: true
 
   '@scarf/scarf@1.4.0': {}
+
+  '@seatsio/seatsio-react@15.17.0(react@18.2.0)':
+    dependencies:
+      '@seatsio/seatsio-types': 6.4.0
+      react: 18.2.0
+
+  '@seatsio/seatsio-types@6.4.0': {}
 
   '@sinclair/typebox@0.27.8': {}
 

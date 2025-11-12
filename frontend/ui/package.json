@@ -20,6 +20,7 @@
     "@mantine/hooks": "^7.7.1",
     "@mantine/modals": "^7.7.1",
     "@mantine/notifications": "^7.7.1",
+    "@seatsio/seatsio-react": "^15.17.0",
     "@tabler/icons-react": "^3.2.0",
     "@tanstack/react-query": "^5.32.0",
     "@tanstack/react-query-devtools": "^5.32.0",

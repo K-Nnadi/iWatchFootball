@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import {useState, useEffect, useMemo} from 'react';
 import {
     Container,
     Title,
@@ -12,10 +12,10 @@ import {
     Stack,
     Image,
 } from '@mantine/core';
-import { useLocation, useParams } from 'react-router-dom';
-import { usePageTransition } from '../../hooks/usePageTransition';
-import { ModernButton } from '../../components/modern';
-import { ScorePredictionCard } from '../../components/predictions';
+import {useLocation, useParams} from 'react-router-dom';
+import {usePageTransition} from '../../hooks/usePageTransition';
+import {ModernButton} from '../../components/modern';
+import {ScorePredictionCard} from '../../components/predictions';
 import TeamLineups from "./teamLineup";
 
 export interface Player {
@@ -35,6 +35,8 @@ export interface MatchDetails {
     matchId: string;
     homeTeam: string;
     awayTeam: string;
+    homeTeamId?: number;
+    awayTeamId?: number;
     date: string;
     venue: string;
     competition?: string;
@@ -64,26 +66,28 @@ function getMatchStatus(matchDateStr: string): 'past' | 'today' | 'future' {
 }
 
 /** Mock function returning last 5 games form for a team. (W, D, L) */
-function getTeamForm(teamName: string): ('W'|'D'|'L')[] {
+function getTeamForm(teamName: string): ('W' | 'D' | 'L')[] {
     const outcomes = ['W', 'D', 'L'];
-    const form: ('W'|'D'|'L')[] = [];
+    const form: ('W' | 'D' | 'L')[] = [];
     for (let i = 0; i < 5; i++) {
         const rand = Math.floor(Math.random() * outcomes.length);
-        form.push(outcomes[rand] as 'W'|'D'|'L');
+        form.push(outcomes[rand] as 'W' | 'D' | 'L');
     }
     return form;
 }
 
 export function MatchPage() {
-    const { matchId } = useParams<{ matchId: string }>();
+    const {matchId} = useParams<{ matchId: string }>();
     const location = useLocation();
-    const { navigateWithTransition } = usePageTransition();
+    const {navigateWithTransition} = usePageTransition();
 
     // Mock match data
     const mockMatchDetails: MatchDetails = {
         matchId: matchId || '1',
         homeTeam: 'Liverpool',
         awayTeam: 'Manchester City',
+        homeTeamId: 1,
+        awayTeamId: 2,
         date: '2025-01-24T15:00:00Z', // Set to tomorrow for testing
         venue: 'Anfield',
         competition: 'Premier League',
@@ -92,79 +96,79 @@ export function MatchPage() {
         homeLineup: {
             formation: '4-3-3',
             players: [
-                { id: 'h1', name: 'Alisson', number: 1, position: 'GK' },
-                { id: 'h2', name: 'Alexander-Arnold', number: 66, position: 'DF' },
-                { id: 'h3', name: 'Van Dijk', number: 4, position: 'DF' },
-                { id: 'h4', name: 'Konate', number: 5, position: 'DF' },
-                { id: 'h5', name: 'Robertson', number: 26, position: 'DF' },
-                { id: 'h6', name: 'Mac Allister', number: 7, position: 'MF' },
-                { id: 'h7', name: 'Szoboszlai', number: 8, position: 'MF' },
-                { id: 'h8', name: 'Jones', number: 17, position: 'MF' },
-                { id: 'h9', name: 'Salah', number: 11, position: 'FW' },
-                { id: 'h10', name: 'Nunez', number: 27, position: 'FW' },
-                { id: 'h11', name: 'Diaz', number: 23, position: 'FW' }
+                {id: 'h1', name: 'Alisson', number: 1, position: 'GK'},
+                {id: 'h2', name: 'Alexander-Arnold', number: 66, position: 'DF'},
+                {id: 'h3', name: 'Van Dijk', number: 4, position: 'DF'},
+                {id: 'h4', name: 'Konate', number: 5, position: 'DF'},
+                {id: 'h5', name: 'Robertson', number: 26, position: 'DF'},
+                {id: 'h6', name: 'Mac Allister', number: 7, position: 'MF'},
+                {id: 'h7', name: 'Szoboszlai', number: 8, position: 'MF'},
+                {id: 'h8', name: 'Jones', number: 17, position: 'MF'},
+                {id: 'h9', name: 'Salah', number: 11, position: 'FW'},
+                {id: 'h10', name: 'Nunez', number: 27, position: 'FW'},
+                {id: 'h11', name: 'Diaz', number: 23, position: 'FW'}
             ],
             substitutes: [
-                { id: 'hs1', name: 'Kelleher', number: 62, position: 'GK' },
-                { id: 'hs2', name: 'Gomez', number: 12, position: 'DF' },
-                { id: 'hs3', name: 'Endo', number: 6, position: 'MF' },
-                { id: 'hs4', name: 'Elliott', number: 67, position: 'MF' },
-                { id: 'hs5', name: 'Gakpo', number: 18, position: 'FW' }
+                {id: 'hs1', name: 'Kelleher', number: 62, position: 'GK'},
+                {id: 'hs2', name: 'Gomez', number: 12, position: 'DF'},
+                {id: 'hs3', name: 'Endo', number: 6, position: 'MF'},
+                {id: 'hs4', name: 'Elliott', number: 67, position: 'MF'},
+                {id: 'hs5', name: 'Gakpo', number: 18, position: 'FW'}
             ]
         },
         awayLineup: {
             formation: '4-2-3-1',
             players: [
-                { id: 'a1', name: 'Ederson', number: 31, position: 'GK' },
-                { id: 'a2', name: 'Walker', number: 2, position: 'DF' },
-                { id: 'a3', name: 'Dias', number: 3, position: 'DF' },
-                { id: 'a4', name: 'Stones', number: 5, position: 'DF' },
-                { id: 'a5', name: 'Ake', number: 6, position: 'DF' },
-                { id: 'a6', name: 'Rodri', number: 16, position: 'MF' },
-                { id: 'a7', name: 'De Bruyne', number: 17, position: 'MF' },
-                { id: 'a8', name: 'Bernardo', number: 20, position: 'MF' },
-                { id: 'a9', name: 'Foden', number: 47, position: 'MF' },
-                { id: 'a10', name: 'Grealish', number: 10, position: 'MF' },
-                { id: 'a11', name: 'Haaland', number: 9, position: 'FW' }
+                {id: 'a1', name: 'Ederson', number: 31, position: 'GK'},
+                {id: 'a2', name: 'Walker', number: 2, position: 'DF'},
+                {id: 'a3', name: 'Dias', number: 3, position: 'DF'},
+                {id: 'a4', name: 'Stones', number: 5, position: 'DF'},
+                {id: 'a5', name: 'Ake', number: 6, position: 'DF'},
+                {id: 'a6', name: 'Rodri', number: 16, position: 'MF'},
+                {id: 'a7', name: 'De Bruyne', number: 17, position: 'MF'},
+                {id: 'a8', name: 'Bernardo', number: 20, position: 'MF'},
+                {id: 'a9', name: 'Foden', number: 47, position: 'MF'},
+                {id: 'a10', name: 'Grealish', number: 10, position: 'MF'},
+                {id: 'a11', name: 'Haaland', number: 9, position: 'FW'}
             ],
             substitutes: [
-                { id: 'as1', name: 'Ortega', number: 33, position: 'GK' },
-                { id: 'as2', name: 'Akanji', number: 25, position: 'DF' },
-                { id: 'as3', name: 'Kovacic', number: 8, position: 'MF' },
-                { id: 'as4', name: 'Doku', number: 11, position: 'FW' },
-                { id: 'as5', name: 'Alvarez', number: 15, position: 'FW' }
+                {id: 'as1', name: 'Ortega', number: 33, position: 'GK'},
+                {id: 'as2', name: 'Akanji', number: 25, position: 'DF'},
+                {id: 'as3', name: 'Kovacic', number: 8, position: 'MF'},
+                {id: 'as4', name: 'Doku', number: 11, position: 'FW'},
+                {id: 'as5', name: 'Alvarez', number: 15, position: 'FW'}
             ]
         },
         homePredictedLineup: {
             formation: '4-3-3',
             players: [
-                { id: 'hp1', name: 'Alisson', number: 1, position: 'GK' },
-                { id: 'hp2', name: 'Alexander-Arnold', number: 66, position: 'DF' },
-                { id: 'hp3', name: 'Van Dijk', number: 4, position: 'DF' },
-                { id: 'hp4', name: 'Konate', number: 5, position: 'DF' },
-                { id: 'hp5', name: 'Robertson', number: 26, position: 'DF' },
-                { id: 'hp6', name: 'Mac Allister', number: 7, position: 'MF' },
-                { id: 'hp7', name: 'Szoboszlai', number: 8, position: 'MF' },
-                { id: 'hp8', name: 'Jones', number: 17, position: 'MF' },
-                { id: 'hp9', name: 'Salah', number: 11, position: 'FW' },
-                { id: 'hp10', name: 'Nunez', number: 27, position: 'FW' },
-                { id: 'hp11', name: 'Diaz', number: 23, position: 'FW' }
+                {id: 'hp1', name: 'Alisson', number: 1, position: 'GK'},
+                {id: 'hp2', name: 'Alexander-Arnold', number: 66, position: 'DF'},
+                {id: 'hp3', name: 'Van Dijk', number: 4, position: 'DF'},
+                {id: 'hp4', name: 'Konate', number: 5, position: 'DF'},
+                {id: 'hp5', name: 'Robertson', number: 26, position: 'DF'},
+                {id: 'hp6', name: 'Mac Allister', number: 7, position: 'MF'},
+                {id: 'hp7', name: 'Szoboszlai', number: 8, position: 'MF'},
+                {id: 'hp8', name: 'Jones', number: 17, position: 'MF'},
+                {id: 'hp9', name: 'Salah', number: 11, position: 'FW'},
+                {id: 'hp10', name: 'Nunez', number: 27, position: 'FW'},
+                {id: 'hp11', name: 'Diaz', number: 23, position: 'FW'}
             ]
         },
         awayPredictedLineup: {
             formation: '4-2-3-1',
             players: [
-                { id: 'ap1', name: 'Ederson', number: 31, position: 'GK' },
-                { id: 'ap2', name: 'Walker', number: 2, position: 'DF' },
-                { id: 'ap3', name: 'Dias', number: 3, position: 'DF' },
-                { id: 'ap4', name: 'Stones', number: 5, position: 'DF' },
-                { id: 'ap5', name: 'Ake', number: 6, position: 'DF' },
-                { id: 'ap6', name: 'Rodri', number: 16, position: 'MF' },
-                { id: 'ap7', name: 'De Bruyne', number: 17, position: 'MF' },
-                { id: 'ap8', name: 'Bernardo', number: 20, position: 'MF' },
-                { id: 'ap9', name: 'Foden', number: 47, position: 'MF' },
-                { id: 'ap10', name: 'Grealish', number: 10, position: 'MF' },
-                { id: 'ap11', name: 'Haaland', number: 9, position: 'FW' }
+                {id: 'ap1', name: 'Ederson', number: 31, position: 'GK'},
+                {id: 'ap2', name: 'Walker', number: 2, position: 'DF'},
+                {id: 'ap3', name: 'Dias', number: 3, position: 'DF'},
+                {id: 'ap4', name: 'Stones', number: 5, position: 'DF'},
+                {id: 'ap5', name: 'Ake', number: 6, position: 'DF'},
+                {id: 'ap6', name: 'Rodri', number: 16, position: 'MF'},
+                {id: 'ap7', name: 'De Bruyne', number: 17, position: 'MF'},
+                {id: 'ap8', name: 'Bernardo', number: 20, position: 'MF'},
+                {id: 'ap9', name: 'Foden', number: 47, position: 'MF'},
+                {id: 'ap10', name: 'Grealish', number: 10, position: 'MF'},
+                {id: 'ap11', name: 'Haaland', number: 9, position: 'FW'}
             ]
         }
     };
@@ -178,15 +182,16 @@ export function MatchPage() {
     const awayForm = useMemo(() => getTeamForm(matchDetails.awayTeam), [matchDetails.awayTeam]);
 
 
-
     function handleViewTickets() {
         // Navigate to seat selection or ticket purchase page
-        navigateWithTransition(`/seat-selection/${matchDetails.matchId}`, { 
-            transitionType: 'loading', 
+        navigateWithTransition(`/seat-selection/${matchDetails.matchId}`, {
+            transitionType: 'loading',
             duration: 1200,
             state: {
                 homeTeam: matchDetails.homeTeam,
                 awayTeam: matchDetails.awayTeam,
+                homeTeamId: matchDetails.homeTeamId,
+                awayTeamId: matchDetails.awayTeamId,
                 homeTeamLogo: matchDetails.homeTeamLogo,
                 awayTeamLogo: matchDetails.awayTeamLogo,
                 date: matchDetails.date,
@@ -197,13 +202,13 @@ export function MatchPage() {
     }
 
     return (
-        <Container size="xl" py={{ base: 'md', sm: 'xl' }} px={{ base: 'xs', sm: 'md' }}>
+        <Container size="xl" py={{base: 'md', sm: 'xl'}} px={{base: 'xs', sm: 'md'}}>
             {/* Match Header */}
-            <Paper 
-                p={{ base: 'md', sm: 'xl' }}
-                mb={{ base: 'md', sm: 'xl' }}
-                style={{ 
-                    backgroundColor: 'var(--modern-dark-gray)', 
+            <Paper
+                p={{base: 'md', sm: 'xl'}}
+                mb={{base: 'md', sm: 'xl'}}
+                style={{
+                    backgroundColor: 'var(--modern-dark-gray)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     position: 'relative',
                     overflow: 'hidden'
@@ -233,10 +238,10 @@ export function MatchPage() {
                     }}
                 />
 
-                <Stack spacing={{ base: 'md', sm: 'lg' }} align="center" style={{ position: 'relative', zIndex: 1 }}>
+                <Stack spacing={{base: 'md', sm: 'lg'}} align="center" style={{position: 'relative', zIndex: 1}}>
                     {/* Competition/Event Badge */}
                     <Badge
-                        size={{ base: 'md', sm: 'lg' }}
+                        size={{base: 'md', sm: 'lg'}}
                         variant="outline"
                         style={{
                             borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -286,16 +291,17 @@ export function MatchPage() {
                     </Stack>
 
                     {/* Teams */}
-                    <Group 
-                        position="apart" 
-                        style={{ width: '100%', maxWidth: '700px' }} 
+                    <Group
+                        position="apart"
+                        style={{width: '100%', maxWidth: '700px'}}
                         align="flex-end"
                         wrap="nowrap"
-                        gap={{ base: 'xs', sm: 'md' }}
+                        gap={{base: 'xs', sm: 'md'}}
                     >
                         {/* Home Team */}
-                        <Stack spacing="sm" align="center" style={{ flex: 1, minWidth: 0 }}>
+                        <Stack spacing="sm" align="center" style={{flex: 1, minWidth: 0}}>
                             <Box
+                                onClick={() => matchDetails.homeTeamId && navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
                                 style={{
                                     width: 'clamp(50px, 12vw, 80px)',
                                     height: 'clamp(50px, 12vw, 80px)',
@@ -306,6 +312,20 @@ export function MatchPage() {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     backgroundColor: 'var(--modern-black)',
+                                    cursor: matchDetails.homeTeamId ? 'pointer' : 'default',
+                                    transition: 'all 0.2s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (matchDetails.homeTeamId) {
+                                        e.currentTarget.style.borderColor = 'var(--modern-lime)';
+                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (matchDetails.homeTeamId) {
+                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                        e.currentTarget.style.transform = 'scale(1)';
+                                    }
                                 }}
                             >
                                 <Image
@@ -313,11 +333,11 @@ export function MatchPage() {
                                     width="clamp(40px, 10vw, 70px)"
                                     height="clamp(40px, 10vw, 70px)"
                                     fit="contain"
-                                    style={{ borderRadius: '50%' }}
+                                    style={{borderRadius: '50%'}}
                                 />
                             </Box>
                             <Text
-                                size={{ base: 'xs', sm: 'md' }}
+                                size={{base: 'xs', sm: 'md'}}
                                 fw={700}
                                 style={{
                                     color: 'var(--modern-white)',
@@ -337,8 +357,8 @@ export function MatchPage() {
                                                 result === 'W'
                                                     ? '#00ff88'
                                                     : result === 'D'
-                                                    ? '#ffaa00'
-                                                    : '#ff4444',
+                                                        ? '#ffaa00'
+                                                        : '#ff4444',
                                             color: 'var(--modern-black)',
                                             fontWeight: 700,
                                             minWidth: '20px',
@@ -352,9 +372,9 @@ export function MatchPage() {
                         </Stack>
 
                         {/* Center VS block */}
-                        <Stack spacing="xs" align="center" style={{ padding: '0 clamp(0.5rem, 2vw, 1.5rem)' }}>
+                        <Stack spacing="xs" align="center" style={{padding: '0 clamp(0.5rem, 2vw, 1.5rem)'}}>
                             <Text
-                                size={{ base: 'md', sm: 'xl' }}
+                                size={{base: 'md', sm: 'xl'}}
                                 fw={900}
                                 style={{
                                     color: 'var(--modern-lime)',
@@ -364,7 +384,7 @@ export function MatchPage() {
                             </Text>
                             <ModernButton
                                 variant="primary"
-                                size={{ base: 'xs', sm: 'sm' }}
+                                size={{base: 'xs', sm: 'sm'}}
                                 onClick={handleViewTickets}
                             >
                                 View Tickets
@@ -372,8 +392,9 @@ export function MatchPage() {
                         </Stack>
 
                         {/* Away Team */}
-                        <Stack spacing="sm" align="center" style={{ flex: 1, minWidth: 0 }}>
+                        <Stack spacing="sm" align="center" style={{flex: 1, minWidth: 0}}>
                             <Box
+                                onClick={() => matchDetails.awayTeamId && navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
                                 style={{
                                     width: 'clamp(50px, 12vw, 80px)',
                                     height: 'clamp(50px, 12vw, 80px)',
@@ -384,6 +405,20 @@ export function MatchPage() {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     backgroundColor: 'var(--modern-black)',
+                                    cursor: matchDetails.awayTeamId ? 'pointer' : 'default',
+                                    transition: 'all 0.2s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (matchDetails.awayTeamId) {
+                                        e.currentTarget.style.borderColor = 'var(--modern-lime)';
+                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (matchDetails.awayTeamId) {
+                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                        e.currentTarget.style.transform = 'scale(1)';
+                                    }
                                 }}
                             >
                                 <Image
@@ -391,11 +426,11 @@ export function MatchPage() {
                                     width="clamp(40px, 10vw, 70px)"
                                     height="clamp(40px, 10vw, 70px)"
                                     fit="contain"
-                                    style={{ borderRadius: '50%' }}
+                                    style={{borderRadius: '50%'}}
                                 />
                             </Box>
                             <Text
-                                size={{ base: 'xs', sm: 'md' }}
+                                size={{base: 'xs', sm: 'md'}}
                                 fw={700}
                                 style={{
                                     color: 'var(--modern-white)',
@@ -415,8 +450,8 @@ export function MatchPage() {
                                                 result === 'W'
                                                     ? '#00ff88'
                                                     : result === 'D'
-                                                    ? '#ffaa00'
-                                                    : '#ff4444',
+                                                        ? '#ffaa00'
+                                                        : '#ff4444',
                                             color: 'var(--modern-black)',
                                             fontWeight: 700,
                                             minWidth: '20px',
@@ -453,7 +488,7 @@ export function MatchPage() {
             />
 
             {/* Team Lineups */}
-                <TeamLineups matchDetails={matchDetails} status={status} />
+            <TeamLineups matchDetails={matchDetails} status={status}/>
         </Container>
     );
 }

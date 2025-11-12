@@ -1,46 +1,33 @@
 import {
     Box,
-    Button,
     Container,
-    Divider,
-    Group,
-    Paper,
-    Text,
-    TextInput,
     Title,
-    Notification,
-    Stack,
-    Image,
-    Radio,
     SimpleGrid,
-    Badge,
 } from '@mantine/core';
-import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
-import { ModernButton } from '../components/modern';
-
-interface CheckoutTicketDetails {
-    matchId: string;
-    homeTeam: string;
-    awayTeam: string;
-    date: string;
-    venue: string;
-    price: number;
-}
-
-interface PaymentProvider {
-    id: number;
-    name: string;
-    slug: string;
-    type: 'CARD' | 'WALLET' | 'BANK_TRANSFER' | 'CRYPTO';
-    logoUrl?: string;
-}
+import { useAuthStore } from '../shared/stores/auth.store';
+import { AuthenticationStep } from './checkout/AuthenticationStep';
+import { DetailsStep } from './checkout/DetailsStep';
+import { AdditionalInfoStep } from './checkout/AdditionalInfoStep';
+import { PaymentStep } from './checkout/PaymentStep';
+import { OrderSummary } from './checkout/OrderSummary';
+import { ReservationTimer } from './checkout/ReservationTimer';
+import { CheckoutStepper } from './checkout/CheckoutStepper';
+import {
+    CheckoutTicketDetails,
+    PaymentProvider,
+    UserDetails,
+    AdditionalInfo,
+    PaymentInfo,
+    CheckoutErrors,
+} from './checkout/types';
 
 export function CheckoutPage() {
     const location = useLocation();
     const { navigateWithTransition } = usePageTransition();
+    const { isLoggedIn } = useAuthStore();
     const ticketDetails: CheckoutTicketDetails = location.state || {
         matchId: 'unknown',
         homeTeam: 'Team A',
@@ -48,6 +35,22 @@ export function CheckoutPage() {
         date: '2023-12-25T18:00:00',
         venue: 'Stadium X',
         price: 50,
+    };
+
+    // Use normalized step indices: 0=Auth, 1=Details, 2=Additional, 3=Payment
+    // When logged in, we skip step 0 (auth) but keep the same internal numbering
+    const [activeStep, setActiveStep] = useState(isLoggedIn ? 1 : 0);
+    const [isGuestCheckout, setIsGuestCheckout] = useState(false);
+    
+    // Handle stepper click - convert stepper step back to internal step
+    const handleStepperClick = (stepperStep: number) => {
+        if (isLoggedIn) {
+            // Convert stepper step (0,1,2) to internal step (1,2,3)
+            setActiveStep(stepperStep + 1);
+        } else {
+            // Steps match directly
+            setActiveStep(stepperStep);
+        }
     };
 
     const [paymentProviders, setPaymentProviders] = useState<PaymentProvider[]>([]);
@@ -86,21 +89,31 @@ export function CheckoutPage() {
         }, 500);
     }, []);
 
-    if (!location.state) {
-        console.error('No ticket details provided. Redirecting to matches page.');
-        navigateWithTransition('/matches');
-        return null;
-    }
-
-    const [paymentInfo, setPaymentInfo] = useState({
-        name: '',
-        cardNumber: '',
-        expiration: '',
-        cvv: '',
-        email: '', // For PayPal
+    // Step 1: Your Details
+    const [userDetails, setUserDetails] = useState<UserDetails>({
+        email: '',
+        confirmEmail: '',
+        phone: '',
+        phoneCountryCode: '+44',
+        firstName: '',
+        lastName: '',
+        address: '',
+        addressLine2: '',
+        postcode: '',
+        townCity: '',
+        country: 'United Kingdom',
+        regionState: '',
+        addressType: 'Personal',
     });
 
-    const [errors, setErrors] = useState({
+    // Step 2: Additional Information
+    const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({
+        agreeToTerms: false,
+        agreeToMarketing: false,
+    });
+
+    // Step 3: Payment
+    const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
         name: '',
         cardNumber: '',
         expiration: '',
@@ -108,11 +121,114 @@ export function CheckoutPage() {
         email: '',
     });
 
+    const [errors, setErrors] = useState<CheckoutErrors>({
+        email: '',
+        confirmEmail: '',
+        phone: '',
+        firstName: '',
+        lastName: '',
+        address: '',
+        postcode: '',
+        townCity: '',
+        country: '',
+        name: '',
+        cardNumber: '',
+        expiration: '',
+        cvv: '',
+        agreeToTerms: '',
+    });
+
     const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-    const validate = () => {
+    // Handle login state changes - if user logs in during checkout, skip auth step
+    useEffect(() => {
+        if (isLoggedIn && activeStep === 0 && !isGuestCheckout) {
+            setActiveStep(1);
+        }
+    }, [isLoggedIn, activeStep, isGuestCheckout]);
+
+    if (!location.state) {
+        console.error('No ticket details provided. Redirecting to matches page.');
+        navigateWithTransition('/matches');
+        return null;
+    }
+
+    const validateStep1 = () => {
         let valid = true;
-        const newErrors = {
+        const newErrors: CheckoutErrors = {
+            ...errors,
+            email: '',
+            confirmEmail: '',
+            phone: '',
+            firstName: '',
+            lastName: '',
+            address: '',
+            postcode: '',
+            townCity: '',
+        };
+
+        const emailRegex = /^\S+@\S+$/;
+        if (!emailRegex.test(userDetails.email)) {
+            newErrors.email = 'Valid email is required';
+            valid = false;
+        }
+
+        if (userDetails.email !== userDetails.confirmEmail) {
+            newErrors.confirmEmail = 'Emails do not match';
+            valid = false;
+        }
+
+        if (!userDetails.phone.trim()) {
+            newErrors.phone = 'Phone number is required';
+            valid = false;
+        }
+
+        if (!userDetails.firstName.trim()) {
+            newErrors.firstName = 'First name is required';
+            valid = false;
+        }
+
+        if (!userDetails.lastName.trim()) {
+            newErrors.lastName = 'Last name is required';
+            valid = false;
+        }
+
+        if (!userDetails.address.trim()) {
+            newErrors.address = 'Address is required';
+            valid = false;
+        }
+
+        if (!userDetails.postcode.trim()) {
+            newErrors.postcode = 'Postcode is required';
+            valid = false;
+        }
+
+        if (!userDetails.townCity.trim()) {
+            newErrors.townCity = 'Town/City is required';
+            valid = false;
+        }
+
+        setErrors(newErrors);
+        return valid;
+    };
+
+    const validateStep2 = () => {
+        let valid = true;
+        const newErrors: CheckoutErrors = { ...errors, agreeToTerms: '' };
+
+        if (!additionalInfo.agreeToTerms) {
+            newErrors.agreeToTerms = 'You must agree to the Terms and Conditions';
+            valid = false;
+        }
+
+        setErrors(newErrors);
+        return valid;
+    };
+
+    const validateStep3 = () => {
+        let valid = true;
+        const newErrors: CheckoutErrors = {
+            ...errors,
             name: '',
             cardNumber: '',
             expiration: '',
@@ -159,8 +275,29 @@ export function CheckoutPage() {
         return valid;
     };
 
+    const handleNext = () => {
+        const detailsStep = isLoggedIn ? 0 : 1;
+        const additionalInfoStep = isLoggedIn ? 1 : 2;
+        const paymentStep = isLoggedIn ? 2 : 3;
+
+        if (activeStep === detailsStep) {
+            if (validateStep1()) {
+                setActiveStep(additionalInfoStep);
+            }
+        } else if (activeStep === additionalInfoStep) {
+            if (validateStep2()) {
+                setActiveStep(paymentStep);
+            }
+        }
+    };
+
+    const handleBack = () => {
+        const minStep = isLoggedIn ? 0 : 0;
+        setActiveStep((prev) => Math.max(minStep, prev - 1));
+    };
+
     const handlePaymentSubmit = () => {
-        if (!validate() || !selectedProvider) return;
+        if (!validateStep3() || !selectedProvider) return;
 
         setPaymentStatus('idle');
         setTimeout(() => {
@@ -186,205 +323,95 @@ export function CheckoutPage() {
         setErrors((prev) => ({ ...prev, [field]: '' }));
     };
 
+    const handleUserDetailsChange = (field: string, value: string) => {
+        setUserDetails((prev) => ({ ...prev, [field]: value }));
+        setErrors((prev) => ({ ...prev, [field]: '' }));
+    };
+
+    const handleAdditionalInfoChange = (field: keyof AdditionalInfo, value: boolean) => {
+        setAdditionalInfo((prev) => ({ ...prev, [field]: value }));
+        if (field === 'agreeToTerms') {
+            setErrors((prev) => ({ ...prev, agreeToTerms: '' }));
+        }
+    };
+
     return (
-        <Container size="sm" my="xl">
+        <Container size="lg" my="xl">
             <Title order={2} mb="lg">
                 Checkout
             </Title>
-            <Paper shadow="xs" radius="md" p="md" withBorder>
-                <Title order={3} size="h5">
-                    Match Details
-                </Title>
-                <Text weight={500} size="sm">
-                    {ticketDetails.homeTeam} vs {ticketDetails.awayTeam}
-                </Text>
-                <Text size="sm">{new Date(ticketDetails.date).toLocaleString()}</Text>
-                <Text size="sm">Venue: {ticketDetails.venue}</Text>
-                <Divider my="sm" />
-                <Group position="apart">
-                    <Text>Total Price</Text>
-                    <Text weight={700}>£{ticketDetails.price?.toFixed(2) || '0.00'}</Text>
-                </Group>
-            </Paper>
 
-            <Paper shadow="xs" radius="md" p="md" mt="lg" withBorder>
-                <Title order={3} size="h5" mb="md">
-                    Select Payment Method
-                </Title>
+            <ReservationTimer
+                initialMinutes={15}
+                onExpire={() => {
+                    // TODO: Handle reservation expiration
+                    console.warn('Reservation expired');
+                }}
+            />
 
-                {loading ? (
-                    <Text size="sm" color="dimmed">
-                        Loading payment options...
-                    </Text>
-                ) : paymentProviders.length === 0 ? (
-                    <Text size="sm" color="dimmed">
-                        No payment methods available
-                    </Text>
-                ) : (
-                    <Radio.Group value={selectedProvider?.id?.toString()} onChange={(value) => {
-                        const provider = paymentProviders.find((p) => p.id.toString() === value);
-                        setSelectedProvider(provider || null);
-                        // Reset form when changing provider
-                        setPaymentInfo({
-                            name: '',
-                            cardNumber: '',
-                            expiration: '',
-                            cvv: '',
-                            email: '',
-                        });
-                    }}>
-                        <Stack mt="xs">
-                            {paymentProviders.map((provider) => (
-                                <Radio
-                                    key={provider.id}
-                                    value={provider.id.toString()}
-                                    label={
-                                        <Group spacing="sm">
-                                            {provider.logoUrl && (
-                                                <Image
-                                                    src={provider.logoUrl}
-                                                    alt={provider.name}
-                                                    width={40}
-                                                    height={40}
-                                                    fit="contain"
-                                                />
-                                            )}
-                                            <Text weight={500}>{provider.name}</Text>
-                                            <Badge size="sm" variant="light">
-                                                {provider.type}
-                                            </Badge>
-                                        </Group>
-                                    }
-                                    styles={{
-                                        label: {
-                                            padding: '0.75rem',
-                                            cursor: 'pointer',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            borderRadius: '4px',
-                                            transition: 'all 0.2s',
-                                        },
-                                    }}
-                                />
-                            ))}
-                        </Stack>
-                    </Radio.Group>
-                )}
+            <CheckoutStepper
+                activeStep={activeStep}
+                isLoggedIn={isLoggedIn}
+                onStepClick={handleStepperClick}
+            />
 
-                {selectedProvider && (
-                    <Box mt="xl">
-                        <Title order={4} size="h6" mb="md">
-                            Payment Information
-                        </Title>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
+                {/* Left Panel - Form */}
+                <Box>
+                    {activeStep === 0 && !isLoggedIn && (
+                        <AuthenticationStep
+                            onContinueAsGuest={() => {
+                                setIsGuestCheckout(true);
+                                setActiveStep(1);
+                            }}
+                        />
+                    )}
 
-                        {selectedProvider.type === 'CARD' && (
-                            <Stack spacing="md">
-                                <TextInput
-                                    label="Name on Card"
-                                    placeholder="John Doe"
-                                    value={paymentInfo.name}
-                                    error={errors.name}
-                                    onChange={(e) => handleInputChange('name', e.currentTarget.value)}
-                                />
-                                <TextInput
-                                    label="Card Number"
-                                    placeholder="1234 5678 9012 3456"
-                                    value={paymentInfo.cardNumber}
-                                    onChange={(e) => {
-                                        const raw = e.currentTarget.value.replace(/\D/g, '');
-                                        const formatted = raw.match(/.{1,4}/g)?.join(' ') ?? '';
-                                        if (raw.length <= 16) {
-                                            handleInputChange('cardNumber', formatted);
-                                        }
-                                    }}
-                                    error={errors.cardNumber}
-                                />
+                    {activeStep === (isLoggedIn ? 0 : 1) && (
+                        <DetailsStep
+                            userDetails={userDetails}
+                            errors={errors}
+                            onUserDetailsChange={handleUserDetailsChange}
+                            onNext={handleNext}
+                        />
+                    )}
 
-                                <Group grow>
-                                    <TextInput
-                                        label="Expiration Date"
-                                        placeholder="MM/YY"
-                                        value={paymentInfo.expiration}
-                                        onChange={(e) => {
-                                            let val = e.currentTarget.value.replace(/\D/g, '');
-                                            if (val.length > 4) val = val.slice(0, 4);
+                    {activeStep === (isLoggedIn ? 1 : 2) && (
+                        <AdditionalInfoStep
+                            additionalInfo={additionalInfo}
+                            errors={errors}
+                            onAdditionalInfoChange={handleAdditionalInfoChange}
+                            onNext={handleNext}
+                            onBack={handleBack}
+                        />
+                    )}
 
-                                            if (val.length >= 3) {
-                                                val = `${val.slice(0, 2)}/${val.slice(2)}`;
-                                            }
-                                            handleInputChange('expiration', val);
-                                        }}
-                                        error={errors.expiration}
-                                    />
+                    {activeStep === (isLoggedIn ? 2 : 3) && (
+                        <PaymentStep
+                            paymentProviders={paymentProviders}
+                            selectedProvider={selectedProvider}
+                            paymentInfo={paymentInfo}
+                            errors={errors}
+                            loading={loading}
+                            paymentStatus={paymentStatus}
+                            ticketDetails={ticketDetails}
+                            onProviderSelect={setSelectedProvider}
+                            onPaymentInfoChange={handleInputChange}
+                            onBack={handleBack}
+                            onPaymentSubmit={handlePaymentSubmit}
+                            onPaymentStatusChange={setPaymentStatus}
+                        />
+                    )}
+                </Box>
 
-                                    <TextInput
-                                        label="CVV"
-                                        placeholder="123"
-                                        value={paymentInfo.cvv}
-                                        onChange={(e) => {
-                                            const raw = e.currentTarget.value.replace(/\D/g, '');
-                                            if (raw.length <= 4) {
-                                                handleInputChange('cvv', raw);
-                                            }
-                                        }}
-                                        error={errors.cvv}
-                                    />
-                                </Group>
-                            </Stack>
-                        )}
-
-                        {selectedProvider.type === 'WALLET' && (
-                            <Stack spacing="md">
-                                <TextInput
-                                    label="Email"
-                                    placeholder="your.email@example.com"
-                                    type="email"
-                                    value={paymentInfo.email}
-                                    error={errors.email}
-                                    onChange={(e) => handleInputChange('email', e.currentTarget.value)}
-                                />
-                                <Text size="sm" color="dimmed">
-                                    You will be redirected to {selectedProvider.name} to complete your payment.
-                                </Text>
-                            </Stack>
-                        )}
-
-                        <ModernButton
-                            fullWidth
-                            variant="primary"
-                            size="md"
-                            mt="lg"
-                            onClick={handlePaymentSubmit}
-                            disabled={paymentStatus === 'idle'}
-                        >
-                            {paymentStatus === 'idle' ? 'Processing...' : `Pay £${ticketDetails.price?.toFixed(2) || '0.00'}`}
-                        </ModernButton>
-                    </Box>
-                )}
-
-                {paymentStatus === 'success' && (
-                    <Notification
-                        mt="lg"
-                        icon={<IconCheck />}
-                        color="green"
-                        title="Payment Successful"
-                        onClose={() => setPaymentStatus('idle')}
-                    >
-                        Thank you for your purchase! Redirecting...
-                    </Notification>
-                )}
-
-                {paymentStatus === 'error' && (
-                    <Notification
-                        mt="lg"
-                        icon={<IconAlertCircle />}
-                        color="red"
-                        title="Payment Failed"
-                        onClose={() => setPaymentStatus('idle')}
-                    >
-                        There was an issue with your payment. Please try again.
-                    </Notification>
-                )}
-            </Paper>
+                {/* Right Panel - Order Summary */}
+                <Box>
+                    <OrderSummary
+                        ticketDetails={ticketDetails}
+                        isGuestCheckout={isGuestCheckout}
+                    />
+                </Box>
+            </SimpleGrid>
         </Container>
     );
 }
