@@ -4999,6 +4999,456 @@
         ]
       }
     },
+    "/news-article": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewsArticleDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsArticle"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create NewsArticle",
+        "tags": [
+          "news-article"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NewsArticle"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all NewsArticles",
+        "tags": [
+          "news-article"
+        ]
+      }
+    },
+    "/news-article/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NewsArticle"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all NewsArticles",
+        "tags": [
+          "news-article"
+        ]
+      }
+    },
+    "/news-article/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of NewsArticles",
+        "tags": [
+          "news-article"
+        ]
+      }
+    },
+    "/news-article/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsArticle"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one NewsArticle",
+        "tags": [
+          "news-article"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsArticle"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one NewsArticle",
+        "tags": [
+          "news-article"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one NewsArticle",
+        "tags": [
+          "news-article"
+        ]
+      }
+    },
+    "/news-article/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for NewsArticle",
+        "tags": [
+          "news-article"
+        ]
+      }
+    },
+    "/news-article/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to NewsArticle",
+        "tags": [
+          "news-article"
+        ]
+      }
+    },
+    "/news-aggregation/trigger": {
+      "post": {
+        "operationId": "NewsAggregatorController_triggerAggregation",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "News aggregation job triggered"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manually trigger news aggregation",
+        "tags": [
+          "news-aggregation"
+        ]
+      }
+    },
+    "/news-aggregation/trigger/{feedName}": {
+      "post": {
+        "operationId": "NewsAggregatorController_triggerFeedAggregation",
+        "parameters": [
+          {
+            "name": "feedName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "News aggregation job triggered for feed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manually trigger news aggregation for a specific feed",
+        "tags": [
+          "news-aggregation"
+        ]
+      }
+    },
+    "/news-aggregation/status": {
+      "get": {
+        "operationId": "NewsAggregatorController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "News aggregation status"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get news aggregation status",
+        "tags": [
+          "news-aggregation"
+        ]
+      }
+    },
     "/payment": {
       "post": {
         "operationId": "create",
@@ -12992,6 +13442,125 @@
           "teamId",
           "team",
           "isCurrent"
+        ]
+      },
+      "CreateNewsArticleDTO": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the news article",
+            "example": "How Thomas Tuchel plans to turn England headache into World Cup advantage"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Summary or excerpt of the article",
+            "example": "The German manager has been analyzing..."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to the original source article",
+            "example": "https://www.independent.co.uk/sport/football/..."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL to the article image",
+            "example": "https://images.unsplash.com/photo-..."
+          },
+          "source": {
+            "type": "string",
+            "description": "Source/publication name",
+            "example": "The Independent"
+          },
+          "publishedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Original publication date",
+            "example": "2025-01-24T10:00:00Z"
+          },
+          "category": {
+            "type": "string",
+            "description": "Article category/topic",
+            "example": "Premier League"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author name",
+            "example": "John Smith"
+          }
+        },
+        "required": [
+          "title",
+          "summary",
+          "url",
+          "source",
+          "publishedAt"
+        ]
+      },
+      "NewsArticle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the news article",
+            "example": "How Thomas Tuchel plans to turn England headache into World Cup advantage"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Summary or excerpt of the article",
+            "example": "The German manager has been analyzing..."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to the original source article",
+            "example": "https://www.independent.co.uk/sport/football/..."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL to the article image",
+            "example": "https://images.unsplash.com/photo-..."
+          },
+          "source": {
+            "type": "string",
+            "description": "Source/publication name",
+            "example": "The Independent"
+          },
+          "publishedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Original publication date",
+            "example": "2025-01-24T10:00:00Z"
+          },
+          "category": {
+            "type": "string",
+            "description": "Article category/topic",
+            "example": "Premier League"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author name",
+            "example": "John Smith"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "summary",
+          "url",
+          "source",
+          "publishedAt"
         ]
       },
       "CreatePaymentDTO": {

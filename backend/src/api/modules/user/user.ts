@@ -73,9 +73,9 @@ export class User extends BaseDbEntity {
     password!: string
 
     @EntityEnumColumn({
-        db: {default: UserType.USER, enum: UserType},
+        db: {default: UserRole.USER, enum: UserRole},
     })
-    type!: UserType
+    type!: UserRole
 
     @ApiProperty()
     @OneToMany(() => Log, log => log.user, {lazy: true})

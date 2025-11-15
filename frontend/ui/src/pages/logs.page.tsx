@@ -9,6 +9,7 @@ import {
     ScrollArea,
     Select,
     SimpleGrid,
+    Stack,
     Tabs,
     Text,
     Title
@@ -358,46 +359,45 @@ export function LogsPage() {
                             </ModernBody>
                         </Box>
 
-                    <Box style={{ position: 'sticky', top:20, width: '100%', maxWidth: 'none', marginBottom: '2rem' }}>
-                        <ModernCard style={{ padding: '1.5rem', paddingBottom: '2rem', backgroundColor: 'var(--modern-dark-gray)' }}>
-                            <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>
-                                Add New Match
-                            </ModernH3>
+                    <Box mb="xl" style={{ maxHeight: 'none' }}>
+                        <ModernCard 
+                            hover={false}
+                            style={{ 
+                                padding: '2rem', 
+                                backgroundColor: 'var(--modern-dark-gray)',
+                                maxHeight: 'none'
+                            }}
+                            styles={{
+                                root: {
+                                    maxHeight: 'none',
+                                    position: 'static',
+                                    transform: 'none !important',
+                                    '&:hover': {
+                                        transform: 'none !important',
+                                        position: 'static'
+                                    }
+                                }
+                            }}
+                        >
+                            <Stack gap="lg">
+                                <Box style={{ textAlign: 'center' }}>
+                                    <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>
+                                        Add New Match
+                                    </ModernH3>
+                                    <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.9rem' }}>
+                                        Search for a fixture by selecting competition, season, and filtering teams
+                                    </ModernBody>
+                                </Box>
 
-                            <ModernBody style={{ color: 'var(--modern-light-gray)', marginBottom: '1.5rem' }}>
-                                Search for a fixture by selecting competition, season, and filtering teams
-                            </ModernBody>
-
-                            <Box mb="sm">
-                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Competition</ModernCaption>
-                                <Select
-                                    placeholder="Select competition"
-                                    data={competitions.map((c) => ({value: c.id, label: c.name}))}
-                                    value={selectedCompetition}
-                                    onChange={(val) => {
-                                        setSelectedCompetition(val);
-                                        setSelectedSeason(null);
-                                        setFixtures([]);
-                                        setFilteredFixtures([]);
-                                        setSelectedHomeTeam(null);
-                                        setSelectedAwayTeam(null);
-                                        setSelectedFixture(null);
-                                    }}
-                                    searchable
-                                    clearable
-                                    style={{width: '100%'}}
-                                />
-                            </Box>
-
-                            {selectedCompetition && (
-                                <Box mb="sm">
-                                    <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Season</ModernCaption>
+                                <Box>
+                                    <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Competition</ModernCaption>
                                     <Select
-                                        placeholder="Select season"
-                                        data={seasons.map((s) => ({value: s.id, label: s.year}))}
-                                        value={selectedSeason}
+                                        placeholder="Select competition"
+                                        data={competitions.map((c) => ({value: c.id, label: c.name}))}
+                                        value={selectedCompetition}
                                         onChange={(val) => {
-                                            setSelectedSeason(val);
+                                            setSelectedCompetition(val);
+                                            setSelectedSeason(null);
                                             setFixtures([]);
                                             setFilteredFixtures([]);
                                             setSelectedHomeTeam(null);
@@ -406,119 +406,199 @@ export function LogsPage() {
                                         }}
                                         searchable
                                         clearable
-                                        style={{width: '100%'}}
+                                        size="md"
+                                        styles={{
+                                            input: {
+                                                backgroundColor: 'var(--modern-black)',
+                                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                color: 'var(--modern-white)',
+                                                '&:focus': {
+                                                    borderColor: 'var(--modern-lime)',
+                                                }
+                                            }
+                                        }}
                                     />
                                 </Box>
-                            )}
 
-                            {selectedSeason && (
-                                <>
-                                    <SimpleGrid cols={2} style={{ gap: 'var(--mantine-spacing-sm)' }} mb="sm">
-                                        <Box>
-                                            <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Home Team</ModernCaption>
-                                            <Select
-                                                placeholder="Select home team"
-                                                data={teams
-                                                    .filter(team => team.id !== selectedAwayTeam)
-                                                    .map((team) => ({
-                                                        value: team.id,
-                                                        label: team.name
-                                                    }))}
-                                                value={selectedHomeTeam}
-                                                onChange={(value) => {
-                                                    setSelectedHomeTeam(value);
-                                                    setSelectedFixture(null);
-                                                }}
-                                                searchable
-                                                clearable
-                                                style={{width: '100%'}}
-                                            />
-                                        </Box>
-                                        <Box>
-                                            <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Away Team</ModernCaption>
-                                            <Select
-                                                placeholder="Select away team"
-                                                data={teams
-                                                    .filter(team => team.id !== selectedHomeTeam)
-                                                    .map((team) => ({
-                                                        value: team.id,
-                                                        label: team.name
-                                                    }))}
-                                                value={selectedAwayTeam}
-                                                onChange={(value) => {
-                                                    setSelectedAwayTeam(value);
-                                                    setSelectedFixture(null);
-                                                }}
-                                                searchable
-                                                clearable
-                                                style={{width: '100%'}}
-                                            />
-                                        </Box>
-                                    </SimpleGrid>
-
-                                    {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
-                                        <Box mb="md">
-                                            <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>Select Fixture</ModernCaption>
-                                            <Select
-                                                placeholder="Choose a fixture"
-                                                data={filteredFixtures.map((f) => ({
-                                                    value: f.id,
-                                                    label: `${f.homeTeam} vs ${f.awayTeam} (${new Date(f.date).toLocaleDateString()})`
-                                                }))}
-                                                value={selectedFixture}
-                                                onChange={setSelectedFixture}
-                                                searchable
-                                                clearable
-                                                style={{width: '100%'}}
-                                            />
-                                            <ModernCaption style={{ color: 'var(--modern-light-gray)', marginTop: '0.5rem' }}>
-                                                {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
-                                            </ModernCaption>
-                                        </Box>
-                                    )}
-
-                                    {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
-                                        <ModernBody style={{ color: 'var(--modern-light-gray)', marginBottom: '1rem', textAlign: 'center' }}>
-                                            No matches found between these teams
-                                        </ModernBody>
-                                    )}
-
-                                    {selectedHomeTeam && selectedAwayTeam && (
-                                        <ModernButton
-                                            onClick={handleAddToLog}
-                                            disabled={!selectedFixture}
-                                            fullWidth
+                                {selectedCompetition && (
+                                    <Box>
+                                        <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Season</ModernCaption>
+                                        <Select
+                                            placeholder="Select season"
+                                            data={seasons.map((s) => ({value: s.id, label: s.year}))}
+                                            value={selectedSeason}
+                                            onChange={(val) => {
+                                                setSelectedSeason(val);
+                                                setFixtures([]);
+                                                setFilteredFixtures([]);
+                                                setSelectedHomeTeam(null);
+                                                setSelectedAwayTeam(null);
+                                                setSelectedFixture(null);
+                                            }}
+                                            searchable
+                                            clearable
                                             size="md"
-                                            variant="primary"
-                                        >
-                                            Add Match to Logs
-                                        </ModernButton>
-                                    )}
-                                </>
-                            )}
+                                            styles={{
+                                                input: {
+                                                    backgroundColor: 'var(--modern-black)',
+                                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                    color: 'var(--modern-white)',
+                                                    '&:focus': {
+                                                        borderColor: 'var(--modern-lime)',
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </Box>
+                                )}
+
+                                {selectedSeason && (
+                                    <>
+                                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                                            <Box>
+                                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Home Team</ModernCaption>
+                                                <Select
+                                                    placeholder="Select home team"
+                                                    data={teams
+                                                        .filter(team => team.id !== selectedAwayTeam)
+                                                        .map((team) => ({
+                                                            value: team.id,
+                                                            label: team.name
+                                                        }))}
+                                                    value={selectedHomeTeam}
+                                                    onChange={(value) => {
+                                                        setSelectedHomeTeam(value);
+                                                        setSelectedFixture(null);
+                                                    }}
+                                                    searchable
+                                                    clearable
+                                                    size="md"
+                                                    styles={{
+                                                        input: {
+                                                            backgroundColor: 'var(--modern-black)',
+                                                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                            color: 'var(--modern-white)',
+                                                            '&:focus': {
+                                                                borderColor: 'var(--modern-lime)',
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Box>
+                                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Away Team</ModernCaption>
+                                                <Select
+                                                    placeholder="Select away team"
+                                                    data={teams
+                                                        .filter(team => team.id !== selectedHomeTeam)
+                                                        .map((team) => ({
+                                                            value: team.id,
+                                                            label: team.name
+                                                        }))}
+                                                    value={selectedAwayTeam}
+                                                    onChange={(value) => {
+                                                        setSelectedAwayTeam(value);
+                                                        setSelectedFixture(null);
+                                                    }}
+                                                    searchable
+                                                    clearable
+                                                    size="md"
+                                                    styles={{
+                                                        input: {
+                                                            backgroundColor: 'var(--modern-black)',
+                                                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                            color: 'var(--modern-white)',
+                                                            '&:focus': {
+                                                                borderColor: 'var(--modern-lime)',
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                        </SimpleGrid>
+
+                                        {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
+                                            <Box>
+                                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Select Fixture</ModernCaption>
+                                                <Select
+                                                    placeholder="Choose a fixture"
+                                                    data={filteredFixtures.map((f) => ({
+                                                        value: f.id,
+                                                        label: `${f.homeTeam} vs ${f.awayTeam} (${new Date(f.date).toLocaleDateString()})`
+                                                    }))}
+                                                    value={selectedFixture}
+                                                    onChange={setSelectedFixture}
+                                                    searchable
+                                                    clearable
+                                                    size="md"
+                                                    styles={{
+                                                        input: {
+                                                            backgroundColor: 'var(--modern-black)',
+                                                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                            color: 'var(--modern-white)',
+                                                            '&:focus': {
+                                                                borderColor: 'var(--modern-lime)',
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                                <ModernCaption style={{ color: 'var(--modern-light-gray)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                                                    {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
+                                                </ModernCaption>
+                                            </Box>
+                                        )}
+
+                                        {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
+                                            <Box style={{ textAlign: 'center', padding: '1rem' }}>
+                                                <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
+                                                    No matches found between these teams
+                                                </ModernBody>
+                                            </Box>
+                                        )}
+
+                                        {selectedHomeTeam && selectedAwayTeam && (
+                                            <Box mt="md">
+                                                <ModernButton
+                                                    onClick={handleAddToLog}
+                                                    disabled={!selectedFixture}
+                                                    fullWidth
+                                                    size="md"
+                                                    variant="primary"
+                                                >
+                                                    Add Match to Logs
+                                                </ModernButton>
+                                            </Box>
+                                        )}
+                                    </>
+                                )}
+                            </Stack>
                         </ModernCard>
                     </Box>
 
                 </Grid.Col>
                 <Grid.Col span={columnSpan}>
-                    <Tabs defaultValue={'matches'} style={{
-                        tab: {
-                            flex: 1,
-                            '&:first-of-type': {
-                                marginLeft: 0,
-                            },
-                            '&:last-of-type': {
-                                marginRight: 0,
-                            },
-                        },
-                        tabsList: {
-                            display: 'flex',
-                            width: '100%',
-                        }
-                    }}>
-                        <Tabs.List>
-                            <Tabs.Tab value={'matches'}> Matches</Tabs.Tab>
-                            <Tabs.Tab value={'stats'}>Stats</Tabs.Tab>
+                    <Tabs defaultValue={'matches'}>
+                        <Tabs.List style={{ justifyContent: 'center', width: '100%' }}>
+                            <Tabs.Tab 
+                                value={'matches'}
+                                style={{ 
+                                    fontSize: '1.1rem',
+                                    padding: '1rem 2rem',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Matches
+                            </Tabs.Tab>
+                            <Tabs.Tab 
+                                value={'stats'}
+                                style={{ 
+                                    fontSize: '1.1rem',
+                                    padding: '1rem 2rem',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Stats
+                            </Tabs.Tab>
                         </Tabs.List>
                         <Tabs.Panel value={'matches'}>
                             <ScrollArea

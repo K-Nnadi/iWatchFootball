@@ -1,4 +1,4 @@
-import { Box, Paper, Text, Title, Group, Stack } from '@mantine/core';
+import { Box, Paper, Text, Title } from '@mantine/core';
 import { useState, useMemo, useEffect } from 'react';
 
 interface ScorePredictionCardProps {
@@ -44,6 +44,15 @@ export function ScorePredictionCard({
 
     const status = useMemo(() => getMatchStatus(date), [date]);
 
+    // Log when user prediction changes
+    useEffect(() => {
+        if (userScorePrediction) {
+            console.log('User has selected:', userScorePrediction);
+        } else {
+            console.log('User has not selected a prediction yet');
+        }
+    }, [userScorePrediction]);
+
     // Fetch predictions and match result
     useEffect(() => {
         // Mock API call - replace with actual API call
@@ -71,11 +80,15 @@ export function ScorePredictionCard({
     }, [status]);
 
     function handleScorePrediction(prediction: 'home' | 'draw' | 'away') {
-        if (!userScorePrediction) {
+        if (!userScorePrediction && status !== 'past') {
+            console.log('User selected prediction:', prediction);
             setUserScorePrediction(prediction);
             // In a real app, you would make an API call here to save the prediction
         }
     }
+
+    // Percentages should only show after user selects a prediction
+    // Removed handleShowPercentages - percentages only show after selection
 
     const allPredictionsWithUser = userScorePrediction 
         ? [...allPredictions, { userId: 'current-user', username: 'You', prediction: userScorePrediction }]
@@ -93,6 +106,27 @@ export function ScorePredictionCard({
     const awayPredictionCount = predictionCounts['away'] || 0;
     const totalPredictions = predictionsForCount.length;
 
+    // Determine if we should show equal sections (future match, no user prediction)
+    // Percentages only show after user selects a prediction
+    const shouldShowEqualSections = status === 'future' && !userScorePrediction;
+    
+    // Calculate percentages - show equal sections if needed, otherwise show actual percentages
+    const homePercentage = shouldShowEqualSections 
+        ? 33.33 
+        : totalPredictions > 0 
+            ? (homePredictionCount / totalPredictions) * 100 
+            : 0;
+    const drawPercentage = shouldShowEqualSections 
+        ? 33.33 
+        : totalPredictions > 0 
+            ? (drawPredictionCount / totalPredictions) * 100 
+            : 0;
+    const awayPercentage = shouldShowEqualSections 
+        ? 33.34 
+        : totalPredictions > 0 
+            ? (awayPredictionCount / totalPredictions) * 100 
+            : 0;
+
     return (
         <Paper 
             p={{ base: 'md', sm: 'xl' }} 
@@ -105,7 +139,11 @@ export function ScorePredictionCard({
                 order={3} 
                 mb="lg" 
                 ta="center"
-                style={{ color: 'var(--modern-white)', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                style={{ 
+                    color: 'var(--modern-white)', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.1em',
+                }}
             >
                 Who Will Win?
             </Title>
@@ -124,112 +162,168 @@ export function ScorePredictionCard({
                         marginBottom: '1rem',
                     }}
                 >
-                    {homePredictionCount > 0 && (
-                        <Box
-                            onClick={() => !userScorePrediction && status !== 'past' && handleScorePrediction('home')}
-                            style={{
-                                width: `${(homePredictionCount / totalPredictions) * 100}%`,
-                                backgroundColor: status === 'past' && matchResult?.winner === 'home' 
-                                    ? 'rgba(0, 255, 136, 0.3)' 
-                                    : userScorePrediction === 'home' 
-                                    ? 'rgba(0, 255, 136, 0.3)' 
-                                    : 'rgba(34, 139, 230, 0.3)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                                cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
-                                transition: 'all 0.2s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!userScorePrediction && status !== 'past') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.5)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!userScorePrediction && status !== 'past') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.3)';
-                                }
-                            }}
-                        >
-                            {(userScorePrediction || status === 'past') && (
-                                <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
-                                    {Math.round((homePredictionCount / totalPredictions) * 100)}%
-                                </Text>
-                            )}
-                        </Box>
-                    )}
-                    {drawPredictionCount > 0 && (
-                        <Box
-                            onClick={() => !userScorePrediction && status !== 'past' && handleScorePrediction('draw')}
-                            style={{
-                                width: `${(drawPredictionCount / totalPredictions) * 100}%`,
-                                backgroundColor: status === 'past' && matchResult?.winner === 'draw' 
-                                    ? 'rgba(0, 255, 136, 0.3)' 
-                                    : userScorePrediction === 'draw' 
-                                    ? 'rgba(0, 255, 136, 0.3)' 
-                                    : 'rgba(250, 176, 5, 0.3)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                                cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
-                                transition: 'all 0.2s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!userScorePrediction && status !== 'past') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.5)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!userScorePrediction && status !== 'past') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.3)';
-                                }
-                            }}
-                        >
-                            {(userScorePrediction || status === 'past') && (
-                                <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
-                                    {Math.round((drawPredictionCount / totalPredictions) * 100)}%
-                                </Text>
-                            )}
-                        </Box>
-                    )}
-                    {awayPredictionCount > 0 && (
-                        <Box
-                            onClick={() => !userScorePrediction && status !== 'past' && handleScorePrediction('away')}
-                            style={{
-                                width: `${(awayPredictionCount / totalPredictions) * 100}%`,
-                                backgroundColor: status === 'past' && matchResult?.winner === 'away' 
-                                    ? 'rgba(0, 255, 136, 0.3)' 
-                                    : userScorePrediction === 'away' 
-                                    ? 'rgba(0, 255, 136, 0.3)' 
-                                    : 'rgba(250, 82, 82, 0.3)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
-                                transition: 'all 0.2s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!userScorePrediction && status !== 'past') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.5)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!userScorePrediction && status !== 'past') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.3)';
-                                }
-                            }}
-                        >
-                            {(userScorePrediction || status === 'past') && (
-                                <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
-                                    {Math.round((awayPredictionCount / totalPredictions) * 100)}%
-                                </Text>
-                            )}
-                        </Box>
-                    )}
+                    {/* Home Team Section */}
+                    <Box
+                        onClick={() => {
+                            if (!userScorePrediction && status !== 'past') {
+                                handleScorePrediction('home');
+                            }
+                        }}
+                        style={{
+                            width: `${homePercentage}%`,
+                            backgroundColor: status === 'past' && matchResult?.winner === 'home' 
+                                ? 'rgba(0, 255, 136, 0.3)' 
+                                : userScorePrediction === 'home' 
+                                ? 'rgba(0, 255, 136, 0.3)' 
+                                : 'rgba(34, 139, 230, 0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
+                            transition: 'all 0.2s ease',
+                            position: 'relative',
+                            borderRadius: '30px 0 0 30px',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!userScorePrediction && status !== 'past') {
+                                e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.5)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!userScorePrediction && status !== 'past') {
+                                e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.3)';
+                            }
+                        }}
+                    >
+                        {shouldShowEqualSections ? (
+                            <Text 
+                                size="sm" 
+                                fw={700} 
+                                style={{ 
+                                    color: 'var(--modern-white)', 
+                                    textAlign: 'center', 
+                                    padding: '0 8px',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {homeTeam}
+                            </Text>
+                        ) : (
+                            <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
+                                {Math.round(homePercentage)}%
+                            </Text>
+                        )}
+                    </Box>
+                    
+                    {/* Draw Section */}
+                    <Box
+                        onClick={() => {
+                            if (!userScorePrediction && status !== 'past') {
+                                handleScorePrediction('draw');
+                            }
+                        }}
+                        style={{
+                            width: `${drawPercentage}%`,
+                            backgroundColor: status === 'past' && matchResult?.winner === 'draw' 
+                                ? 'rgba(0, 255, 136, 0.3)' 
+                                : userScorePrediction === 'draw' 
+                                ? 'rgba(0, 255, 136, 0.3)' 
+                                : 'rgba(250, 176, 5, 0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
+                            transition: 'all 0.2s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!userScorePrediction && status !== 'past') {
+                                e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.5)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!userScorePrediction && status !== 'past') {
+                                e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.3)';
+                            }
+                        }}
+                    >
+                        {shouldShowEqualSections ? (
+                            <Text 
+                                size="sm" 
+                                fw={700} 
+                                style={{ 
+                                    color: 'var(--modern-white)', 
+                                    textAlign: 'center', 
+                                    padding: '0 8px' 
+                                }}
+                            >
+                                Draw
+                            </Text>
+                        ) : (
+                            <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
+                                {Math.round(drawPercentage)}%
+                            </Text>
+                        )}
+                    </Box>
+                    
+                    {/* Away Team Section */}
+                    <Box
+                        onClick={() => {
+                            if (!userScorePrediction && status !== 'past') {
+                                handleScorePrediction('away');
+                            }
+                        }}
+                        style={{
+                            width: `${awayPercentage}%`,
+                            backgroundColor: status === 'past' && matchResult?.winner === 'away' 
+                                ? 'rgba(0, 255, 136, 0.3)' 
+                                : userScorePrediction === 'away' 
+                                ? 'rgba(0, 255, 136, 0.3)' 
+                                : 'rgba(250, 82, 82, 0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
+                            transition: 'all 0.2s ease',
+                            borderRadius: '0 30px 30px 0',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!userScorePrediction && status !== 'past') {
+                                e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.5)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!userScorePrediction && status !== 'past') {
+                                e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.3)';
+                            }
+                        }}
+                    >
+                        {shouldShowEqualSections ? (
+                            <Text 
+                                size="sm" 
+                                fw={700} 
+                                style={{ 
+                                    color: 'var(--modern-white)', 
+                                    textAlign: 'center', 
+                                    padding: '0 8px',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {awayTeam}
+                            </Text>
+                        ) : (
+                            <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
+                                {Math.round(awayPercentage)}%
+                            </Text>
+                        )}
+                    </Box>
                 </Box>
-                {(userScorePrediction || status === 'past') && (
+                {userScorePrediction && (
                     <Text size="sm" c="dimmed" ta="center" mt="md">
                         Based on <Text span fw={700} c="var(--modern-white)">{totalPredictions}</Text> predictions
                     </Text>

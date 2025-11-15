@@ -54,25 +54,36 @@ export function PageTransition({ children }: PageTransitionProps) {
 
   const getTransitionStyles = () => {
     const baseStyles = {
-      transition: `all ${duration}ms ease-in-out`,
+      transition: `opacity ${duration}ms ease-in-out`,
       opacity: showContent ? 1 : 0,
+      willChange: showContent ? 'auto' : 'opacity',
+      backfaceVisibility: 'hidden' as const,
+      WebkitBackfaceVisibility: 'hidden' as const,
+      transform: 'translateZ(0)',
+      WebkitTransform: 'translateZ(0)',
     };
 
     switch (transitionType) {
       case 'slide':
         return {
           ...baseStyles,
-          transform: showContent ? 'translateX(0)' : 'translateX(100%)',
+          transition: `opacity ${duration}ms ease-in-out, transform ${duration}ms ease-in-out`,
+          transform: showContent ? 'translateX(0) translateZ(0)' : 'translateX(100%) translateZ(0)',
+          willChange: showContent ? 'auto' : 'opacity, transform',
         };
       case 'scale':
         return {
           ...baseStyles,
-          transform: showContent ? 'scale(1)' : 'scale(0.95)',
+          transition: `opacity ${duration}ms ease-in-out, transform ${duration}ms ease-in-out`,
+          transform: showContent ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(0)',
+          willChange: showContent ? 'auto' : 'opacity, transform',
         };
       case 'loading':
         return {
           ...baseStyles,
-          transform: showContent ? 'translateY(0)' : 'translateY(20px)',
+          transition: `opacity ${duration}ms ease-in-out, transform ${duration}ms ease-in-out`,
+          transform: showContent ? 'translateY(0) translateZ(0)' : 'translateY(20px) translateZ(0)',
+          willChange: showContent ? 'auto' : 'opacity, transform',
         };
       default: // fade
         return baseStyles;
@@ -133,6 +144,11 @@ export function PageTransition({ children }: PageTransitionProps) {
           zIndex: 9999,
           opacity: loadingOpacity,
           transition: 'opacity 300ms ease-in-out',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+          willChange: loadingOpacity < 1 ? 'opacity' : 'auto',
         }}
       >
           <Box

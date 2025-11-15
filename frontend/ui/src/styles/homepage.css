@@ -107,7 +107,83 @@ html {
     animation: loading 1.5s infinite;
 }
 
-/* Cinematic section reveal */
+/* Scroll-triggered animations */
+.scroll-animate-fadeUp {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+}
+
+.scroll-animate-fadeUp.scroll-animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+    will-change: auto;
+}
+
+.scroll-animate-fadeIn {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.scroll-animate-fadeIn.scroll-animate-visible {
+    opacity: 1;
+    will-change: auto;
+}
+
+.scroll-animate-slideLeft {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.scroll-animate-slideLeft.scroll-animate-visible {
+    opacity: 1;
+    transform: translateX(0);
+    will-change: auto;
+}
+
+.scroll-animate-slideRight {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.scroll-animate-slideRight.scroll-animate-visible {
+    opacity: 1;
+    transform: translateX(0);
+    will-change: auto;
+}
+
+.scroll-animate-scale {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.scroll-animate-scale.scroll-animate-visible {
+    opacity: 1;
+    transform: scale(1);
+    will-change: auto;
+}
+
+/* Cinematic section reveal (legacy) */
 .reveal-on-scroll {
     opacity: 0;
     transform: translateY(40px);
@@ -144,10 +220,39 @@ a:focus-visible {
 @media (max-width: 768px) {
     .hero-content { animation: fadeInUp 0.8s ease-out; }
     .hero-image { animation: fadeInUp 0.8s ease-out 0.2s both; }
+    
+    /* Prevent horizontal scrolling */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Mobile-specific spacing */
+    .dark-theme {
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    /* Ensure containers don't overflow */
+    .mantine-Container-root {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 100% !important;
+    }
+    
+    /* Better carousel spacing on mobile */
+    .mantine-Carousel-root {
+        padding: 0 0.5rem;
+    }
+    
+    /* Adjust match card spacing */
+    .modern-card {
+        margin-bottom: 1rem;
+    }
 }
 
-/* Smooth transitions for theme toggling */
-* {
+/* Smooth transitions for theme toggling - only for specific elements to prevent flickering */
+button, a, .mantine-Button-root, .mantine-NavLink-root {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 

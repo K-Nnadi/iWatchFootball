@@ -12,6 +12,7 @@ import {LogModule, LogService} from "../modules/log/log.module";
 import {Public} from "../../auth/decorators/public.decorator";
 import {CommsPreferenceModule, CommsPreferenceService} from "../modules/commsPreference/commsPreference.module";
 import {CommunicationFrequency, Language} from "../enums/commsPreference.enum";
+import {UserRole} from "../../auth/types/security.types";
 
 
 export class ValidateBody {
@@ -129,7 +130,7 @@ export class AuthController {
         }
 
         let user = await this.userService.create({
-            ...registerUser, type: UserType.USER,
+            ...registerUser, type: UserRole.USER,
         });
 
         if (user) {

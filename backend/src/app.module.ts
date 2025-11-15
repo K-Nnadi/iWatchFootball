@@ -32,6 +32,8 @@ import {AuthModule as CoreAuthModule} from "./auth/auth.module";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {PaymentProviderModule} from "./api/modules/paymentProvider/paymentProvider.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
+import {NewsArticleModule} from "./api/modules/newsArticle/newsArticle.module";
+import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {HealthController} from "./health/health.controller";
 
@@ -57,6 +59,8 @@ const Modules = [
     LogModule,
     ManagerModule,
     ManagerEmploymentModule,
+    NewsArticleModule,
+    NewsAggregatorModule,
     PaymentModule,
     PaymentProviderModule,
     PlayerModule,

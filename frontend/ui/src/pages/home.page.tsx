@@ -8,10 +8,13 @@ import {
     Grid,
     Group,
     Stack,
-    Text
+    Text,
+    useMantineTheme
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
     IconBell,
+    IconBookmark,
     IconClock,
     IconPlayerPlay,
     IconTicket,
@@ -20,23 +23,29 @@ import {
 import {Carousel} from '@mantine/carousel';
 import '../styles/homepage.css';
 import {usePageTransition} from "../hooks/usePageTransition";
+import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
 
 // Hero Section Component - Lando Style
 function HeroSection() {
+    const theme = useMantineTheme();
+    const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
+    
     return (
         <Box
             className="dark-theme"
             style={{
-                padding: '6rem 0',
+                padding: isMobile ? '3rem 0' : '6rem 0',
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                width: '100vw',
-                marginLeft: 'calc(-50vw + 50%)',
-                marginRight: 'calc(-50vw + 50%)'
+                ...(!isMobile && {
+                    width: '100vw',
+                    marginLeft: 'calc(-50vw + 50%)',
+                    marginRight: 'calc(-50vw + 50%)',
+                }),
             }}
         >
             {/* Background Pattern */}
@@ -64,14 +73,6 @@ function HeroSection() {
                                 Live scores, personalised statistics, and ticket bookings all in one place.
                                 Experience football like never before with our cutting-edge platform.
                             </ModernBody>
-                            <Group gap="md">
-                                <ModernButton variant="primary" size="lg">
-                                    Download App
-                                </ModernButton>
-                                <ModernButton variant="secondary" size="lg">
-                                    Explore Features
-                                </ModernButton>
-                            </Group>
                         </Stack>
                     </Grid.Col>
                     <Grid.Col span={{base: 12, md: 6}}>
@@ -100,6 +101,7 @@ function HeroSection() {
 // Live Matches Section Component
 function LiveMatchesSection() {
     const { navigateWithTransition } = usePageTransition();
+    const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 0, threshold: 0.2 });
 
     const matches = [
         {
@@ -142,15 +144,18 @@ function LiveMatchesSection() {
 
     return (
         <Box
-            py="6rem"
+            ref={scrollAnimation.ref}
+            className={scrollAnimation.className}
+            py={{ base: '3rem', md: '6rem' }}
         >
             <Container size="xl">
-                <Group justify="space-between" mb="3rem">
-                    <ModernH2>
+                <Group justify="space-between" mb="3rem" wrap="wrap" gap="md">
+                    <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 2rem)' }}>
                         Live <span style={{color: 'var(--modern-lime)'}}>Matches</span>
                     </ModernH2>
                     <Button
                         variant="outline"
+                        size="sm"
                         style={{ 
                             cursor: 'pointer',
                             borderColor: 'var(--modern-lime)',
@@ -166,53 +171,60 @@ function LiveMatchesSection() {
                 <Grid gutter="xl">
                     {matches.map((match) => (
                         <Grid.Col key={match.id} span={{base: 12, md: 4}}>
-                            <ModernCard hover accent>
-                                <Stack gap="md">
-                                    <Group justify="space-between">
-                                        <ModernCaption>{match.league}</ModernCaption>
-                                        <Group gap="xs">
-                                            <IconPlayerPlay size={16} color="var(--modern-lime)"/>
-                                            <Text size="sm" color="var(--modern-lime)" fw={600}>
-                                                LIVE
-                                            </Text>
-                                        </Group>
-                                    </Group>
-
-                                    <Group justify="space-between" align="center">
-                                        <Stack align="center" gap="xs">
-                                            <Avatar
-                                                src={match.homeLogo}
-                                                size="xl"
-                                                radius="md"
-                                            />
-                                            <Text fw={600} size="sm">{match.homeTeam}</Text>
-                                        </Stack>
-
-                                        <Stack align="center" gap="xs">
-                                            <Text
-                                                size="2.5rem"
-                                                fw={900}
-                                                style={{color: 'var(--modern-lime)'}}
-                                            >
-                                                {match.homeScore !== null ? `${match.homeScore} - ${match.awayScore}` : '- -'}
-                                            </Text>
+                            <Box
+                                onClick={() => navigateWithTransition(`/match/${match.id}`)}
+                                style={{
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <ModernCard hover accent>
+                                    <Stack gap="md">
+                                        <Group justify="space-between">
+                                            <ModernCaption>{match.league}</ModernCaption>
                                             <Group gap="xs">
-                                                <IconClock size={14}/>
-                                                <Text size="sm" c="dimmed">{match.time}</Text>
+                                                <IconPlayerPlay size={16} color="var(--modern-lime)"/>
+                                                <Text size="sm" color="var(--modern-lime)" fw={600}>
+                                                    LIVE
+                                                </Text>
                                             </Group>
-                                        </Stack>
+                                        </Group>
 
-                                        <Stack align="center" gap="xs">
-                                            <Avatar
-                                                src={match.awayLogo}
-                                                size="xl"
-                                                radius="md"
-                                            />
-                                            <Text fw={600} size="sm">{match.awayTeam}</Text>
-                                        </Stack>
-                                    </Group>
-                                </Stack>
-                            </ModernCard>
+                                        <Group justify="space-between" align="center">
+                                            <Stack align="center" gap="xs">
+                                                <Avatar
+                                                    src={match.homeLogo}
+                                                    size="xl"
+                                                    radius="md"
+                                                />
+                                                <Text fw={600} size="sm">{match.homeTeam}</Text>
+                                            </Stack>
+
+                                            <Stack align="center" gap="xs">
+                                                <Text
+                                                    size="2.5rem"
+                                                    fw={900}
+                                                    style={{color: 'var(--modern-lime)'}}
+                                                >
+                                                    {match.homeScore !== null ? `${match.homeScore} - ${match.awayScore}` : '- -'}
+                                                </Text>
+                                                <Group gap="xs">
+                                                    <IconClock size={14}/>
+                                                    <Text size="sm" c="dimmed">{match.time}</Text>
+                                                </Group>
+                                            </Stack>
+
+                                            <Stack align="center" gap="xs">
+                                                <Avatar
+                                                    src={match.awayLogo}
+                                                    size="xl"
+                                                    radius="md"
+                                                />
+                                                <Text fw={600} size="sm">{match.awayTeam}</Text>
+                                            </Stack>
+                                        </Group>
+                                    </Stack>
+                                </ModernCard>
+                            </Box>
                         </Grid.Col>
                     ))}
                 </Grid>
@@ -221,73 +233,190 @@ function LiveMatchesSection() {
     );
 }
 
-// Latest News Section Component
-function LatestNewsSection() {
-    const news = [
-        {
-            id: 1,
-            title: 'Guardiola Signs New 3-Year Contract with Man City',
-            excerpt: 'The Spanish manager has committed his future to the club until 2026 after winning four Premier League titles.',
-            category: 'Premier League',
-            time: '2 hours ago',
-            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
-        },
+// Top News Section Component
+function TopNewsSection() {
+    const { navigateWithTransition } = usePageTransition();
+    const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 150, threshold: 0.2 });
+    const theme = useMantineTheme();
+    const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
+
+    const featuredArticle = {
+        id: 1,
+        title: 'How Thomas Tuchel plans to turn England headache into World Cup advantage',
+        excerpt: 'The German manager has been analyzing England\'s recent performances and believes he has found key weaknesses to exploit in the upcoming World Cup campaign.',
+        source: 'The Independent',
+        time: '7 hours ago',
+        image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&w=1200&q=80'
+    };
+
+    const topNews = [
         {
             id: 2,
-            title: '2026 World Cup Stadiums Revealed Across USA, Canada & Mexico',
-            excerpt: 'FIFA has announced the 16 host cities for the expanded 48-team tournament in North America.',
-            category: 'World Cup',
-            time: '5 hours ago',
-            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
+            title: 'Mauricio Pochettino hails MLS decision to make calendar change',
+            source: 'OneFootball',
+            time: 'about an hour ago',
+            image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&w=600&q=80'
         },
         {
             id: 3,
-            title: 'Bellingham Set for Record Move to Real Madrid',
-            excerpt: 'The English midfielder is reportedly close to completing a €120m transfer from Dortmund this summer.',
-            category: 'Transfer News',
-            time: 'Yesterday',
+            title: '5 spicy fixtures you must watch this weekend',
+            source: 'The Football Faithful',
+            time: '13 hours ago',
             image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
         },
         {
             id: 4,
-            title: 'Bellingham Set for Record Move to Real Madrid',
-            excerpt: 'The English midfielder is reportedly close to completing a €120m transfer from Dortmund this summer.',
-            category: 'Transfer News',
-            time: 'Yesterday',
-            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
+            title: 'Croatia win to secure 2026 WC spot; Germany victorious & Netherlands draw',
+            source: 'OneFootball',
+            time: '6 hours ago',
+            image: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=600&q=80'
         },
         {
             id: 5,
-            title: 'Bellingham Set for Record Move to Real Madrid',
-            excerpt: 'The English midfielder is reportedly close to completing a €120m transfer from Dortmund this summer.',
-            category: 'Transfer News',
-            time: 'Yesterday',
+            title: 'Chelsea dealt new injury worry ahead of Barcelona and Arsenal fixtures',
+            source: 'Evening Standard',
+            time: '3 hours ago',
+            image: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=600&q=80'
+        },
+        {
+            id: 6,
+            title: 'Liverpool\'s Title Hopes Dented by Draw at Anfield',
+            source: 'Sky Sports',
+            time: '1 hour ago',
+            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
+        },
+        {
+            id: 7,
+            title: 'Mbappé Announces Decision on Future',
+            source: 'L\'Equipe',
+            time: '4 hours ago',
+            image: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=600&q=80'
+        },
+        {
+            id: 8,
+            title: 'Barcelona\'s Financial Recovery Plan Approved',
+            source: 'Marca',
+            time: '8 hours ago',
+            image: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=600&q=80'
+        },
+        {
+            id: 9,
+            title: 'Bayern Munich Appoint New Sporting Director',
+            source: 'Kicker',
+            time: '12 hours ago',
             image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
         }
     ];
 
     return (
         <Box
-            className="dark-theme"
-            py="6rem"
+            ref={scrollAnimation.ref}
+            className={`dark-theme ${scrollAnimation.className}`}
+            py={{ base: '3rem', md: '6rem' }}
             style={{
-                width: '100vw',
-                marginLeft: 'calc(-50vw + 50%)',
-                marginRight: 'calc(-50vw + 50%)'
+                ...(!isMobile && {
+                    width: '100vw',
+                    marginLeft: 'calc(-50vw + 50%)',
+                    marginRight: 'calc(-50vw + 50%)',
+                }),
             }}
         >
             <Container size="xl">
-                <Group justify="space-between" mb="3rem">
-                    <ModernH2>
-                        Latest <span style={{color: 'var(--modern-lime)'}}>News</span>
+                <Group justify="space-between" mb="3rem" wrap="wrap" gap="md">
+                    <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 2rem)' }}>
+                        Top <span style={{color: 'var(--modern-lime)'}}>News</span>
                     </ModernH2>
-                    <ModernButton variant="secondary">
+                    <ModernButton 
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => navigateWithTransition('/news')}
+                    >
                         View All
                     </ModernButton>
                 </Group>
 
+                {/* Featured Article */}
+                <Grid gutter={0} mb="3rem">
+                    <Grid.Col span={{ base: 12, md: 7 }}>
+                        <Box
+                            onClick={() => navigateWithTransition(`/news/${featuredArticle.id}`)}
+                            style={{
+                                cursor: 'pointer',
+                                position: 'relative',
+                                height: isMobile ? '250px' : '400px',
+                                borderRadius: isMobile ? '8px 8px 0 0' : '8px 0 0 8px',
+                                overflow: 'hidden',
+                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!isMobile) {
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
+                        >
+                            <Box
+                                component="img"
+                                src={featuredArticle.image}
+                                alt={featuredArticle.title}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                }}
+                            />
+                        </Box>
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 5 }}>
+                        <Box
+                            onClick={() => navigateWithTransition(`/news/${featuredArticle.id}`)}
+                            style={{
+                                cursor: 'pointer',
+                                minHeight: isMobile ? 'auto' : '400px',
+                                height: isMobile ? 'auto' : '400px',
+                                backgroundColor: 'var(--modern-black)',
+                                padding: isMobile ? '1.5rem' : '3rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                borderRadius: isMobile ? '0 0 8px 8px' : '0 8px 8px 0',
+                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!isMobile) {
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
+                        >
+                            <Stack gap="md">
+                                <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', lineHeight: 1.3 }}>
+                                    {featuredArticle.title}
+                                </ModernH2>
+                                <ModernBody style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}>
+                                    {featuredArticle.excerpt}
+                                </ModernBody>
+                                <Group gap="xs" mt="md">
+                                    <Text size="sm" c="dimmed">{featuredArticle.source}</Text>
+                                    <Text size="sm" c="dimmed">•</Text>
+                                    <Text size="sm" c="dimmed">{featuredArticle.time}</Text>
+                                </Group>
+                            </Stack>
+                        </Box>
+                    </Grid.Col>
+                </Grid>
+
+                {/* Top News Carousel */}
                 <Carousel
-                    slideSize={{base: '100%', sm: '50%', md: '33.333%'}}
+                    slideSize={{base: '85%', sm: '50%', md: '25%'}}
                     slideGap="lg"
                     align="start"
                     slidesToScroll={1}
@@ -295,41 +424,74 @@ function LatestNewsSection() {
                     loop
                     dragFree
                     height="100%"
+                    styles={{
+                        control: {
+                            opacity: 1,
+                            backgroundColor: 'var(--modern-lime)',
+                            color: 'var(--modern-black)',
+                            border: 'none',
+                            '&[data-inactive]': {
+                                opacity: 0.3,
+                                cursor: 'not-allowed',
+                            },
+                        },
+                        indicator: {
+                            width: 8,
+                            height: 8,
+                            backgroundColor: 'var(--modern-lime)',
+                            opacity: 0.3,
+                            '&[data-active]': {
+                                opacity: 1,
+                            },
+                        },
+                    }}
                 >
-                    {news.map((article) => (
+                    {topNews.map((article) => (
                         <Carousel.Slide key={article.id}>
-                            <ModernCard hover>
-                                <Stack gap="md">
-                                    <Box
-                                        component="img"
-                                        src={article.image}
-                                        alt={article.title}
-                                        style={{
-                                            width: '100%',
-                                            height: '200px',
-                                            objectFit: 'cover',
-                                            borderRadius: '8px',
-                                            transition: 'transform 0.3s ease'
-                                        }}
-                                    />
-                                    <Stack gap="md">
-                                        <Group gap="xs">
-                                            <ModernCaption>{article.category}</ModernCaption>
-                                            <Text size="sm" c="dimmed">•</Text>
-                                            <Text size="sm" c="dimmed">{article.time}</Text>
-                                        </Group>
-                                        <ModernH3>
-                                            {article.title}
-                                        </ModernH3>
-                                        <ModernBody>
-                                            {article.excerpt}
-                                        </ModernBody>
-                                        <ModernButton variant="secondary" size="sm">
-                                            Read More
-                                        </ModernButton>
+                            <Box
+                                onClick={() => navigateWithTransition(`/news/${article.id}`)}
+                                style={{
+                                    cursor: 'pointer',
+                                    height: '100%',
+                                }}
+                            >
+                                <ModernCard hover style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <Stack gap="md" style={{ flex: 1 }}>
+                                        <Box
+                                            component="img"
+                                            src={article.image}
+                                            alt={article.title}
+                                            style={{
+                                                width: '100%',
+                                                height: '180px',
+                                                objectFit: 'cover',
+                                                borderRadius: '4px',
+                                            }}
+                                        />
+                                        <Stack gap="xs" style={{ flex: 1 }}>
+                                            <ModernH3 style={{ fontSize: '1rem', lineHeight: 1.4 }}>
+                                                {article.title}
+                                            </ModernH3>
+                                            <Group gap="xs" justify="space-between" mt="auto">
+                                                <Group gap="xs">
+                                                    <Text size="xs" c="dimmed">{article.source}</Text>
+                                                    <Text size="xs" c="dimmed">•</Text>
+                                                    <Text size="xs" c="dimmed">{article.time}</Text>
+                                                </Group>
+                                                <IconBookmark 
+                                                    size={16} 
+                                                    color="var(--modern-lime)" 
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        // Handle bookmark
+                                                    }}
+                                                />
+                                            </Group>
+                                        </Stack>
                                     </Stack>
-                                </Stack>
-                            </ModernCard>
+                                </ModernCard>
+                            </Box>
                         </Carousel.Slide>
                     ))}
                 </Carousel>
@@ -340,6 +502,9 @@ function LatestNewsSection() {
 
 // Features Section Component
 function FeaturesSection() {
+    const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 200, threshold: 0.2 });
+    const theme = useMantineTheme();
+    const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
     const features = [
         {
             icon: IconBell,
@@ -360,10 +525,16 @@ function FeaturesSection() {
 
     return (
         <Box
-            py="6rem"
+            ref={scrollAnimation.ref}
+            className={scrollAnimation.className}
+            py={{ base: '3rem', md: '6rem' }}
         >
             <Container size="xl">
-                <ModernH2 style={{textAlign: 'center', marginBottom: '4rem'}}>
+                <ModernH2 style={{
+                    textAlign: 'center', 
+                    marginBottom: isMobile ? '2rem' : '4rem',
+                    fontSize: 'clamp(1.25rem, 4vw, 2rem)'
+                }}>
                     Why Choose <span style={{color: 'var(--modern-lime)'}}>I Watch Football</span>?
                 </ModernH2>
 
@@ -384,7 +555,7 @@ function FeaturesSection() {
                                             transition: 'all 0.3s ease'
                                         }}
                                     >
-                                        <feature.icon size={32} color="var(--lando-black)"/>
+                                        <feature.icon size={32} color="var(--modern-black)" stroke={2}/>
                                     </Box>
                                     <ModernH3 style={{textAlign: 'center'}}>
                                         {feature.title}
@@ -407,7 +578,7 @@ export function HomePage() {
         <>
             <HeroSection/>
             <LiveMatchesSection/>
-            <LatestNewsSection/>
+            <TopNewsSection/>
             <FeaturesSection/>
         </>
     );

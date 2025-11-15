@@ -42,28 +42,73 @@ export const ModernButton: React.FC<ModernButtonProps> = ({
     }
   };
 
-  return (
-    <MantineButton
-      {...props}
-      className={`${getVariantClass()} ${getSizeClass()} ${className}`}
-      styles={{
+  const getButtonStyles = () => {
+    const baseStyles = {
+      fontWeight: 600,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.05em',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      position: 'relative' as const,
+      overflow: 'hidden' as const,
+      borderRadius: 0,
+      lineHeight: 1.5,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    };
+
+    if (variant === 'primary') {
+      return {
         root: {
+          ...baseStyles,
+          backgroundColor: 'var(--modern-lime)',
+          border: '2px solid var(--modern-lime)',
+          color: 'var(--modern-black)',
+          '&:hover': {
+            backgroundColor: 'transparent',
+            color: 'var(--modern-lime)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 25px rgba(0, 255, 136, 0.3)',
+          }
+        }
+      };
+    } else {
+      return {
+        root: {
+          ...baseStyles,
           backgroundColor: 'transparent',
           border: '2px solid var(--modern-lime)',
           color: 'var(--modern-lime)',
-          fontWeight: 600,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'relative',
-          overflow: 'hidden',
-          borderRadius: 0,
           '&:hover': {
             backgroundColor: 'var(--modern-lime)',
             color: 'var(--modern-black)',
             transform: 'translateY(-2px)',
             boxShadow: '0 8px 25px rgba(0, 255, 136, 0.3)',
           }
+        }
+      };
+    }
+  };
+
+  const buttonStyles = getButtonStyles();
+  
+  return (
+    <MantineButton
+      {...props}
+      className={`${getVariantClass()} ${getSizeClass()} ${className}`}
+      styles={{
+        ...buttonStyles,
+        inner: {
+          lineHeight: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        label: {
+          lineHeight: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }
       }}
     >

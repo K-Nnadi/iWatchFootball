@@ -11,7 +11,9 @@ import {
     SimpleGrid,
     Stack,
     Image,
+    useMantineTheme,
 } from '@mantine/core';
+import {useMediaQuery} from '@mantine/hooks';
 import {useLocation, useParams} from 'react-router-dom';
 import {usePageTransition} from '../../hooks/usePageTransition';
 import {ModernButton} from '../../components/modern';
@@ -80,6 +82,8 @@ export function MatchPage() {
     const {matchId} = useParams<{ matchId: string }>();
     const location = useLocation();
     const {navigateWithTransition} = usePageTransition();
+    const theme = useMantineTheme();
+    const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
 
     // Mock match data
     const mockMatchDetails: MatchDetails = {
@@ -295,16 +299,25 @@ export function MatchPage() {
                         justify="space-between"
                         style={{width: '100%', maxWidth: '700px'}}
                         align="flex-end"
-                        wrap="nowrap"
+                        wrap={isMobile ? 'wrap' : 'nowrap'}
                         gap="md"
                     >
                         {/* Home Team */}
-                        <Stack gap="sm" align="center" style={{flex: 1, minWidth: 0}}>
+                        <Stack 
+                            gap="sm" 
+                            align="center" 
+                            style={{
+                                flex: isMobile ? '0 0 100%' : 1,
+                                minWidth: 0,
+                                width: isMobile ? '100%' : 'auto',
+                                order: 1,
+                            }}
+                        >
                             <Box
                                 onClick={() => matchDetails.homeTeamId && navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
                                 style={{
-                                    width: 'clamp(50px, 12vw, 80px)',
-                                    height: 'clamp(50px, 12vw, 80px)',
+                                    width: 'clamp(60px, 15vw, 80px)',
+                                    height: 'clamp(60px, 15vw, 80px)',
                                     borderRadius: '50%',
                                     overflow: 'hidden',
                                     border: '2px solid rgba(255, 255, 255, 0.2)',
@@ -330,8 +343,8 @@ export function MatchPage() {
                             >
                                 <Image
                                     src={matchDetails.homeTeamLogo || 'https://via.placeholder.com/70'}
-                                    width="clamp(40px, 10vw, 70px)"
-                                    height="clamp(40px, 10vw, 70px)"
+                                    width="clamp(50px, 12vw, 70px)"
+                                    height="clamp(50px, 12vw, 70px)"
                                     fit="contain"
                                     style={{borderRadius: '50%'}}
                                 />
@@ -343,12 +356,12 @@ export function MatchPage() {
                                     color: 'var(--modern-white)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
-                                    fontSize: 'clamp(0.75rem, 2vw, 1rem)',
+                                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
                                 }}
                             >
                                 {matchDetails.homeTeam}
                             </Text>
-                            <Group gap={4}>
+                            <Group gap={4} justify="center">
                                 {homeForm.map((result, i) => (
                                     <Badge
                                         key={i}
@@ -362,8 +375,13 @@ export function MatchPage() {
                                                         : '#ff4444',
                                             color: 'var(--modern-black)',
                                             fontWeight: 700,
-                                            minWidth: '20px',
-                                            fontSize: '0.7rem',
+                                            minWidth: 'clamp(18px, 4vw, 22px)',
+                                            height: 'clamp(18px, 4vw, 22px)',
+                                            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+                                            padding: '0 4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
                                         }}
                                     >
                                         {result}
@@ -373,33 +391,54 @@ export function MatchPage() {
                         </Stack>
 
                         {/* Center VS block */}
-                        <Stack gap="xs" align="center" style={{padding: '0 clamp(0.5rem, 2vw, 1.5rem)'}}>
+                        <Stack 
+                            gap="xs" 
+                            align="center" 
+                            style={{
+                                padding: '0 clamp(0.5rem, 2vw, 1.5rem)',
+                                width: isMobile ? '100%' : 'auto',
+                                order: isMobile ? 3 : 2,
+                            }}
+                        >
                             <Text
                                 size="xl"
                                 fw={900}
                                 style={{
                                     color: 'var(--modern-lime)',
-                                    fontSize: 'clamp(1rem, 3vw, 1.5rem)',
+                                    fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
                                 }}
                             >
                                 VS
                             </Text>
                             <ModernButton
                                 variant="primary"
-                                size="sm"
+                                size={isMobile ? 'md' : 'sm'}
                                 onClick={handleViewTickets}
+                                style={{
+                                    width: isMobile ? '100%' : 'auto',
+                                    maxWidth: isMobile ? '300px' : 'none',
+                                }}
                             >
                                 View Tickets
                             </ModernButton>
                         </Stack>
 
                         {/* Away Team */}
-                        <Stack gap="sm" align="center" style={{flex: 1, minWidth: 0}}>
+                        <Stack 
+                            gap="sm" 
+                            align="center" 
+                            style={{
+                                flex: isMobile ? '0 0 100%' : 1,
+                                minWidth: 0,
+                                width: isMobile ? '100%' : 'auto',
+                                order: isMobile ? 2 : 3,
+                            }}
+                        >
                             <Box
                                 onClick={() => matchDetails.awayTeamId && navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
                                 style={{
-                                    width: 'clamp(50px, 12vw, 80px)',
-                                    height: 'clamp(50px, 12vw, 80px)',
+                                    width: 'clamp(60px, 15vw, 80px)',
+                                    height: 'clamp(60px, 15vw, 80px)',
                                     borderRadius: '50%',
                                     overflow: 'hidden',
                                     border: '2px solid rgba(255, 255, 255, 0.2)',
@@ -425,8 +464,8 @@ export function MatchPage() {
                             >
                                 <Image
                                     src={matchDetails.awayTeamLogo || 'https://via.placeholder.com/70'}
-                                    width="clamp(40px, 10vw, 70px)"
-                                    height="clamp(40px, 10vw, 70px)"
+                                    width="clamp(50px, 12vw, 70px)"
+                                    height="clamp(50px, 12vw, 70px)"
                                     fit="contain"
                                     style={{borderRadius: '50%'}}
                                 />
@@ -438,12 +477,12 @@ export function MatchPage() {
                                     color: 'var(--modern-white)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
-                                    fontSize: 'clamp(0.75rem, 2vw, 1rem)',
+                                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
                                 }}
                             >
                                 {matchDetails.awayTeam}
                             </Text>
-                            <Group gap={4}>
+                            <Group gap={4} justify="center">
                                 {awayForm.map((result, i) => (
                                     <Badge
                                         key={i}
@@ -457,8 +496,13 @@ export function MatchPage() {
                                                         : '#ff4444',
                                             color: 'var(--modern-black)',
                                             fontWeight: 700,
-                                            minWidth: '20px',
-                                            fontSize: '0.7rem',
+                                            minWidth: 'clamp(18px, 4vw, 22px)',
+                                            height: 'clamp(18px, 4vw, 22px)',
+                                            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+                                            padding: '0 4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
                                         }}
                                     >
                                         {result}

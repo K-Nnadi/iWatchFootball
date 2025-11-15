@@ -31,66 +31,75 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
             }}
         >
             <Container px="md" h={'100%'}>
-                <Flex justify={'space-between'} align="center" h="100%">
-                    {/* Logo Section */}
-                    <Group gap="xs">
+                <Flex justify={'space-between'} align="center" h="100%" style={{ position: 'relative' }}>
+                    {/* Left Section - Burger Menu */}
+                    <Group gap="xs" style={{ flex: 1 }}>
                         <Burger opened={navbarOpen} onClick={toggleNavbar} hiddenFrom="sm" size="md" color="var(--modern-white)" />
-                        <Group gap="xs" visibleFrom="sm">
-                            <Title 
-                                order={3} 
-                                size="xl" 
-                                fw={700} 
-                                c="var(--modern-white)" 
-                                onClick={() => navigateWithTransition('/')}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                I Watch Football
-                            </Title>
-                        </Group>
                     </Group>
 
-                    {/* Navigation Links */}
-                    {showHeader && (
-                        <Group gap="xl" visibleFrom="md">
-                            {pages.map(({ page, label }) => (
-                                <Button
-                                    key={label}
-                                    variant="subtle"
-                                    onClick={() => navigateWithTransition(`/${page}`)}
-                                    style={{
-                                        color: 'var(--modern-white)',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        fontWeight: 600,
-                                        padding: '0.5rem 1rem',
-                                        borderRadius: '0',
-                                        border: '2px solid transparent',
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        backgroundColor: 'transparent'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.color = 'var(--modern-lime)';
-                                        e.currentTarget.style.borderColor = 'var(--modern-lime)';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.color = 'var(--modern-white)';
-                                        e.currentTarget.style.borderColor = 'transparent';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                >
-                                    {label}
-                                </Button>
-                            ))}
-                        </Group>
-                    )}
+                    {/* Center Section - Title and Navigation */}
+                    <Box style={{ 
+                        position: 'absolute', 
+                        left: '50%', 
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}>
+                        <Title 
+                            order={2} 
+                            size={{ base: '1.5rem', sm: '1.75rem', md: '2rem' }}
+                            fw={700} 
+                            c="var(--modern-white)" 
+                            onClick={() => navigateWithTransition('/')}
+                            style={{ cursor: 'pointer', textAlign: 'center' }}
+                        >
+                            I Watch Football
+                        </Title>
+                        {/* Navigation Links */}
+                        {showHeader && (
+                            <Group gap="xl" visibleFrom="md">
+                                {pages.map(({ page, label }) => (
+                                    <Button
+                                        key={label}
+                                        variant="subtle"
+                                        onClick={() => navigateWithTransition(`/${page}`)}
+                                        style={{
+                                            color: 'var(--modern-white)',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            fontWeight: 600,
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '0',
+                                            border: '2px solid transparent',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            backgroundColor: 'transparent'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.color = 'var(--modern-lime)';
+                                            e.currentTarget.style.borderColor = 'var(--modern-lime)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.color = 'var(--modern-white)';
+                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        {label}
+                                    </Button>
+                                ))}
+                            </Group>
+                        )}
+                    </Box>
 
                     {/* Right Section */}
-                    <Group gap="lg">
+                    <Group gap="lg" style={{ flex: 1, justifyContent: 'flex-end' }}>
                         {showHeader && (
                             <>
                                 <IoSettingsOutline
