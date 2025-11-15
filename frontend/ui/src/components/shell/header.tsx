@@ -49,11 +49,14 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     }}>
                         <Title 
                             order={2} 
-                            size={{ base: '1.5rem', sm: '1.75rem', md: '2rem' }}
                             fw={700} 
                             c="var(--modern-white)" 
                             onClick={() => navigateWithTransition('/')}
-                            style={{ cursor: 'pointer', textAlign: 'center' }}
+                            style={{ 
+                                cursor: 'pointer', 
+                                textAlign: 'center',
+                                fontSize: 'clamp(1.5rem, 4vw, 2rem)'
+                            }}
                         >
                             I Watch Football
                         </Title>

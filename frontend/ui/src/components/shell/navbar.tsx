@@ -102,13 +102,6 @@ export function Navbar() {
                     zIndex: 200,
                     pointerEvents: 'auto',
                 }}
-                sx={(theme) => ({
-                    [theme.fn.largerThan('sm')]: {
-                        height: 'auto',
-                        position: 'relative',
-                        zIndex: 'auto',
-                    },
-                })}
             >
             <Stack gap="lg" style={{ 
                 justifyContent: 'center', 
