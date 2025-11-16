@@ -19,17 +19,18 @@ export const ModernCard: React.FC<ModernCardProps> = ({
       className={`modern-card ${accent ? 'modern-card-accent' : ''} ${className}`}
       styles={{
         root: {
-          backgroundColor: 'var(--modern-dark-gray)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundColor: 'var(--modern-card-bg)',
+          border: '1px solid var(--modern-card-border)',
           borderRadius: 0,
           padding: '2rem',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
           overflow: 'hidden',
+          color: 'var(--modern-text-primary)',
           '&:hover': hover ? {
             transform: 'translateY(-8px)',
             borderColor: 'var(--modern-lime)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+            boxShadow: '0 20px 40px var(--modern-shadow-color)',
           } : {}
         }
       }}

@@ -33,7 +33,6 @@ function HeroSection() {
     
     return (
         <Box
-            className="dark-theme"
             style={{
                 padding: isMobile ? '3rem 0' : '6rem 0',
                 position: 'relative',
@@ -41,27 +40,31 @@ function HeroSection() {
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
+                backgroundColor: 'var(--modern-bg-primary)',
+                color: 'var(--modern-text-primary)',
                 ...(!isMobile && {
                     width: '100vw',
-                    marginLeft: 'calc(-50vw + 50%)',
-                    marginRight: 'calc(-50vw + 50%)',
+                    marginLeft: 'calc(50% - 50vw)',
+                    marginRight: 'calc(50% - 50vw)',
                 }),
             }}
         >
-            {/* Background Pattern */}
+            {/* Subtle Background Pattern */}
             <Box
+                className="section-background-pattern"
                 style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'linear-gradient(45deg, transparent 0%, rgba(0, 255, 136, 0.05) 100%)',
-                    pointerEvents: 'none'
+                    opacity: 0.03,
+                    pointerEvents: 'none',
+                    zIndex: 0,
                 }}
             />
 
-            <Container size="xl">
+            <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
                 <Grid align="center" gutter="xl">
                     <Grid.Col span={{base: 12, md: 6}}>
                         <Stack gap="xl" className="hero-content">
@@ -147,8 +150,31 @@ function LiveMatchesSection() {
             ref={scrollAnimation.ref}
             className={scrollAnimation.className}
             py={{ base: '3rem', md: '6rem' }}
+            px={{ base: 'md', md: 0 }}
+            style={{
+                backgroundColor: 'var(--modern-bg-secondary)',
+                color: 'var(--modern-text-primary)',
+                borderTop: '1px solid var(--modern-section-divider)',
+                borderBottom: '1px solid var(--modern-section-divider)',
+                position: 'relative',
+                overflow: 'hidden',
+            }}
         >
-            <Container size="xl">
+            {/* Subtle Background Pattern */}
+            <Box
+                className="section-background-pattern"
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0.03,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                }}
+            />
+            <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
                 <Group justify="space-between" mb="3rem" wrap="wrap" gap="md">
                     <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 2rem)' }}>
                         Live <span style={{color: 'var(--modern-lime)'}}>Matches</span>
@@ -311,17 +337,37 @@ function TopNewsSection() {
     return (
         <Box
             ref={scrollAnimation.ref}
-            className={`dark-theme ${scrollAnimation.className}`}
+            className={scrollAnimation.className}
             py={{ base: '3rem', md: '6rem' }}
             style={{
+                backgroundColor: 'var(--modern-bg-primary)',
+                color: 'var(--modern-text-primary)',
+                borderTop: '1px solid var(--modern-section-divider)',
+                borderBottom: '1px solid var(--modern-section-divider)',
+                position: 'relative',
+                overflow: 'hidden',
                 ...(!isMobile && {
                     width: '100vw',
-                    marginLeft: 'calc(-50vw + 50%)',
-                    marginRight: 'calc(-50vw + 50%)',
+                    marginLeft: 'calc(50% - 50vw)',
+                    marginRight: 'calc(50% - 50vw)',
                 }),
             }}
         >
-            <Container size="xl">
+            {/* Subtle Background Pattern */}
+            <Box
+                className="section-background-pattern"
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0.03,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                }}
+            />
+            <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
                 <Group justify="space-between" mb="3rem" wrap="wrap" gap="md">
                     <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 2rem)' }}>
                         Top <span style={{color: 'var(--modern-lime)'}}>News</span>
@@ -378,7 +424,7 @@ function TopNewsSection() {
                                 cursor: 'pointer',
                                 minHeight: isMobile ? 'auto' : '400px',
                                 height: isMobile ? 'auto' : '400px',
-                                backgroundColor: 'var(--modern-black)',
+                                backgroundColor: 'var(--modern-card-bg)',
                                 padding: isMobile ? '1.5rem' : '3rem',
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -424,11 +470,11 @@ function TopNewsSection() {
                     loop
                     dragFree
                     height="100%"
-                    styles={{
+                        styles={{
                         control: {
                             opacity: 1,
                             backgroundColor: 'var(--modern-lime)',
-                            color: 'var(--modern-black)',
+                            color: 'var(--modern-bg-primary)',
                             border: 'none',
                             '&[data-inactive]': {
                                 opacity: 0.3,
@@ -528,8 +574,30 @@ function FeaturesSection() {
             ref={scrollAnimation.ref}
             className={scrollAnimation.className}
             py={{ base: '3rem', md: '6rem' }}
+            px={{ base: 'md', md: 0 }}
+            style={{
+                backgroundColor: 'var(--modern-bg-secondary)',
+                color: 'var(--modern-text-primary)',
+                borderTop: '1px solid var(--modern-section-divider)',
+                position: 'relative',
+                overflow: 'hidden',
+            }}
         >
-            <Container size="xl">
+            {/* Subtle Background Pattern */}
+            <Box
+                className="section-background-pattern"
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0.03,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                }}
+            />
+            <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
                 <ModernH2 style={{
                     textAlign: 'center', 
                     marginBottom: isMobile ? '2rem' : '4rem',
@@ -555,7 +623,7 @@ function FeaturesSection() {
                                             transition: 'all 0.3s ease'
                                         }}
                                     >
-                                        <feature.icon size={32} color="var(--modern-black)" stroke={2}/>
+                                        <feature.icon size={32} color="var(--modern-bg-primary)" stroke={2}/>
                                     </Box>
                                     <ModernH3 style={{textAlign: 'center'}}>
                                         {feature.title}

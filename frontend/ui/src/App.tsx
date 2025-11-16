@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <MantineProvider defaultColorScheme={'light'}>
+            <MantineProvider defaultColorScheme={'dark'}>
                 <Notifications />
                 <Router/>
             </MantineProvider>

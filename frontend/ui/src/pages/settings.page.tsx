@@ -61,15 +61,23 @@ export function SettingsPage() {
 
             <Paper withBorder shadow="sm" p="md" radius="md">
                 <Group justify="space-between" mb="md">
-                    <Text>Dark Mode</Text>
+                    <Text c="var(--modern-text-primary)">Dark Mode</Text>
                     <Switch
                         checked={isDarkMode}
                         onChange={(event) => handleDarkModeChange(event.currentTarget.checked)}
+                        styles={{
+                            track: {
+                                backgroundColor: isDarkMode ? 'var(--modern-lime)' : undefined,
+                            },
+                            thumb: {
+                                backgroundColor: isDarkMode ? 'var(--modern-bg-primary)' : undefined,
+                            }
+                        }}
                     />
                 </Group>
 
                 <Group justify="space-between" mb="md">
-                    <Text>Language</Text>
+                    <Text c="var(--modern-text-primary)">Language</Text>
                     <Select
                         value={language}
                         onChange={(value) => value && setLanguage(value)}
@@ -83,18 +91,50 @@ export function SettingsPage() {
                 </Group>
 
                 <Group justify="space-between" mb="md">
-                    <Text>Match Notifications</Text>
+                    <Text c="var(--modern-text-primary)">Match Notifications</Text>
                     <Switch
                         checked={notificationsEnabled}
                         onChange={(event) => setNotificationsEnabled(event.currentTarget.checked)}
+                        styles={{
+                            track: {
+                                backgroundColor: notificationsEnabled ? 'var(--modern-lime)' : undefined,
+                            },
+                            thumb: {
+                                backgroundColor: notificationsEnabled ? 'var(--modern-bg-primary)' : undefined,
+                            }
+                        }}
                     />
                 </Group>
 
                 <Group justify="flex-end" mt="lg">
-                    <Button variant="outline" onClick={() => window.history.back()}>
+                    <Button 
+                        variant="outline" 
+                        onClick={() => window.history.back()}
+                        style={{
+                            borderColor: 'var(--modern-lime)',
+                            color: 'var(--modern-lime)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            fontWeight: 600,
+                            borderRadius: '0',
+                        }}
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button 
+                        onClick={handleSave}
+                        style={{
+                            backgroundColor: 'var(--modern-lime)',
+                            color: 'var(--modern-bg-primary)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            fontWeight: 600,
+                            borderRadius: '0',
+                            border: '2px solid var(--modern-lime)',
+                        }}
+                    >
+                        Save Changes
+                    </Button>
                 </Group>
             </Paper>
         </Container>

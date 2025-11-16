@@ -30,13 +30,44 @@
   }
 }
 
+/* Blinking red dot animation */
+@keyframes blink-dot {
+  0%, 45% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50%, 95% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 :root {
-  /* Modern Color Palette */
+  /* Modern Color Palette - Base Colors */
   --modern-black: #000000;
   --modern-lime: #00ff88;
   --modern-white: #ffffff;
   --modern-gray: #666666;
   --modern-dark-gray: #1a1a1a;
+  
+  /* Theme-aware Color Variables - Default to Dark Mode */
+  --modern-bg-primary: var(--modern-black);
+  --modern-bg-secondary: var(--modern-dark-gray);
+  --modern-text-primary: var(--modern-white);
+  --modern-text-secondary: var(--modern-gray);
+  --modern-border-color: rgba(255, 255, 255, 0.1);
+  --modern-card-bg: var(--modern-dark-gray);
+  --modern-card-border: rgba(255, 255, 255, 0.1);
+  --modern-navbar-bg: var(--modern-black);
+  --modern-header-bg: var(--modern-black);
+  --modern-shadow-color: rgba(0, 0, 0, 0.3);
+  --modern-backdrop-color: rgba(0, 0, 0, 0.5);
+  --modern-bg-tertiary: #0f0f0f;
+  --modern-section-divider: rgba(255, 255, 255, 0.05);
   
   /* Typography */
   --modern-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -55,10 +86,77 @@
   --modern-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+/* Light Mode Theme Variables */
+[data-mantine-color-scheme="light"] {
+  --modern-bg-primary: var(--modern-white);
+  --modern-bg-secondary: #f8f9fa;
+  --modern-bg-tertiary: #f0f0f0;
+  --modern-text-primary: var(--modern-black);
+  --modern-text-secondary: #4a4a4a;
+  --modern-border-color: rgba(0, 0, 0, 0.1);
+  --modern-card-bg: #f8f9fa;
+  --modern-card-border: rgba(0, 0, 0, 0.1);
+  --modern-navbar-bg: var(--modern-white);
+  --modern-header-bg: var(--modern-white);
+  --modern-shadow-color: rgba(0, 0, 0, 0.1);
+  --modern-backdrop-color: rgba(0, 0, 0, 0.3);
+  --modern-section-divider: rgba(0, 0, 0, 0.08);
+  --modern-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --modern-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --modern-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Theme Variables (explicit) */
+[data-mantine-color-scheme="dark"] {
+  --modern-bg-primary: var(--modern-black);
+  --modern-bg-secondary: var(--modern-dark-gray);
+  --modern-bg-tertiary: #0f0f0f;
+  --modern-text-primary: var(--modern-white);
+  --modern-text-secondary: var(--modern-gray);
+  --modern-border-color: rgba(255, 255, 255, 0.1);
+  --modern-card-bg: var(--modern-dark-gray);
+  --modern-card-border: rgba(255, 255, 255, 0.1);
+  --modern-navbar-bg: var(--modern-black);
+  --modern-header-bg: var(--modern-black);
+  --modern-shadow-color: rgba(0, 0, 0, 0.3);
+  --modern-backdrop-color: rgba(0, 0, 0, 0.5);
+  --modern-section-divider: rgba(255, 255, 255, 0.05);
+  --modern-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --modern-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --modern-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
 /* Global Reset for Modern Aesthetic */
 * {
   box-sizing: border-box;
 }
+
+/* Smooth transitions for theme changes - applied globally */
+html,
+body,
+* {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Exclude elements that shouldn't transition (animations, etc.) */
+[style*="animation"],
+[class*="animate"],
+[class*="slide"],
+[class*="fade"],
+.navbar-slide-down,
+.navbar-slide-up {
+  transition: none !important;
+}
+
+/* Exclude page transition elements from global theme transitions - they have their own */
+.page-transition-loading {
+  transition: opacity 300ms ease-in-out, background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Page transition ball uses inline styles for transitions - don't override */
 
 /* Ensure all Mantine components use our design system - only for dark theme */
 .dark-theme .mantine-Button-root {
@@ -105,9 +203,12 @@
 
 /* Navbar styling with modern button effects */
 .mantine-Navbar-root {
-  background-color: var(--modern-black) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  background-color: var(--modern-navbar-bg) !important;
+  border-right: 1px solid var(--modern-border-color) !important;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   will-change: transform, opacity;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
@@ -140,7 +241,7 @@
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-color: var(--modern-backdrop-color) !important;
     z-index: 199 !important;
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
@@ -292,7 +393,7 @@
 }
 
 .mantine-NavLink-root {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.1em !important;
   font-weight: 700 !important;
@@ -354,21 +455,21 @@
 
 .mantine-NavLink-root[data-active="true"],
 .mantine-NavLink-root.nav-link-active {
-  color: rgba(255, 255, 255, 0.4) !important;
+  color: var(--modern-text-secondary) !important;
   border-color: transparent !important;
   background-color: transparent !important;
-  opacity: 0.4 !important;
+  opacity: 0.6 !important;
 }
 
 .mantine-NavLink-root[data-active="true"] *,
 .mantine-NavLink-root.nav-link-active * {
-  color: rgba(255, 255, 255, 0.4) !important;
-  opacity: 0.4 !important;
+  color: var(--modern-text-secondary) !important;
+  opacity: 0.6 !important;
 }
 
 /* Override Mantine's default blue colors */
 .mantine-NavLink-root[data-variant="subtle"] {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
 }
 
 .mantine-NavLink-root[data-variant="subtle"]:hover {
@@ -383,7 +484,7 @@
 
 /* Override any Mantine color schemes */
 .mantine-NavLink-root[data-color="blue"] {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
 }
 
 .mantine-NavLink-root[data-color="blue"]:hover {
@@ -397,7 +498,7 @@
 /* Force override all Mantine NavLink colors */
 .mantine-NavLink-root,
 .mantine-NavLink-root * {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
 }
 
 .mantine-NavLink-root:hover,
@@ -436,23 +537,28 @@
 
 /* Header styling with modern theme */
 .mantine-Header-root {
-  background-color: var(--modern-black) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--modern-header-bg) !important;
+  box-shadow: 0 1px 3px var(--modern-shadow-color) !important;
+  border-bottom: 1px solid var(--modern-border-color) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .mantine-Title-root {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
   font-family: var(--modern-font-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .mantine-Burger-root {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Header navigation buttons */
 .mantine-Button-root[data-variant="subtle"] {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
   font-weight: 600 !important;
@@ -486,7 +592,7 @@
 
 .mantine-Button-root[data-variant="outline"]:hover {
   background-color: var(--modern-lime) !important;
-  color: var(--modern-black) !important;
+  color: var(--modern-bg-primary) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3) !important;
 }
@@ -494,7 +600,7 @@
 /* Header filled buttons */
 .mantine-Button-root[data-variant="filled"] {
   background-color: var(--modern-lime) !important;
-  color: var(--modern-black) !important;
+  color: var(--modern-bg-primary) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
   font-weight: 600 !important;
@@ -513,9 +619,9 @@
 
 /* Logs page specific styling */
 .dark-theme .mantine-Select-input {
-  background-color: var(--modern-dark-gray) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  color: var(--modern-white) !important;
+  background-color: var(--modern-card-bg) !important;
+  border-color: var(--modern-border-color) !important;
+  color: var(--modern-text-primary) !important;
 }
 
 .dark-theme .mantine-Select-input:focus {
@@ -524,21 +630,21 @@
 }
 
 .dark-theme .mantine-Select-dropdown {
-  background-color: var(--modern-dark-gray) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background-color: var(--modern-card-bg) !important;
+  border: 1px solid var(--modern-border-color) !important;
 }
 
 .dark-theme .mantine-Select-option {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
 }
 
 .dark-theme .mantine-Select-option:hover {
   background-color: var(--modern-lime) !important;
-  color: var(--modern-black) !important;
+  color: var(--modern-bg-primary) !important;
 }
 
 .dark-theme .mantine-Tabs-tab {
-  color: var(--modern-white) !important;
+  color: var(--modern-text-primary) !important;
   border-bottom: 2px solid transparent !important;
 }
 
@@ -552,10 +658,36 @@
   background-color: rgba(0, 255, 136, 0.1) !important;
 }
 
-/* Remove AppShell padding for full-width dark sections */
-.dark-theme {
-  margin: -1rem !important;
+/* Remove AppShell padding for full-width sections */
+.mantine-AppShell-Main {
+  overflow-x: visible !important;
+  padding: 0 !important;
+}
+
+.mantine-AppShell-Main .dark-theme {
+  margin-left: -1rem !important;
+  margin-right: -1rem !important;
   padding: 1rem !important;
+  width: calc(100% + 2rem) !important;
+  position: relative !important;
+}
+
+/* Also handle dark-theme at root level */
+.dark-theme {
+  margin-left: -1rem !important;
+  margin-right: -1rem !important;
+  padding: 1rem !important;
+  width: calc(100% + 2rem) !important;
+  position: relative !important;
+}
+
+/* Mobile override - keep margin 0 on mobile */
+@media (max-width: 768px) {
+  .dark-theme {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
 }
 
 /* Ensure proper spacing for dark theme sections */
@@ -568,16 +700,21 @@ body {
   font-family: var(--modern-font-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Only apply dark theme to specific pages that need it */
+/* Only apply dark theme to specific pages that need it - now theme-aware */
 .dark-theme {
-  background-color: var(--modern-black);
-  color: var(--modern-white);
+  background-color: var(--modern-bg-primary) !important;
+  color: var(--modern-text-primary) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark-theme * {
-  color: var(--modern-white);
+  color: var(--modern-text-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Modern Typography System */
@@ -607,7 +744,7 @@ body {
 .modern-body {
   font-size: 1.125rem;
   line-height: 1.7;
-  color: var(--modern-gray);
+  color: var(--modern-text-secondary);
 }
 
 .modern-caption {
@@ -701,7 +838,7 @@ body {
 }
 
 .modern-btn:hover {
-  color: var(--modern-black) !important;
+  color: var(--modern-bg-primary) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3) !important;
 }
@@ -712,7 +849,7 @@ body {
 
 .modern-btn-primary {
   background: var(--modern-lime) !important;
-  color: var(--modern-black) !important;
+  color: var(--modern-bg-primary) !important;
   border-color: var(--modern-lime) !important;
 }
 
@@ -722,13 +859,19 @@ body {
   border-color: var(--modern-lime) !important;
 }
 
+.modern-btn-primary:hover::before {
+  left: 0;
+}
+
 /* Modern Card System */
 .modern-card {
-  background: var(--modern-dark-gray);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--modern-card-bg);
+  border: 1px solid var(--modern-card-border);
   border-radius: 0;
   padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   height: 100%;
@@ -752,7 +895,7 @@ body {
 .modern-card:hover {
   transform: translateY(-8px);
   border-color: var(--modern-lime);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px var(--modern-shadow-color);
 }
 
 .modern-card:hover::before {
@@ -793,7 +936,7 @@ body {
 .modern-card .modern-body {
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--modern-gray);
+  color: var(--modern-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -858,7 +1001,7 @@ body {
 
 .modern-card .match-time {
   font-size: 0.75rem;
-  color: var(--modern-gray);
+  color: var(--modern-text-secondary);
   text-align: center;
   margin-bottom: 1rem;
 }
@@ -888,7 +1031,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--modern-black);
+  background: var(--modern-bg-primary);
   position: relative;
   overflow: hidden;
 }
@@ -923,14 +1066,14 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.9);
+  background: var(--modern-navbar-bg);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--modern-border-color);
   padding: 1rem 0;
 }
 
 .modern-nav-link {
-  color: var(--modern-white);
+  color: var(--modern-text-primary);
   text-decoration: none;
   font-weight: 500;
   text-transform: uppercase;
@@ -1046,15 +1189,142 @@ body {
   }
 }
 
-/* Dark mode is default, but light mode support */
-@media (prefers-color-scheme: light) {
-  .modern-light-mode {
-    background-color: var(--modern-white);
-    color: var(--modern-black);
-  }
-  
-  .modern-light-mode .modern-card {
-    background: #f8f9fa;
-    border-color: rgba(0, 0, 0, 0.1);
-  }
+/* Ensure Mantine components also respect theme for non-dark-theme sections */
+[data-mantine-color-scheme="light"] .mantine-Button-root[data-variant="subtle"] {
+  color: var(--modern-text-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-mantine-color-scheme="light"] .mantine-Title-root {
+  color: var(--modern-text-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-mantine-color-scheme="light"] .mantine-Text-root {
+  color: var(--modern-text-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-mantine-color-scheme="light"] .mantine-Burger-root {
+  color: var(--modern-text-primary) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Ensure dark-theme class also respects color scheme */
+[data-mantine-color-scheme="light"] .dark-theme {
+  background-color: var(--modern-bg-primary);
+  color: var(--modern-text-primary);
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-mantine-color-scheme="light"] .dark-theme * {
+  color: var(--modern-text-primary);
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Override Mantine's default blue button colors to use lime green */
+.mantine-Button-root[data-variant="filled"]:not([style*="background-color"]) {
+  background-color: var(--modern-lime) !important;
+  color: var(--modern-bg-primary) !important;
+  border-color: var(--modern-lime) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mantine-Button-root[data-variant="filled"]:not([style*="background-color"]):hover {
+  background-color: transparent !important;
+  color: var(--modern-lime) !important;
+  border-color: var(--modern-lime) !important;
+}
+
+/* Override Switch component colors to use lime green */
+.mantine-Switch-track[data-checked="true"],
+.mantine-Switch-track[aria-checked="true"] {
+  background-color: var(--modern-lime) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mantine-Switch-thumb[data-checked="true"],
+.mantine-Switch-thumb[aria-checked="true"] {
+  background-color: var(--modern-bg-primary) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Override all Switch components to use lime when checked */
+.mantine-Switch-input:checked + .mantine-Switch-track {
+  background-color: var(--modern-lime) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mantine-Switch-input:checked + .mantine-Switch-track .mantine-Switch-thumb {
+  background-color: var(--modern-bg-primary) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mantine-Switch-track {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mantine-Switch-thumb {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Subtle background pattern for sections */
+.section-background-pattern {
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      var(--modern-lime) 10px,
+      var(--modern-lime) 11px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      var(--modern-lime) 10px,
+      var(--modern-lime) 11px
+    );
+  background-size: 20px 20px;
+  mix-blend-mode: overlay;
+}
+
+/* Alternative subtle grid pattern for light mode */
+[data-mantine-color-scheme="light"] .section-background-pattern {
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      var(--modern-lime) 40px,
+      var(--modern-lime) 41px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      var(--modern-lime) 40px,
+      var(--modern-lime) 41px
+    );
+  background-size: 40px 40px;
+  opacity: 0.02;
+  mix-blend-mode: multiply;
+}
+
+/* Subtle diagonal lines pattern for dark mode */
+[data-mantine-color-scheme="dark"] .section-background-pattern {
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      var(--modern-lime) 20px,
+      var(--modern-lime) 21px
+    );
+  background-size: 28px 28px;
+  opacity: 0.04;
+  mix-blend-mode: screen;
 }

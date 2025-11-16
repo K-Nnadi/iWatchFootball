@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Stack } from '@mantine/core';
+import { Box } from '@mantine/core';
 import { usePageTransitionStore } from '../../shared/stores/pageTransition.store';
 
 interface PageTransitionProps {
@@ -20,19 +20,20 @@ export function PageTransition({ children }: PageTransitionProps) {
       // Fade in the loading screen
       setLoadingOpacity(1);
       
-      // Phase 1: Spin for 60% of duration
-      const spinDuration = duration * 0.6;
+      // Phase 1: Spin for 40% of duration
+      const spinDuration = duration * 0.4;
       const spinTimer = setTimeout(() => {
         setAnimationPhase('stop');
       }, spinDuration);
       
-      // Phase 2: Stop and zoom for remaining 40% of duration
-      const zoomStartTime = spinDuration; // 200ms pause between spin and zoom
-      const zoomTimer = setTimeout(() => {
+      // Phase 2: Brief pause (stop) - 10% of duration
+      const stopDuration = duration * 0.1;
+      const stopTimer = setTimeout(() => {
         setAnimationPhase('zoom');
-      }, zoomStartTime);
+      }, spinDuration + stopDuration);
       
-      // Phase 3: Fade out and show content
+      // Phase 3: Zoom for 30% of duration
+      // Phase 4: Fade out and show content - remaining 20% of duration
       const fadeOutTimer = setTimeout(() => {
         setLoadingOpacity(0);
         
@@ -46,7 +47,7 @@ export function PageTransition({ children }: PageTransitionProps) {
       
       return () => {
         clearTimeout(spinTimer);
-        clearTimeout(zoomTimer);
+        clearTimeout(stopTimer);
         clearTimeout(fadeOutTimer);
       };
     }
@@ -94,6 +95,7 @@ export function PageTransition({ children }: PageTransitionProps) {
     const getAnimationStyles = () => {
       const baseSize = 120;
       const maxZoomSize = 800; // Maximum zoom size
+      const zoomDuration = duration * 0.3; // Match the zoom phase duration
       
       switch (animationPhase) {
         case 'spin':
@@ -102,6 +104,7 @@ export function PageTransition({ children }: PageTransitionProps) {
             height: `${baseSize}px`,
             animation: 'spin 1.5s linear infinite',
             transform: 'scale(1)',
+            transition: 'none',
           };
         case 'stop':
           return {
@@ -117,7 +120,7 @@ export function PageTransition({ children }: PageTransitionProps) {
             height: `${maxZoomSize}px`,
             animation: 'none',
             transform: 'scale(1)',
-            transition: 'all 0.8s ease-in',
+            transition: `all ${zoomDuration}ms ease-in`,
           };
         default:
           return {
@@ -125,19 +128,21 @@ export function PageTransition({ children }: PageTransitionProps) {
             height: `${baseSize}px`,
             animation: 'none',
             transform: 'scale(1)',
+            transition: 'none',
           };
       }
     };
 
     return (
       <Box
+        className="page-transition-loading"
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'var(--modern-black)',
+          backgroundColor: 'var(--modern-bg-primary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -152,6 +157,7 @@ export function PageTransition({ children }: PageTransitionProps) {
         }}
       >
           <Box
+              className="page-transition-ball"
               style={{
                   position: 'relative',
                   ...getAnimationStyles(),

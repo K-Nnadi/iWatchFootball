@@ -120,3 +120,4 @@ export class CreateNewsArticleDTO extends PickType(NewsArticle, [
     'metadata'
 ] as const) {}
 
+

@@ -112,6 +112,31 @@ export function MatchesPage() {
         setCurrentStartDate(newStart);
         setSelectedDateIndex(3);
     }
+
+    function onDateSelect(date: Date) {
+        // Normalize the selected date
+        const selected = new Date(date);
+        selected.setHours(0, 0, 0, 0);
+
+        // Check if the date is in the current window
+        const currentDates = generateDates();
+        const indexInWindow = currentDates.findIndex(d => {
+            const dayDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            return dayDate.getTime() === selected.getTime();
+        });
+
+        if (indexInWindow !== -1) {
+            // Date is in current window, just select it
+            setSelectedDateIndex(indexInWindow);
+        } else {
+            // Date is outside current window, shift window to center it at index 3
+            const newStart = new Date(selected);
+            newStart.setDate(selected.getDate() - 3);
+            setCurrentStartDate(newStart);
+            setSelectedDateIndex(3);
+        }
+    }
+
     function getDateLabelForNav(d: Date): string {
         const dayDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         const dayToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -236,13 +261,13 @@ export function MatchesPage() {
 
     return (
         <Box className="dark-theme" style={{ 
-            backgroundColor: 'var(--modern-black)', 
+            backgroundColor: 'var(--modern-bg-primary)', 
             minHeight: '100vh',
             padding: '2rem 0'
         }}>
             <Container size="lg" style={{ position: 'relative', minHeight: '400px' }}>
                 <ModernH1 style={{ 
-                    color: 'var(--modern-white)', 
+                    color: 'var(--modern-text-primary)', 
                     marginBottom: '1.5rem',
                     textAlign: 'center'
                 }}>
@@ -254,12 +279,12 @@ export function MatchesPage() {
                     p="md" 
                     mb="lg" 
                     style={{ 
-                        backgroundColor: 'var(--modern-dark-gray)', 
-                        border: '1px solid rgba(255, 255, 255, 0.1)' 
+                        backgroundColor: 'var(--modern-card-bg)', 
+                        border: '1px solid var(--modern-border-color)' 
                     }}
                 >
                     <Group gap="md">
-                        <Text size="sm" fw={600} style={{ color: 'var(--modern-white)' }}>
+                        <Text size="sm" fw={600} style={{ color: 'var(--modern-text-primary)' }}>
                             Filters:
                         </Text>
                         <Chip
@@ -269,7 +294,7 @@ export function MatchesPage() {
                             styles={{
                                 label: {
                                     backgroundColor: showLive ? 'var(--modern-lime)' : 'transparent',
-                                    color: showLive ? 'var(--modern-black)' : 'var(--modern-white)',
+                                    color: showLive ? 'var(--modern-bg-primary)' : 'var(--modern-text-primary)',
                                     borderColor: 'var(--modern-lime)',
                                     fontWeight: 600,
                                 }
@@ -284,7 +309,7 @@ export function MatchesPage() {
                             styles={{
                                 label: {
                                     backgroundColor: showAvailableTickets ? 'var(--modern-lime)' : 'transparent',
-                                    color: showAvailableTickets ? 'var(--modern-black)' : 'var(--modern-white)',
+                                    color: showAvailableTickets ? 'var(--modern-bg-primary)' : 'var(--modern-text-primary)',
                                     borderColor: 'var(--modern-lime)',
                                     fontWeight: 600,
                                 }
@@ -302,18 +327,19 @@ export function MatchesPage() {
                 onPrevClick={onPrevClick}
                 onNextClick={onNextClick}
                 onReturnToToday={onReturnToToday}
+                onDateSelect={onDateSelect}
                 getDateLabel={getDateLabelForNav}
             />
 
             {Object.keys(matchesByCompetition).length === 0 && !loading ? (
                 <ModernCard style={{ 
-                    backgroundColor: 'var(--modern-dark-gray)',
+                    backgroundColor: 'var(--modern-card-bg)',
                     textAlign: 'center',
                     padding: '3rem',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    border: '1px solid var(--modern-border-color)',
                     borderRadius: '8px'
                 }}>
-                    <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>
+                    <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
                         {showLive || showAvailableTickets ? 'No matches match your filters' : 'No matches on this date'}
                     </ModernH3>
                     <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
@@ -327,16 +353,16 @@ export function MatchesPage() {
                             value={competitionName} 
                             key={competitionName}
                             style={{ 
-                                backgroundColor: 'var(--modern-dark-gray)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                backgroundColor: 'var(--modern-card-bg)',
+                                border: '1px solid var(--modern-border-color)',
                                 borderRadius: '8px',
                                 marginBottom: '1rem',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                                boxShadow: '0 2px 4px var(--modern-shadow-color)'
                             }}
                         >
                             <Accordion.Control style={{ 
                                 backgroundColor: 'transparent',
-                                color: 'var(--modern-white)',
+                                color: 'var(--modern-text-primary)',
                                 padding: '1rem 1.5rem'
                             }}>
                                 <Group gap="md" align="center">
@@ -348,7 +374,7 @@ export function MatchesPage() {
                                         style={{ borderRadius: '4px' }}
                                     />
                                     <ModernH3 style={{ 
-                                        color: 'var(--modern-white)', 
+                                        color: 'var(--modern-text-primary)', 
                                         margin: 0,
                                         fontSize: '1.1rem',
                                         fontWeight: 600
@@ -359,7 +385,7 @@ export function MatchesPage() {
                                         size="sm" 
                                         style={{ 
                                             backgroundColor: 'var(--modern-lime)', 
-                                            color: 'var(--modern-black)',
+                                            color: 'var(--modern-bg-primary)',
                                             fontWeight: 600
                                         }}
                                     >
@@ -406,8 +432,22 @@ export function MatchesPage() {
                                                                     color: 'white',
                                                                     fontWeight: 700,
                                                                     animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
                                                                 }}
                                                             >
+                                                                <span
+                                                                    style={{
+                                                                        width: '8px',
+                                                                        height: '8px',
+                                                                        borderRadius: '50%',
+                                                                        backgroundColor: '#ff0000',
+                                                                        display: 'inline-block',
+                                                                        animation: 'blink-dot 1s ease-in-out infinite',
+                                                                        boxShadow: '0 0 4px rgba(255, 0, 0, 0.8)',
+                                                                    }}
+                                                                />
                                                                 LIVE
                                                             </Badge>
                                                         )}

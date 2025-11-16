@@ -52,7 +52,7 @@ export function AppWrapper() {
             footer={{
                 height: { base: 60, md: 80 }
             }}
-            padding="md"
+            padding={0}
         >
             {/* Pass isLoggedIn to Header */}
             <Header showHeader={showHeader} isLoggedIn={isLoggedIn} />

@@ -30,3 +30,4 @@ export class NewsArticleController extends CrudController<NewsArticle, CreateNew
 
 export class NewsArticleModule {}
 
+

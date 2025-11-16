@@ -3,9 +3,9 @@
   line-height: 1.6;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(25, 25, 25, 0.95);
-  background-color: #ffffff;
+  color-scheme: dark light;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: #1a1b1e;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,10 +14,10 @@
   scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    color: rgba(255, 255, 255, 0.95);
-    background-color: #1a1b1e;
+    color: rgba(25, 25, 25, 0.95);
+    background-color: #ffffff;
   }
 }
 
