@@ -156,9 +156,6 @@ export function DateNavigation({
                                         monthCell: {
                                             color: 'var(--modern-white)',
                                         },
-                                        yearCell: {
-                                            color: 'var(--modern-white)',
-                                        },
                                     }}
                                 />
                             </Popover.Dropdown>
