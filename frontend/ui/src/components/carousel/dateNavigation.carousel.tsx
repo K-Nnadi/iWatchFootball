@@ -140,9 +140,6 @@ export function DateNavigation({
                                         }
                                     }}
                                     styles={{
-                                        calendar: {
-                                            backgroundColor: 'var(--modern-dark-gray)',
-                                        },
                                         day: {
                                             color: 'var(--modern-white)',
                                             '&[data-selected]': {

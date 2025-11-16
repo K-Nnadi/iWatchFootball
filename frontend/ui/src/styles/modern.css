@@ -143,12 +143,20 @@ body,
 
 /* Exclude elements that shouldn't transition (animations, etc.) */
 [style*="animation"],
-[class*="animate"],
 [class*="slide"],
-[class*="fade"],
+[class*="fade"]:not([class*="scroll-animate"]),
 .navbar-slide-down,
 .navbar-slide-up {
   transition: none !important;
+}
+
+/* Exclude scroll animation classes from global transitions - they have their own */
+.scroll-animate-fadeUp,
+.scroll-animate-fadeIn,
+.scroll-animate-slideLeft,
+.scroll-animate-slideRight,
+.scroll-animate-scale {
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Exclude page transition elements from global theme transitions - they have their own */

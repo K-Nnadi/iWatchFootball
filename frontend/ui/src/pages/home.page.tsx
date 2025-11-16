@@ -36,7 +36,7 @@ function HeroSection() {
             style={{
                 padding: isMobile ? '3rem 0' : '6rem 0',
                 position: 'relative',
-                overflow: 'hidden',
+                overflowX: 'hidden',
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
@@ -157,7 +157,7 @@ function LiveMatchesSection() {
                 borderTop: '1px solid var(--modern-section-divider)',
                 borderBottom: '1px solid var(--modern-section-divider)',
                 position: 'relative',
-                overflow: 'hidden',
+                overflowX: 'hidden',
             }}
         >
             {/* Subtle Background Pattern */}
@@ -345,7 +345,7 @@ function TopNewsSection() {
                 borderTop: '1px solid var(--modern-section-divider)',
                 borderBottom: '1px solid var(--modern-section-divider)',
                 position: 'relative',
-                overflow: 'hidden',
+                overflowX: 'hidden',
                 ...(!isMobile && {
                     width: '100vw',
                     marginLeft: 'calc(50% - 50vw)',
@@ -580,7 +580,7 @@ function FeaturesSection() {
                 color: 'var(--modern-text-primary)',
                 borderTop: '1px solid var(--modern-section-divider)',
                 position: 'relative',
-                overflow: 'hidden',
+                overflowX: 'hidden',
             }}
         >
             {/* Subtle Background Pattern */}

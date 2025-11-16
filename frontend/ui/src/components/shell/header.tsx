@@ -36,11 +36,14 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     <Group gap="xs" visibleFrom="md">
                         <Title 
                             order={2} 
-                            size={{ base: '1.5rem', sm: '1.75rem', md: '2rem' }}
+                            size="2rem"
                             fw={700} 
                             c="var(--modern-text-primary)" 
                             onClick={() => navigateWithTransition('/')}
-                            style={{ cursor: 'pointer' }}
+                            style={{ 
+                                cursor: 'pointer',
+                                fontSize: 'clamp(1.5rem, 2vw, 2rem)'
+                            }}
                         >
                             I Watch Football
                         </Title>
@@ -70,11 +73,14 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     >
                         <Title 
                             order={2} 
-                            size={{ base: '1.5rem', sm: '1.75rem' }}
+                            size="1.75rem"
                             fw={700} 
                             c="var(--modern-text-primary)" 
                             onClick={() => navigateWithTransition('/')}
-                            style={{ cursor: 'pointer' }}
+                            style={{ 
+                                cursor: 'pointer',
+                                fontSize: 'clamp(1.5rem, 3vw, 1.75rem)'
+                            }}
                         >
                             I Watch Football
                         </Title>
