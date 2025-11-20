@@ -42,7 +42,18 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 			} : false
 		}
 
-		// console.log('TypeORM Config:', JSON.stringify(typeORMConfig, null, 2));
+		console.log('📊 TypeORM Configuration:');
+		console.log(`   Type: ${typeORMConfig.type || 'not set'}`);
+		console.log(`   Host: ${typeORMConfig.host ? '***set***' : 'not set'}`);
+		console.log(`   Port: ${typeORMConfig.port || 'not set'}`);
+		console.log(`   Database: ${typeORMConfig.database ? '***set***' : 'not set'}`);
+		console.log(`   Username: ${typeORMConfig.username ? '***set***' : 'not set'}`);
+		console.log(`   Password: ${typeORMConfig.password ? '***set***' : 'not set'}`);
+		console.log(`   SSL: ${typeORMConfig.ssl ? 'enabled' : 'disabled'}`);
+		console.log(`   Synchronize: ${typeORMConfig.synchronize}`);
+		console.log(`   Migrations Run: ${typeORMConfig.migrationsRun}`);
+		console.log(`   Entity paths:`, typeORMConfig.entities);
+		
 		return  typeORMConfig;
 	}
 }
