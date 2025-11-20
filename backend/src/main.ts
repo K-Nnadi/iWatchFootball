@@ -7,8 +7,11 @@ import {SecurityInterceptor} from "./auth/interceptors/security.interceptor";
 config();
 const port = Number(process.env.PORT) || 8080
 
-void GenericBootstrap(AppModule, port, {
+GenericBootstrap(AppModule, port, {
     enableAuth: true,
     GlobalAuthGuard,
     SecurityInterceptor
+}).catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
 });

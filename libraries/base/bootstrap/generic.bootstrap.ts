@@ -47,9 +47,14 @@ export async function GenericBootstrap(module: any, port: number, options?: {
 
     const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
     SwaggerModule.setup('api-docs', app, document);
-    fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+    
+    // Only write openapi.json if we have write permissions (skip in Cloud Run)
+    try {
+        fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+    } catch (error) {
+        console.warn('Could not write openapi.json file (this is OK in production):', error);
+    }
 
-    await app.listen(port, '0.0.0.0', () => {
-        console.log(`🚀 Server running on port ${port}`);
-    });
+    await app.listen({ port, host: '0.0.0.0' });
+    console.log(`🚀 Server running on port ${port}`);
 }
