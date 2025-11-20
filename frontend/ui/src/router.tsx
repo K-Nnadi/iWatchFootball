@@ -16,6 +16,7 @@ import {ThankYouPage} from "./pages/thankYou.page";
 import {SeatSelectionPage} from "./pages/seatSelection.page";
 import {MatchPage} from "./pages/match/match.page";
 import {TeamPage} from "./pages/team/team.page";
+import {PlayerPage} from "./pages/player/player.page";
 import {NewsPage} from "./pages/news.page";
 import {NewsDetailPage} from "./pages/news/newsDetail.page";
 
@@ -56,6 +57,10 @@ const additionalRoutes = [
     {
         path: '/team/:id',
         element: <TeamPage />
+    },
+    {
+        path: '/player/:id',
+        element: <PlayerPage />
     },
     {
         path: '/news/:id',

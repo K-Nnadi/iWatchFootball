@@ -1014,6 +1014,11 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Competition card logo hover effect */
+.modern-card:hover .competition-logo-wrapper {
+  transform: scale(1.05);
+}
+
 /* Modern Grid System */
 .modern-grid {
   display: grid;

@@ -1,23 +1,20 @@
-import React, {FormEvent, useEffect, useRef, useState} from 'react';
+import React, {FormEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {
     Box,
-    Button,
     Container,
     Grid,
     LoadingOverlay,
-    Paper,
     ScrollArea,
     Select,
+    SegmentedControl,
     SimpleGrid,
     Stack,
-    Tabs,
-    Text,
-    Title
+    Tabs
 } from '@mantine/core';
-import { ModernButton, ModernCard, ModernH1, ModernH2, ModernH3, ModernBody, ModernCaption } from '../components/modern';
+import { showNotification } from '@mantine/notifications';
+import { ModernButton, ModernCard, ModernH2, ModernH3, ModernBody, ModernCaption } from '../components/modern';
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
-import StatsTab from "../tabs/stats.tab";
 import NewStatsTab from "../tabs/newStats.tab";
 
 interface Competition {
@@ -83,10 +80,9 @@ export function LogsPage() {
     const [selectedAwayTeam, setSelectedAwayTeam] = useState<string | null>(null);
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const [loggedFixtures, setLoggedFixtures] = useState<UserGame[]>([]);
+    const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified'>('all');
 
     useEffect(() => {
         setLoading(true);
@@ -222,11 +218,8 @@ export function LogsPage() {
 
     const handleAddToLog = async (e: FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setSuccessMessage(null);
 
         if (!selectedFixture) {
-            setError('No fixture selected');
             return;
         }
 
@@ -261,7 +254,14 @@ export function LogsPage() {
 
             setLoggedFixtures((prev) => [...prev, newLog]);
             setLoading(false);
-            setSuccessMessage('Match successfully added to your logs!');
+
+            // Show success notification
+            showNotification({
+                title: 'Match Added Successfully!',
+                message: `${addedFixture.homeTeam} vs ${addedFixture.awayTeam} has been added to your logs`,
+                color: 'green',
+                autoClose: 3000,
+            });
 
             // Reset all selection fields after successfully logging a game
             setSelectedCompetition(null);
@@ -274,7 +274,6 @@ export function LogsPage() {
 
         } catch (err) {
             setLoading(false);
-            setError('Failed to add match. Please try again.');
         }
     };
 
@@ -319,7 +318,6 @@ export function LogsPage() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const [windowHeight, setWindowHeight] = useState(window.innerHeight);
     const headerRef = useRef<HTMLDivElement>(null);
     const tabsRef = useRef<HTMLDivElement>(null);
     const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
@@ -336,6 +334,15 @@ export function LogsPage() {
         window.addEventListener('resize', updateHeight);
         return () => window.removeEventListener('resize', updateHeight);
     }, []);
+
+    // Filter logged fixtures based on verification status
+    const filteredLoggedFixtures = useMemo(() => {
+        if (verificationFilter === 'all') {
+            return loggedFixtures;
+        } else {
+            return loggedFixtures.filter(fixture => fixture.isVerified);
+        }
+    }, [loggedFixtures, verificationFilter]);
     return (
         <Box className="dark-theme" style={{ 
             minHeight: '100vh', 
@@ -600,6 +607,33 @@ export function LogsPage() {
                                 Stats
                             </Tabs.Tab>
                         </Tabs.List>
+                        <Box mb="md" mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
+                            <SegmentedControl
+                                value={verificationFilter}
+                                onChange={(value) => setVerificationFilter(value as 'all' | 'verified')}
+                                data={[
+                                    { label: 'All Games', value: 'all' },
+                                    { label: 'Verified', value: 'verified' },
+                                ]}
+                                size="sm"
+                                styles={{
+                                    root: {
+                                        backgroundColor: 'var(--modern-dark-gray)',
+                                    },
+                                    label: {
+                                        color: 'var(--modern-white)',
+                                        '&[data-active]': {
+                                            color: 'var(--modern-black)',
+                                        },
+                                    },
+                                    control: {
+                                        '&[data-active]': {
+                                            backgroundColor: 'var(--modern-lime)',
+                                        },
+                                    },
+                                }}
+                            />
+                        </Box>
                         <Tabs.Panel value={'matches'}>
                             <ScrollArea
                                 style={{ height: `${scrollAreaHeight}px`, minHeight: '400px' }}
@@ -607,11 +641,17 @@ export function LogsPage() {
                                 scrollbarSize={2}
                                 scrollHideDelay={0}
                             >
-                                {loggedFixtures.length === 0 && !loading ? (
+                                {filteredLoggedFixtures.length === 0 && !loading ? (
                                     <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-dark-gray)' }}>
-                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>No Matches Logged Yet</ModernH3>
+                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>
+                                            {loggedFixtures.length === 0 
+                                                ? 'No Matches Logged Yet' 
+                                                : verificationFilter === 'verified' ? 'No Verified Matches Found' : 'No Matches Found'}
+                                        </ModernH3>
                                         <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
-                                            Start by adding your first match using the form
+                                            {loggedFixtures.length === 0 
+                                                ? 'Start by adding your first match using the form'
+                                                : 'Try changing the filter to see more matches'}
                                         </ModernBody>
                                     </ModernCard>
                                 ) : (
@@ -619,7 +659,7 @@ export function LogsPage() {
                                         cols={1}
                                         style={{ gap: 'var(--mantine-spacing-lg)', maxHeight: '80vh', overflowY: 'auto', padding: '0 8px' }}
                                     >
-                                        {loggedFixtures.map((fixture) => (
+                                        {filteredLoggedFixtures.map((fixture) => (
                                             <LoggedFixtureCard
                                                 key={fixture.fixtureId}
                                                 homeTeam={fixture.homeTeam}
@@ -646,16 +686,22 @@ export function LogsPage() {
                                 scrollbarSize={2}
                                 scrollHideDelay={0}
                             >
-                                {loggedFixtures.length === 0 && !loading ? (
+                                {filteredLoggedFixtures.length === 0 && !loading ? (
                                     <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-dark-gray)' }}>
-                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>No Matches Logged Yet</ModernH3>
+                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>
+                                            {loggedFixtures.length === 0 
+                                                ? 'No Matches Logged Yet' 
+                                                : verificationFilter === 'verified' ? 'No Verified Matches Found' : 'No Matches Found'}
+                                        </ModernH3>
                                         <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
-                                            Start by adding your first match using the form
+                                            {loggedFixtures.length === 0 
+                                                ? 'Start by adding your first match using the form'
+                                                : 'Try changing the filter to see more matches'}
                                         </ModernBody>
                                     </ModernCard>
                                 ) : (
-                                    // <StatsTab loggedFixtures={loggedFixtures}/>
-                                    <NewStatsTab />
+                                    // <StatsTab loggedFixtures={filteredLoggedFixtures}/>
+                                    <NewStatsTab loggedFixtures={filteredLoggedFixtures} />
                                 )}
                             </ScrollArea>
                         </Tabs.Panel>
