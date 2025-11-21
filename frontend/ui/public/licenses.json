@@ -1,0 +1,470 @@
+{
+  "generatedAt": "2025-11-21T03:25:03.596Z",
+  "dependencies": [
+    {
+      "name": "@7nohe/openapi-react-query-codegen",
+      "version": "0.5.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@casl/ability",
+      "version": "6.3.3",
+      "license": "MIT"
+    },
+    {
+      "name": "@fastify/static",
+      "version": "7.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@gsap/react",
+      "version": "2.1.2",
+      "license": "SEE LICENSE AT https://gsap.com/standard-license"
+    },
+    {
+      "name": "@mantine/carousel",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@mantine/core",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@mantine/dates",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@mantine/form",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@mantine/hooks",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@mantine/modals",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@mantine/notifications",
+      "version": "7.7.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/bullmq",
+      "version": "11.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/cli",
+      "version": "10.3.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/common",
+      "version": "10.3.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/config",
+      "version": "3.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/core",
+      "version": "10.3.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/mapped-types",
+      "version": "*",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/passport",
+      "version": "11.0.5",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/platform-express",
+      "version": "10.3.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/platform-fastify",
+      "version": "10.3.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/schedule",
+      "version": "6.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/schematics",
+      "version": "10.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/swagger",
+      "version": "8.1.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/testing",
+      "version": "10.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@nestjs/typeorm",
+      "version": "10.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@seatsio/seatsio-react",
+      "version": "15.17.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@tabler/icons-react",
+      "version": "3.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@tanstack/react-query",
+      "version": "5.32.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@tanstack/react-query-devtools",
+      "version": "5.32.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/bcryptjs",
+      "version": "2.4.6",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/express",
+      "version": "4.17.17",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/jest",
+      "version": "29.5.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/multer",
+      "version": "1.4.12",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/node",
+      "version": "20.14.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/passport",
+      "version": "1.0.7",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/passport-jwt",
+      "version": "4.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/qs",
+      "version": "6.9.7",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/react",
+      "version": "18.2.66",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/react-dom",
+      "version": "18.2.22",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/supertest",
+      "version": "6.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@typescript-eslint/eslint-plugin",
+      "version": "7.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "version": "7.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@vitejs/plugin-react-swc",
+      "version": "3.5.0",
+      "license": "MIT"
+    },
+    {
+      "name": "axios",
+      "version": "1.3.6",
+      "license": "MIT"
+    },
+    {
+      "name": "bcryptjs",
+      "version": "2.4.3",
+      "license": "BSD-3-Clause"
+    },
+    {
+      "name": "bullmq",
+      "version": "5.41.5",
+      "license": "MIT"
+    },
+    {
+      "name": "class-validator",
+      "version": "0.14.0",
+      "license": "MIT"
+    },
+    {
+      "name": "cross-env",
+      "version": "7.0.3",
+      "license": "MIT"
+    },
+    {
+      "name": "dayjs",
+      "version": "1.11.7",
+      "license": "MIT"
+    },
+    {
+      "name": "dotenv",
+      "version": "16.4.4",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "name": "eslint",
+      "version": "8.57.0",
+      "license": "MIT"
+    },
+    {
+      "name": "eslint-config-prettier",
+      "version": "9.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "eslint-plugin-prettier",
+      "version": "5.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
+      "version": "4.6.0",
+      "license": "MIT"
+    },
+    {
+      "name": "eslint-plugin-react-refresh",
+      "version": "0.4.6",
+      "license": "MIT"
+    },
+    {
+      "name": "express",
+      "version": "4.18.2",
+      "license": "MIT"
+    },
+    {
+      "name": "fast-jwt",
+      "version": "2.2.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "fastify",
+      "version": "4.26.0",
+      "license": "MIT"
+    },
+    {
+      "name": "firebase",
+      "version": "12.3.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "framer-motion",
+      "version": "12.23.24",
+      "license": "MIT"
+    },
+    {
+      "name": "gsap",
+      "version": "3.13.0",
+      "license": "Standard 'no charge' license: https://gsap.com/standard-license."
+    },
+    {
+      "name": "jest",
+      "version": "29.5.0",
+      "license": "MIT"
+    },
+    {
+      "name": "lottie-react",
+      "version": "2.4.1",
+      "license": "MIT"
+    },
+    {
+      "name": "multer",
+      "version": "1.4.5-lts.1",
+      "license": "MIT"
+    },
+    {
+      "name": "orval",
+      "version": "6.31.0",
+      "license": "MIT"
+    },
+    {
+      "name": "passport",
+      "version": "0.7.0",
+      "license": "MIT"
+    },
+    {
+      "name": "passport-jwt",
+      "version": "4.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "pg",
+      "version": "8.11.3",
+      "license": "MIT"
+    },
+    {
+      "name": "postgres",
+      "version": "3.4.3",
+      "license": "Unlicense"
+    },
+    {
+      "name": "prettier",
+      "version": "2.0.4",
+      "license": "MIT"
+    },
+    {
+      "name": "qs",
+      "version": "6.11.1",
+      "license": "BSD-3-Clause"
+    },
+    {
+      "name": "react",
+      "version": "18.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "react-dom",
+      "version": "18.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "react-icons",
+      "version": "5.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "react-router-dom",
+      "version": "6.22.3",
+      "license": "MIT"
+    },
+    {
+      "name": "reflect-metadata",
+      "version": "0.2.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "rss-parser",
+      "version": "3.13.0",
+      "license": "MIT"
+    },
+    {
+      "name": "rxjs",
+      "version": "7.8.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "source-map-support",
+      "version": "0.5.21",
+      "license": "MIT"
+    },
+    {
+      "name": "supertest",
+      "version": "6.3.3",
+      "license": "MIT"
+    },
+    {
+      "name": "swagger-ui-express",
+      "version": "5.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "ts-jest",
+      "version": "29.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "ts-loader",
+      "version": "9.4.3",
+      "license": "MIT"
+    },
+    {
+      "name": "ts-node",
+      "version": "10.9.2",
+      "license": "MIT"
+    },
+    {
+      "name": "ts-node-dev",
+      "version": "2.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "tsconfig-paths",
+      "version": "4.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "typeorm",
+      "version": "0.3.20",
+      "license": "MIT"
+    },
+    {
+      "name": "typescript",
+      "version": "5.1.3",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "validator",
+      "version": "13.11.0",
+      "license": "MIT"
+    },
+    {
+      "name": "vite",
+      "version": "5.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "vite-plugin-environment",
+      "version": "1.1.3",
+      "license": "MIT"
+    },
+    {
+      "name": "vite-tsconfig-paths",
+      "version": "4.0.5",
+      "license": "MIT"
+    },
+    {
+      "name": "zustand",
+      "version": "4.5.2",
+      "license": "MIT"
+    }
+  ]
+}

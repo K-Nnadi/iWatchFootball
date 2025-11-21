@@ -1,6 +1,5 @@
 import { AppShell } from '@mantine/core';
 import { Header } from './header';
-import { Footer } from './footer';
 import { Navbar } from './navbar';
 import { Main } from "./main";
 import { PageTransition } from '../transitions/PageTransition';
@@ -40,17 +39,14 @@ export function AppWrapper() {
         <AppShell
             header={{
                 height: {
-                    base: 60,
-                    md: 70
+                    base: 70,
+                    md: 80
                 }
             }}
             navbar={{ 
                 width: { base: 300, sm: 350, md: 400, lg: 450, xl: 500 }, 
                 breakpoint: 'sm', 
                 collapsed 
-            }}
-            footer={{
-                height: { base: 60, md: 80 }
             }}
             padding={0}
         >

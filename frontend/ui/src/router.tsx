@@ -19,6 +19,9 @@ import {TeamPage} from "./pages/team/team.page";
 import {PlayerPage} from "./pages/player/player.page";
 import {NewsPage} from "./pages/news.page";
 import {NewsDetailPage} from "./pages/news/newsDetail.page";
+import {LicensesPage} from "./pages/licenses.page";
+import {ContactPage} from "./pages/contact.page";
+import {HelpPage} from "./pages/help.page";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -69,6 +72,18 @@ const additionalRoutes = [
     {
         path: '/seat-selection/:id',
         element: <SeatSelectionPage />
+    },
+    {
+        path: '/licenses',
+        element: <LicensesPage />
+    },
+    {
+        path: '/contact',
+        element: <ContactPage />
+    },
+    {
+        path: '/help',
+        element: <HelpPage />
     },
     {
         path: '/*',

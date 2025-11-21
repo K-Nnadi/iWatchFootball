@@ -4,6 +4,7 @@ import { Button as MantineButton, ButtonProps as MantineButtonProps } from '@man
 interface ModernButtonProps extends Omit<MantineButtonProps, 'variant' | 'size'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit' | 'reset';
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 

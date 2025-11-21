@@ -180,7 +180,7 @@ export function DateNavigation({
     return (
         <Container size="xs" mb={20}>
             <Stack gap="xs">
-                <Text size="md" fw={500}>
+                <Text size="md" fw={500} style={{ textAlign: 'center' }}>
                     {formatSelectedDate(selectedDate)}
                     {canReturnToToday && (
                         <>
@@ -200,7 +200,15 @@ export function DateNavigation({
 
 
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <ActionIcon onClick={onPrevClick} style={{ marginRight: theme.spacing.xs }}>
+                    <ActionIcon 
+                        onClick={onPrevClick} 
+                        style={{ 
+                            marginRight: theme.spacing.xs,
+                            backgroundColor: 'var(--modern-lime)',
+                            color: 'var(--modern-white)',
+                            borderRadius: '8px',
+                        }}
+                    >
                         <IconChevronLeft size={18} />
                     </ActionIcon>
 
@@ -215,7 +223,14 @@ export function DateNavigation({
                         {slides}
                     </Carousel>
 
-                    <ActionIcon onClick={onNextClick}>
+                    <ActionIcon 
+                        onClick={onNextClick}
+                        style={{ 
+                            backgroundColor: 'var(--modern-lime)',
+                            color: 'var(--modern-white)',
+                            borderRadius: '8px',
+                        }}
+                    >
                         <IconChevronRight size={18} />
                     </ActionIcon>
                 </div>

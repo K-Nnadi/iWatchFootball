@@ -1,0 +1,226 @@
+﻿[
+  {
+    "name": "@iWatchFootball/ui",
+    "version": "0.1.0",
+    "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\frontend\\ui",
+    "private": true,
+    "dependencies": {
+      "@gsap/react": {
+        "from": "@gsap/react",
+        "version": "2.1.2",
+        "resolved": "https://registry.npmjs.org/@gsap/react/-/react-2.1.2.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@gsap+react@2.1.2_gsap@3.13.0_react@18.2.0\\node_modules\\@gsap\\react"
+      },
+      "@iWatchFootball/base-tools": {
+        "from": "@iWatchFootball/base-tools",
+        "version": "link:../../libraries/base",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\libraries\\base"
+      },
+      "@iWatchFootball/clients": {
+        "from": "@iWatchFootball/clients",
+        "version": "link:../../clients",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\clients"
+      },
+      "@mantine/carousel": {
+        "from": "@mantine/carousel",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/carousel/-/carousel-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+carousel@7.17.8_@mantine+core@7.17.8_@mantine+hooks@7.17.8_react@18.2.0__@types+reac_pqrhaxvru7zwwbje6kais6iomi\\node_modules\\@mantine\\carousel"
+      },
+      "@mantine/core": {
+        "from": "@mantine/core",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/core/-/core-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+core@7.17.8_@mantine+hooks@7.17.8_react@18.2.0__@types+react@18.2.66_react-dom@18.2._o7kumwry6ejkysx64qwx4pcoou\\node_modules\\@mantine\\core"
+      },
+      "@mantine/dates": {
+        "from": "@mantine/dates",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/dates/-/dates-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+dates@7.17.8_@mantine+core@7.17.8_@mantine+hooks@7.17.8_react@18.2.0__@types+react@1_mpd2k4d3jaum2lmxvjbjepxbju\\node_modules\\@mantine\\dates"
+      },
+      "@mantine/form": {
+        "from": "@mantine/form",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/form/-/form-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+form@7.17.8_react@18.2.0\\node_modules\\@mantine\\form"
+      },
+      "@mantine/hooks": {
+        "from": "@mantine/hooks",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/hooks/-/hooks-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+hooks@7.17.8_react@18.2.0\\node_modules\\@mantine\\hooks"
+      },
+      "@mantine/modals": {
+        "from": "@mantine/modals",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/modals/-/modals-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+modals@7.17.8_@mantine+core@7.17.8_@mantine+hooks@7.17.8_react@18.2.0__@types+react@_hzavqn2qkme667amw4aop2l7ra\\node_modules\\@mantine\\modals"
+      },
+      "@mantine/notifications": {
+        "from": "@mantine/notifications",
+        "version": "7.17.8",
+        "resolved": "https://registry.npmjs.org/@mantine/notifications/-/notifications-7.17.8.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@mantine+notifications@7.17.8_@mantine+core@7.17.8_@mantine+hooks@7.17.8_react@18.2.0__@types_e7bojqqfxm4jzzrwdgydrxgvii\\node_modules\\@mantine\\notifications"
+      },
+      "@seatsio/seatsio-react": {
+        "from": "@seatsio/seatsio-react",
+        "version": "15.17.0",
+        "resolved": "https://registry.npmjs.org/@seatsio/seatsio-react/-/seatsio-react-15.17.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@seatsio+seatsio-react@15.17.0_react@18.2.0\\node_modules\\@seatsio\\seatsio-react"
+      },
+      "@tabler/icons-react": {
+        "from": "@tabler/icons-react",
+        "version": "3.2.0",
+        "resolved": "https://registry.npmjs.org/@tabler/icons-react/-/icons-react-3.2.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@tabler+icons-react@3.2.0_react@18.2.0\\node_modules\\@tabler\\icons-react"
+      },
+      "@tanstack/react-query": {
+        "from": "@tanstack/react-query",
+        "version": "5.32.0",
+        "resolved": "https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.32.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@tanstack+react-query@5.32.0_react@18.2.0\\node_modules\\@tanstack\\react-query"
+      },
+      "@tanstack/react-query-devtools": {
+        "from": "@tanstack/react-query-devtools",
+        "version": "5.32.0",
+        "resolved": "https://registry.npmjs.org/@tanstack/react-query-devtools/-/react-query-devtools-5.32.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@tanstack+react-query-devtools@5.32.0_@tanstack+react-query@5.32.0_react@18.2.0__react@18.2.0\\node_modules\\@tanstack\\react-query-devtools"
+      },
+      "dayjs": {
+        "from": "dayjs",
+        "version": "1.11.11",
+        "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.11.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\dayjs@1.11.11\\node_modules\\dayjs"
+      },
+      "firebase": {
+        "from": "firebase",
+        "version": "12.3.0",
+        "resolved": "https://registry.npmjs.org/firebase/-/firebase-12.3.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\firebase@12.3.0\\node_modules\\firebase"
+      },
+      "framer-motion": {
+        "from": "framer-motion",
+        "version": "12.23.24",
+        "resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-12.23.24.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\framer-motion@12.23.24_react-dom@18.2.0_react@18.2.0__react@18.2.0\\node_modules\\framer-motion"
+      },
+      "gsap": {
+        "from": "gsap",
+        "version": "3.13.0",
+        "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.13.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\gsap@3.13.0\\node_modules\\gsap"
+      },
+      "lottie-react": {
+        "from": "lottie-react",
+        "version": "2.4.1",
+        "resolved": "https://registry.npmjs.org/lottie-react/-/lottie-react-2.4.1.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\lottie-react@2.4.1_react-dom@18.2.0_react@18.2.0__react@18.2.0\\node_modules\\lottie-react"
+      },
+      "react": {
+        "from": "react",
+        "version": "18.2.0",
+        "resolved": "https://registry.npmjs.org/react/-/react-18.2.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\react@18.2.0\\node_modules\\react"
+      },
+      "react-dom": {
+        "from": "react-dom",
+        "version": "18.2.0",
+        "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\react-dom@18.2.0_react@18.2.0\\node_modules\\react-dom"
+      },
+      "react-icons": {
+        "from": "react-icons",
+        "version": "5.1.0",
+        "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-5.1.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\react-icons@5.1.0_react@18.2.0\\node_modules\\react-icons"
+      },
+      "react-router-dom": {
+        "from": "react-router-dom",
+        "version": "6.22.3",
+        "resolved": "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.22.3.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\react-router-dom@6.22.3_react-dom@18.2.0_react@18.2.0__react@18.2.0\\node_modules\\react-router-dom"
+      },
+      "vite": {
+        "from": "vite",
+        "version": "5.2.0",
+        "resolved": "https://registry.npmjs.org/vite/-/vite-5.2.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\vite@5.2.0_@types+node@20.14.1_terser@5.31.1\\node_modules\\vite"
+      },
+      "vite-plugin-environment": {
+        "from": "vite-plugin-environment",
+        "version": "1.1.3",
+        "resolved": "https://registry.npmjs.org/vite-plugin-environment/-/vite-plugin-environment-1.1.3.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\vite-plugin-environment@1.1.3_vite@5.2.0_@types+node@20.14.1_terser@5.31.1_\\node_modules\\vite-plugin-environment"
+      },
+      "vite-tsconfig-paths": {
+        "from": "vite-tsconfig-paths",
+        "version": "4.0.5",
+        "resolved": "https://registry.npmjs.org/vite-tsconfig-paths/-/vite-tsconfig-paths-4.0.5.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\vite-tsconfig-paths@4.0.5_typescript@5.3.3\\node_modules\\vite-tsconfig-paths"
+      },
+      "zustand": {
+        "from": "zustand",
+        "version": "4.5.2",
+        "resolved": "https://registry.npmjs.org/zustand/-/zustand-4.5.2.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\zustand@4.5.2_@types+react@18.2.66_immer@9.0.21_react@18.2.0\\node_modules\\zustand"
+      }
+    },
+    "devDependencies": {
+      "@types/react": {
+        "from": "@types/react",
+        "version": "18.2.66",
+        "resolved": "https://registry.npmjs.org/@types/react/-/react-18.2.66.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@types+react@18.2.66\\node_modules\\@types\\react"
+      },
+      "@types/react-dom": {
+        "from": "@types/react-dom",
+        "version": "18.2.22",
+        "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.2.22.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@types+react-dom@18.2.22\\node_modules\\@types\\react-dom"
+      },
+      "@typescript-eslint/eslint-plugin": {
+        "from": "@typescript-eslint/eslint-plugin",
+        "version": "7.2.0",
+        "resolved": "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-7.2.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@typescript-eslint+eslint-plugin@7.2.0_@typescript-eslint+parser@7.2.0_eslint@8.57.0_typescri_etgnpqo3atsywvfzo75fi2ic7m\\node_modules\\@typescript-eslint\\eslint-plugin"
+      },
+      "@typescript-eslint/parser": {
+        "from": "@typescript-eslint/parser",
+        "version": "7.2.0",
+        "resolved": "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-7.2.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@typescript-eslint+parser@7.2.0_eslint@8.57.0_typescript@5.3.3\\node_modules\\@typescript-eslint\\parser"
+      },
+      "@vitejs/plugin-react-swc": {
+        "from": "@vitejs/plugin-react-swc",
+        "version": "3.5.0",
+        "resolved": "https://registry.npmjs.org/@vitejs/plugin-react-swc/-/plugin-react-swc-3.5.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\@vitejs+plugin-react-swc@3.5.0_vite@5.2.0_@types+node@20.14.1_terser@5.31.1_\\node_modules\\@vitejs\\plugin-react-swc"
+      },
+      "eslint": {
+        "from": "eslint",
+        "version": "8.57.0",
+        "resolved": "https://registry.npmjs.org/eslint/-/eslint-8.57.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\eslint@8.57.0\\node_modules\\eslint"
+      },
+      "eslint-plugin-react-hooks": {
+        "from": "eslint-plugin-react-hooks",
+        "version": "4.6.0",
+        "resolved": "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.6.0.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\eslint-plugin-react-hooks@4.6.0_eslint@8.57.0\\node_modules\\eslint-plugin-react-hooks"
+      },
+      "eslint-plugin-react-refresh": {
+        "from": "eslint-plugin-react-refresh",
+        "version": "0.4.6",
+        "resolved": "https://registry.npmjs.org/eslint-plugin-react-refresh/-/eslint-plugin-react-refresh-0.4.6.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\eslint-plugin-react-refresh@0.4.6_eslint@8.57.0\\node_modules\\eslint-plugin-react-refresh"
+      },
+      "typescript": {
+        "from": "typescript",
+        "version": "5.3.3",
+        "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.3.3.tgz",
+        "path": "C:\\Users\\kenne\\Coding\\Projects\\monoRepo\\node_modules\\.pnpm\\typescript@5.3.3\\node_modules\\typescript"
+      }
+    }
+  }
+]
