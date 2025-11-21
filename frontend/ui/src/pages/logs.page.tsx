@@ -662,6 +662,7 @@ export function LogsPage() {
                                         {filteredLoggedFixtures.map((fixture) => (
                                             <LoggedFixtureCard
                                                 key={fixture.fixtureId}
+                                                fixtureId={fixture.fixtureId}
                                                 homeTeam={fixture.homeTeam}
                                                 awayTeam={fixture.awayTeam}
                                                 homeScore={fixture.homeScore}

@@ -45,7 +45,6 @@ export function Footer() {
     const moreLinks = [
         { label: 'App Store', path: '/app-store', external: true },
         { label: 'Google Play', path: '/google-play', external: true },
-        { label: 'Merch', path: '/merch', external: false },
     ];
 
     return(
