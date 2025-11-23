@@ -133,14 +133,14 @@ export function ScorePredictionCard({
             radius="lg" 
             withBorder 
             mb={{ base: 'md', sm: 'xl' }}
-            style={{ backgroundColor: 'var(--modern-dark-gray)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+            style={{ backgroundColor: 'var(--modern-card-bg)', border: '1px solid var(--modern-border-color)' }}
         >
             <Title 
                 order={3} 
                 mb="lg" 
                 ta="center"
                 style={{ 
-                    color: 'var(--modern-white)', 
+                    color: 'var(--modern-text-primary)', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.1em',
                 }}
@@ -154,7 +154,7 @@ export function ScorePredictionCard({
                     style={{
                         width: '100%',
                         height: '60px',
-                        border: '2px solid rgba(255, 255, 255, 0.3)',
+                        border: '2px solid var(--modern-border-color)',
                         borderRadius: '30px',
                         display: 'flex',
                         overflow: 'hidden',
@@ -179,7 +179,7 @@ export function ScorePredictionCard({
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            borderRight: '2px solid var(--modern-border-color)',
                             cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
                             transition: 'all 0.2s ease',
                             position: 'relative',
@@ -201,7 +201,7 @@ export function ScorePredictionCard({
                                 size="sm" 
                                 fw={700} 
                                 style={{ 
-                                    color: 'var(--modern-white)', 
+                                    color: 'var(--modern-text-primary)', 
                                     textAlign: 'center', 
                                     padding: '0 8px',
                                     textOverflow: 'ellipsis',
@@ -212,7 +212,7 @@ export function ScorePredictionCard({
                                 {homeTeam}
                             </Text>
                         ) : (
-                            <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
+                            <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
                                 {Math.round(homePercentage)}%
                             </Text>
                         )}
@@ -235,7 +235,7 @@ export function ScorePredictionCard({
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            borderRight: '2px solid var(--modern-border-color)',
                             cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
                             transition: 'all 0.2s ease',
                         }}
@@ -255,7 +255,7 @@ export function ScorePredictionCard({
                                 size="sm" 
                                 fw={700} 
                                 style={{ 
-                                    color: 'var(--modern-white)', 
+                                    color: 'var(--modern-text-primary)', 
                                     textAlign: 'center', 
                                     padding: '0 8px' 
                                 }}
@@ -263,7 +263,7 @@ export function ScorePredictionCard({
                                 Draw
                             </Text>
                         ) : (
-                            <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
+                            <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
                                 {Math.round(drawPercentage)}%
                             </Text>
                         )}
@@ -306,7 +306,7 @@ export function ScorePredictionCard({
                                 size="sm" 
                                 fw={700} 
                                 style={{ 
-                                    color: 'var(--modern-white)', 
+                                    color: 'var(--modern-text-primary)', 
                                     textAlign: 'center', 
                                     padding: '0 8px',
                                     textOverflow: 'ellipsis',
@@ -317,7 +317,7 @@ export function ScorePredictionCard({
                                 {awayTeam}
                             </Text>
                         ) : (
-                            <Text size="lg" fw={700} style={{ color: 'var(--modern-white)' }}>
+                            <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
                                 {Math.round(awayPercentage)}%
                             </Text>
                         )}
@@ -325,7 +325,7 @@ export function ScorePredictionCard({
                 </Box>
                 {userScorePrediction && (
                     <Text size="sm" c="dimmed" ta="center" mt="md">
-                        Based on <Text span fw={700} c="var(--modern-white)">{totalPredictions}</Text> predictions
+                        Based on <Text span fw={700} style={{ color: 'var(--modern-text-primary)' }}>{totalPredictions}</Text> predictions
                     </Text>
                 )}
                 

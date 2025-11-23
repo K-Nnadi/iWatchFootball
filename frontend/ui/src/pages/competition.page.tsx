@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, Container, Image, LoadingOverlay, SimpleGrid, Tabs, Text, Title, Box, Group, Badge, Stack, Center, Divider, Grid } from '@mantine/core';
-import { IconNews, IconTable, IconCalendar, IconWorld, IconFlag, IconClock, IconBookmark } from '@tabler/icons-react';
+import { Container, Image, LoadingOverlay, Tabs, Text, Title, Box, Group, Badge, Stack, Center, Divider, Grid, Paper } from '@mantine/core';
+import { IconNews, IconTable, IconCalendar, IconWorld, IconFlag, IconClock } from '@tabler/icons-react';
 import { LeagueTable } from "../components/tables/leagueTable";
 import { ModernCard, ModernH3, ModernBody } from '../components/modern';
 import { usePageTransition } from '../hooks/usePageTransition';
@@ -37,7 +37,28 @@ interface Fixture {
     homeTeam: string;
     awayTeam: string;
     date: string;
+    venue?: string;
+    homeScore?: number;
+    awayScore?: number;
+    hasTickets?: boolean;
+    isLive?: boolean;
 }
+
+// Team crests mapping for match cards
+const teamCrests: Record<string, string> = {
+    'Team A': 'https://logos-world.net/wp-content/uploads/2020/06/Arsenal-Logo.png',
+    'Team B': 'https://logos-world.net/wp-content/uploads/2020/06/Chelsea-Logo.png',
+    'Team C': 'https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png',
+    'Team D': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-United-Logo.png',
+    'Team E': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png',
+    'Team F': 'https://logos-world.net/wp-content/uploads/2020/06/Tottenham-Logo.png',
+    'Team G': 'https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png',
+    'Team H': 'https://logos-world.net/wp-content/uploads/2020/06/Barcelona-Logo.png',
+    'Team I': 'https://logos-world.net/wp-content/uploads/2020/06/Bayern-Munich-Logo.png',
+    'Team J': 'https://logos-world.net/wp-content/uploads/2020/06/PSG-Logo.png',
+    'Team K': 'https://logos-world.net/wp-content/uploads/2020/06/Juventus-Logo.png',
+    'Team L': 'https://logos-world.net/wp-content/uploads/2020/06/AC-Milan-Logo.png'
+};
 
 // This component demonstrates a tabbed layout for a single competition page
 export function CompetitionPage() {
@@ -126,10 +147,10 @@ export function CompetitionPage() {
             ];
 
             const mockFixtures: Fixture[] = [
-                { id: 'fix1', homeTeam: 'Team A', awayTeam: 'Team D', date: '2023-09-15' },
-                { id: 'fix2', homeTeam: 'Team B', awayTeam: 'Team C', date: '2023-09-16' },
-                { id: 'fix3', homeTeam: 'Team A', awayTeam: 'Team C', date: '2023-09-15' },
-                { id: 'fix4', homeTeam: 'Team D', awayTeam: 'Team B', date: '2023-09-16' }
+                { id: 'fix1', homeTeam: 'Team A', awayTeam: 'Team D', date: '2023-09-15', venue: 'Stadium A', hasTickets: true },
+                { id: 'fix2', homeTeam: 'Team B', awayTeam: 'Team C', date: '2023-09-16', venue: 'Stadium B', hasTickets: false },
+                { id: 'fix3', homeTeam: 'Team A', awayTeam: 'Team C', date: '2023-09-15', venue: 'Stadium A', hasTickets: true },
+                { id: 'fix4', homeTeam: 'Team D', awayTeam: 'Team B', date: '2023-09-16', venue: 'Stadium D', hasTickets: true }
             ];
 
             setTimeout(() => {
@@ -318,30 +339,19 @@ export function CompetitionPage() {
                                                             {item.excerpt || item.description}
                                                         </ModernBody>
                                                     )}
-                                                    <Group gap="xs" justify="space-between" mt="auto">
-                                                        <Group gap="xs">
-                                                            {item.source && (
-                                                                <>
-                                                                    <Text size="xs" c="dimmed">{item.source}</Text>
-                                                                    {item.time && <Text size="xs" c="dimmed">•</Text>}
-                                                                </>
-                                                            )}
-                                                            {item.time && (
-                                                                <Group gap={4}>
-                                                                    <IconClock size={12} color="var(--modern-gray)" />
-                                                                    <Text size="xs" c="dimmed">{item.time}</Text>
-                                                                </Group>
-                                                            )}
-                                                        </Group>
-                                                        <IconBookmark 
-                                                            size={16} 
-                                                            color="var(--modern-lime)" 
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                // Handle bookmark
-                                                            }}
-                                                        />
+                                                    <Group gap="xs" mt="auto">
+                                                        {item.source && (
+                                                            <>
+                                                                <Text size="xs" c="dimmed">{item.source}</Text>
+                                                                {item.time && <Text size="xs" c="dimmed">•</Text>}
+                                                            </>
+                                                        )}
+                                                        {item.time && (
+                                                            <Group gap={4}>
+                                                                <IconClock size={12} color="var(--modern-gray)" />
+                                                                <Text size="xs" c="dimmed">{item.time}</Text>
+                                                            </Group>
+                                                        )}
                                                     </Group>
                                                 </Stack>
                                             </Stack>
@@ -424,70 +434,142 @@ export function CompetitionPage() {
                                             {groupedFixtures[date].length} {groupedFixtures[date].length === 1 ? 'match' : 'matches'}
                                         </Badge>
                                     </Group>
-                                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                                    <Grid gutter="md">
                                         {groupedFixtures[date].map((fix, fixIndex) => (
-                                            <Card
-                                                key={fix.id}
-                                                className="modern-card"
-                                                padding="xl"
-                                                radius={0}
-                                                withBorder={false}
-                                                style={{
-                                                    animation: `fadeInUp 0.6s ease-out ${(dateIndex * 0.1) + (fixIndex * 0.05)}s both`,
-                                                }}
-                                            >
-                                                <Stack gap="sm">
-                                                    <Group justify="space-between" align="center" wrap="nowrap">
-                                                        <Text
-                                                            fw={600}
-                                                            size="lg"
-                                                            style={{
-                                                                flex: 1,
-                                                                textAlign: 'center',
-                                                            }}
-                                                        >
-                                                            {fix.homeTeam}
-                                                        </Text>
-                                                        <Text
-                                                            c="dimmed"
-                                                            size="sm"
-                                                            px="md"
-                                                            style={{
-                                                                color: 'var(--modern-lime)',
-                                                                fontWeight: 700,
-                                                            }}
-                                                        >
-                                                            VS
-                                                        </Text>
-                                                        <Text
-                                                            fw={600}
-                                                            size="lg"
-                                                            style={{
-                                                                flex: 1,
-                                                                textAlign: 'center',
-                                                            }}
-                                                        >
-                                                            {fix.awayTeam}
-                                                        </Text>
+                                            <Grid.Col span={{ base: 12, sm: 6, md: 4 }} key={fix.id}>
+                                                <Paper
+                                                    radius="md"
+                                                    p="md"
+                                                    withBorder
+                                                    onClick={() =>
+                                                        navigateWithTransition(`/match/${fix.id}`)
+                                                    }
+                                                    style={{
+                                                        cursor: 'pointer',
+                                                        transition: '0.2s ease',
+                                                        position: 'relative',
+                                                        animation: `fadeInUp 0.6s ease-out ${(dateIndex * 0.1) + (fixIndex * 0.05)}s both`,
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.transform = 'translateY(-3px)';
+                                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                        e.currentTarget.style.boxShadow = 'none';
+                                                    }}
+                                                >
+                                                    {/* Status Badges */}
+                                                    <Group justify="space-between" mb="xs">
+                                                        {fix.isLive && (
+                                                            <Badge
+                                                                size="sm"
+                                                                style={{
+                                                                    backgroundColor: '#ff4444',
+                                                                    color: 'white',
+                                                                    fontWeight: 700,
+                                                                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                }}
+                                                            >
+                                                                <span
+                                                                    style={{
+                                                                        width: '8px',
+                                                                        height: '8px',
+                                                                        borderRadius: '50%',
+                                                                        backgroundColor: '#ff0000',
+                                                                        display: 'inline-block',
+                                                                        animation: 'blink-dot 1s ease-in-out infinite',
+                                                                        boxShadow: '0 0 4px rgba(255, 0, 0, 0.8)',
+                                                                    }}
+                                                                />
+                                                                LIVE
+                                                            </Badge>
+                                                        )}
+                                                        {fix.hasTickets && (
+                                                            <Badge
+                                                                size="sm"
+                                                                variant="light"
+                                                                style={{
+                                                                    backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                                                                    color: 'var(--modern-lime)',
+                                                                    fontWeight: 600,
+                                                                }}
+                                                            >
+                                                                Tickets Available
+                                                            </Badge>
+                                                        )}
                                                     </Group>
-                                                    <Divider
-                                                        color="var(--modern-card-border)"
-                                                        style={{ margin: '0.5rem 0' }}
-                                                    />
-                                                    <Group justify="center" gap="xs">
-                                                        <IconCalendar size={14} style={{ color: 'var(--modern-text-secondary)' }} />
-                                                        <Text size="sm" c="dimmed">
-                                                            {new Date(fix.date).toLocaleDateString('en-US', {
-                                                                month: 'short',
-                                                                day: 'numeric',
-                                                                year: 'numeric',
-                                                            })}
-                                                        </Text>
-                                                    </Group>
-                                                </Stack>
-                                            </Card>
+                                                    <Grid align="center">
+                                                        {/* Crests */}
+                                                        <Grid.Col span={2}>
+                                                            <Stack gap="xs" align="center" justify="center" style={{ minHeight: '60px' }}>
+                                                                <Image 
+                                                                    src={teamCrests[fix.homeTeam] || ''} 
+                                                                    width={40} 
+                                                                    height={40} 
+                                                                    fit="contain"
+                                                                    style={{ minWidth: '40px', minHeight: '40px', maxWidth: '40px', maxHeight: '40px' }}
+                                                                />
+                                                                <Image 
+                                                                    src={teamCrests[fix.awayTeam] || ''} 
+                                                                    width={40} 
+                                                                    height={40} 
+                                                                    fit="contain"
+                                                                    style={{ minWidth: '40px', minHeight: '40px', maxWidth: '40px', maxHeight: '40px' }}
+                                                                />
+                                                            </Stack>
+                                                        </Grid.Col>
+
+                                                        {/* Team Names */}
+                                                        <Grid.Col span={6}>
+                                                            <Stack gap="xs" justify="center">
+                                                                <Text size="sm" fw={500} style={{ wordBreak: 'break-word' }}>{fix.homeTeam}</Text>
+                                                                <Text size="sm" fw={500} style={{ wordBreak: 'break-word' }}>{fix.awayTeam}</Text>
+                                                            </Stack>
+                                                        </Grid.Col>
+
+                                                        {/* Divider */}
+                                                        <Grid.Col span={1} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <Divider
+                                                                orientation="vertical"
+                                                                color="rgba(255, 255, 255, 0.3)"
+                                                                size="sm"
+                                                                style={{ 
+                                                                    height: '60px',
+                                                                    borderColor: 'rgba(255, 255, 255, 0.3)'
+                                                                }}
+                                                            />
+                                                        </Grid.Col>
+
+                                                        {/* Score or Time */}
+                                                        <Grid.Col span={3}>
+                                                            <Stack gap="xs" align="flex-end" justify="center">
+                                                                {fix.homeScore !== undefined && fix.awayScore !== undefined ? (
+                                                                    <>
+                                                                        <Text size="sm" fw={600}>{fix.homeScore}</Text>
+                                                                        <Text size="sm" fw={600}>{fix.awayScore}</Text>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Text size="sm" c="dimmed">Kickoff</Text>
+                                                                        <Text size="sm">
+                                                                            {new Date(fix.date).toLocaleTimeString(undefined, {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </Text>
+                                                                    </>
+                                                                )}
+                                                            </Stack>
+                                                        </Grid.Col>
+                                                    </Grid>
+                                                </Paper>
+                                            </Grid.Col>
                                         ))}
-                                    </SimpleGrid>
+                                    </Grid>
                                 </Box>
                             ))}
                         </Stack>

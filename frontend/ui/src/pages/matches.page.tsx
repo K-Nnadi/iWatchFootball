@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import {Container, Accordion, Grid, Box, Group, Badge, Image, Paper, Stack, Text, Divider, Chip} from '@mantine/core';
+import {Container, Accordion, Grid, Box, Group, Badge, Image, Paper, Stack, Text, Divider} from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { usePageTransition } from '../hooks/usePageTransition';
 import {DateNavigation} from "../components/carousel/dateNavigation.carousel";
 import { ModernCard, ModernH1, ModernH3, ModernBody } from '../components/modern';
+import { MatchFilter } from '../components/filters/MatchFilter';
 
 interface TodayMatch {
     id: string;
@@ -51,6 +53,14 @@ export function MatchesPage() {
     const [loading, setLoading] = useState(true);
     const [showLive, setShowLive] = useState(false);
     const [showAvailableTickets, setShowAvailableTickets] = useState(false);
+
+    const form = useForm({
+        initialValues: {
+            competition: '',
+            team: '',
+            venue: '',
+        },
+    });
 
     const windowSize = 7; // always 7 days displayed
 
@@ -274,51 +284,15 @@ export function MatchesPage() {
                 Matches
                 </ModernH1>
 
-                {/* Filters */}
-                <Paper 
-                    p="md" 
-                    mb="lg" 
-                    style={{ 
-                        backgroundColor: 'var(--modern-card-bg)', 
-                        border: '1px solid var(--modern-border-color)' 
-                    }}
-                >
-                    <Group gap="md">
-                        <Text size="sm" fw={600} style={{ color: 'var(--modern-text-primary)' }}>
-                            Filters:
-                        </Text>
-                        <Chip
-                            checked={showLive}
-                            onChange={(checked) => setShowLive(checked)}
-                            variant={showLive ? 'filled' : 'outline'}
-                            styles={{
-                                label: {
-                                    backgroundColor: showLive ? 'var(--modern-lime)' : 'transparent',
-                                    color: showLive ? 'var(--modern-bg-primary)' : 'var(--modern-text-primary)',
-                                    borderColor: 'var(--modern-lime)',
-                                    fontWeight: 600,
-                                }
-                            }}
-                        >
-                            LIVE
-                        </Chip>
-                        <Chip
-                            checked={showAvailableTickets}
-                            onChange={(checked) => setShowAvailableTickets(checked)}
-                            variant={showAvailableTickets ? 'filled' : 'outline'}
-                            styles={{
-                                label: {
-                                    backgroundColor: showAvailableTickets ? 'var(--modern-lime)' : 'transparent',
-                                    color: showAvailableTickets ? 'var(--modern-bg-primary)' : 'var(--modern-text-primary)',
-                                    borderColor: 'var(--modern-lime)',
-                                    fontWeight: 600,
-                                }
-                            }}
-                        >
-                            Available Tickets
-                        </Chip>
-                    </Group>
-                </Paper>
+                <MatchFilter
+                    form={form}
+                    showLive={showLive}
+                    setShowLive={setShowLive}
+                    showAvailableTickets={showAvailableTickets}
+                    setShowAvailableTickets={setShowAvailableTickets}
+                    showBadges={true}
+                    showFormFilters={false}
+                />
 
             <DateNavigation
                 dates={dates}
@@ -468,17 +442,29 @@ export function MatchesPage() {
                                                     <Grid align="center">
                                                         {/* Crests */}
                                                         <Grid.Col span={2}>
-                                                            <Stack gap="xs" align="center" justify="center">
-                                                                <Image src={teamCrests[m.homeTeam]} width={32} height={32} fit="contain" />
-                                                                <Image src={teamCrests[m.awayTeam]} width={32} height={32} fit="contain" />
+                                                            <Stack gap="xs" align="center" justify="center" style={{ minHeight: '60px' }}>
+                                                                <Image 
+                                                                    src={teamCrests[m.homeTeam]} 
+                                                                    width={40} 
+                                                                    height={40} 
+                                                                    fit="contain"
+                                                                    style={{ minWidth: '40px', minHeight: '40px', maxWidth: '40px', maxHeight: '40px' }}
+                                                                />
+                                                                <Image 
+                                                                    src={teamCrests[m.awayTeam]} 
+                                                                    width={40} 
+                                                                    height={40} 
+                                                                    fit="contain"
+                                                                    style={{ minWidth: '40px', minHeight: '40px', maxWidth: '40px', maxHeight: '40px' }}
+                                                                />
                                                             </Stack>
                                                         </Grid.Col>
 
                                                         {/* Team Names */}
-                                                        <Grid.Col span={5}>
+                                                        <Grid.Col span={6}>
                                                             <Stack gap="xs" justify="center">
-                                                                <Text size="sm" fw={500}>{m.homeTeam}</Text>
-                                                                <Text size="sm" fw={500}>{m.awayTeam}</Text>
+                                                                <Text size="sm" fw={500} style={{ wordBreak: 'break-word' }}>{m.homeTeam}</Text>
+                                                                <Text size="sm" fw={500} style={{ wordBreak: 'break-word' }}>{m.awayTeam}</Text>
                                                             </Stack>
                                                         </Grid.Col>
 
@@ -497,7 +483,7 @@ export function MatchesPage() {
 
 
                                                         {/* Score or Time */}
-                                                        <Grid.Col span={4}>
+                                                        <Grid.Col span={3}>
                                                             <Stack gap="xs" align="flex-end" justify="center">
                                                                 {m.homeScore !== undefined && m.awayScore !== undefined ? (
                                                                     <>

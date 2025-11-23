@@ -91,8 +91,8 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                 p={{ base: 'md', sm: 'xl' }}
                 radius="md"
                 style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    border: isPredicted ? '1px dashed rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: 'var(--modern-bg-tertiary)',
+                    border: isPredicted ? '1px dashed var(--modern-border-color)' : '1px solid var(--modern-border-color)',
                     height: 'clamp(500px, 60vh, 600px)',
                     minHeight: 'clamp(500px, 60vh, 600px)',
                     maxHeight: 'clamp(500px, 60vh, 600px)',
@@ -122,7 +122,7 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                         textAlign: 'center', 
                         width: '100%', 
                         marginBottom: 'clamp(1rem, 3vw, 2rem)',
-                        color: 'var(--modern-gray)',
+                        color: 'var(--modern-text-secondary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.1em',
                         fontWeight: 600,
@@ -209,9 +209,9 @@ function renderPlayerRow(players: Player[]) {
                     size="lg"
                     radius="xl"
                     style={{
-                        backgroundColor: 'var(--modern-dark-gray)',
+                        backgroundColor: 'var(--modern-bg-secondary)',
                         border: '2px solid var(--modern-lime)',
-                        color: 'var(--modern-white)',
+                        color: 'var(--modern-text-primary)',
                         fontWeight: 700,
                         fontSize: 'clamp(0.65rem, 1.5vw, 1.1rem)',
                         width: 'clamp(2.5rem, 5vw, 3.5rem)',
@@ -225,7 +225,7 @@ function renderPlayerRow(players: Player[]) {
                     fw={500}
                     style={{
                         fontSize: 'clamp(0.6rem, 1.2vw, 0.875rem)', 
-                        color: 'var(--modern-white)',
+                        color: 'var(--modern-text-primary)',
                         maxWidth: 'clamp(50px, 12vw, 100px)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',

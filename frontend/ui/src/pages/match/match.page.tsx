@@ -1,4 +1,4 @@
-import {useState, useEffect, useMemo} from 'react';
+import {useState, useMemo} from 'react';
 import {
     Container,
     Title,
@@ -7,14 +7,13 @@ import {
     Box,
     Text,
     Group,
-    Button,
     SimpleGrid,
     Stack,
     Image,
     useMantineTheme,
 } from '@mantine/core';
 import {useMediaQuery} from '@mantine/hooks';
-import {useLocation, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {usePageTransition} from '../../hooks/usePageTransition';
 import {ModernButton} from '../../components/modern';
 import {ScorePredictionCard} from '../../components/predictions';
@@ -68,7 +67,7 @@ function getMatchStatus(matchDateStr: string): 'past' | 'today' | 'future' {
 }
 
 /** Mock function returning last 5 games form for a team. (W, D, L) */
-function getTeamForm(teamName: string): ('W' | 'D' | 'L')[] {
+function getTeamForm(): ('W' | 'D' | 'L')[] {
     const outcomes = ['W', 'D', 'L'];
     const form: ('W' | 'D' | 'L')[] = [];
     for (let i = 0; i < 5; i++) {
@@ -80,7 +79,6 @@ function getTeamForm(teamName: string): ('W' | 'D' | 'L')[] {
 
 export function MatchPage() {
     const {matchId} = useParams<{ matchId: string }>();
-    const location = useLocation();
     const {navigateWithTransition} = usePageTransition();
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
@@ -178,12 +176,12 @@ export function MatchPage() {
     };
 
 
-    const [matchDetails, setMatchDetails] = useState<MatchDetails>(mockMatchDetails);
+    const [matchDetails] = useState<MatchDetails>(mockMatchDetails);
     const status = getMatchStatus(matchDetails.date);
 
     // Retrieve last 5 games form for each team
-    const homeForm = useMemo(() => getTeamForm(matchDetails.homeTeam), [matchDetails.homeTeam]);
-    const awayForm = useMemo(() => getTeamForm(matchDetails.awayTeam), [matchDetails.awayTeam]);
+    const homeForm = useMemo(() => getTeamForm(), []);
+    const awayForm = useMemo(() => getTeamForm(), []);
 
 
     function handleViewTickets() {
@@ -206,51 +204,79 @@ export function MatchPage() {
     }
 
     return (
-        <Container size="xl" py={{base: 'md', sm: 'xl'}} px={{base: 'xs', sm: 'md'}}>
-            {/* Match Header */}
-            <Paper
-                p={{base: 'md', sm: 'xl'}}
-                mb={{base: 'md', sm: 'xl'}}
+        <>
+            {/* Match Header Section */}
+            <Box
+                py={{ base: '3rem', md: '6rem' }}
                 style={{
-                    backgroundColor: 'var(--modern-dark-gray)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: 'var(--modern-bg-primary)',
+                    color: 'var(--modern-text-primary)',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflowX: 'hidden',
+                    ...(!isMobile && {
+                        width: '100vw',
+                        marginLeft: 'calc(50% - 50vw)',
+                        marginRight: 'calc(50% - 50vw)',
+                    }),
                 }}
             >
-                {/* Background decorative elements */}
+                {/* Subtle Background Pattern */}
                 <Box
+                    className="section-background-pattern"
                     style={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
-                        width: '200px',
-                        height: '200px',
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
-                        borderRadius: '0 0 100% 0',
-                    }}
-                />
-                <Box
-                    style={{
-                        position: 'absolute',
-                        top: 0,
                         right: 0,
-                        width: '200px',
-                        height: '200px',
-                        background: 'linear-gradient(225deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
-                        borderRadius: '0 0 0 100%',
+                        bottom: 0,
+                        opacity: 0.03,
+                        pointerEvents: 'none',
+                        zIndex: 0,
                     }}
                 />
+                <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
+                    <Paper
+                        p={{base: 'md', sm: 'xl'}}
+                        style={{
+                            backgroundColor: 'var(--modern-card-bg)',
+                            border: '1px solid var(--modern-border-color)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        {/* Background decorative elements */}
+                        <Box
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '200px',
+                                height: '200px',
+                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
+                                borderRadius: '0 0 100% 0',
+                            }}
+                        />
+                        <Box
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                width: '200px',
+                                height: '200px',
+                                background: 'linear-gradient(225deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
+                                borderRadius: '0 0 0 100%',
+                            }}
+                        />
 
-                <Stack gap="lg" align="center" style={{position: 'relative', zIndex: 1}}>
+                        <Stack gap="lg" align="center" style={{position: 'relative', zIndex: 1}}>
                     {/* Competition/Event Badge */}
                     <Badge
                         size="lg"
                         variant="outline"
                         style={{
-                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderColor: 'var(--modern-border-color)',
                             backgroundColor: 'transparent',
-                            color: 'var(--modern-white)',
+                            color: 'var(--modern-text-primary)',
                             padding: '0.5rem 1rem',
                             textTransform: 'uppercase',
                             letterSpacing: '0.1em',
@@ -266,7 +292,7 @@ export function MatchPage() {
                             size="xl"
                             fw={900}
                             style={{
-                                color: 'var(--modern-white)',
+                                color: 'var(--modern-text-primary)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.05em',
                                 fontSize: 'clamp(1.5rem, 3vw, 2rem)',
@@ -282,7 +308,7 @@ export function MatchPage() {
                             size="md"
                             fw={600}
                             style={{
-                                color: 'var(--modern-white)',
+                                color: 'var(--modern-text-primary)',
                                 fontSize: '1.25rem',
                             }}
                         >
@@ -320,11 +346,11 @@ export function MatchPage() {
                                     height: 'clamp(60px, 15vw, 80px)',
                                     borderRadius: '50%',
                                     overflow: 'hidden',
-                                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                                    border: '2px solid var(--modern-border-color)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    backgroundColor: 'var(--modern-black)',
+                                    backgroundColor: 'var(--modern-bg-secondary)',
                                     cursor: matchDetails.homeTeamId ? 'pointer' : 'default',
                                     transition: 'all 0.2s ease',
                                 }}
@@ -336,7 +362,7 @@ export function MatchPage() {
                                 }}
                                 onMouseLeave={(e) => {
                                     if (matchDetails.homeTeamId) {
-                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                        e.currentTarget.style.borderColor = 'var(--modern-border-color)';
                                         e.currentTarget.style.transform = 'scale(1)';
                                     }
                                 }}
@@ -353,7 +379,7 @@ export function MatchPage() {
                                 size="md"
                                 fw={700}
                                 style={{
-                                    color: 'var(--modern-white)',
+                                    color: 'var(--modern-text-primary)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
                                     fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
@@ -361,33 +387,7 @@ export function MatchPage() {
                             >
                                 {matchDetails.homeTeam}
                             </Text>
-                            <Group gap={4} justify="center">
-                                {homeForm.map((result, i) => (
-                                    <Badge
-                                        key={i}
-                                        size="xs"
-                                        style={{
-                                            backgroundColor:
-                                                result === 'W'
-                                                    ? '#00ff88'
-                                                    : result === 'D'
-                                                        ? '#ffaa00'
-                                                        : '#ff4444',
-                                            color: 'var(--modern-black)',
-                                            fontWeight: 700,
-                                            minWidth: 'clamp(18px, 4vw, 22px)',
-                                            height: 'clamp(18px, 4vw, 22px)',
-                                            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-                                            padding: '0 4px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                        }}
-                                    >
-                                        {result}
-                                    </Badge>
-                                ))}
-                            </Group>
+
                         </Stack>
 
                         {/* Center VS block */}
@@ -441,11 +441,11 @@ export function MatchPage() {
                                     height: 'clamp(60px, 15vw, 80px)',
                                     borderRadius: '50%',
                                     overflow: 'hidden',
-                                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                                    border: '2px solid var(--modern-border-color)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    backgroundColor: 'var(--modern-black)',
+                                    backgroundColor: 'var(--modern-bg-secondary)',
                                     cursor: matchDetails.awayTeamId ? 'pointer' : 'default',
                                     transition: 'all 0.2s ease',
                                 }}
@@ -457,7 +457,7 @@ export function MatchPage() {
                                 }}
                                 onMouseLeave={(e) => {
                                     if (matchDetails.awayTeamId) {
-                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                        e.currentTarget.style.borderColor = 'var(--modern-border-color)';
                                         e.currentTarget.style.transform = 'scale(1)';
                                     }
                                 }}
@@ -474,7 +474,7 @@ export function MatchPage() {
                                 size="md"
                                 fw={700}
                                 style={{
-                                    color: 'var(--modern-white)',
+                                    color: 'var(--modern-text-primary)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
                                     fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
@@ -482,33 +482,7 @@ export function MatchPage() {
                             >
                                 {matchDetails.awayTeam}
                             </Text>
-                            <Group gap={4} justify="center">
-                                {awayForm.map((result, i) => (
-                                    <Badge
-                                        key={i}
-                                        size="xs"
-                                        style={{
-                                            backgroundColor:
-                                                result === 'W'
-                                                    ? '#00ff88'
-                                                    : result === 'D'
-                                                        ? '#ffaa00'
-                                                        : '#ff4444',
-                                            color: 'var(--modern-black)',
-                                            fontWeight: 700,
-                                            minWidth: 'clamp(18px, 4vw, 22px)',
-                                            height: 'clamp(18px, 4vw, 22px)',
-                                            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-                                            padding: '0 4px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                        }}
-                                    >
-                                        {result}
-                                    </Badge>
-                                ))}
-                            </Group>
+
                         </Stack>
                     </Group>
 
@@ -516,7 +490,7 @@ export function MatchPage() {
                     <Text
                         size="sm"
                         style={{
-                            color: 'var(--modern-gray)',
+                            color: 'var(--modern-text-secondary)',
                             textTransform: 'uppercase',
                             letterSpacing: '0.1em',
                         }}
@@ -524,18 +498,239 @@ export function MatchPage() {
                         {matchDetails.venue}
                     </Text>
                 </Stack>
-            </Paper>
+                    </Paper>
+                </Container>
+            </Box>
 
+            {/* Form & Prediction Section */}
+            <Box
+                py={{ base: '3rem', md: '6rem' }}
+                px={{ base: 'md', md: 0 }}
+                style={{
+                    backgroundColor: 'var(--modern-bg-secondary)',
+                    color: 'var(--modern-text-primary)',
+                    borderTop: '1px solid var(--modern-section-divider)',
+                    borderBottom: '1px solid var(--modern-section-divider)',
+                    position: 'relative',
+                    overflowX: 'hidden',
+                }}
+            >
+                {/* Subtle Background Pattern */}
+                <Box
+                    className="section-background-pattern"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        opacity: 0.03,
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                    }}
+                />
+                <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
+                    <Stack gap="xl">
+                        {/* Form Section */}
+                        <Paper
+                            p={{ base: 'md', sm: 'xl' }}
+                            radius="lg"
+                            withBorder
+                            style={{ backgroundColor: 'var(--modern-card-bg)', border: '1px solid var(--modern-border-color)' }}
+                        >
+                            <Title
+                                order={3}
+                                mb="xl"
+                                ta="center"
+                                style={{
+                                    color: 'var(--modern-text-primary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
+                                }}
+                            >
+                                Form
+                            </Title>
+                            
+                            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+                                {/* Home Team Form */}
+                                <Stack gap="md" align="center">
+                                    <Group gap="sm" align="center" justify="center" wrap="nowrap">
+                                        {matchDetails.homeTeamLogo && (
+                                            <Image
+                                                src={matchDetails.homeTeamLogo}
+                                                width={24}
+                                                height={24}
+                                                fit="contain"
+                                                style={{ borderRadius: '50%' }}
+                                            />
+                                        )}
+                                        <Text
+                                            size="sm"
+                                            fw={600}
+                                            style={{
+                                                color: 'var(--modern-text-primary)',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {matchDetails.homeTeam}
+                                        </Text>
+                                    </Group>
+                                    <Group gap={6} justify="center" wrap="nowrap">
+                                        {homeForm.map((result, i) => (
+                                            <Box
+                                                key={i}
+                                                style={{
+                                                    width: 'clamp(32px, 6vw, 40px)',
+                                                    height: 'clamp(32px, 6vw, 40px)',
+                                                    borderRadius: '50%',
+                                                    backgroundColor:
+                                                        result === 'W'
+                                                            ? '#00ff88'
+                                                            : result === 'D'
+                                                                ? '#ffaa00'
+                                                                : '#ff4444',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: '2px solid var(--modern-border-color)',
+                                                    boxShadow: '0 2px 8px var(--modern-shadow-color)',
+                                                    transition: 'all 0.2s ease',
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.transform = 'scale(1.1)';
+                                                    e.currentTarget.style.boxShadow = '0 4px 12px var(--modern-shadow-color)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.transform = 'scale(1)';
+                                                    e.currentTarget.style.boxShadow = '0 2px 8px var(--modern-shadow-color)';
+                                                }}
+                                            >
+                                                <Text
+                                                    fw={900}
+                                                    style={{
+                                                        color: 'var(--modern-bg-primary)',
+                                                        fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+                                                        lineHeight: 1,
+                                                    }}
+                                                >
+                                                    {result}
+                                                </Text>
+                                            </Box>
+                                        ))}
+                                    </Group>
+                                </Stack>
 
-            {/* Score Prediction Section */}
-            <ScorePredictionCard
-                homeTeam={matchDetails.homeTeam}
-                awayTeam={matchDetails.awayTeam}
-                date={matchDetails.date}
-            />
+                                {/* Away Team Form */}
+                                <Stack gap="md" align="center">
+                                    <Group gap="sm" align="center" justify="center" wrap="nowrap">
+                                        {matchDetails.awayTeamLogo && (
+                                            <Image
+                                                src={matchDetails.awayTeamLogo}
+                                                width={24}
+                                                height={24}
+                                                fit="contain"
+                                                style={{ borderRadius: '50%' }}
+                                            />
+                                        )}
+                                        <Text
+                                            size="sm"
+                                            fw={600}
+                                            style={{
+                                                color: 'var(--modern-text-primary)',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {matchDetails.awayTeam}
+                                        </Text>
+                                    </Group>
+                                    <Group gap={6} justify="center" wrap="nowrap">
+                                        {awayForm.map((result, i) => (
+                                            <Box
+                                                key={i}
+                                                style={{
+                                                    width: 'clamp(32px, 6vw, 40px)',
+                                                    height: 'clamp(32px, 6vw, 40px)',
+                                                    borderRadius: '50%',
+                                                    backgroundColor:
+                                                        result === 'W'
+                                                            ? '#00ff88'
+                                                            : result === 'D'
+                                                                ? '#ffaa00'
+                                                                : '#ff4444',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: '2px solid var(--modern-border-color)',
+                                                    boxShadow: '0 2px 8px var(--modern-shadow-color)',
+                                                    transition: 'all 0.2s ease',
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.transform = 'scale(1.1)';
+                                                    e.currentTarget.style.boxShadow = '0 4px 12px var(--modern-shadow-color)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.transform = 'scale(1)';
+                                                    e.currentTarget.style.boxShadow = '0 2px 8px var(--modern-shadow-color)';
+                                                }}
+                                            >
+                                                <Text
+                                                    fw={900}
+                                                    style={{
+                                                        color: 'var(--modern-bg-primary)',
+                                                        fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+                                                        lineHeight: 1,
+                                                    }}
+                                                >
+                                                    {result}
+                                                </Text>
+                                            </Box>
+                                        ))}
+                                    </Group>
+                                </Stack>
+                            </SimpleGrid>
+                        </Paper>
 
-            {/* Team Lineups */}
-            <TeamLineups matchDetails={matchDetails} status={status}/>
-        </Container>
+                        {/* Score Prediction Section */}
+                        <ScorePredictionCard
+                            homeTeam={matchDetails.homeTeam}
+                            awayTeam={matchDetails.awayTeam}
+                            date={matchDetails.date}
+                        />
+                    </Stack>
+                </Container>
+            </Box>
+
+            {/* Team Lineups Section */}
+            <Box
+                py={{ base: '3rem', md: '6rem' }}
+                px={{ base: 'md', md: 0 }}
+                style={{
+                    backgroundColor: 'var(--modern-bg-secondary)',
+                    color: 'var(--modern-text-primary)',
+                    borderTop: '1px solid var(--modern-section-divider)',
+                    position: 'relative',
+                    overflowX: 'hidden',
+                }}
+            >
+                {/* Subtle Background Pattern */}
+                <Box
+                    className="section-background-pattern"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        opacity: 0.03,
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                    }}
+                />
+                <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
+                    <TeamLineups matchDetails={matchDetails} status={status}/>
+                </Container>
+            </Box>
+        </>
     );
 }

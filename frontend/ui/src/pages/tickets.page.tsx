@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {Container, Accordion, Grid, Box, Group, Badge, Image, Paper, Stack, Text, Divider} from '@mantine/core';
+import { useForm } from '@mantine/form';
 import {IconTicket} from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
 import {DateNavigation} from "../components/carousel/dateNavigation.carousel";
 import { ModernCard, ModernH1, ModernH3, ModernBody, ModernButton } from '../components/modern';
+import { MatchFilter } from '../components/filters/MatchFilter';
 
 interface TicketMatch {
     id: string;
@@ -53,6 +55,16 @@ export function TicketsPage() {
     const { navigateWithTransition } = usePageTransition();
     const [matches, setMatches] = useState<TicketMatch[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showLive, setShowLive] = useState(false);
+    const [showAvailableTickets, setShowAvailableTickets] = useState(false);
+
+    const form = useForm({
+        initialValues: {
+            competition: '',
+            team: '',
+            venue: '',
+        },
+    });
 
     const windowSize = 7; // always 7 days displayed
 
@@ -222,8 +234,18 @@ export function TicketsPage() {
         }
     }, [selectedDate, fetchMatchesForDate]);
 
+    // Filter matches based on active filters
+    const filteredMatches = useMemo(() => {
+        return matches.filter((match) => {
+            if (form.values.competition && match.competitionName !== form.values.competition) return false;
+            if (form.values.team && !match.homeTeam.toLowerCase().includes(form.values.team.toLowerCase()) && !match.awayTeam.toLowerCase().includes(form.values.team.toLowerCase())) return false;
+            if (form.values.venue && !match.venue.toLowerCase().includes(form.values.venue.toLowerCase())) return false;
+            return true;
+        });
+    }, [matches, form.values]);
+
     // group matches by competition
-    const matchesByCompetition = matches.reduce<Record<string, TicketMatch[]>>((acc, match) => {
+    const matchesByCompetition = filteredMatches.reduce<Record<string, TicketMatch[]>>((acc, match) => {
         if (!acc[match.competitionName]) acc[match.competitionName] = [];
         acc[match.competitionName].push(match);
         return acc;
@@ -268,6 +290,16 @@ export function TicketsPage() {
                     Browse and book tickets for upcoming matches. Select a date to see available tickets.
                 </ModernBody>
 
+                <MatchFilter
+                    form={form}
+                    showLive={showLive}
+                    setShowLive={setShowLive}
+                    showAvailableTickets={showAvailableTickets}
+                    setShowAvailableTickets={setShowAvailableTickets}
+                    showBadges={false}
+                    showFormFilters={true}
+                />
+
                 <DateNavigation
                     dates={dates}
                     selectedDateIndex={selectedDateIndex}
@@ -290,10 +322,10 @@ export function TicketsPage() {
                     }}>
                         <IconTicket size={48} color="var(--modern-text-secondary)" style={{ margin: '0 auto 1rem' }} />
                         <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
-                            No tickets available
+                            {showLive || showAvailableTickets || form.values.competition || form.values.team || form.values.venue ? 'No matches match your filters' : 'No tickets available'}
                         </ModernH3>
                         <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
-                            There are no tickets available for matches on this date. Try selecting a different date.
+                            {showLive || showAvailableTickets || form.values.competition || form.values.team || form.values.venue ? 'Try adjusting your filters' : 'There are no tickets available for matches on this date. Try selecting a different date.'}
                         </ModernBody>
                     </ModernCard>
                 ) : (

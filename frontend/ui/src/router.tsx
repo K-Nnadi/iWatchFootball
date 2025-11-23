@@ -23,6 +23,7 @@ import {LicensesPage} from "./pages/licenses.page";
 import {ContactPage} from "./pages/contact.page";
 import {HelpPage} from "./pages/help.page";
 import {TicketsPage} from "./pages/tickets.page";
+import {ProfilePage} from "./pages/profile.page";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -38,7 +39,8 @@ const IWatchFootballElements: ElementMap = {
     checkout: <CheckoutPage/>,
     thankYou: <ThankYouPage/>,
     news: <NewsPage/>,
-    tickets: <TicketsPage/>
+    tickets: <TicketsPage/>,
+    profile: <ProfilePage/>
 }
 
 const childrenRoutes = Object.entries(IWatchFootballElements).map(([path, element]) => ({

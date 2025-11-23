@@ -9,7 +9,7 @@ import {
     Select,
     Pagination,
 } from '@mantine/core';
-import { IconBookmark, IconClock } from '@tabler/icons-react';
+import { IconClock } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { ModernBody, ModernButton, ModernCard, ModernH2, ModernH3 } from '../components/modern';
 
@@ -211,24 +211,13 @@ export function NewsPage() {
                                                     {article.excerpt}
                                                 </ModernBody>
                                             )}
-                                            <Group gap="xs" justify="space-between" mt="auto">
-                                                <Group gap="xs">
-                                                    <Text size="xs" c="dimmed">{article.source}</Text>
-                                                    <Text size="xs" c="dimmed">•</Text>
-                                                    <Group gap={4}>
-                                                        <IconClock size={12} color="var(--modern-gray)" />
-                                                        <Text size="xs" c="dimmed">{article.time}</Text>
-                                                    </Group>
+                                            <Group gap="xs" mt="auto">
+                                                <Text size="xs" c="dimmed">{article.source}</Text>
+                                                <Text size="xs" c="dimmed">•</Text>
+                                                <Group gap={4}>
+                                                    <IconClock size={12} color="var(--modern-gray)" />
+                                                    <Text size="xs" c="dimmed">{article.time}</Text>
                                                 </Group>
-                                                <IconBookmark 
-                                                    size={16} 
-                                                    color="var(--modern-lime)" 
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // Handle bookmark
-                                                    }}
-                                                />
                                             </Group>
                                         </Stack>
                                     </Stack>

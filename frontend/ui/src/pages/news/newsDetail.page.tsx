@@ -9,7 +9,7 @@ import {
     Divider,
 } from '@mantine/core';
 import { useParams } from 'react-router-dom';
-import { IconBookmark, IconClock, IconExternalLink, IconArrowLeft } from '@tabler/icons-react';
+import { IconClock, IconExternalLink, IconArrowLeft } from '@tabler/icons-react';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { ModernBody, ModernH1, ModernH2 } from '../../components/modern';
 
@@ -157,31 +157,21 @@ export function NewsDetailPage() {
                         </Text>
                     )}
                     <ModernH1>{article.title}</ModernH1>
-                    <Group gap="md">
-                        <Group gap="xs">
-                            <Text size="sm" c="dimmed">{article.source}</Text>
-                            {article.author && (
-                                <>
-                                    <Text size="sm" c="dimmed">•</Text>
-                                    <Text size="sm" c="dimmed">{article.author}</Text>
-                                </>
-                            )}
-                            <Text size="sm" c="dimmed">•</Text>
-                            <Group gap={4}>
-                                <IconClock size={14} color="var(--modern-gray)" />
-                                <Text size="sm" c="dimmed">
-                                    {article.publishedAt ? formatDate(article.publishedAt) : article.time}
-                                </Text>
-                            </Group>
+                    <Group gap="xs">
+                        <Text size="sm" c="dimmed">{article.source}</Text>
+                        {article.author && (
+                            <>
+                                <Text size="sm" c="dimmed">•</Text>
+                                <Text size="sm" c="dimmed">{article.author}</Text>
+                            </>
+                        )}
+                        <Text size="sm" c="dimmed">•</Text>
+                        <Group gap={4}>
+                            <IconClock size={14} color="var(--modern-gray)" />
+                            <Text size="sm" c="dimmed">
+                                {article.publishedAt ? formatDate(article.publishedAt) : article.time}
+                            </Text>
                         </Group>
-                        <IconBookmark 
-                            size={20} 
-                            color="var(--modern-lime)" 
-                            style={{ cursor: 'pointer', marginLeft: 'auto' }}
-                            onClick={() => {
-                                // Handle bookmark
-                            }}
-                        />
                     </Group>
                 </Stack>
 

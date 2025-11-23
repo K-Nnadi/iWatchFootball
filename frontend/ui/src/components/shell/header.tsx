@@ -1,6 +1,6 @@
 import React from 'react';
-import { AppShell, Box, Burger, Button, Container, Divider, Flex, Group, Text, Title } from '@mantine/core';
-import { IoSettingsOutline } from 'react-icons/io5';
+import { AppShell, Avatar, Box, Burger, Button, Container, Divider, Flex, Group, Menu, Text, Title } from '@mantine/core';
+import { IoSettingsOutline, IoPersonOutline } from 'react-icons/io5';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
 
@@ -24,7 +24,6 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
             style={{
                 backgroundColor: 'var(--modern-header-bg)',
                 boxShadow: '0 1px 3px var(--modern-shadow-color)',
-                borderBottom: '1px solid var(--modern-border-color)',
                 position: 'sticky',
                 top: 0,
                 zIndex: 1000
@@ -58,6 +57,94 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                         color="var(--modern-text-primary)"
                         style={{ position: 'absolute', left: 0, zIndex: 1 }}
                     />
+
+                    {/* Mobile Avatar - Right side */}
+                    <Box hiddenFrom="md" style={{ position: 'absolute', right: 0, zIndex: 1 }}>
+                        {isLoggedIn ? (
+                            // Logged in: Click to go to profile
+                            <Avatar
+                                size="md"
+                                radius="xl"
+                                onClick={() => navigateWithTransition('/profile')}
+                                style={{
+                                    backgroundColor: 'var(--modern-bg-tertiary)',
+                                    color: 'var(--modern-lime)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
+                                <IoPersonOutline size={20} />
+                            </Avatar>
+                        ) : (
+                            // Not logged in: Menu with Sign In/Sign Up
+                            <Menu
+                                shadow="md"
+                                width={200}
+                                position="bottom-end"
+                                withArrow
+                            >
+                                <Menu.Target>
+                                    <Avatar
+                                        size="md"
+                                        radius="xl"
+                                        style={{
+                                            backgroundColor: 'var(--modern-bg-tertiary)',
+                                            color: 'var(--modern-lime)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        <IoPersonOutline size={20} />
+                                    </Avatar>
+                                </Menu.Target>
+                                <Menu.Dropdown
+                                    style={{
+                                        backgroundColor: 'var(--modern-card-bg)',
+                                        border: '1px solid var(--modern-border-color)',
+                                    }}
+                                >
+                                    <Menu.Item
+                                        onClick={() => navigateWithTransition('/signIn')}
+                                        style={{
+                                            color: 'var(--modern-text-primary)',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        Sign In
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        onClick={() => navigateWithTransition('/join')}
+                                        style={{
+                                            color: 'var(--modern-lime)',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        Join
+                                    </Menu.Item>
+                                </Menu.Dropdown>
+                            </Menu>
+                        )}
+                    </Box>
 
                     {/* Title - Mobile: Centered */}
                     <Box

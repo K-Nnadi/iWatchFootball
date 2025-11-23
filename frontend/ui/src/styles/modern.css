@@ -706,14 +706,52 @@ body,
 .main-content-wrapper {
   display: flex !important;
   flex-direction: column !important;
-  min-height: calc(100vh - 80px) !important;
+  min-height: calc(100vh - 80px - 100px) !important; /* Account for header (80px) + ad banner (100px) */
 }
 
 /* Ensure footer stays at bottom on mobile */
 @media (max-width: 768px) {
   .main-content-wrapper {
-    min-height: calc(100vh - 70px) !important;
+    min-height: calc(100vh - 70px - 90px) !important; /* Account for header (70px) + ad banner (90px) */
   }
+}
+
+/* Ad banner styling */
+.ad-banner {
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+@media (min-width: 768px) {
+  .ad-banner {
+    height: 100px !important;
+    min-height: 100px !important;
+  }
+}
+
+/* Ensure no gap between header and main, and ad banner inside main */
+.mantine-AppShell-Header {
+  margin-bottom: 0 !important;
+}
+
+.mantine-AppShell-Main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Ad banner as first child of Main should have no top margin */
+.mantine-AppShell-Main > .ad-banner {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Ensure main-content-wrapper has no top margin when following ad banner */
+.ad-banner + .main-content-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 .mantine-AppShell-Main .dark-theme {

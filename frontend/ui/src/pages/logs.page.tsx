@@ -346,7 +346,7 @@ export function LogsPage() {
     return (
         <Box className="dark-theme" style={{ 
             minHeight: '100vh', 
-            backgroundColor: 'var(--modern-black)',
+            backgroundColor: 'var(--modern-bg-primary)',
             width: '100vw',
             marginLeft: 'calc(-50vw + 50%)',
             marginRight: 'calc(-50vw + 50%)',
@@ -358,10 +358,10 @@ export function LogsPage() {
                     <Grid.Col span={columnSpan}>
 
                         <Box mb={10}>
-                            <ModernH2 style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>
+                            <ModernH2 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
                                 My Logged Games
                             </ModernH2>
-                            <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
+                            <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
                                 Track and manage your match history across different competitions
                             </ModernBody>
                         </Box>
@@ -371,7 +371,7 @@ export function LogsPage() {
                             hover={false}
                             style={{ 
                                 padding: '2rem', 
-                                backgroundColor: 'var(--modern-dark-gray)',
+                                backgroundColor: 'var(--modern-card-bg)',
                                 maxHeight: 'none'
                             }}
                             styles={{
@@ -388,16 +388,16 @@ export function LogsPage() {
                         >
                             <Stack gap="lg">
                                 <Box style={{ textAlign: 'center' }}>
-                                    <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '0.5rem' }}>
+                                    <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
                                         Add New Match
                                     </ModernH3>
-                                    <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.9rem' }}>
+                                    <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.9rem' }}>
                                         Search for a fixture by selecting competition, season, and filtering teams
                                     </ModernBody>
                                 </Box>
 
                                 <Box>
-                                    <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Competition</ModernCaption>
+                                    <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Competition</ModernCaption>
                                     <Select
                                         placeholder="Select competition"
                                         data={competitions.map((c) => ({value: c.id, label: c.name}))}
@@ -416,9 +416,9 @@ export function LogsPage() {
                                         size="md"
                                         styles={{
                                             input: {
-                                                backgroundColor: 'var(--modern-black)',
-                                                borderColor: 'rgba(255, 255, 255, 0.2)',
-                                                color: 'var(--modern-white)',
+                                                backgroundColor: 'var(--modern-bg-secondary)',
+                                                borderColor: 'var(--modern-border-color)',
+                                                color: 'var(--modern-text-primary)',
                                                 '&:focus': {
                                                     borderColor: 'var(--modern-lime)',
                                                 }
@@ -429,7 +429,7 @@ export function LogsPage() {
 
                                 {selectedCompetition && (
                                     <Box>
-                                        <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Season</ModernCaption>
+                                        <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Season</ModernCaption>
                                         <Select
                                             placeholder="Select season"
                                             data={seasons.map((s) => ({value: s.id, label: s.year}))}
@@ -447,9 +447,9 @@ export function LogsPage() {
                                             size="md"
                                             styles={{
                                                 input: {
-                                                    backgroundColor: 'var(--modern-black)',
-                                                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                                                    color: 'var(--modern-white)',
+                                                    backgroundColor: 'var(--modern-bg-secondary)',
+                                                    borderColor: 'var(--modern-border-color)',
+                                                    color: 'var(--modern-text-primary)',
                                                     '&:focus': {
                                                         borderColor: 'var(--modern-lime)',
                                                     }
@@ -463,7 +463,7 @@ export function LogsPage() {
                                     <>
                                         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                                             <Box>
-                                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Home Team</ModernCaption>
+                                                <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Home Team</ModernCaption>
                                                 <Select
                                                     placeholder="Select home team"
                                                     data={teams
@@ -482,9 +482,9 @@ export function LogsPage() {
                                                     size="md"
                                                     styles={{
                                                         input: {
-                                                            backgroundColor: 'var(--modern-black)',
-                                                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                                                            color: 'var(--modern-white)',
+                                                            backgroundColor: 'var(--modern-bg-secondary)',
+                                                            borderColor: 'var(--modern-border-color)',
+                                                            color: 'var(--modern-text-primary)',
                                                             '&:focus': {
                                                                 borderColor: 'var(--modern-lime)',
                                                             }
@@ -493,7 +493,7 @@ export function LogsPage() {
                                                 />
                                             </Box>
                                             <Box>
-                                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Away Team</ModernCaption>
+                                                <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Away Team</ModernCaption>
                                                 <Select
                                                     placeholder="Select away team"
                                                     data={teams
@@ -512,9 +512,9 @@ export function LogsPage() {
                                                     size="md"
                                                     styles={{
                                                         input: {
-                                                            backgroundColor: 'var(--modern-black)',
-                                                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                                                            color: 'var(--modern-white)',
+                                                            backgroundColor: 'var(--modern-bg-secondary)',
+                                                            borderColor: 'var(--modern-border-color)',
+                                                            color: 'var(--modern-text-primary)',
                                                             '&:focus': {
                                                                 borderColor: 'var(--modern-lime)',
                                                             }
@@ -526,7 +526,7 @@ export function LogsPage() {
 
                                         {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
                                             <Box>
-                                                <ModernCaption style={{ color: 'var(--modern-white)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Select Fixture</ModernCaption>
+                                                <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Select Fixture</ModernCaption>
                                                 <Select
                                                     placeholder="Choose a fixture"
                                                     data={filteredFixtures.map((f) => ({
@@ -540,16 +540,16 @@ export function LogsPage() {
                                                     size="md"
                                                     styles={{
                                                         input: {
-                                                            backgroundColor: 'var(--modern-black)',
-                                                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                                                            color: 'var(--modern-white)',
+                                                            backgroundColor: 'var(--modern-bg-secondary)',
+                                                            borderColor: 'var(--modern-border-color)',
+                                                            color: 'var(--modern-text-primary)',
                                                             '&:focus': {
                                                                 borderColor: 'var(--modern-lime)',
                                                             }
                                                         }
                                                     }}
                                                 />
-                                                <ModernCaption style={{ color: 'var(--modern-light-gray)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                                                <ModernCaption style={{ color: 'var(--modern-text-secondary)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
                                                     {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
                                                 </ModernCaption>
                                             </Box>
@@ -557,7 +557,7 @@ export function LogsPage() {
 
                                         {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
                                             <Box style={{ textAlign: 'center', padding: '1rem' }}>
-                                                <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
+                                                <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
                                                     No matches found between these teams
                                                 </ModernBody>
                                             </Box>
@@ -618,12 +618,12 @@ export function LogsPage() {
                                 size="sm"
                                 styles={{
                                     root: {
-                                        backgroundColor: 'var(--modern-dark-gray)',
+                                        backgroundColor: 'var(--modern-bg-secondary)',
                                     },
                                     label: {
-                                        color: 'var(--modern-white)',
+                                        color: 'var(--modern-text-primary)',
                                         '&[data-active]': {
-                                            color: 'var(--modern-black)',
+                                            color: 'var(--modern-bg-primary)',
                                         },
                                     },
                                     control: {
@@ -642,13 +642,13 @@ export function LogsPage() {
                                 scrollHideDelay={0}
                             >
                                 {filteredLoggedFixtures.length === 0 && !loading ? (
-                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-dark-gray)' }}>
-                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>
+                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
+                                        <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '1rem' }}>
                                             {loggedFixtures.length === 0 
                                                 ? 'No Matches Logged Yet' 
                                                 : verificationFilter === 'verified' ? 'No Verified Matches Found' : 'No Matches Found'}
                                         </ModernH3>
-                                        <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
+                                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
                                             {loggedFixtures.length === 0 
                                                 ? 'Start by adding your first match using the form'
                                                 : 'Try changing the filter to see more matches'}
@@ -688,13 +688,13 @@ export function LogsPage() {
                                 scrollHideDelay={0}
                             >
                                 {filteredLoggedFixtures.length === 0 && !loading ? (
-                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-dark-gray)' }}>
-                                        <ModernH3 style={{ color: 'var(--modern-white)', marginBottom: '1rem' }}>
+                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
+                                        <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '1rem' }}>
                                             {loggedFixtures.length === 0 
                                                 ? 'No Matches Logged Yet' 
                                                 : verificationFilter === 'verified' ? 'No Verified Matches Found' : 'No Matches Found'}
                                         </ModernH3>
-                                        <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
+                                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
                                             {loggedFixtures.length === 0 
                                                 ? 'Start by adding your first match using the form'
                                                 : 'Try changing the filter to see more matches'}

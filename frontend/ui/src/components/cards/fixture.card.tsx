@@ -103,11 +103,11 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                 <ModernCard 
                     style={{ 
                         padding: '1.5rem', 
-                        backgroundColor: 'var(--modern-dark-gray)', 
-                        color: 'var(--modern-white)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        backgroundColor: 'var(--modern-card-bg)', 
+                        color: 'var(--modern-text-primary)',
+                        border: '1px solid var(--modern-border-color)',
                         borderRadius: '8px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                        boxShadow: '0 2px 4px var(--modern-shadow-color)',
                         transition: 'all 0.2s ease',
                     }}
                 >
@@ -115,7 +115,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                 <Box mb="md">
                     <Group gap="xs" mb="sm">
                         <ModernH3 style={{ 
-                            color: 'var(--modern-white)', 
+                            color: 'var(--modern-text-primary)', 
                             fontSize: '1rem',
                             fontWeight: 700,
                             textTransform: 'uppercase',
@@ -125,8 +125,8 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                             {competitionName}
                         </ModernH3>
                         <Badge size="sm" style={{ 
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                            color: 'var(--modern-light-gray)',
+                            backgroundColor: 'var(--modern-bg-tertiary)', 
+                            color: 'var(--modern-text-secondary)',
                             border: 'none',
                             borderRadius: '12px',
                             fontSize: '0.75rem',
@@ -140,8 +140,8 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                                 leftSection={<IconCheck size={12} />}
                                 style={{ 
                                     minWidth: 85, 
-                                    backgroundColor: '#00ff88', 
-                                    color: 'white',
+                                    backgroundColor: 'var(--modern-lime)', 
+                                    color: 'var(--modern-bg-primary)',
                                     border: 'none',
                                     borderRadius: '12px',
                                     fontSize: '0.75rem',
@@ -160,7 +160,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                         <ModernBody style={{ 
                             fontWeight: 600, 
                             fontSize: '1rem', 
-                            color: 'var(--modern-white)',
+                            color: 'var(--modern-text-primary)',
                             margin: 0
                         }}>
                             {homeTeam}
@@ -176,7 +176,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                             <ModernH3 style={{ 
                                 fontWeight: 700, 
                                 fontSize: '1.1rem', 
-                                color: 'var(--modern-black)', 
+                                color: 'var(--modern-bg-primary)', 
                                 margin: 0 
                             }}>
                                 {homeScore} - {awayScore}
@@ -185,7 +185,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                         <ModernBody style={{ 
                             fontWeight: 600, 
                             fontSize: '1rem', 
-                            color: 'var(--modern-white)',
+                            color: 'var(--modern-text-primary)',
                             margin: 0
                         }}>
                             {awayTeam}
@@ -198,7 +198,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                     {venue && (
                         <ModernBody style={{ 
                             fontSize: '0.875rem', 
-                            color: 'var(--modern-light-gray)',
+                            color: 'var(--modern-text-secondary)',
                             margin: 0,
                             fontWeight: 500
                         }}>
@@ -214,7 +214,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                 opened={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={
-                    <ModernH3 style={{ color: 'var(--modern-white)', fontSize: '1.125rem', fontWeight: 600 }}>
+                    <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
                         {homeTeam} vs {awayTeam}
                     </ModernH3>
                 }
@@ -226,23 +226,23 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                 }}
                 styles={{
                     content: {
-                        backgroundColor: 'var(--modern-dark-gray)',
-                        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        backgroundColor: 'var(--modern-card-bg)',
+                        boxShadow: '0 20px 60px var(--modern-shadow-color)',
+                        border: '1px solid var(--modern-border-color)',
                     },
                     header: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                        backgroundColor: 'var(--modern-bg-tertiary)',
+                        borderBottom: '1px solid var(--modern-border-color)',
                         padding: '1.5rem',
                     },
                     body: {
                         padding: '1.5rem',
-                        backgroundColor: 'var(--modern-dark-gray)',
+                        backgroundColor: 'var(--modern-card-bg)',
                     },
                     close: {
-                        color: 'var(--modern-white)',
+                        color: 'var(--modern-text-primary)',
                         '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            backgroundColor: 'var(--modern-bg-tertiary)',
                         },
                     },
                 }}
@@ -251,24 +251,24 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                     {/* Match Info */}
                     <Box>
                         <Group justify="space-between" mb="xs">
-                            <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.875rem', fontWeight: 500 }}>
+                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem', fontWeight: 500 }}>
                                 {competitionName}
                             </ModernBody>
                             <Badge size="sm" style={{ 
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                                color: 'var(--modern-light-gray)',
+                                backgroundColor: 'var(--modern-bg-tertiary)', 
+                                color: 'var(--modern-text-secondary)',
                                 border: 'none',
                             }}>
                                 {stage}
                             </Badge>
                         </Group>
                         {venue && (
-                            <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.875rem' }}>
+                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
                                 <IconMapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />
                                 {venue}
                             </ModernBody>
                         )}
-                        <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.875rem', marginTop: '4px' }}>
+                        <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
                             <IconCalendar size={14} style={{ display: 'inline', marginRight: '4px' }} />
                             {new Date(date).toLocaleDateString('en-US', { 
                                 year: 'numeric', 
@@ -280,32 +280,32 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                         </ModernBody>
                     </Box>
 
-                    <Divider color="rgba(255, 255, 255, 0.1)" />
+                    <Divider color="var(--modern-border-color)" />
 
                     {/* Events Section */}
                     <Box>
-                        <ModernH3 style={{ color: 'var(--modern-white)', fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
+                        <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
                             Match Events
                         </ModernH3>
                         <Box style={{ display: 'flex', minHeight: '200px' }}>
                             <Stack gap="md" style={{ flex: 1, paddingRight: '1.5rem' }}>
-                                <ModernH3 style={{ color: 'var(--modern-white)', fontSize: '0.875rem', fontWeight: 600 }}>{homeTeam}</ModernH3>
+                                <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '0.875rem', fontWeight: 600 }}>{homeTeam}</ModernH3>
                                 {homeEvents.length === 0 ? (
-                                    <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.875rem' }}>No events</ModernBody>
+                                    <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>No events</ModernBody>
                                 ) : (
                                     homeEvents.map((e: MatchEvent, index: number) => (
                                         <Group key={index} gap="xs" wrap="nowrap">
-                                            <ModernBody style={{ fontWeight: 500, fontSize: '0.875rem', minWidth: 35, color: 'var(--modern-white)' }}>
+                                            <ModernBody style={{ fontWeight: 500, fontSize: '0.875rem', minWidth: 35, color: 'var(--modern-text-primary)' }}>
                                                 {e.time}' {eventIcon(e.type)}
                                             </ModernBody>
-                                            <ModernBody style={{ fontSize: '0.875rem', color: 'var(--modern-white)' }}>{e.description}</ModernBody>
+                                            <ModernBody style={{ fontSize: '0.875rem', color: 'var(--modern-text-primary)' }}>{e.description}</ModernBody>
                                         </Group>
                                     ))
                                 )}
                             </Stack>
                             <Divider 
                                 orientation="vertical" 
-                                color="rgba(255, 255, 255, 0.1)"
+                                color="var(--modern-border-color)"
                                 style={{ 
                                     height: 'auto',
                                     alignSelf: 'stretch',
@@ -313,18 +313,18 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                                 }} 
                             />
                             <Stack gap="md" style={{ flex: 1, paddingLeft: '1.5rem' }}>
-                                <ModernH3 style={{ color: 'var(--modern-white)', fontSize: '0.875rem', fontWeight: 600, textAlign: 'right' }}>
+                                <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '0.875rem', fontWeight: 600, textAlign: 'right' }}>
                                     {awayTeam}
                                 </ModernH3>
                                 {awayEvents.length === 0 ? (
-                                    <ModernBody style={{ color: 'var(--modern-light-gray)', fontSize: '0.875rem', textAlign: 'right' }}>
+                                    <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem', textAlign: 'right' }}>
                                         No events
                                     </ModernBody>
                                 ) : (
                                     awayEvents.map((e: MatchEvent, index: number) => (
                                         <Group key={index} gap="xs" justify="flex-end" wrap="nowrap">
-                                            <ModernBody style={{ fontSize: '0.875rem', color: 'var(--modern-white)' }}>{e.description}</ModernBody>
-                                            <ModernBody style={{ fontWeight: 500, fontSize: '0.875rem', minWidth: 35, color: 'var(--modern-white)' }}>
+                                            <ModernBody style={{ fontSize: '0.875rem', color: 'var(--modern-text-primary)' }}>{e.description}</ModernBody>
+                                            <ModernBody style={{ fontWeight: 500, fontSize: '0.875rem', minWidth: 35, color: 'var(--modern-text-primary)' }}>
                                                 {e.time}' {eventIcon(e.type)}
                                             </ModernBody>
                                         </Group>
@@ -334,7 +334,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
                         </Box>
                     </Box>
 
-                    <Divider color="rgba(255, 255, 255, 0.1)" />
+                    <Divider color="var(--modern-border-color)" />
 
                     {/* Action Buttons */}
                     <Group justify="flex-end" gap="md">

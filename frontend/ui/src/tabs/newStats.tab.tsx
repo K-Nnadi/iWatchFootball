@@ -116,8 +116,8 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
             <Stack gap="xl">
                 {stats.map((category) => (
                     <Stack key={category.title} gap="md">
-                        <Title order={3} c="white">{category.title}</Title>
-                        <Card shadow="sm" radius="md" withBorder style={{ backgroundColor: 'var(--modern-dark-gray)' }}>
+                        <Title order={3} style={{ color: 'var(--modern-text-primary)' }}>{category.title}</Title>
+                        <Card shadow="sm" radius="md" withBorder style={{ backgroundColor: 'var(--modern-card-bg)', borderColor: 'var(--modern-border-color)' }}>
                             <Stack gap="sm">
                                 {category.topPlayers.map((player, index) => (
                                     <Card 
@@ -125,14 +125,14 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                         p="md" 
                                         shadow={index === 0 ? 'md' : 'xs'} 
                                         radius="md"
-                                        style={{ backgroundColor: 'var(--modern-black)' }}
+                                        style={{ backgroundColor: 'var(--modern-bg-secondary)', borderColor: 'var(--modern-border-color)' }}
                                     >
                                         <Group>
                                             {player.image && (
                                                 <Image src={player.image} width={50} height={50} radius="50%" />
                                             )}
                                             <Stack gap={0}>
-                                                <Text fw={700} size="lg" c="white">
+                                                <Text fw={700} size="lg" style={{ color: 'var(--modern-text-primary)' }}>
                                                     {player.name}
                                                 </Text>
                                                 {player.team && (

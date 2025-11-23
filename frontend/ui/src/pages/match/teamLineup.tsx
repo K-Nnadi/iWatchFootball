@@ -18,13 +18,13 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
             radius="lg" 
             withBorder 
             mb={{ base: 'md', sm: 'xl' }} 
-            style={{ backgroundColor: 'var(--modern-dark-gray)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+            style={{ backgroundColor: 'var(--modern-card-bg)', border: '1px solid var(--modern-border-color)' }}
         >
             <Title 
                 order={3} 
                 mb={{ base: 'md', sm: 'xl' }} 
                 ta="center" 
-                style={{ color: 'var(--modern-white)' }}
+                style={{ color: 'var(--modern-text-primary)' }}
             >
                 Team Lineups
             </Title>
@@ -38,7 +38,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                         transition: 'all 0.2s ease',
                     },
                     tabLabel: {
-                        color: 'var(--modern-white)',
+                        color: 'var(--modern-text-primary)',
                     }
                 }}
             >
@@ -53,7 +53,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                                 }
                             },
                             tabLabel: {
-                                color: 'var(--modern-white)',
+                                color: 'var(--modern-text-primary)',
                                 '&[data-active]': {
                                     color: 'var(--modern-lime)',
                                 }
@@ -74,7 +74,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                                 }
                             },
                             tabLabel: {
-                                color: 'var(--modern-white)',
+                                color: 'var(--modern-text-primary)',
                                 '&[data-active]': {
                                     color: 'var(--modern-lime)',
                                 }
@@ -138,14 +138,14 @@ interface SubstitutesListProps {
 function SubstitutesList({ substitutes }: SubstitutesListProps) {
     return (
         <Box mt="xl">
-            <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-white)' }}>Substitutes</Title>
+            <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-text-primary)' }}>Substitutes</Title>
             <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
                 {substitutes ? substitutes.map(substitute => (
-                    <Text key={substitute.id} size="sm" style={{ color: 'var(--modern-gray)', margin: '0.25rem' }}>
+                    <Text key={substitute.id} size="sm" style={{ color: 'var(--modern-text-secondary)', margin: '0.25rem' }}>
                         {substitute.name}
                     </Text>
                 )) : (
-                    <Text size="sm" style={{ color: 'var(--modern-gray)' }}>No substitutes listed.</Text>
+                    <Text size="sm" style={{ color: 'var(--modern-text-secondary)' }}>No substitutes listed.</Text>
                 )}
             </Box>
         </Box>

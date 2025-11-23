@@ -14,7 +14,6 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import {
     IconBell,
-    IconBookmark,
     IconClock,
     IconPlayerPlay,
     IconTicket,
@@ -461,86 +460,83 @@ function TopNewsSection() {
                 </Grid>
 
                 {/* Top News Carousel */}
-                <Carousel
-                    slideSize={{base: '85%', sm: '50%', md: '25%'}}
-                    slideGap="lg"
-                    align="start"
-                    slidesToScroll={1}
-                    withIndicators
-                    loop
-                    dragFree
-                    height="100%"
+                <Box style={{ position: 'relative', paddingBottom: '32px' }}>
+                    <Carousel
+                        slideSize={{base: '85%', sm: '50%', md: '25%'}}
+                        slideGap="lg"
+                        align="start"
+                        slidesToScroll={1}
+                        withIndicators
+                        loop
+                        dragFree
+                        height="100%"
                         styles={{
-                        control: {
-                            opacity: 1,
-                            backgroundColor: 'var(--modern-lime)',
-                            color: 'var(--modern-bg-primary)',
-                            border: 'none',
-                            '&[data-inactive]': {
-                                opacity: 0.3,
-                                cursor: 'not-allowed',
-                            },
-                        },
-                        indicator: {
-                            width: 8,
-                            height: 8,
-                            backgroundColor: 'var(--modern-lime)',
-                            opacity: 0.3,
-                            '&[data-active]': {
+                            control: {
                                 opacity: 1,
+                                backgroundColor: 'var(--modern-lime)',
+                                color: 'var(--modern-bg-primary)',
+                                border: 'none',
+                                '&[data-inactive]': {
+                                    opacity: 0.3,
+                                    cursor: 'not-allowed',
+                                },
                             },
-                        },
-                    }}
-                >
-                    {topNews.map((article) => (
-                        <Carousel.Slide key={article.id}>
-                            <Box
-                                onClick={() => navigateWithTransition(`/news/${article.id}`)}
-                                style={{
-                                    cursor: 'pointer',
-                                    height: '100%',
-                                }}
-                            >
-                                <ModernCard hover style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                    <Stack gap="md" style={{ flex: 1 }}>
-                                        <Box
-                                            component="img"
-                                            src={article.image}
-                                            alt={article.title}
-                                            style={{
-                                                width: '100%',
-                                                height: '180px',
-                                                objectFit: 'cover',
-                                                borderRadius: '4px',
-                                            }}
-                                        />
-                                        <Stack gap="xs" style={{ flex: 1 }}>
-                                            <ModernH3 style={{ fontSize: '1rem', lineHeight: 1.4 }}>
-                                                {article.title}
-                                            </ModernH3>
-                                            <Group gap="xs" justify="space-between" mt="auto">
-                                                <Group gap="xs">
+                            indicator: {
+                                width: 8,
+                                height: 8,
+                                backgroundColor: 'var(--modern-lime)',
+                                opacity: 0.3,
+                                '&[data-active]': {
+                                    opacity: 1,
+                                },
+                            },
+                            indicators: {
+                                position: 'absolute',
+                                bottom: '-24px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                            },
+                        }}
+                    >
+                        {topNews.map((article) => (
+                            <Carousel.Slide key={article.id}>
+                                <Box
+                                    onClick={() => navigateWithTransition(`/news/${article.id}`)}
+                                    style={{
+                                        cursor: 'pointer',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <ModernCard hover style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                        <Stack gap="md" style={{ flex: 1 }}>
+                                            <Box
+                                                component="img"
+                                                src={article.image}
+                                                alt={article.title}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '180px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '4px',
+                                                }}
+                                            />
+                                            <Stack gap="xs" style={{ flex: 1 }}>
+                                                <ModernH3 style={{ fontSize: '1rem', lineHeight: 1.4 }}>
+                                                    {article.title}
+                                                </ModernH3>
+                                                <Group gap="xs" mt="auto">
                                                     <Text size="xs" c="dimmed">{article.source}</Text>
                                                     <Text size="xs" c="dimmed">•</Text>
                                                     <Text size="xs" c="dimmed">{article.time}</Text>
                                                 </Group>
-                                                <IconBookmark 
-                                                    size={16} 
-                                                    color="var(--modern-lime)" 
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // Handle bookmark
-                                                    }}
-                                                />
-                                            </Group>
+                                            </Stack>
                                         </Stack>
-                                    </Stack>
-                                </ModernCard>
-                            </Box>
-                        </Carousel.Slide>
-                    ))}
-                </Carousel>
+                                    </ModernCard>
+                                </Box>
+                            </Carousel.Slide>
+                        ))}
+                    </Carousel>
+                </Box>
             </Container>
         </Box>
     );
