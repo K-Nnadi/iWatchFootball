@@ -7,7 +7,7 @@ import { AdBanner } from "./adBanner";
 export function Main(){
     return(
         <AppShell.Main>
-            <AdBanner height={{ base: 90, md: 100 }} />
+            {/*<AdBanner height={{ base: 90, md: 100 }} />*/}
             <Box className="main-content-wrapper" style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
