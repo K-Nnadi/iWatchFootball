@@ -1,10 +1,11 @@
 .stadium-map-container {
-    background-color: var(--modern-dark-gray);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--modern-card-bg);
+    border: 1px solid var(--modern-border-color);
     padding: 1.5rem;
-    border-radius: 0;
+    border-radius: 8px;
     position: relative;
     overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .stadium-map-wrapper {
@@ -12,8 +13,10 @@
     width: 100%;
     height: 500px;
     overflow: hidden;
-    background-color: #0a0a0a;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--modern-bg-primary);
+    border: 1px solid var(--modern-border-color);
+    border-radius: 8px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .stadium-svg {
@@ -32,12 +35,31 @@
 }
 
 .stadium-map-container .mantine-Radio-root {
-    color: var(--modern-white);
+    color: var(--modern-text-primary);
 }
 
 .stadium-map-container .mantine-Radio-label {
-    color: var(--modern-white);
+    color: var(--modern-text-primary);
     font-family: var(--modern-font-primary);
+}
+
+.stadium-map-container .mantine-Radio-inner {
+    border-color: var(--modern-border-color);
+}
+
+.stadium-map-container .mantine-Radio-inner[data-checked] {
+    background-color: var(--modern-lime);
+    border-color: var(--modern-lime);
+}
+
+.stadium-map-container .mantine-Button-root {
+    border-color: var(--modern-lime);
+    color: var(--modern-lime);
+}
+
+.stadium-map-container .mantine-Button-root:hover {
+    background-color: var(--modern-lime);
+    color: var(--modern-black);
 }
 
 .stadium-map-container .mantine-Button-root {

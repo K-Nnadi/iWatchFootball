@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Container, SimpleGrid, Card, Image, Text, Group, Title, LoadingOverlay, Badge, Box, Stack, Center } from '@mantine/core';
+import { Container, SimpleGrid, Card, Image, Text, Group, LoadingOverlay, Badge, Box, Stack, Center } from '@mantine/core';
 import { IconWorld, IconFlag } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { ModernH1, ModernBody } from '../components/modern';
 import '../styles/modern.css';
 
 interface Competition {
@@ -36,20 +37,12 @@ export function CompetitionsPage() {
         <Container size="xl" my="xl" pos="relative">
             <LoadingOverlay visible={loading} />
             <Box mb="xl">
-                <Title 
-                    order={1} 
-                    mb="md"
-                    style={{
-                        fontSize: 'clamp(2rem, 5vw, 3rem)',
-                        fontWeight: 700,
-                        letterSpacing: '-0.02em',
-                    }}
-                >
+                <ModernH1 style={{ marginBottom: '1.5rem' }}>
                     Competitions
-                </Title>
-                <Text size="lg" c="dimmed" style={{ maxWidth: '600px' }}>
+                </ModernH1>
+                <ModernBody style={{ maxWidth: '600px' }}>
                     Explore football competitions from around the world
-                </Text>
+                </ModernBody>
             </Box>
             
             <SimpleGrid 

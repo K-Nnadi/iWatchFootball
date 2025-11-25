@@ -122,7 +122,25 @@ export function PageTransition({ children }: PageTransitionProps) {
         );
     }
 
-    return <Box style={getTransitionStyles()}>{children}</Box>;
+    return (
+        <Box 
+            className="page-transition-wrapper"
+            style={{
+                ...getTransitionStyles(),
+                margin: 0,
+                marginTop: 0,
+                padding: 0,
+                paddingTop: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                minHeight: 0,
+                gap: 0,
+            }}
+        >
+            {children}
+        </Box>
+    );
 }
 
 // Include globally (CSS or styled-components)

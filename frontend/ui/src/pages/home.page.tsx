@@ -25,7 +25,6 @@ import {usePageTransition} from "../hooks/usePageTransition";
 import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
 
-// Hero Section Component - Lando Style
 function HeroSection() {
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);

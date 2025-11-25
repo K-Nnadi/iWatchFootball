@@ -1,0 +1,120 @@
+{
+  "name": "Anfield Road",
+  "venue": "Anfield",
+  "pitch": {
+    "x": 280,
+    "y": 220,
+    "width": 240,
+    "height": 160
+  },
+  "stands": [
+    {
+      "name": "KENNY DALGLISH STAND",
+      "position": "top",
+      "sections": [
+        {"id": "CE1", "label": "CE1", "x": 200, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE2", "label": "CE2", "x": 230, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE3", "label": "CE3", "x": 260, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE4", "label": "CE4", "x": 290, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE5", "label": "CE5", "x": 320, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE6", "label": "CE6", "x": 350, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE7", "label": "CE7", "x": 380, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE8", "label": "CE8", "x": 410, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"},
+        {"id": "CE9", "label": "CE9", "x": 440, "y": 50, "width": 28, "height": 22, "category": 1, "tier": "upper", "color": "red"}
+      ]
+    },
+    {
+      "name": "THE KOP",
+      "position": "right",
+      "sections": [
+        {"id": "102", "label": "102", "x": 540, "y": 240, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "104", "label": "104", "x": 565, "y": 240, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "109", "label": "109", "x": 590, "y": 240, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "202", "label": "202", "x": 540, "y": 200, "width": 22, "height": 28, "category": 3, "tier": "middle", "color": "light-green"},
+        {"id": "204", "label": "204", "x": 565, "y": 200, "width": 22, "height": 28, "category": 3, "tier": "middle", "color": "light-green"},
+        {"id": "208", "label": "208", "x": 590, "y": 200, "width": 22, "height": 28, "category": 3, "tier": "middle", "color": "light-green"},
+        {"id": "304", "label": "304", "x": 565, "y": 160, "width": 22, "height": 28, "category": 3, "tier": "upper", "color": "light-green"}
+      ]
+    },
+    {
+      "name": "MAIN STAND",
+      "position": "bottom",
+      "sections": [
+        {"id": "M1", "label": "M1", "x": 200, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M2", "label": "M2", "x": 230, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M3", "label": "M3", "x": 260, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M4", "label": "M4", "x": 290, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M5", "label": "M5", "x": 320, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M6", "label": "M6", "x": 350, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M7", "label": "M7", "x": 380, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M8", "label": "M8", "x": 410, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "M9", "label": "M9", "x": 440, "y": 420, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "orange"},
+        {"id": "U1", "label": "U1", "x": 200, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U2", "label": "U2", "x": 230, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U3", "label": "U3", "x": 260, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U4", "label": "U4", "x": 290, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U5", "label": "U5", "x": 320, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U6", "label": "U6", "x": 350, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U7", "label": "U7", "x": 380, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U8", "label": "U8", "x": 410, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "U9", "label": "U9", "x": 440, "y": 450, "width": 28, "height": 22, "category": 1, "tier": "lower", "color": "red"},
+        {"id": "L1", "label": "L1", "x": 200, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L2", "label": "L2", "x": 230, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L3", "label": "L3", "x": 260, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L4", "label": "L4", "x": 290, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L5", "label": "L5", "x": 320, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L6", "label": "L6", "x": 350, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L7", "label": "L7", "x": 380, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L8", "label": "L8", "x": 410, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L9", "label": "L9", "x": 440, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L10", "label": "L10", "x": 470, "y": 380, "width": 28, "height": 35, "category": 2, "tier": "lower", "color": "blue"},
+        {"id": "L11", "label": "L11", "x": 60, "y": 300, "width": 22, "height": 26, "category": 3, "tier": "lower", "color": "blue"},
+        {"id": "L12", "label": "L12", "x": 85, "y": 300, "width": 22, "height": 26, "category": 3, "tier": "lower", "color": "blue"},
+        {"id": "L13", "label": "L13", "x": 110, "y": 300, "width": 22, "height": 26, "category": 3, "tier": "lower", "color": "blue"},
+        {"id": "L14", "label": "L14", "x": 135, "y": 300, "width": 22, "height": 26, "category": 3, "tier": "lower", "color": "blue"},
+        {"id": "L15", "label": "L15", "x": 160, "y": 300, "width": 22, "height": 26, "category": 3, "tier": "lower", "color": "blue"},
+        {"id": "L16", "label": "L16", "x": 185, "y": 300, "width": 22, "height": 26, "category": 3, "tier": "lower", "color": "blue"}
+      ]
+    },
+    {
+      "name": "ANFIELD ROAD STAND",
+      "position": "left",
+      "sections": [
+        {"id": "KG", "label": "KG", "x": 60, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KH", "label": "KH", "x": 90, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KI", "label": "KI", "x": 120, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KJ", "label": "KJ", "x": 150, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KK", "label": "KK", "x": 180, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KL", "label": "KL", "x": 210, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KM", "label": "KM", "x": 240, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KN", "label": "KN", "x": 270, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "KP", "label": "KP", "x": 300, "y": 50, "width": 28, "height": 22, "category": 2, "tier": "upper", "color": "blue"},
+        {"id": "AU2", "label": "AU2", "x": 60, "y": 80, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU4", "label": "AU4", "x": 85, "y": 80, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU6", "label": "AU6", "x": 110, "y": 80, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU8", "label": "AU8", "x": 135, "y": 80, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU1", "label": "AU1", "x": 60, "y": 115, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU3", "label": "AU3", "x": 85, "y": 115, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU5", "label": "AU5", "x": 110, "y": 115, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AU7", "label": "AU7", "x": 135, "y": 115, "width": 22, "height": 28, "category": 1, "tier": "upper", "color": "dark-purple"},
+        {"id": "AM1", "label": "AM1", "x": 60, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM2", "label": "AM2", "x": 85, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM3", "label": "AM3", "x": 110, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM4", "label": "AM4", "x": 135, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM5", "label": "AM5", "x": 160, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM6", "label": "AM6", "x": 185, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM7", "label": "AM7", "x": 210, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AM8", "label": "AM8", "x": 235, "y": 150, "width": 22, "height": 28, "category": 2, "tier": "middle", "color": "orange"},
+        {"id": "AL1", "label": "AL1", "x": 60, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL2", "label": "AL2", "x": 85, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL3", "label": "AL3", "x": 110, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL4", "label": "AL4", "x": 135, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL5", "label": "AL5", "x": 160, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL6", "label": "AL6", "x": 185, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL7", "label": "AL7", "x": 210, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL8", "label": "AL8", "x": 235, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"},
+        {"id": "AL9", "label": "AL9", "x": 260, "y": 190, "width": 22, "height": 28, "category": 3, "tier": "lower", "color": "light-green"}
+      ]
+    }
+  ]
+}

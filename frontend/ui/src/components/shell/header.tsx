@@ -1,8 +1,9 @@
 import React from 'react';
-import { AppShell, Avatar, Box, Burger, Button, Container, Divider, Flex, Group, Menu, Text, Title } from '@mantine/core';
+import { AppShell, Avatar, Box, Burger, Button, Container, Flex, Group, Menu, Title } from '@mantine/core';
 import { IoSettingsOutline, IoPersonOutline } from 'react-icons/io5';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
+import classes from './styles/header.module.css';
 
 interface HeaderProps {
     showHeader: boolean;
@@ -20,29 +21,18 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     ];
 
     return (
-        <AppShell.Header
-            style={{
-                backgroundColor: 'var(--modern-header-bg)',
-                boxShadow: '0 1px 3px var(--modern-shadow-color)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 1000
-            }}
-        >
+        <AppShell.Header className={classes.header}>
             <Container px="md" h={'100%'}>
-                <Flex justify={'space-between'} align="center" h="100%" style={{ position: 'relative' }}>
+                <Flex justify={'space-between'} align="center" h="100%" className={classes.inner}>
                     {/* Logo Section - Desktop: Left, Mobile: Hidden (title is centered) */}
-                    <Group gap="xs" visibleFrom="md">
+                    <Group gap="xs" visibleFrom="md" className={classes.logoSection}>
                         <Title 
                             order={2} 
                             size="2rem"
                             fw={700} 
                             c="var(--modern-text-primary)" 
                             onClick={() => navigateWithTransition('/')}
-                            style={{ 
-                                cursor: 'pointer',
-                                fontSize: 'clamp(1.5rem, 2vw, 2rem)'
-                            }}
+                            style={{ cursor: 'pointer', fontSize: 'clamp(1.5rem, 2vw, 2rem)' }}
                         >
                             I Watch Football
                         </Title>
@@ -55,31 +45,18 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                         hiddenFrom="md" 
                         size="md" 
                         color="var(--modern-text-primary)"
-                        style={{ position: 'absolute', left: 0, zIndex: 1 }}
+                        className={classes.burgerMenu}
                     />
 
                     {/* Mobile Avatar - Right side */}
-                    <Box hiddenFrom="md" style={{ position: 'absolute', right: 0, zIndex: 1 }}>
+                    <Box hiddenFrom="md" className={classes.mobileAvatar}>
                         {isLoggedIn ? (
-                            // Logged in: Click to go to profile
+                            // Logged in: Click to go to settings
                             <Avatar
                                 size="md"
                                 radius="xl"
-                                onClick={() => navigateWithTransition('/profile')}
-                                style={{
-                                    backgroundColor: 'var(--modern-bg-tertiary)',
-                                    color: 'var(--modern-lime)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}
+                                onClick={() => navigateWithTransition('/settings')}
+                                className={classes.avatar}
                             >
                                 <IoPersonOutline size={20} />
                             </Avatar>
@@ -95,49 +72,21 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                     <Avatar
                                         size="md"
                                         radius="xl"
-                                        style={{
-                                            backgroundColor: 'var(--modern-bg-tertiary)',
-                                            color: 'var(--modern-lime)',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
+                                        className={classes.avatar}
                                     >
                                         <IoPersonOutline size={20} />
                                     </Avatar>
                                 </Menu.Target>
-                                <Menu.Dropdown
-                                    style={{
-                                        backgroundColor: 'var(--modern-card-bg)',
-                                        border: '1px solid var(--modern-border-color)',
-                                    }}
-                                >
+                                <Menu.Dropdown className={classes.menuDropdown}>
                                     <Menu.Item
                                         onClick={() => navigateWithTransition('/signIn')}
-                                        style={{
-                                            color: 'var(--modern-text-primary)',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.05em',
-                                            fontWeight: 600,
-                                        }}
+                                        className={classes.menuItem}
                                     >
                                         Sign In
                                     </Menu.Item>
                                     <Menu.Item
                                         onClick={() => navigateWithTransition('/join')}
-                                        style={{
-                                            color: 'var(--modern-lime)',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.05em',
-                                            fontWeight: 600,
-                                        }}
+                                        className={classes.menuItemLime}
                                     >
                                         Join
                                     </Menu.Item>
@@ -147,27 +96,14 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     </Box>
 
                     {/* Title - Mobile: Centered */}
-                    <Box
-                        hiddenFrom="md"
-                        style={{
-                            position: 'absolute',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '100%',
-                            textAlign: 'center',
-                            zIndex: 0
-                        }}
-                    >
+                    <Box hiddenFrom="md" className={classes.mobileTitle}>
                         <Title 
                             order={2} 
                             size="1.75rem"
                             fw={700} 
                             c="var(--modern-text-primary)" 
                             onClick={() => navigateWithTransition('/')}
-                            style={{ 
-                                cursor: 'pointer',
-                                fontSize: 'clamp(1.5rem, 3vw, 1.75rem)'
-                            }}
+                            className={classes.mobileTitleText}
                         >
                             I Watch Football
                         </Title>
@@ -181,31 +117,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                     key={label}
                                     variant="subtle"
                                     onClick={() => navigateWithTransition(`/${page}`)}
-                                    style={{
-                                        color: 'var(--modern-text-primary)',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        fontWeight: 600,
-                                        padding: '0.5rem 1rem',
-                                        borderRadius: '0',
-                                        border: '2px solid transparent',
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        backgroundColor: 'transparent'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.color = 'var(--modern-lime)';
-                                        e.currentTarget.style.borderColor = 'var(--modern-lime)';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.color = 'var(--modern-text-primary)';
-                                        e.currentTarget.style.borderColor = 'transparent';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
+                                    className={classes.navButton}
                                 >
                                     {label}
                                 </Button>
@@ -220,75 +132,21 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                 <IoSettingsOutline
                                     size={24}
                                     onClick={() => navigateWithTransition('/settings')}
-                                    style={{ 
-                                        cursor: 'pointer', 
-                                        color: 'var(--modern-text-primary)',
-                                        transition: 'color 0.3s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.color = 'var(--modern-lime)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.color = 'var(--modern-text-primary)';
-                                    }}
+                                    className={classes.settingsIcon}
                                 />
                                 {!isLoggedIn && (
                                     <>
                                         <Button
                                             variant="outline"
                                             onClick={() => navigateWithTransition('/signIn')}
-                                            style={{
-                                                borderColor: 'var(--modern-lime)',
-                                                color: 'var(--modern-lime)',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.05em',
-                                                fontWeight: 600,
-                                                padding: '0.5rem 1rem',
-                                                borderRadius: '0',
-                                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                backgroundColor: 'transparent'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'var(--modern-lime)';
-                                                e.currentTarget.style.color = 'var(--modern-bg-primary)';
-                                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'transparent';
-                                                e.currentTarget.style.color = 'var(--modern-lime)';
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = 'none';
-                                            }}
+                                            className={classes.signInButton}
                                         >
                                             Sign In
                                         </Button>
                                         <Button
                                             variant="filled"
                                             onClick={() => navigateWithTransition('/join')}
-                                            style={{
-                                                backgroundColor: 'var(--modern-lime)',
-                                                color: 'var(--modern-bg-primary)',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.05em',
-                                                fontWeight: 600,
-                                                padding: '0.5rem 1rem',
-                                                borderRadius: '0',
-                                                border: '2px solid var(--modern-lime)',
-                                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'transparent';
-                                                e.currentTarget.style.color = 'var(--modern-lime)';
-                                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.3)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'var(--modern-lime)';
-                                                e.currentTarget.style.color = 'var(--modern-bg-primary)';
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = 'none';
-                                            }}
+                                            className={classes.joinButton}
                                         >
                                             Join
                                         </Button>

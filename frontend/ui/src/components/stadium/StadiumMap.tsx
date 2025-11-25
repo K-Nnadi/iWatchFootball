@@ -1,20 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Box, Group, Button, Radio } from '@mantine/core';
+import React, { useState, useRef, useMemo } from 'react';
+import { Box, Group, Button, Radio, useMantineColorScheme } from '@mantine/core';
 import { SeatsioSeatingChart } from '@seatsio/seatsio-react';
+import { getAllSections, getColorByColorName, type StadiumSection } from './anfieldStadium';
 import './StadiumMap.css';
-
-interface StadiumSection {
-    id: string;
-    label: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    category: number;
-    available: number;
-    price: number;
-    highlighted?: boolean;
-}
 
 interface StadiumMapProps {
     // Legacy props for custom SVG implementation
@@ -55,6 +43,8 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     onSeatsioObjectDeselected,
     useSeatsio = false,
 }) => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -98,15 +88,33 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
         setIsDragging(false);
     };
 
-    const getSectionColor = (section: StadiumSection) => {
+    // Use Anfield data if no sections provided, otherwise use provided sections
+    const allSections = useMemo(() => {
+        if (sections && sections.length > 0) {
+            return sections;
+        }
+        return getAllSections();
+    }, [sections]);
+
+    const getSectionColor = (section: StadiumSection & { color?: string }) => {
         if (section.highlighted) return '#00ff88';
-        if (section.available === 0) return '#333333';
-        if (section.category === 1) return '#1e3a8a';
-        if (section.category === 2) return '#1e40af';
-        if (section.category === 3) return '#3b82f6';
-        if (section.category === 4) return '#60a5fa';
-        return '#93c5fd';
+        if ((section.available ?? 0) === 0) return isDark ? '#1a1a1a' : '#e0e0e0';
+        // Use color from JSON if available
+        if (section.color) {
+            return getColorByColorName(section.color, isDark);
+        }
+        // Fallback to category-based colors
+        if (section.category === 1) return isDark ? '#dc2626' : '#ef4444';
+        if (section.category === 2) return isDark ? '#ea580c' : '#f97316';
+        if (section.category === 3) return isDark ? '#14b8a6' : '#2dd4bf';
+        if (section.category === 4) return isDark ? '#2563eb' : '#3b82f6';
+        return isDark ? '#6b7280' : '#9ca3af';
     };
+
+    const getTextColor = () => isDark ? '#ffffff' : '#000000';
+    const getPitchColor = () => isDark ? '#d1d5db' : '#e5e7eb';
+    const getPitchLineColor = () => isDark ? '#ffffff' : '#000000';
+    const getStadiumBg = () => isDark ? '#0a0a0a' : '#ffffff';
 
     // Seats.io event handlers
     const handleSeatsioObjectSelected = (object: any) => {
@@ -164,18 +172,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     // Render custom SVG implementation (legacy)
     return (
         <Box className="stadium-map-container" ref={containerRef}>
-            <Group justify="space-between" mb="md">
-                {onViewModeChange && (
-                    <Radio.Group
-                        value={viewMode}
-                        onChange={(value) => onViewModeChange?.(value as 'zone' | 'block')}
-                    >
-                        <Group>
-                            <Radio value="zone" label="Tickets by Zone" />
-                            <Radio value="block" label="Tickets by Block" />
-                        </Group>
-                    </Radio.Group>
-                )}
+            <Group justify="flex-end" mb="md">
                 <Group>
                     <Button size="xs" variant="outline" onClick={handleZoomIn}>
                         +
@@ -195,7 +192,10 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
-                style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                style={{ 
+                    cursor: isDragging ? 'grabbing' : 'grab',
+                    backgroundColor: getStadiumBg(),
+                }}
             >
                 <svg
                     ref={svgRef}
@@ -206,29 +206,85 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                         transformOrigin: 'center center',
                     }}
                 >
-                    {/* Pitch */}
+                    {/* Stadium Background */}
                     <rect
-                        x="200"
-                        y="200"
-                        width="400"
-                        height="200"
-                        fill="#00a651"
-                        stroke="#ffffff"
+                        x="0"
+                        y="0"
+                        width="800"
+                        height="600"
+                        fill={getStadiumBg()}
+                    />
+
+                    {/* Pitch - Rectangular with markings (centered) */}
+                    <rect
+                        x="280"
+                        y="220"
+                        width="240"
+                        height="160"
+                        fill={getPitchColor()}
+                        stroke={getPitchLineColor()}
                         strokeWidth="2"
                     />
-                    <text
-                        x="400"
-                        y="300"
-                        textAnchor="middle"
-                        fill="#ffffff"
-                        fontSize="16"
-                        fontWeight="bold"
-                    >
-                        PITCH
-                    </text>
+                    {/* Center Line */}
+                    <line
+                        x1="400"
+                        y1="220"
+                        x2="400"
+                        y2="380"
+                        stroke={getPitchLineColor()}
+                        strokeWidth="2"
+                    />
+                    {/* Center Circle */}
+                    <ellipse
+                        cx="400"
+                        cy="300"
+                        rx="40"
+                        ry="40"
+                        fill="none"
+                        stroke={getPitchLineColor()}
+                        strokeWidth="2"
+                    />
+                    {/* Penalty Boxes */}
+                    <rect
+                        x="280"
+                        y="220"
+                        width="60"
+                        height="160"
+                        fill="none"
+                        stroke={getPitchLineColor()}
+                        strokeWidth="2"
+                    />
+                    <rect
+                        x="460"
+                        y="220"
+                        width="60"
+                        height="160"
+                        fill="none"
+                        stroke={getPitchLineColor()}
+                        strokeWidth="2"
+                    />
+                    {/* Goal Areas */}
+                    <rect
+                        x="280"
+                        y="260"
+                        width="24"
+                        height="80"
+                        fill="none"
+                        stroke={getPitchLineColor()}
+                        strokeWidth="2"
+                    />
+                    <rect
+                        x="496"
+                        y="260"
+                        width="24"
+                        height="80"
+                        fill="none"
+                        stroke={getPitchLineColor()}
+                        strokeWidth="2"
+                    />
 
-                    {/* Stadium Sections */}
-                    {sections.map((section) => (
+                    {/* Stadium Sections - Rectangular blocks */}
+                    {allSections.map((section) => (
                         <g key={section.id}>
                             <rect
                                 x={section.x}
@@ -239,24 +295,25 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                                 stroke={
                                     selectedSectionId === section.id
                                         ? '#00ff88'
-                                        : '#ffffff'
+                                        : isDark 
+                                            ? 'rgba(255, 255, 255, 0.2)' 
+                                            : 'rgba(0, 0, 0, 0.15)'
                                 }
-                                strokeWidth={
-                                    selectedSectionId === section.id ? 3 : 1
-                                }
-                                opacity={section.available === 0 ? 0.3 : 0.8}
+                                strokeWidth={selectedSectionId === section.id ? 2 : 1}
+                                opacity={(section.available ?? 0) === 0 ? 0.4 : 0.9}
                                 className="stadium-section"
                                 onClick={() => onSectionClick?.(section.id)}
                                 style={{ cursor: 'pointer' }}
                             />
                             <text
                                 x={section.x + section.width / 2}
-                                y={section.y + section.height / 2}
+                                y={section.y + section.height / 2 + 3}
                                 textAnchor="middle"
-                                fill="#ffffff"
-                                fontSize="10"
-                                fontWeight="bold"
+                                fill={getTextColor()}
+                                fontSize="9"
+                                fontWeight="600"
                                 pointerEvents="none"
+                                opacity={(section.available ?? 0) === 0 ? 0.5 : 1}
                             >
                                 {section.label}
                             </text>
@@ -264,11 +321,45 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     ))}
 
                     {/* Stand Labels */}
-                    <text x="100" y="150" fill="#ffffff" fontSize="14" fontWeight="bold">
-                        TRIBUNA
+                    <text 
+                        x="50" 
+                        y="150" 
+                        fill={getTextColor()} 
+                        fontSize="12" 
+                        fontWeight="bold"
+                        opacity="0.8"
+                    >
+                        ANFIELD ROAD STAND
                     </text>
-                    <text x="650" y="150" fill="#ffffff" fontSize="14" fontWeight="bold">
-                        STAMPA
+                    <text 
+                        x="200" 
+                        y="70" 
+                        fill={getTextColor()} 
+                        fontSize="12" 
+                        fontWeight="bold"
+                        opacity="0.8"
+                    >
+                        KENNY DALGLISH STAND
+                    </text>
+                    <text 
+                        x="600" 
+                        y="200" 
+                        fill={getTextColor()} 
+                        fontSize="12" 
+                        fontWeight="bold"
+                        opacity="0.8"
+                    >
+                        THE KOP
+                    </text>
+                    <text 
+                        x="200" 
+                        y="550" 
+                        fill={getTextColor()} 
+                        fontSize="12" 
+                        fontWeight="bold"
+                        opacity="0.8"
+                    >
+                        MAIN STAND
                     </text>
                 </svg>
             </Box>

@@ -37,12 +37,6 @@ export function AppWrapper() {
 
     return (
         <AppShell
-            header={{
-                height: {
-                    base: 70,
-                    md: 80
-                }
-            }}
             navbar={{ 
                 width: { base: 300, sm: 350, md: 400, lg: 450, xl: 500 }, 
                 breakpoint: 'sm', 

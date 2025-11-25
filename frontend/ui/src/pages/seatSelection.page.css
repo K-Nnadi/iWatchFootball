@@ -1,11 +1,15 @@
+/* Base Page Styles - Theme Aware */
 .seat-selection-page {
-    background-color: var(--modern-black);
+    background-color: var(--modern-bg-primary);
+    transition: background-color 0.3s ease;
 }
 
+/* Select Inputs - Theme Aware */
 .seat-selection-page .mantine-Select-input {
-    background-color: var(--modern-black) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    color: var(--modern-white) !important;
+    background-color: var(--modern-card-bg) !important;
+    border-color: var(--modern-border-color) !important;
+    color: var(--modern-text-primary) !important;
+    transition: all 0.3s ease !important;
 }
 
 .seat-selection-page .mantine-Select-input:focus {
@@ -14,12 +18,12 @@
 }
 
 .seat-selection-page .mantine-Select-dropdown {
-    background-color: var(--modern-dark-gray) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: var(--modern-card-bg) !important;
+    border: 1px solid var(--modern-border-color) !important;
 }
 
 .seat-selection-page .mantine-Select-option {
-    color: var(--modern-white) !important;
+    color: var(--modern-text-primary) !important;
 }
 
 .seat-selection-page .mantine-Select-option:hover {
@@ -40,21 +44,86 @@
     background-color: var(--modern-lime) !important;
 }
 
+/* Radio Buttons - Theme Aware */
 .seat-selection-page .mantine-Radio-root {
-    color: var(--modern-white);
+    color: var(--modern-text-primary);
 }
 
 .seat-selection-page .mantine-Radio-label {
-    color: var(--modern-white);
+    color: var(--modern-text-primary);
     font-family: var(--modern-font-primary);
 }
 
 .seat-selection-page .mantine-Radio-inner {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: var(--modern-border-color);
 }
 
 .seat-selection-page .mantine-Radio-inner[data-checked] {
     background-color: var(--modern-lime);
     border-color: var(--modern-lime);
+}
+
+/* Price Range Inputs - Theme Aware */
+.seat-selection-page .mantine-NumberInput-input {
+    transition: all 0.2s ease !important;
+}
+
+[data-mantine-color-scheme="light"] .seat-selection-page .mantine-NumberInput-input {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-mantine-color-scheme="dark"] .seat-selection-page .mantine-NumberInput-input {
+    background-color: var(--modern-dark-gray) !important;
+    color: var(--modern-white) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.seat-selection-page .mantine-NumberInput-input:focus {
+    border-color: var(--modern-lime) !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.1) !important;
+}
+
+[data-mantine-color-scheme="light"] .seat-selection-page .mantine-NumberInput-input:hover {
+    border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-mantine-color-scheme="dark"] .seat-selection-page .mantine-NumberInput-input:hover {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Range Slider - Theme Aware */
+.seat-selection-page .mantine-RangeSlider-track {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    transition: background-color 0.3s ease !important;
+}
+
+[data-mantine-color-scheme="light"] .seat-selection-page .mantine-RangeSlider-track {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.seat-selection-page .mantine-RangeSlider-bar {
+    background-color: var(--modern-lime) !important;
+}
+
+.seat-selection-page .mantine-RangeSlider-thumb {
+    border-color: var(--modern-lime) !important;
+    background-color: var(--modern-lime) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+[data-mantine-color-scheme="light"] .seat-selection-page .mantine-RangeSlider-thumb {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Hide RangeSlider labels/tooltips */
+.seat-selection-page .mantine-RangeSlider-label {
+    display: none !important;
+}
+
+.seat-selection-page .mantine-RangeSlider-markLabel {
+    display: none !important;
 }
 

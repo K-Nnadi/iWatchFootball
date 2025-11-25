@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-11-23T04:47:13.830Z",
+  "generatedAt": "2025-11-25T00:35:25.516Z",
   "dependencies": [
     {
       "name": "@7nohe/openapi-react-query-codegen",
@@ -339,6 +339,11 @@
     {
       "name": "pg",
       "version": "8.11.3",
+      "license": "MIT"
+    },
+    {
+      "name": "postcss",
+      "version": "8.5.6",
       "license": "MIT"
     },
     {

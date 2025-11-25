@@ -1,84 +1,41 @@
-.form__group {
-	position: relative;
-	padding: 20px 0 0;
-	width: 100%;
-	max-width: 280px;
-}
-
-.form__field {
-	font-family: inherit;
-	width: 100%;
-	border: none;
-	border-bottom: 2px solid #9b9b9b;
-	outline: 0;
-	font-size: 14px;
-	color: #fff;
-	padding: 7px 0;
-	background: transparent;
-	transition: border-color 0.2s;
-}
-
-.form__field::placeholder {
-	color: transparent;
-}
-
-.form__field:placeholder-shown ~ .form__label {
-	font-size: 14px;
-	cursor: text;
-	top: 20px;
-}
-
-.form__label {
-	position: absolute;
-	top: 0;
-	display: block;
-	transition: 0.2s;
-	font-size: 14px;
-	color: #9b9b9b;
-	pointer-events: none;
-}
-
-.form__field:focus {
-	padding-bottom: 6px;
-	font-weight: 700;
-	border-width: 3px;
-	border-image: var(--mantine-color-neutral-1);
-	border-image-slice: 1;
-}
-
-.form__field:focus ~ .form__label {
-	position: absolute;
-	top: 0;
-	display: block;
-	transition: 0.2s;
-	font-size: 17px;
-	color: var(--mantine-color-neutral-1);
-	font-weight: 700;
-}
-
-/* reset input */
-.form__field:required, .form__field:invalid {
-	box-shadow: none;
-}
-
 .footer {
-	background-color: var(--mantine-color-neutral-0);
-	color: #d3d3d3;
-	padding: var(--mantine-spacing-xl);
-	min-height: 200px;
-	margin-top: 48px;
+	background-color: var(--modern-bg-primary);
+	color: var(--modern-text-primary);
+	padding: 3rem 0 1rem;
+	border-top: 1px solid var(--modern-border-color);
 }
 
-.footerIcons {
-	background-color: #141516;
-	color: #f2f8fc;
-	margin-right: 20px;
+.brandSection {
+	/* Brand section styles */
 }
 
-.footerContent {
-	padding:  var(--mantine-spacing-md);
-	@media(min-width: 1200px) {
-		max-width: 1200px;
-	}
-	margin: 0 auto;
+.brandTitle {
+	color: var(--modern-text-primary);
+}
+
+.brandDescription {
+	color: var(--modern-text-secondary);
+}
+
+.contactInfo {
+	color: var(--modern-text-secondary);
+}
+
+.sectionTitle {
+	color: var(--modern-text-primary);
+}
+
+.link {
+	color: var(--modern-text-secondary);
+	cursor: pointer;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.link:hover {
+	color: var(--modern-lime);
+}
+
+.copyright {
+	color: var(--modern-text-secondary);
 }

@@ -10,5 +10,8 @@ export default defineConfig({
         additionalData: `@import "./src/_mantine";`,
       },
     },
+    modules: {
+      localsConvention: 'camelCase',
+    },
   }
 })

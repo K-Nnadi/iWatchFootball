@@ -1,59 +1,149 @@
 .header {
 	height: 84px;
-	margin-bottom: 120px;
-	background-color: var(--mantine-color-body);
-	border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+	margin: 0;
+	margin-bottom: 0;
+	background-color: var(--modern-header-bg);
+	box-shadow: 0 1px 3px var(--modern-shadow-color);
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+	border-bottom: 1px solid var(--modern-border-color);
 }
 
 .inner {
-	height: rem(84px);
+	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	position: relative;
 }
 
-.links {
-	padding-top: var(--mantine-spacing-lg);
-	height: rem(84px);
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
+.logoSection {
+	/* Desktop logo section */
 }
 
-.mainLinks {
-	margin-right: calc(var(--mantine-spacing-sm) * -1);
+.mobileTitle {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 100%;
+	text-align: center;
+	z-index: 0;
 }
 
-.mainLink {
+.burgerMenu {
+	position: absolute;
+	left: 0;
+	z-index: 1;
+}
+
+.mobileAvatar {
+	position: absolute;
+	right: 0;
+	z-index: 1;
+}
+
+.navButton {
+	color: var(--modern-text-primary);
 	text-transform: uppercase;
-	font-size: var(--mantine-font-size-xs);
-	color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-1));
-	padding: rem(7px) var(--mantine-spacing-sm);
-	font-weight: 700;
-	border-bottom: rem(2px) solid transparent;
-	transition:
-			border-color 100ms ease,
-			color 100ms ease;
-
-	@mixin hover {
-		color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-		text-decoration: none;
-	}
-
-	&[data-active] {
-		color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-		border-bottom-color: var(--mantine-color-blue-6);
-	}
+	letter-spacing: 0.05em;
+	font-weight: 600;
+	padding: 0.5rem 1rem;
+	border-radius: 0;
+	border: 2px solid transparent;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
 }
 
-.secondaryLink {
-	color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-1));
-	font-size: var(--mantine-font-size-xs);
-	text-transform: uppercase;
-	transition: color 100ms ease;
+.navButton:hover {
+	color: var(--modern-lime);
+	border-color: var(--modern-lime);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+}
 
-	@mixin hover {
-		color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-		text-decoration: none;
-	}
+.settingsIcon {
+	cursor: pointer;
+	color: var(--modern-text-primary);
+	transition: color 0.3s ease;
+}
+
+.settingsIcon:hover {
+	color: var(--modern-lime);
+}
+
+.signInButton {
+	border-color: var(--modern-lime);
+	color: var(--modern-lime);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+	padding: 0.5rem 1rem;
+	border-radius: 0;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	background-color: transparent;
+}
+
+.signInButton:hover {
+	background-color: var(--modern-lime);
+	color: var(--modern-bg-primary);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+}
+
+.joinButton {
+	background-color: var(--modern-lime);
+	color: var(--modern-bg-primary);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+	padding: 0.5rem 1rem;
+	border-radius: 0;
+	border: 2px solid var(--modern-lime);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.joinButton:hover {
+	background-color: transparent;
+	color: var(--modern-lime);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+}
+
+.avatar {
+	background-color: var(--modern-bg-tertiary);
+	color: var(--modern-lime);
+	cursor: pointer;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.avatar:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+}
+
+.menuDropdown {
+	background-color: var(--modern-card-bg);
+	border: 1px solid var(--modern-border-color);
+}
+
+.menuItem {
+	color: var(--modern-text-primary);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+.menuItemLime {
+	color: var(--modern-lime);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+.mobileTitleText {
+	cursor: pointer;
+	font-size: clamp(1.5rem, 3vw, 1.75rem);
 }

@@ -672,47 +672,103 @@ body,
   background-color: rgba(0, 255, 136, 0.1) !important;
 }
 
-/* Remove AppShell padding for full-width sections */
+/* ============================================
+   AppShell Layout
+   ============================================ */
+
+/* AppShell root container */
 .mantine-AppShell-root {
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
+  gap: 0 !important;
 }
 
-/* Ensure header maintains its fixed height */
+/* Header - fixed height, no bottom margin or spacing */
 .mantine-AppShell-Header {
   flex-shrink: 0 !important;
   flex-grow: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 0 !important;
+  border-bottom: 1px solid var(--modern-border-color) !important;
 }
 
-.mantine-AppShell-Main {
-  overflow-x: visible !important;
+/* Remove any spacing between Header and Main */
+.mantine-AppShell-Header + .mantine-AppShell-Main,
+.mantine-AppShell-Header ~ .mantine-AppShell-Main {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  gap: 0 !important;
+}
+
+/* Ensure no gap in the AppShell layout between Header and Main sections */
+.mantine-AppShell-root > .mantine-AppShell-Header + * {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* PageTransition Box wrapper (direct child of AppShell, between Header and Main) */
+.page-transition-wrapper,
+.mantine-AppShell-root > .page-transition-wrapper,
+.mantine-AppShell-root > div[class*="mantine-Box-root"]:has(> .mantine-AppShell-Main),
+.mantine-AppShell-root > .mantine-AppShell-Header ~ div[class*="mantine-Box-root"] {
+  margin: 0 !important;
+  margin-top: 0 !important;
   padding: 0 !important;
+  padding-top: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   flex: 1 !important;
   min-height: 0 !important;
+  gap: 0 !important;
 }
 
-/* Ensure PageTransition wrapper doesn't interfere */
+/* Main content area - no gaps, full flex */
+.mantine-AppShell-Main {
+  overflow-x: visible !important;
+  padding: 0 !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  gap: 0 !important;
+  background-color: var(--modern-bg-primary) !important;
+}
+
+/* PageTransition wrapper - no spacing */
 .mantine-AppShell-Main > div[class*="mantine-Box-root"] {
   display: flex !important;
   flex-direction: column !important;
   min-height: 100% !important;
   height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
 }
 
-/* Ensure footer stays at bottom - desktop */
+/* Ensure AdBanner has no top spacing when it's the first child */
+.mantine-AppShell-Main .ad-banner:first-child,
+.mantine-AppShell-Main > div[class*="mantine-Box-root"] > .ad-banner:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Main content wrapper - no top spacing */
 .main-content-wrapper {
   display: flex !important;
   flex-direction: column !important;
-  min-height: calc(100vh - 80px - 100px) !important; /* Account for header (80px) + ad banner (100px) */
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  min-height: calc(100vh - 80px - 100px) !important; /* Desktop: header (80px) + ad banner (100px) */
 }
 
-/* Ensure footer stays at bottom on mobile */
 @media (max-width: 768px) {
   .main-content-wrapper {
-    min-height: calc(100vh - 70px - 90px) !important; /* Account for header (70px) + ad banner (90px) */
+    min-height: calc(100vh - 70px - 90px) !important; /* Mobile: header (70px) + ad banner (90px) */
   }
 }
 
@@ -732,72 +788,32 @@ body,
   }
 }
 
-/* Ensure no gap between header and main, and ad banner inside main */
-.mantine-AppShell-Header {
-  margin-bottom: 0 !important;
-}
-
-.mantine-AppShell-Main {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-/* Ad banner as first child of Main should have no top margin */
+/* Ad banner as first child of Main - no spacing */
 .mantine-AppShell-Main > .ad-banner {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
-/* Ensure main-content-wrapper has no top margin when following ad banner */
+/* Main content wrapper following ad banner - no spacing */
 .ad-banner + .main-content-wrapper {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
 
+/* ============================================
+   Dark Theme Sections
+   ============================================ */
+
+/* Dark theme base styles - full width with padding */
+.dark-theme,
 .mantine-AppShell-Main .dark-theme {
-  margin-left: -1rem !important;
-  margin-right: -1rem !important;
-  padding: 1rem !important;
-  width: calc(100% + 2rem) !important;
-  position: relative !important;
-}
-
-/* Also handle dark-theme at root level */
-.dark-theme {
-  margin-left: -1rem !important;
-  margin-right: -1rem !important;
-  padding: 1rem !important;
-  width: calc(100% + 2rem) !important;
-  position: relative !important;
-}
-
-/* Mobile override - keep margin 0 on mobile */
-@media (max-width: 768px) {
-  .dark-theme {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-  }
-}
-
-/* Ensure proper spacing for dark theme sections */
-.dark-theme .mantine-Container-root {
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-}
-
-body {
-  font-family: var(--modern-font-primary);
-  line-height: 1.6;
-  overflow-x: hidden;
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Only apply dark theme to specific pages that need it - now theme-aware */
-.dark-theme {
   background-color: var(--modern-bg-primary) !important;
   color: var(--modern-text-primary) !important;
+  margin-left: -1rem !important;
+  margin-right: -1rem !important;
+  padding: 1rem !important;
+  width: calc(100% + 2rem) !important;
+  position: relative !important;
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -805,6 +821,43 @@ body {
 .dark-theme * {
   color: var(--modern-text-primary) !important;
   transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme container spacing */
+.dark-theme .mantine-Container-root {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Mobile override - no negative margins on mobile */
+@media (max-width: 768px) {
+  .dark-theme,
+  .mantine-AppShell-Main .dark-theme {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* ============================================
+   Body Styles
+   ============================================ */
+
+html,
+#root {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body {
+  font-family: var(--modern-font-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: var(--modern-bg-primary) !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Modern Typography System */

@@ -276,12 +276,8 @@ export function MatchesPage() {
             padding: '2rem 0'
         }}>
             <Container size="lg" style={{ position: 'relative', minHeight: '400px' }}>
-                <ModernH1 style={{ 
-                    color: 'var(--modern-text-primary)', 
-                    marginBottom: '1.5rem',
-                    textAlign: 'center'
-                }}>
-                Matches
+                <ModernH1 style={{ marginBottom: '1.5rem' }}>
+                    Matches
                 </ModernH1>
 
                 <MatchFilter

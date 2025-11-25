@@ -274,10 +274,7 @@ export function TicketsPage() {
             <Container size="lg" style={{ position: 'relative', minHeight: '400px' }}>
                 <Group gap="md" mb="xl" align="center">
                     <IconTicket size={32} color="var(--modern-lime)" />
-                    <ModernH1 style={{ 
-                        color: 'var(--modern-text-primary)', 
-                        margin: 0
-                    }}>
+                    <ModernH1>
                         Available Tickets
                     </ModernH1>
                 </Group>
