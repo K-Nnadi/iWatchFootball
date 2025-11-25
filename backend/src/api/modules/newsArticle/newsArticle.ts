@@ -10,7 +10,7 @@ import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/se
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
 
-@Entity('news_article')
+@Entity('newsArticle')
 @SecurityFeature<NewsArticle>({
   base: {
     // READ operations - Public access for news articles (no authentication required)

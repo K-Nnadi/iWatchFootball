@@ -7,8 +7,8 @@ import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../auth/decorators/roles.decorator';
 import { UserRole } from '../../../auth/types/security.types';
 
-@ApiTags('news-aggregation')
-@Controller('news-aggregation')
+@ApiTags('newsAggregation')
+@Controller('newsAggregation')
 export class NewsAggregatorController {
   constructor(
     @Optional() private readonly scheduler: NewsAggregatorScheduler | null,

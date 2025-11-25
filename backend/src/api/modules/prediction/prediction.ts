@@ -1,10 +1,10 @@
-import {ApiProperty, PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToOne} from "typeorm";
+import {PickType} from "@nestjs/swagger";
+import {Column, Entity} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {PredictedResult} from "../../enums/prediction.enum";
 import {User} from "../user/user";
 import {Fixture} from "../fixture/fixture";
-import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {EntityColumn, EntityRelation, OptionalEntityColumn, RelationshipType} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
@@ -68,15 +68,23 @@ export class Prediction extends BaseDbEntity {
     @EntityColumn({db: {type: "int"}})
     userId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => User, user => user.predictions, {lazy: true})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => User,
+        joinOptions: {name: 'userId'},
+        description: 'User who made this prediction'
+    })
     user!: Promise<User>;
 
     @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.predictions, {lazy: true})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Fixture,
+        joinOptions: {name: 'fixtureId'},
+        description: 'Fixture for this prediction'
+    })
     fixture!: Promise<Fixture>;
 
     @OptionalEntityColumn({db:{enum: PredictedResult}})

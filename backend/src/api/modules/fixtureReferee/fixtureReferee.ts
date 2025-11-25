@@ -1,10 +1,10 @@
-import {ApiProperty, PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToOne} from 'typeorm';
+import {PickType} from "@nestjs/swagger";
+import {Column, Entity} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {RefereeRole} from "../../enums/referee.enum";
 import {Fixture} from "../fixture/fixture";
 import {Referee} from "../referee/referee";
-import {EntityColumn, EntityEnumColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {EntityColumn, EntityEnumColumn, EntityRelation, RelationshipType} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('fixtureReferee')
 export class FixtureReferee extends BaseDbEntity {
@@ -14,8 +14,12 @@ export class FixtureReferee extends BaseDbEntity {
     })
     fixtureId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.referees, { lazy: true })
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Fixture,
+        joinOptions: {name: 'fixtureId'},
+        description: 'Fixture for this referee assignment'
+    })
     fixture!: Promise<Fixture>;
 
     @EntityColumn({
@@ -23,8 +27,12 @@ export class FixtureReferee extends BaseDbEntity {
     })
     refereeId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Referee, referee => referee.fixtures)
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Referee,
+        joinOptions: {name: 'refereeId'},
+        description: 'Referee for this fixture'
+    })
     referee!: Referee;
 
     @EntityEnumColumn({

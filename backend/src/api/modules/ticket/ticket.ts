@@ -1,4 +1,4 @@
-import {Entity, ManyToOne} from 'typeorm';
+import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Fixture} from '../fixture/fixture';
 import {Payment} from '../payment/payment';
@@ -7,7 +7,7 @@ import {
     EntityColumn, EntityRelation,
     OptionalEntityColumn, RelationshipType,
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
-import {ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
+import {PickType} from '@nestjs/swagger';
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
@@ -72,8 +72,12 @@ export class Ticket extends BaseDbEntity {
     @EntityColumn({db: {type: 'int'},})
     fixtureId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Fixture, (fixture) => fixture.id, {nullable: false})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Fixture,
+        joinOptions: {name: 'fixtureId'},
+        description: 'The fixture this ticket is valid for'
+    })
     fixture!: Fixture;
 
     /**
@@ -82,8 +86,12 @@ export class Ticket extends BaseDbEntity {
     @OptionalEntityColumn({db: {type: 'int'},})
     userId?: number;
 
-    @ApiPropertyOptional({nullable: true})
-    @ManyToOne(() => User, (user) => user.id, {nullable: true})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => User,
+        joinOptions: {name: 'userId'},
+        description: 'User who has purchased this ticket'
+    })
     user?: User;
 
     /**
@@ -97,8 +105,8 @@ export class Ticket extends BaseDbEntity {
     @EntityRelation({
         type: RelationshipType.MANY_TO_ONE,
         entity: () => Payment,
-        inverseSide: (payment: Payment) => payment.tickets,
-        joinOptions: {name: 'paymentId'}
+        joinOptions: {name: 'paymentId'},
+        description: 'Payment information if ticket is purchased'
     })
     payment?: Payment;
 }

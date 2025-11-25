@@ -23,7 +23,7 @@ export class PaymentProviderService extends CrudRepoAdapter<PaymentProvider, Cre
     }
 }
 
-@AuthedController('payment-provider')
+@AuthedController('paymentProvider')
 export class PaymentProviderController extends CrudController<PaymentProvider, CreatePaymentProviderDTO>(
     PaymentProvider,
     CreatePaymentProviderDTO,

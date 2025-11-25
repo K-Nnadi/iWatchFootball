@@ -60,7 +60,7 @@ export function CheckoutPage() {
     useEffect(() => {
         // TODO: Replace with actual API call
         // const fetchProviders = async () => {
-        //     const response = await fetch('/api/payment-provider?enabled=true');
+        //     const response = await fetch('/api/paymentProvider?enabled=true');
         //     const data = await response.json();
         //     setPaymentProviders(data);
         //     setLoading(false);

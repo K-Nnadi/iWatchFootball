@@ -1,4 +1,4 @@
-import {Entity, ManyToOne, OneToMany} from 'typeorm';
+import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Team} from '../team/team';
 import {Stadium} from '../stadium/stadium';
@@ -12,9 +12,11 @@ import {Prediction} from '../prediction/prediction';
 import {
     EntityColumn,
     EntityEnumColumn,
+    EntityRelation,
     OptionalEntityColumn,
+    RelationshipType
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
-import {ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
+import {PickType} from '@nestjs/swagger';
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
@@ -81,8 +83,12 @@ export class Fixture extends BaseDbEntity {
     })
     homeTeamId?: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Team, (team) => team.homeFixtures, {  nullable: true })
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Team,
+        joinOptions: {name: 'homeTeamId'},
+        description: 'Home team for this fixture'
+    })
     homeTeam?: Promise<Team>;
 
     @OptionalEntityColumn({
@@ -91,12 +97,20 @@ export class Fixture extends BaseDbEntity {
     })
     awayTeamId?: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Team, (team) => team.awayFixtures, {  nullable: true })
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Team,
+        joinOptions: {name: 'awayTeamId'},
+        description: 'Away team for this fixture'
+    })
     awayTeam?: Promise<Team>;
 
-    @ApiProperty()
-    @OneToMany(() => LineUp, (lineUp) => lineUp.fixture, {lazy: true})
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => LineUp,
+        inverseSide: (lineUp: LineUp) => lineUp.fixture,
+        description: 'Line-ups for this fixture'
+    })
     lineUps!: Promise<LineUp[]>;
 
     @EntityColumn({
@@ -111,8 +125,12 @@ export class Fixture extends BaseDbEntity {
     })
     seasonId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => TeamCompetitionSeason, (teamCompetitionSeason) => teamCompetitionSeason.fixtures)
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => TeamCompetitionSeason,
+        joinOptions: {name: 'competitionId'},
+        description: 'Team competition season for this fixture'
+    })
     teamCompetitionSeasons!: TeamCompetitionSeason;
 
     @EntityColumn({
@@ -121,16 +139,28 @@ export class Fixture extends BaseDbEntity {
     })
     stadiumId!: number;
 
-    @ApiPropertyOptional({nullable: true})
-    @ManyToOne(() => Stadium, (stadium) => stadium.fixtures)
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Stadium,
+        joinOptions: {name: 'stadiumId'},
+        description: 'Stadium where this fixture takes place'
+    })
     stadium?: Stadium;
 
-    @ApiProperty()
-    @OneToMany(() => Goal, (goal) => goal.fixture, { cascade: true })
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Goal,
+        inverseSide: (goal: Goal) => goal.fixture,
+        description: 'Goals scored in this fixture'
+    })
     goals!: Goal[];
 
-    @ApiProperty()
-    @OneToMany(() => FixtureReferee, (fixtureReferee) => fixtureReferee.fixture)
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => FixtureReferee,
+        inverseSide: (fixtureReferee: FixtureReferee) => fixtureReferee.fixture,
+        description: 'Referees for this fixture'
+    })
     referees!: FixtureReferee[];
 
     @EntityEnumColumn({
@@ -151,12 +181,20 @@ export class Fixture extends BaseDbEntity {
     })
     attendance?: number;
 
-    @ApiProperty()
-    @OneToMany(() => Log, (log) => log.fixture)
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Log,
+        inverseSide: (log: Log) => log.fixture,
+        description: 'Logs for this fixture'
+    })
     logs!: Log[];
 
-    @ApiProperty()
-    @OneToMany(() => Prediction, (prediction) => prediction.fixture)
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Prediction,
+        inverseSide: (prediction: Prediction) => prediction.fixture,
+        description: 'Predictions for this fixture'
+    })
     predictions?: Prediction[];
 }
 

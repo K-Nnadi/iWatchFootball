@@ -14,7 +14,7 @@ export class CommsPreferenceService extends CrudRepoAdapter<CommsPreference, Com
   }
 }
 
-@AuthedController('comms-preference')
+@AuthedController('commsPreference')
 export class CommsPreferenceController extends CrudController<CommsPreference, CommsPreferenceDTO>(CommsPreference, CommsPreferenceDTO){
   constructor(private service: CommsPreferenceService) {
     super(service)

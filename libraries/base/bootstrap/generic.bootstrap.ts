@@ -61,7 +61,11 @@ export async function GenericBootstrap(module: any, port: number, options?: {
 
         console.log('📦 Step 6/7: Setting up Swagger/OpenAPI documentation...');
         const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
-        SwaggerModule.setup('api-docs', app, document);
+        SwaggerModule.setup('api-docs', app, document, {
+            swaggerOptions: {
+                docExpansion: 'none', // All accordions closed by default
+            },
+        });
         console.log('✅ Swagger documentation setup complete');
         
         // Only write openapi.json if we have write permissions (skip in Cloud Run)
@@ -79,8 +83,8 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         
         console.log('='.repeat(60));
         console.log(`✅ SUCCESS: Server is now running on port ${port}`);
-        console.log(`   Health check endpoint: http://0.0.0.0:${port}/health`);
-        console.log(`   API docs endpoint: http://0.0.0.0:${port}/api-docs`);
+        console.log(`   Health check endpoint: http://localhost:${port}/health`);
+        console.log(`   API docs endpoint: http://localhost:${port}/api-docs`);
         console.log('='.repeat(60));
     } catch (error: unknown) {
         console.error('='.repeat(60));

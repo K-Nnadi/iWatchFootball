@@ -2,6 +2,7 @@ import {Entity, ManyToOne} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Ticket} from '../ticket/ticket';
 import {PaymentProvider} from '../paymentProvider/paymentProvider';
+import {Transaction} from '../transaction/transaction';
 import {
     EntityColumn,
     EntityEnumColumn,
@@ -97,6 +98,16 @@ export class Payment extends BaseDbEntity {
         inverseSide: (ticket: Ticket) => ticket.payment, // Ensure this matches `Ticket.payment`
     })
     tickets!: Ticket[];
+
+    /**
+     * Transactions that make up this payment (cash, credit, etc.)
+     */
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Transaction,
+        inverseSide: (transaction: Transaction) => transaction.payment,
+    })
+    transactions!: Transaction[];
 }
 
 export class CreatePaymentDTO extends PickType(Payment, [

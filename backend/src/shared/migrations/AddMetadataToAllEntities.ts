@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddMetadataToAllEntities1234567890123 implements MigrationInterface {
-    name = 'AddMetadataToAllEntities1234567890123'
+export class AddMetadataToAllEntities1764039977083 implements MigrationInterface {
+    name = 'AddMetadataToAllEntities1764039977083'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Dynamically discover all tables in the database
@@ -10,9 +10,21 @@ export class AddMetadataToAllEntities1234567890123 implements MigrationInterface
         // Add metadata column to each table
         for (const table of tables) {
             try {
+                // Use DO block to check and add column atomically
                 await queryRunner.query(`
-                    ALTER TABLE "${table}" 
-                    ADD COLUMN "metadata" jsonb
+                    DO $$ 
+                    BEGIN
+                        IF NOT EXISTS (
+                            SELECT 1 
+                            FROM information_schema.columns 
+                            WHERE table_schema = 'public' 
+                            AND table_name = '${table}' 
+                            AND column_name = 'metadata'
+                        ) THEN
+                            ALTER TABLE "${table}" 
+                            ADD COLUMN "metadata" jsonb;
+                        END IF;
+                    END $$;
                 `);
                 console.log(`Added metadata column to table: ${table}`);
             } catch (error) {
@@ -45,9 +57,21 @@ export class AddMetadataToAllEntities1234567890123 implements MigrationInterface
         // Remove metadata column from each table
         for (const table of tables) {
             try {
+                // Use DO block to check and drop column atomically
                 await queryRunner.query(`
-                    ALTER TABLE "${table}" 
-                    DROP COLUMN "metadata"
+                    DO $$ 
+                    BEGIN
+                        IF EXISTS (
+                            SELECT 1 
+                            FROM information_schema.columns 
+                            WHERE table_schema = 'public' 
+                            AND table_name = '${table}' 
+                            AND column_name = 'metadata'
+                        ) THEN
+                            ALTER TABLE "${table}" 
+                            DROP COLUMN "metadata";
+                        END IF;
+                    END $$;
                 `);
                 console.log(`Removed metadata column from table: ${table}`);
             } catch (error) {

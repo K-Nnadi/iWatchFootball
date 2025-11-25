@@ -12,7 +12,7 @@ import { OperationType, createRoleGroup, UserRole } from '../../../auth/types/se
 import { RequestWithUser } from '../../../auth/types/auth.types';
 import { FindOptionsWhere } from 'typeorm';
 
-@Entity('payment_provider')
+@Entity('paymentProvider')
 @SecurityFeature<PaymentProvider>({
     base: {
         // READ operations - Public can see enabled providers (without secrets), admins see all

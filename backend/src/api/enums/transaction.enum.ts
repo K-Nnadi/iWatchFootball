@@ -1,0 +1,8 @@
+export enum TransactionType {
+    CASH_PAYMENT = 'CASH_PAYMENT',
+    CREDIT_USAGE = 'CREDIT_USAGE',
+    CREDIT_TOP_UP = 'CREDIT_TOP_UP',
+    REFUND = 'REFUND',
+    CREDIT_REFUND = 'CREDIT_REFUND',
+}
+

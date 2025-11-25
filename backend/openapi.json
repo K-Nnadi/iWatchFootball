@@ -808,7 +808,7 @@
         ]
       }
     },
-    "/comms-preference": {
+    "/commsPreference": {
       "post": {
         "operationId": "create",
         "parameters": [],
@@ -844,7 +844,7 @@
         ],
         "summary": "Create CommsPreference",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       },
       "get": {
@@ -875,11 +875,11 @@
         ],
         "summary": "Get all CommsPreferences",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       }
     },
-    "/comms-preference/query": {
+    "/commsPreference/query": {
       "get": {
         "operationId": "getQuery",
         "parameters": [
@@ -963,11 +963,11 @@
         ],
         "summary": "Get all CommsPreferences",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       }
     },
-    "/comms-preference/count": {
+    "/commsPreference/count": {
       "get": {
         "operationId": "getCount",
         "parameters": [
@@ -1021,11 +1021,11 @@
         ],
         "summary": "Get count of CommsPreferences",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       }
     },
-    "/comms-preference/{id}": {
+    "/commsPreference/{id}": {
       "get": {
         "operationId": "getOne",
         "parameters": [
@@ -1060,7 +1060,7 @@
         ],
         "summary": "Get one CommsPreference",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       },
       "patch": {
@@ -1100,7 +1100,7 @@
         ],
         "summary": "Update one CommsPreference",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       },
       "delete": {
@@ -1130,11 +1130,11 @@
         ],
         "summary": "Delete one CommsPreference",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       }
     },
-    "/comms-preference/upload": {
+    "/commsPreference/upload": {
       "post": {
         "operationId": "upload",
         "parameters": [],
@@ -1153,11 +1153,11 @@
         ],
         "summary": "Upload a file for CommsPreference",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       }
     },
-    "/comms-preference/download/{filename}": {
+    "/commsPreference/download/{filename}": {
       "get": {
         "operationId": "download",
         "parameters": [
@@ -1185,7 +1185,7 @@
         ],
         "summary": "Download file related to CommsPreference",
         "tags": [
-          "comms-preference"
+          "commsPreference"
         ]
       }
     },
@@ -4999,7 +4999,7 @@
         ]
       }
     },
-    "/news-article": {
+    "/newsArticle": {
       "post": {
         "operationId": "create",
         "parameters": [],
@@ -5035,7 +5035,7 @@
         ],
         "summary": "Create NewsArticle",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       },
       "get": {
@@ -5066,11 +5066,11 @@
         ],
         "summary": "Get all NewsArticles",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       }
     },
-    "/news-article/query": {
+    "/newsArticle/query": {
       "get": {
         "operationId": "getQuery",
         "parameters": [
@@ -5154,11 +5154,11 @@
         ],
         "summary": "Get all NewsArticles",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       }
     },
-    "/news-article/count": {
+    "/newsArticle/count": {
       "get": {
         "operationId": "getCount",
         "parameters": [
@@ -5212,11 +5212,11 @@
         ],
         "summary": "Get count of NewsArticles",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       }
     },
-    "/news-article/{id}": {
+    "/newsArticle/{id}": {
       "get": {
         "operationId": "getOne",
         "parameters": [
@@ -5251,7 +5251,7 @@
         ],
         "summary": "Get one NewsArticle",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       },
       "patch": {
@@ -5291,7 +5291,7 @@
         ],
         "summary": "Update one NewsArticle",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       },
       "delete": {
@@ -5321,11 +5321,11 @@
         ],
         "summary": "Delete one NewsArticle",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       }
     },
-    "/news-article/upload": {
+    "/newsArticle/upload": {
       "post": {
         "operationId": "upload",
         "parameters": [],
@@ -5344,11 +5344,11 @@
         ],
         "summary": "Upload a file for NewsArticle",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       }
     },
-    "/news-article/download/{filename}": {
+    "/newsArticle/download/{filename}": {
       "get": {
         "operationId": "download",
         "parameters": [
@@ -5376,11 +5376,11 @@
         ],
         "summary": "Download file related to NewsArticle",
         "tags": [
-          "news-article"
+          "newsArticle"
         ]
       }
     },
-    "/news-aggregation/trigger": {
+    "/newsAggregation/trigger": {
       "post": {
         "operationId": "NewsAggregatorController_triggerAggregation",
         "parameters": [],
@@ -5396,11 +5396,11 @@
         ],
         "summary": "Manually trigger news aggregation",
         "tags": [
-          "news-aggregation"
+          "newsAggregation"
         ]
       }
     },
-    "/news-aggregation/trigger/{feedName}": {
+    "/newsAggregation/trigger/{feedName}": {
       "post": {
         "operationId": "NewsAggregatorController_triggerFeedAggregation",
         "parameters": [
@@ -5425,11 +5425,11 @@
         ],
         "summary": "Manually trigger news aggregation for a specific feed",
         "tags": [
-          "news-aggregation"
+          "newsAggregation"
         ]
       }
     },
-    "/news-aggregation/status": {
+    "/newsAggregation/status": {
       "get": {
         "operationId": "NewsAggregatorController_getStatus",
         "parameters": [],
@@ -5445,7 +5445,7 @@
         ],
         "summary": "Get news aggregation status",
         "tags": [
-          "news-aggregation"
+          "newsAggregation"
         ]
       }
     },
@@ -5830,7 +5830,7 @@
         ]
       }
     },
-    "/payment-provider": {
+    "/paymentProvider": {
       "post": {
         "operationId": "create",
         "parameters": [],
@@ -5866,7 +5866,7 @@
         ],
         "summary": "Create PaymentProvider",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       },
       "get": {
@@ -5897,11 +5897,11 @@
         ],
         "summary": "Get all PaymentProviders",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       }
     },
-    "/payment-provider/query": {
+    "/paymentProvider/query": {
       "get": {
         "operationId": "getQuery",
         "parameters": [
@@ -5985,11 +5985,11 @@
         ],
         "summary": "Get all PaymentProviders",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       }
     },
-    "/payment-provider/count": {
+    "/paymentProvider/count": {
       "get": {
         "operationId": "getCount",
         "parameters": [
@@ -6043,11 +6043,11 @@
         ],
         "summary": "Get count of PaymentProviders",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       }
     },
-    "/payment-provider/{id}": {
+    "/paymentProvider/{id}": {
       "get": {
         "operationId": "getOne",
         "parameters": [
@@ -6082,7 +6082,7 @@
         ],
         "summary": "Get one PaymentProvider",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       },
       "patch": {
@@ -6122,7 +6122,7 @@
         ],
         "summary": "Update one PaymentProvider",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       },
       "delete": {
@@ -6152,11 +6152,11 @@
         ],
         "summary": "Delete one PaymentProvider",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       }
     },
-    "/payment-provider/upload": {
+    "/paymentProvider/upload": {
       "post": {
         "operationId": "upload",
         "parameters": [],
@@ -6175,11 +6175,11 @@
         ],
         "summary": "Upload a file for PaymentProvider",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
         ]
       }
     },
-    "/payment-provider/download/{filename}": {
+    "/paymentProvider/download/{filename}": {
       "get": {
         "operationId": "download",
         "parameters": [
@@ -6207,7 +6207,1531 @@
         ],
         "summary": "Download file related to PaymentProvider",
         "tags": [
-          "payment-provider"
+          "paymentProvider"
+        ]
+      }
+    },
+    "/credit": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCreditDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Credit"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create Credit",
+        "tags": [
+          "credit"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Credit"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Credits",
+        "tags": [
+          "credit"
+        ]
+      }
+    },
+    "/credit/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Credit"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Credits",
+        "tags": [
+          "credit"
+        ]
+      }
+    },
+    "/credit/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Credits",
+        "tags": [
+          "credit"
+        ]
+      }
+    },
+    "/credit/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Credit"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one Credit",
+        "tags": [
+          "credit"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credit"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one Credit",
+        "tags": [
+          "credit"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one Credit",
+        "tags": [
+          "credit"
+        ]
+      }
+    },
+    "/credit/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Credit",
+        "tags": [
+          "credit"
+        ]
+      }
+    },
+    "/credit/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Credit",
+        "tags": [
+          "credit"
+        ]
+      }
+    },
+    "/transaction": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create Transaction",
+        "tags": [
+          "transaction"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transaction"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Transactions",
+        "tags": [
+          "transaction"
+        ]
+      }
+    },
+    "/transaction/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transaction"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Transactions",
+        "tags": [
+          "transaction"
+        ]
+      }
+    },
+    "/transaction/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Transactions",
+        "tags": [
+          "transaction"
+        ]
+      }
+    },
+    "/transaction/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one Transaction",
+        "tags": [
+          "transaction"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transaction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one Transaction",
+        "tags": [
+          "transaction"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one Transaction",
+        "tags": [
+          "transaction"
+        ]
+      }
+    },
+    "/transaction/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Transaction",
+        "tags": [
+          "transaction"
+        ]
+      }
+    },
+    "/transaction/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Transaction",
+        "tags": [
+          "transaction"
+        ]
+      }
+    },
+    "/loyaltyScheme": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLoyaltySchemeDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoyaltyScheme"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create LoyaltyScheme",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoyaltyScheme"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all LoyaltySchemes",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      }
+    },
+    "/loyaltyScheme/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoyaltyScheme"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all LoyaltySchemes",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      }
+    },
+    "/loyaltyScheme/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of LoyaltySchemes",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      }
+    },
+    "/loyaltyScheme/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoyaltyScheme"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one LoyaltyScheme",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoyaltyScheme"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one LoyaltyScheme",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one LoyaltyScheme",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      }
+    },
+    "/loyaltyScheme/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for LoyaltyScheme",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      }
+    },
+    "/loyaltyScheme/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to LoyaltyScheme",
+        "tags": [
+          "loyaltyScheme"
+        ]
+      }
+    },
+    "/loyaltyEvent": {
+      "post": {
+        "operationId": "create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLoyaltyEventDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoyaltyEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create LoyaltyEvent",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      },
+      "get": {
+        "operationId": "getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoyaltyEvent"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all LoyaltyEvents",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      }
+    },
+    "/loyaltyEvent/query": {
+      "get": {
+        "operationId": "getQuery",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoyaltyEvent"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all LoyaltyEvents",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      }
+    },
+    "/loyaltyEvent/count": {
+      "get": {
+        "operationId": "getCount",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of LoyaltyEvents",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      }
+    },
+    "/loyaltyEvent/{id}": {
+      "get": {
+        "operationId": "getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoyaltyEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one LoyaltyEvent",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoyaltyEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one LoyaltyEvent",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one LoyaltyEvent",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      }
+    },
+    "/loyaltyEvent/upload": {
+      "post": {
+        "operationId": "upload",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for LoyaltyEvent",
+        "tags": [
+          "loyaltyEvent"
+        ]
+      }
+    },
+    "/loyaltyEvent/download/{filename}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to LoyaltyEvent",
+        "tags": [
+          "loyaltyEvent"
         ]
       }
     },
@@ -12575,112 +14099,6 @@
           "stage"
         ]
       },
-      "TeamCompetitionSeason": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string"
-          },
-          "teamId": {
-            "type": "number"
-          },
-          "team": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "competitionId": {
-            "type": "number"
-          },
-          "competition": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "seasonId": {
-            "type": "number"
-          },
-          "season": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "fixtures": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "points": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "teamId",
-          "competitionId",
-          "competition",
-          "seasonId",
-          "season",
-          "fixtures"
-        ]
-      },
-      "Stadium": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "opened": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "teamIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "teams": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "capacity": {
-            "type": "number"
-          },
-          "addressId": {
-            "type": "number"
-          },
-          "address": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "fixtures": {
-            "$ref": "#/components/schemas/Promise"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "country"
-        ]
-      },
       "Fixture": {
         "type": "object",
         "properties": {
@@ -12708,7 +14126,12 @@
             "example": 1
           },
           "homeTeam": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Home team for this fixture",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "awayTeamId": {
             "type": "number",
@@ -12716,10 +14139,19 @@
             "example": 2
           },
           "awayTeam": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Away team for this fixture",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "lineUps": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Line-ups for this fixture",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/"
+            }
           },
           "competitionId": {
             "type": "number",
@@ -12732,7 +14164,12 @@
             "example": 2023
           },
           "teamCompetitionSeasons": {
-            "$ref": "#/components/schemas/TeamCompetitionSeason"
+            "description": "Team competition season for this fixture",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "stadiumId": {
             "type": "number",
@@ -12740,23 +14177,25 @@
             "example": 5
           },
           "stadium": {
-            "nullable": true,
+            "description": "Stadium where this fixture takes place",
             "allOf": [
               {
-                "$ref": "#/components/schemas/Stadium"
+                "$ref": "#/components/schemas/"
               }
             ]
           },
           "goals": {
+            "description": "Goals scored in this fixture",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/"
             }
           },
           "referees": {
+            "description": "Referees for this fixture",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/"
             }
           },
           "status": {
@@ -12795,15 +14234,17 @@
             "example": 50000
           },
           "logs": {
+            "description": "Logs for this fixture",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/"
             }
           },
           "predictions": {
+            "description": "Predictions for this fixture",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/"
             }
           }
         },
@@ -12817,6 +14258,7 @@
           "seasonId",
           "teamCompetitionSeasons",
           "stadiumId",
+          "stadium",
           "goals",
           "referees",
           "status",
@@ -12849,41 +14291,6 @@
           "role"
         ]
       },
-      "Referee": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "nationality": {
-            "type": "string"
-          },
-          "fixtures": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "nationality",
-          "fixtures"
-        ]
-      },
       "FixtureReferee": {
         "type": "object",
         "properties": {
@@ -12903,13 +14310,23 @@
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Fixture for this referee assignment",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "refereeId": {
             "type": "number"
           },
           "referee": {
-            "$ref": "#/components/schemas/Referee"
+            "description": "Referee for this fixture",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "role": {
             "type": "string",
@@ -13054,19 +14471,34 @@
             "type": "number"
           },
           "scorer": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Player who scored this goal",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "assistantId": {
             "type": "number"
           },
           "assistant": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Player who assisted this goal",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "fixtureId": {
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Fixture where this goal was scored",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "teamId": {
             "type": "number"
@@ -13199,19 +14631,41 @@
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Fixture for this line-up",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "teamId": {
             "type": "number"
           },
           "team": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Team for this line-up",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "managerId": {
             "type": "number"
           },
+          "manager": {
+            "description": "Manager for this line-up",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          },
           "playerLineups": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Player line-ups for this line-up",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/"
+            }
           },
           "formation": {
             "type": "string"
@@ -13224,6 +14678,7 @@
           "teamId",
           "team",
           "managerId",
+          "manager",
           "playerLineups"
         ]
       },
@@ -13271,13 +14726,23 @@
             "type": "number"
           },
           "user": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "User who created this log",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "fixtureId": {
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Fixture for this log",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "ticketNumber": {
             "type": "string"
@@ -13698,13 +15163,20 @@
             "items": {
               "$ref": "#/components/schemas/"
             }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/"
+            }
           }
         },
         "required": [
           "id",
           "method",
           "status",
-          "tickets"
+          "tickets",
+          "transactions"
         ]
       },
       "CreatePaymentProviderDTO": {
@@ -13758,6 +15230,363 @@
           "type",
           "apiKey",
           "enabled"
+        ]
+      },
+      "CreateCreditDTO": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "Current credit balance for the user",
+            "example": 100.5
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID of the user who owns this credit account",
+            "example": 1
+          }
+        },
+        "required": [
+          "balance",
+          "userId"
+        ]
+      },
+      "Credit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number",
+            "description": "Current credit balance for the user",
+            "example": 100.5
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID of the user who owns this credit account",
+            "example": 1
+          },
+          "user": {
+            "description": "User who owns this credit account",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "balance",
+          "userId",
+          "user"
+        ]
+      },
+      "CreateTransactionDTO": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of transaction",
+            "example": "CASH_PAYMENT"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Transaction amount (positive for credits, negative for debits)",
+            "example": 50
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the transaction",
+            "example": "Payment for ticket purchase"
+          },
+          "paymentId": {
+            "type": "number",
+            "description": "ID of the payment this transaction belongs to",
+            "example": 1
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID of the user who owns this transaction",
+            "example": 1
+          }
+        },
+        "required": [
+          "type",
+          "amount",
+          "userId"
+        ]
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of transaction",
+            "example": "CASH_PAYMENT"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Transaction amount (positive for credits, negative for debits)",
+            "example": 50
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the transaction",
+            "example": "Payment for ticket purchase"
+          },
+          "paymentId": {
+            "type": "number",
+            "description": "ID of the payment this transaction belongs to",
+            "example": 1
+          },
+          "payment": {
+            "description": "Payment this transaction belongs to",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID of the user who owns this transaction",
+            "example": 1
+          },
+          "user": {
+            "description": "User who owns this transaction",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "amount",
+          "payment",
+          "userId",
+          "user"
+        ]
+      },
+      "CreateLoyaltySchemeDTO": {
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "description": "Type of loyalty event this scheme applies to",
+            "example": "SPENDING_MILESTONE"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the loyalty scheme",
+            "example": "Spend £1000 Get £20"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the loyalty scheme",
+            "example": "Award £20 credit when user spends £1000"
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Threshold value for the scheme (e.g., spending amount)",
+            "example": 1000
+          },
+          "rewardAmount": {
+            "type": "number",
+            "description": "Credit amount to award when scheme is triggered",
+            "example": 20
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this scheme is enabled",
+            "example": true
+          }
+        },
+        "required": [
+          "eventType",
+          "name",
+          "rewardAmount",
+          "enabled"
+        ]
+      },
+      "LoyaltyScheme": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of loyalty event this scheme applies to",
+            "example": "SPENDING_MILESTONE"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the loyalty scheme",
+            "example": "Spend £1000 Get £20"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the loyalty scheme",
+            "example": "Award £20 credit when user spends £1000"
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Threshold value for the scheme (e.g., spending amount)",
+            "example": 1000
+          },
+          "rewardAmount": {
+            "type": "number",
+            "description": "Credit amount to award when scheme is triggered",
+            "example": 20
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this scheme is enabled",
+            "example": true
+          }
+        },
+        "required": [
+          "id",
+          "eventType",
+          "name",
+          "rewardAmount",
+          "enabled"
+        ]
+      },
+      "CreateLoyaltyEventDTO": {
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "description": "Type of loyalty event",
+            "example": "SPENDING_MILESTONE"
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID of the user who received this reward",
+            "example": 1
+          },
+          "loyaltySchemeId": {
+            "type": "number",
+            "description": "ID of the loyalty scheme that triggered this event",
+            "example": 1
+          },
+          "rewardAmount": {
+            "type": "number",
+            "description": "Credit amount awarded",
+            "example": 20
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the loyalty event",
+            "example": "Birthday reward: £10 credit"
+          }
+        },
+        "required": [
+          "eventType",
+          "userId",
+          "rewardAmount"
+        ]
+      },
+      "LoyaltyEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of loyalty event",
+            "example": "SPENDING_MILESTONE"
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID of the user who received this reward",
+            "example": 1
+          },
+          "user": {
+            "description": "User who received this loyalty reward",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          },
+          "loyaltySchemeId": {
+            "type": "number",
+            "description": "ID of the loyalty scheme that triggered this event",
+            "example": 1
+          },
+          "loyaltyScheme": {
+            "description": "Loyalty scheme that triggered this event",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          },
+          "rewardAmount": {
+            "type": "number",
+            "description": "Credit amount awarded",
+            "example": 20
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the loyalty event",
+            "example": "Birthday reward: £10 credit"
+          }
+        },
+        "required": [
+          "id",
+          "eventType",
+          "userId",
+          "user",
+          "loyaltyScheme",
+          "rewardAmount"
         ]
       },
       "CreatePlayerDTO": {
@@ -14050,13 +15879,23 @@
             "type": "number"
           },
           "user": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "User who made this prediction",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "fixtureId": {
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Fixture for this prediction",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "predicted": {
             "type": "string"
@@ -14088,13 +15927,23 @@
             "type": "number"
           },
           "user": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "User who made this prediction",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "fixtureId": {
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Promise"
+            "description": "Fixture for this prediction",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "predicted": {
             "type": "string"
@@ -14121,6 +15970,41 @@
         "required": [
           "name",
           "nationality"
+        ]
+      },
+      "Referee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "fixtures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "nationality",
+          "fixtures"
         ]
       },
       "CreateSeasonDTO": {
@@ -14200,6 +16084,59 @@
           }
         },
         "required": [
+          "name",
+          "country"
+        ]
+      },
+      "Stadium": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "opened": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "teams": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "addressId": {
+            "type": "number"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "fixtures": {
+            "$ref": "#/components/schemas/Promise"
+          }
+        },
+        "required": [
+          "id",
           "name",
           "country"
         ]
@@ -14450,6 +16387,59 @@
           "seasonId"
         ]
       },
+      "TeamCompetitionSeason": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "team": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "competitionId": {
+            "type": "number"
+          },
+          "competition": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "seasonId": {
+            "type": "number"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "fixtures": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "points": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "teamId",
+          "competitionId",
+          "competition",
+          "seasonId",
+          "season",
+          "fixtures"
+        ]
+      },
       "CreateTicketDTO": {
         "type": "object",
         "properties": {
@@ -14473,71 +16463,6 @@
           "category",
           "price",
           "fixtureId"
-        ]
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 32
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "MODERATOR",
-              "USER"
-            ]
-          },
-          "logs": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "predictions": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "commsPreferenceId": {
-            "type": "number"
-          },
-          "commsPreference": {
-            "$ref": "#/components/schemas/Promise"
-          }
-        },
-        "required": [
-          "id",
-          "firstName",
-          "lastName",
-          "userName",
-          "email",
-          "password",
-          "type",
-          "logs"
         ]
       },
       "Ticket": {
@@ -14565,16 +16490,21 @@
             "type": "number"
           },
           "fixture": {
-            "$ref": "#/components/schemas/Fixture"
+            "description": "The fixture this ticket is valid for",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           },
           "userId": {
             "type": "number"
           },
           "user": {
-            "nullable": true,
+            "description": "User who has purchased this ticket",
             "allOf": [
               {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/"
               }
             ]
           },
@@ -14582,7 +16512,12 @@
             "type": "number"
           },
           "payment": {
-            "$ref": "#/components/schemas/"
+            "description": "Payment information if ticket is purchased",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
           }
         },
         "required": [
@@ -14591,6 +16526,7 @@
           "price",
           "fixtureId",
           "fixture",
+          "user",
           "payment"
         ]
       },
@@ -14777,6 +16713,88 @@
           "userName",
           "email",
           "type"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MODERATOR",
+              "USER"
+            ]
+          },
+          "logs": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "predictions": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "commsPreferenceId": {
+            "type": "number"
+          },
+          "commsPreference": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "credit": {
+            "description": "Credit account for this user",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/"
+              }
+            ]
+          },
+          "transactions": {
+            "description": "Transactions for this user",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "userName",
+          "email",
+          "password",
+          "type",
+          "logs",
+          "credit",
+          "transactions"
         ]
       },
       "LoginBody": {

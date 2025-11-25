@@ -1,11 +1,13 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, JoinColumn, OneToMany, OneToOne} from "typeorm";
+import {Entity, JoinColumn, OneToMany} from "typeorm";
 import {UserType} from "../../enums/user.enum";
 import {Log} from "../log/log";
 import {
     EntityColumn,
     EntityEnumColumn,
-    OptionalEntityColumn
+    EntityRelation,
+    OptionalEntityColumn,
+    RelationshipType
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Prediction} from "../prediction/prediction";
@@ -14,6 +16,8 @@ import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/se
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
 import {CommsPreference} from "../commsPreference/commsPreference";
+import {Credit} from "../credit/credit";
+import {Transaction} from "../transaction/transaction";
 
 
 @Entity('user')
@@ -92,6 +96,21 @@ export class User extends BaseDbEntity {
     @OneToMany(() => CommsPreference, commsPreference => commsPreference.user, {lazy: true})
     @JoinColumn({ name: 'commsPreferenceId' })
     commsPreference?: Promise<CommsPreference>;
+
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_ONE,
+        entity: () => Credit,
+        description: 'Credit account for this user'
+    })
+    credit?: Promise<Credit>;
+
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Transaction,
+        inverseSide: (transaction: Transaction) => transaction.user,
+        description: 'Transactions for this user'
+    })
+    transactions?: Promise<Transaction[]>;
 }
 
 export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {

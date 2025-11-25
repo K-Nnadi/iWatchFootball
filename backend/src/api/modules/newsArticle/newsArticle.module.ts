@@ -14,7 +14,7 @@ export class NewsArticleService extends CrudRepoAdapter<NewsArticle, CreateNewsA
   }
 }
 
-@AuthedController('news-article')
+@AuthedController('newsArticle')
 export class NewsArticleController extends CrudController<NewsArticle, CreateNewsArticleDTO>(NewsArticle, CreateNewsArticleDTO){
   constructor(private service: NewsArticleService) {
     super(service)

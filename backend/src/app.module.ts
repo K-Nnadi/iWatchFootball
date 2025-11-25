@@ -32,6 +32,11 @@ import {AuthModule as CoreAuthModule} from "./auth/auth.module";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {PaymentProviderModule} from "./api/modules/paymentProvider/paymentProvider.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
+import {TransactionModule} from "./api/modules/transaction/transaction.module";
+import {CreditModule} from "./api/modules/credit/credit.module";
+import {LoyaltySchemeModule} from "./api/modules/loyaltyScheme/loyaltyScheme.module";
+import {LoyaltyEventModule} from "./api/modules/loyaltyEvent/loyaltyEvent.module";
+import {LoyaltyModule} from "./api/services/loyalty/loyalty.module";
 import {NewsArticleModule} from "./api/modules/newsArticle/newsArticle.module";
 import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
@@ -63,6 +68,11 @@ const Modules = [
     NewsAggregatorModule,
     PaymentModule,
     PaymentProviderModule,
+    CreditModule,
+    TransactionModule,
+    LoyaltySchemeModule,
+    LoyaltyEventModule,
+    LoyaltyModule,
     PlayerModule,
     PlayerLineUpModule,
     PositionModule,

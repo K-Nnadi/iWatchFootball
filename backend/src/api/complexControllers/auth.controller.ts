@@ -134,7 +134,7 @@ export class AuthController {
         });
 
         if (user) {
-            await this.commsPreferenceService.create({
+            const commsPreference = await this.commsPreferenceService.create({
                 userId: user.id,
                 emailNotifications: CommunicationFrequency.DAILY,
                 inAppNotifications: CommunicationFrequency.IMMEDIATE,
@@ -145,11 +145,21 @@ export class AuthController {
                 matchReminders: CommunicationFrequency.DAILY,
                 language: Language.EN
             });
+            
+            // Update user with commsPreferenceId
+            if (commsPreference) {
+                user = await this.userService.update(user.id, {
+                    commsPreferenceId: commsPreference.id
+                });
+            }
+            
+            const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(user);
+            void response.code(200).send({
+                user, access_token: token
+            });
         } else {
             void response.code(400).send({message: 'Something went wrong..'});
         }
-        
-        return user;
     }
 }
 

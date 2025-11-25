@@ -9,7 +9,7 @@ import { FindOptionsWhere } from 'typeorm';
 import { CommunicationFrequency, Language } from "../../enums/commsPreference.enum";
 import { User } from "../user/user";
 
-@Entity('comms_preference')
+@Entity('commsPreference')
 @SecurityFeature<CommsPreference>({
   base: {
     // READ operations - Users can only see their own preferences, admins can see all

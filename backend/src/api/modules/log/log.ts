@@ -1,9 +1,9 @@
-import {ApiProperty, PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToOne} from "typeorm";
+import {PickType} from "@nestjs/swagger";
+import {Column, Entity} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {User} from "../user/user";
 import {Fixture} from "../fixture/fixture";
-import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
+import {EntityColumn, EntityRelation, OptionalEntityColumn, RelationshipType} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
@@ -52,15 +52,23 @@ export class Log extends BaseDbEntity {
     @EntityColumn({db: {type: "int"}})
     userId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => User, user => user.logs, {lazy: true})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => User,
+        joinOptions: {name: 'userId'},
+        description: 'User who created this log'
+    })
     user!: Promise<User>;
 
     @EntityColumn({db: {type: "int"}})
     fixtureId!: number;
 
-    @ApiProperty()
-    @ManyToOne(() => Fixture, fixture => fixture.logs, {lazy: true})
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Fixture,
+        joinOptions: {name: 'fixtureId'},
+        description: 'Fixture for this log'
+    })
     fixture!: Promise<Fixture>;
 
     @OptionalEntityColumn({db: {type: "varchar"}})
