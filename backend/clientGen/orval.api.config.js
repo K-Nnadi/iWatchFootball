@@ -1,8 +1,8 @@
 module.exports = {
     mainApi: {
         output: {
-            mode: 'tags-split',
-            target: '../../clients/queries',
+            mode: 'tags',
+            target: '../../clients',
             client: 'react-query',
 
             override: {

@@ -149,6 +149,7 @@ export class AuthController {
             // Update user with commsPreferenceId
             if (commsPreference) {
                 user = await this.userService.update(user.id, {
+                    id: user.id,
                     commsPreferenceId: commsPreference.id
                 });
             }

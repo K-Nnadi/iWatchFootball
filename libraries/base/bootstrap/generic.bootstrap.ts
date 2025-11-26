@@ -68,10 +68,64 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         });
         console.log('✅ Swagger documentation setup complete');
         
+        // Clean up empty $ref values that can occur with lazy-loaded relations
+        function hasEmptyRef(obj: any): boolean {
+            if (obj && typeof obj === 'object') {
+                if ('$ref' in obj) {
+                    const ref = obj.$ref;
+                    return !ref || ref === '#/components/schemas/' || ref.endsWith('/');
+                }
+                if ('allOf' in obj && Array.isArray(obj.allOf)) {
+                    return obj.allOf.every((item: any) => hasEmptyRef(item));
+                }
+            }
+            return false;
+        }
+
+        function cleanRefs(obj: any, isProperty = false): any {
+            if (Array.isArray(obj)) {
+                return obj.map((item: any) => cleanRefs(item, isProperty)).filter((item: any) => !hasEmptyRef(item) && item !== undefined);
+            } else if (obj && typeof obj === 'object') {
+                const cleaned: any = {};
+                for (const [key, value] of Object.entries(obj)) {
+                    // Skip properties with empty $ref or empty allOf
+                    if (hasEmptyRef(value)) {
+                        continue;
+                    }
+                    // Clean allOf arrays
+                    if (key === 'allOf' && Array.isArray(value)) {
+                        const cleanedAllOf = cleanRefs(value, isProperty).filter((item: any) => !hasEmptyRef(item) && item !== undefined);
+                        if (cleanedAllOf.length > 0) {
+                            cleaned[key] = cleanedAllOf;
+                        }
+                        // If allOf becomes empty, skip this property entirely
+                    } else {
+                        const cleanedValue = cleanRefs(value, key === 'properties');
+                        if (cleanedValue !== undefined) {
+                            cleaned[key] = cleanedValue;
+                        }
+                    }
+                }
+                // Final check: if object is an array type, ensure it has items
+                if (cleaned.type === 'array' && !cleaned.items) {
+                    // Remove invalid array definitions (especially in properties)
+                    if (isProperty) {
+                        return undefined;
+                    }
+                    // For top-level schemas, we might want to keep it but Orval will error, so remove it
+                    return undefined;
+                }
+                return cleaned;
+            }
+            return obj;
+        }
+
+        const cleanedDocument = cleanRefs(document);
+        
         // Only write openapi.json if we have write permissions (skip in Cloud Run)
         try {
-            fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
-            console.log('✅ OpenAPI JSON file written');
+            fs.writeFileSync('./openapi.json', JSON.stringify(cleanedDocument, null, 2));
+            console.log('✅ OpenAPI JSON file written (cleaned empty $ref values)');
         } catch (error) {
             console.warn('⚠️  Could not write openapi.json file (this is OK in production):', error);
         }

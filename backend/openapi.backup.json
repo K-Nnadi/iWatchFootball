@@ -48,7 +48,7 @@
     },
     "/address": {
       "post": {
-        "operationId": "createAddress",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -86,7 +86,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllAddress",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -119,7 +119,7 @@
     },
     "/address/query": {
       "get": {
-        "operationId": "getQueryAddress",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -207,7 +207,7 @@
     },
     "/address/count": {
       "get": {
-        "operationId": "getCountAddress",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -265,7 +265,7 @@
     },
     "/address/{id}": {
       "get": {
-        "operationId": "getOneAddress",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -302,7 +302,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneAddress",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -342,7 +342,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneAddress",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -374,7 +374,7 @@
     },
     "/address/upload": {
       "post": {
-        "operationId": "uploadAddress",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -397,7 +397,7 @@
     },
     "/address/download/{filename}": {
       "get": {
-        "operationId": "downloadAddress",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -429,7 +429,7 @@
     },
     "/card": {
       "post": {
-        "operationId": "createCard",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -467,7 +467,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllCard",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -500,7 +500,7 @@
     },
     "/card/query": {
       "get": {
-        "operationId": "getQueryCard",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -588,7 +588,7 @@
     },
     "/card/count": {
       "get": {
-        "operationId": "getCountCard",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -646,7 +646,7 @@
     },
     "/card/{id}": {
       "get": {
-        "operationId": "getOneCard",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -683,7 +683,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneCard",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -723,7 +723,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneCard",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -755,7 +755,7 @@
     },
     "/card/upload": {
       "post": {
-        "operationId": "uploadCard",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -778,7 +778,7 @@
     },
     "/card/download/{filename}": {
       "get": {
-        "operationId": "downloadCard",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -810,7 +810,7 @@
     },
     "/commsPreference": {
       "post": {
-        "operationId": "createCommsPreference",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -848,7 +848,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllCommsPreference",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -881,7 +881,7 @@
     },
     "/commsPreference/query": {
       "get": {
-        "operationId": "getQueryCommsPreference",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -969,7 +969,7 @@
     },
     "/commsPreference/count": {
       "get": {
-        "operationId": "getCountCommsPreference",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -1027,7 +1027,7 @@
     },
     "/commsPreference/{id}": {
       "get": {
-        "operationId": "getOneCommsPreference",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -1064,7 +1064,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneCommsPreference",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -1104,7 +1104,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneCommsPreference",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -1136,7 +1136,7 @@
     },
     "/commsPreference/upload": {
       "post": {
-        "operationId": "uploadCommsPreference",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -1159,7 +1159,7 @@
     },
     "/commsPreference/download/{filename}": {
       "get": {
-        "operationId": "downloadCommsPreference",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -1191,7 +1191,7 @@
     },
     "/competition": {
       "post": {
-        "operationId": "createCompetition",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1229,7 +1229,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllCompetition",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -1262,7 +1262,7 @@
     },
     "/competition/query": {
       "get": {
-        "operationId": "getQueryCompetition",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -1350,7 +1350,7 @@
     },
     "/competition/count": {
       "get": {
-        "operationId": "getCountCompetition",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -1408,7 +1408,7 @@
     },
     "/competition/{id}": {
       "get": {
-        "operationId": "getOneCompetition",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -1445,7 +1445,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneCompetition",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -1485,7 +1485,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneCompetition",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -1517,7 +1517,7 @@
     },
     "/competition/upload": {
       "post": {
-        "operationId": "uploadCompetition",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -1540,7 +1540,7 @@
     },
     "/competition/download/{filename}": {
       "get": {
-        "operationId": "downloadCompetition",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -1572,7 +1572,7 @@
     },
     "/fixture": {
       "post": {
-        "operationId": "createFixture",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1610,7 +1610,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllFixture",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -1643,7 +1643,7 @@
     },
     "/fixture/query": {
       "get": {
-        "operationId": "getQueryFixture",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -1731,7 +1731,7 @@
     },
     "/fixture/count": {
       "get": {
-        "operationId": "getCountFixture",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -1789,7 +1789,7 @@
     },
     "/fixture/{id}": {
       "get": {
-        "operationId": "getOneFixture",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -1826,7 +1826,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneFixture",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -1866,7 +1866,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneFixture",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -1898,7 +1898,7 @@
     },
     "/fixture/upload": {
       "post": {
-        "operationId": "uploadFixture",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -1921,7 +1921,7 @@
     },
     "/fixture/download/{filename}": {
       "get": {
-        "operationId": "downloadFixture",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -1953,7 +1953,7 @@
     },
     "/fixtureReferee": {
       "post": {
-        "operationId": "createFixtureReferee",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1991,7 +1991,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllFixtureReferee",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -2024,7 +2024,7 @@
     },
     "/fixtureReferee/query": {
       "get": {
-        "operationId": "getQueryFixtureReferee",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -2112,7 +2112,7 @@
     },
     "/fixtureReferee/count": {
       "get": {
-        "operationId": "getCountFixtureReferee",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -2170,7 +2170,7 @@
     },
     "/fixtureReferee/{id}": {
       "get": {
-        "operationId": "getOneFixtureReferee",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -2207,7 +2207,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneFixtureReferee",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -2247,7 +2247,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneFixtureReferee",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -2279,7 +2279,7 @@
     },
     "/fixtureReferee/upload": {
       "post": {
-        "operationId": "uploadFixtureReferee",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -2302,7 +2302,7 @@
     },
     "/fixtureReferee/download/{filename}": {
       "get": {
-        "operationId": "downloadFixtureReferee",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -2334,7 +2334,7 @@
     },
     "/genericToken": {
       "post": {
-        "operationId": "createGenericToken",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2372,7 +2372,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllGenericToken",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -2405,7 +2405,7 @@
     },
     "/genericToken/query": {
       "get": {
-        "operationId": "getQueryGenericToken",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -2493,7 +2493,7 @@
     },
     "/genericToken/count": {
       "get": {
-        "operationId": "getCountGenericToken",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -2551,7 +2551,7 @@
     },
     "/genericToken/{id}": {
       "get": {
-        "operationId": "getOneGenericToken",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -2588,7 +2588,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneGenericToken",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -2628,7 +2628,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneGenericToken",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -2660,7 +2660,7 @@
     },
     "/genericToken/upload": {
       "post": {
-        "operationId": "uploadGenericToken",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -2683,7 +2683,7 @@
     },
     "/genericToken/download/{filename}": {
       "get": {
-        "operationId": "downloadGenericToken",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -2715,7 +2715,7 @@
     },
     "/goal": {
       "post": {
-        "operationId": "createGoal",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2753,7 +2753,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllGoal",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -2786,7 +2786,7 @@
     },
     "/goal/query": {
       "get": {
-        "operationId": "getQueryGoal",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -2874,7 +2874,7 @@
     },
     "/goal/count": {
       "get": {
-        "operationId": "getCountGoal",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -2932,7 +2932,7 @@
     },
     "/goal/{id}": {
       "get": {
-        "operationId": "getOneGoal",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -2969,7 +2969,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneGoal",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -3009,7 +3009,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneGoal",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -3041,7 +3041,7 @@
     },
     "/goal/upload": {
       "post": {
-        "operationId": "uploadGoal",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -3064,7 +3064,7 @@
     },
     "/goal/download/{filename}": {
       "get": {
-        "operationId": "downloadGoal",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -3096,7 +3096,7 @@
     },
     "/injury": {
       "post": {
-        "operationId": "createInjury",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3134,7 +3134,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllInjury",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -3167,7 +3167,7 @@
     },
     "/injury/query": {
       "get": {
-        "operationId": "getQueryInjury",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -3255,7 +3255,7 @@
     },
     "/injury/count": {
       "get": {
-        "operationId": "getCountInjury",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -3313,7 +3313,7 @@
     },
     "/injury/{id}": {
       "get": {
-        "operationId": "getOneInjury",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -3350,7 +3350,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneInjury",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -3390,7 +3390,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneInjury",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -3422,7 +3422,7 @@
     },
     "/injury/upload": {
       "post": {
-        "operationId": "uploadInjury",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -3445,7 +3445,7 @@
     },
     "/injury/download/{filename}": {
       "get": {
-        "operationId": "downloadInjury",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -3477,7 +3477,7 @@
     },
     "/lineUp": {
       "post": {
-        "operationId": "createLineUp",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3515,7 +3515,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllLineUp",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -3548,7 +3548,7 @@
     },
     "/lineUp/query": {
       "get": {
-        "operationId": "getQueryLineUp",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -3636,7 +3636,7 @@
     },
     "/lineUp/count": {
       "get": {
-        "operationId": "getCountLineUp",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -3694,7 +3694,7 @@
     },
     "/lineUp/{id}": {
       "get": {
-        "operationId": "getOneLineUp",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -3731,7 +3731,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneLineUp",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -3771,7 +3771,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneLineUp",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -3803,7 +3803,7 @@
     },
     "/lineUp/upload": {
       "post": {
-        "operationId": "uploadLineUp",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -3826,7 +3826,7 @@
     },
     "/lineUp/download/{filename}": {
       "get": {
-        "operationId": "downloadLineUp",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -3858,7 +3858,7 @@
     },
     "/log": {
       "post": {
-        "operationId": "createLog",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3896,7 +3896,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllLog",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -3929,7 +3929,7 @@
     },
     "/log/query": {
       "get": {
-        "operationId": "getQueryLog",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -4017,7 +4017,7 @@
     },
     "/log/count": {
       "get": {
-        "operationId": "getCountLog",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -4075,7 +4075,7 @@
     },
     "/log/{id}": {
       "get": {
-        "operationId": "getOneLog",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -4112,7 +4112,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneLog",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -4152,7 +4152,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneLog",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -4184,7 +4184,7 @@
     },
     "/log/upload": {
       "post": {
-        "operationId": "uploadLog",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -4207,7 +4207,7 @@
     },
     "/log/download/{filename}": {
       "get": {
-        "operationId": "downloadLog",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -4239,7 +4239,7 @@
     },
     "/manager": {
       "post": {
-        "operationId": "createManager",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4277,7 +4277,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllManager",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -4310,7 +4310,7 @@
     },
     "/manager/query": {
       "get": {
-        "operationId": "getQueryManager",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -4398,7 +4398,7 @@
     },
     "/manager/count": {
       "get": {
-        "operationId": "getCountManager",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -4456,7 +4456,7 @@
     },
     "/manager/{id}": {
       "get": {
-        "operationId": "getOneManager",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -4493,7 +4493,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneManager",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -4533,7 +4533,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneManager",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -4565,7 +4565,7 @@
     },
     "/manager/upload": {
       "post": {
-        "operationId": "uploadManager",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -4588,7 +4588,7 @@
     },
     "/manager/download/{filename}": {
       "get": {
-        "operationId": "downloadManager",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -4620,7 +4620,7 @@
     },
     "/managerEmployment": {
       "post": {
-        "operationId": "createManagerEmployment",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4658,7 +4658,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllManagerEmployment",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -4691,7 +4691,7 @@
     },
     "/managerEmployment/query": {
       "get": {
-        "operationId": "getQueryManagerEmployment",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -4779,7 +4779,7 @@
     },
     "/managerEmployment/count": {
       "get": {
-        "operationId": "getCountManagerEmployment",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -4837,7 +4837,7 @@
     },
     "/managerEmployment/{id}": {
       "get": {
-        "operationId": "getOneManagerEmployment",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -4874,7 +4874,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneManagerEmployment",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -4914,7 +4914,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneManagerEmployment",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -4946,7 +4946,7 @@
     },
     "/managerEmployment/upload": {
       "post": {
-        "operationId": "uploadManagerEmployment",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -4969,7 +4969,7 @@
     },
     "/managerEmployment/download/{filename}": {
       "get": {
-        "operationId": "downloadManagerEmployment",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -5001,7 +5001,7 @@
     },
     "/newsArticle": {
       "post": {
-        "operationId": "createNewsArticle",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5039,7 +5039,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllNewsArticle",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -5072,7 +5072,7 @@
     },
     "/newsArticle/query": {
       "get": {
-        "operationId": "getQueryNewsArticle",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -5160,7 +5160,7 @@
     },
     "/newsArticle/count": {
       "get": {
-        "operationId": "getCountNewsArticle",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -5218,7 +5218,7 @@
     },
     "/newsArticle/{id}": {
       "get": {
-        "operationId": "getOneNewsArticle",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -5255,7 +5255,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneNewsArticle",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -5295,7 +5295,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneNewsArticle",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -5327,7 +5327,7 @@
     },
     "/newsArticle/upload": {
       "post": {
-        "operationId": "uploadNewsArticle",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -5350,7 +5350,7 @@
     },
     "/newsArticle/download/{filename}": {
       "get": {
-        "operationId": "downloadNewsArticle",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -5451,7 +5451,7 @@
     },
     "/payment": {
       "post": {
-        "operationId": "createPayment",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5489,7 +5489,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllPayment",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -5522,7 +5522,7 @@
     },
     "/payment/query": {
       "get": {
-        "operationId": "getQueryPayment",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -5610,7 +5610,7 @@
     },
     "/payment/count": {
       "get": {
-        "operationId": "getCountPayment",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -5668,7 +5668,7 @@
     },
     "/payment/{id}": {
       "get": {
-        "operationId": "getOnePayment",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -5705,7 +5705,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOnePayment",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -5745,7 +5745,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOnePayment",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -5777,7 +5777,7 @@
     },
     "/payment/upload": {
       "post": {
-        "operationId": "uploadPayment",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -5800,7 +5800,7 @@
     },
     "/payment/download/{filename}": {
       "get": {
-        "operationId": "downloadPayment",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -5832,7 +5832,7 @@
     },
     "/paymentProvider": {
       "post": {
-        "operationId": "createPaymentProvider",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5870,7 +5870,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllPaymentProvider",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -5903,7 +5903,7 @@
     },
     "/paymentProvider/query": {
       "get": {
-        "operationId": "getQueryPaymentProvider",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -5991,7 +5991,7 @@
     },
     "/paymentProvider/count": {
       "get": {
-        "operationId": "getCountPaymentProvider",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -6049,7 +6049,7 @@
     },
     "/paymentProvider/{id}": {
       "get": {
-        "operationId": "getOnePaymentProvider",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -6086,7 +6086,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOnePaymentProvider",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -6126,7 +6126,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOnePaymentProvider",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -6158,7 +6158,7 @@
     },
     "/paymentProvider/upload": {
       "post": {
-        "operationId": "uploadPaymentProvider",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -6181,7 +6181,7 @@
     },
     "/paymentProvider/download/{filename}": {
       "get": {
-        "operationId": "downloadPaymentProvider",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -6213,7 +6213,7 @@
     },
     "/credit": {
       "post": {
-        "operationId": "createCredit",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6251,7 +6251,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllCredit",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -6284,7 +6284,7 @@
     },
     "/credit/query": {
       "get": {
-        "operationId": "getQueryCredit",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -6372,7 +6372,7 @@
     },
     "/credit/count": {
       "get": {
-        "operationId": "getCountCredit",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -6430,7 +6430,7 @@
     },
     "/credit/{id}": {
       "get": {
-        "operationId": "getOneCredit",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -6467,7 +6467,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneCredit",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -6507,7 +6507,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneCredit",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -6539,7 +6539,7 @@
     },
     "/credit/upload": {
       "post": {
-        "operationId": "uploadCredit",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -6562,7 +6562,7 @@
     },
     "/credit/download/{filename}": {
       "get": {
-        "operationId": "downloadCredit",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -6594,7 +6594,7 @@
     },
     "/transaction": {
       "post": {
-        "operationId": "createTransaction",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6632,7 +6632,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllTransaction",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -6665,7 +6665,7 @@
     },
     "/transaction/query": {
       "get": {
-        "operationId": "getQueryTransaction",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -6753,7 +6753,7 @@
     },
     "/transaction/count": {
       "get": {
-        "operationId": "getCountTransaction",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -6811,7 +6811,7 @@
     },
     "/transaction/{id}": {
       "get": {
-        "operationId": "getOneTransaction",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -6848,7 +6848,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneTransaction",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -6888,7 +6888,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneTransaction",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -6920,7 +6920,7 @@
     },
     "/transaction/upload": {
       "post": {
-        "operationId": "uploadTransaction",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -6943,7 +6943,7 @@
     },
     "/transaction/download/{filename}": {
       "get": {
-        "operationId": "downloadTransaction",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -6975,7 +6975,7 @@
     },
     "/loyaltyScheme": {
       "post": {
-        "operationId": "createLoyaltyScheme",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7013,7 +7013,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllLoyaltyScheme",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -7046,7 +7046,7 @@
     },
     "/loyaltyScheme/query": {
       "get": {
-        "operationId": "getQueryLoyaltyScheme",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -7134,7 +7134,7 @@
     },
     "/loyaltyScheme/count": {
       "get": {
-        "operationId": "getCountLoyaltyScheme",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -7192,7 +7192,7 @@
     },
     "/loyaltyScheme/{id}": {
       "get": {
-        "operationId": "getOneLoyaltyScheme",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -7229,7 +7229,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneLoyaltyScheme",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -7269,7 +7269,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneLoyaltyScheme",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -7301,7 +7301,7 @@
     },
     "/loyaltyScheme/upload": {
       "post": {
-        "operationId": "uploadLoyaltyScheme",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -7324,7 +7324,7 @@
     },
     "/loyaltyScheme/download/{filename}": {
       "get": {
-        "operationId": "downloadLoyaltyScheme",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -7356,7 +7356,7 @@
     },
     "/loyaltyEvent": {
       "post": {
-        "operationId": "createLoyaltyEvent",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7394,7 +7394,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllLoyaltyEvent",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -7427,7 +7427,7 @@
     },
     "/loyaltyEvent/query": {
       "get": {
-        "operationId": "getQueryLoyaltyEvent",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -7515,7 +7515,7 @@
     },
     "/loyaltyEvent/count": {
       "get": {
-        "operationId": "getCountLoyaltyEvent",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -7573,7 +7573,7 @@
     },
     "/loyaltyEvent/{id}": {
       "get": {
-        "operationId": "getOneLoyaltyEvent",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -7610,7 +7610,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneLoyaltyEvent",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -7650,7 +7650,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneLoyaltyEvent",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -7682,7 +7682,7 @@
     },
     "/loyaltyEvent/upload": {
       "post": {
-        "operationId": "uploadLoyaltyEvent",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -7705,7 +7705,7 @@
     },
     "/loyaltyEvent/download/{filename}": {
       "get": {
-        "operationId": "downloadLoyaltyEvent",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -7737,7 +7737,7 @@
     },
     "/player": {
       "post": {
-        "operationId": "createPlayer",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7775,7 +7775,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllPlayer",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -7808,7 +7808,7 @@
     },
     "/player/query": {
       "get": {
-        "operationId": "getQueryPlayer",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -7896,7 +7896,7 @@
     },
     "/player/count": {
       "get": {
-        "operationId": "getCountPlayer",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -7954,7 +7954,7 @@
     },
     "/player/{id}": {
       "get": {
-        "operationId": "getOnePlayer",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -7991,7 +7991,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOnePlayer",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -8031,7 +8031,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOnePlayer",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -8063,7 +8063,7 @@
     },
     "/player/upload": {
       "post": {
-        "operationId": "uploadPlayer",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -8086,7 +8086,7 @@
     },
     "/player/download/{filename}": {
       "get": {
-        "operationId": "downloadPlayer",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -8118,7 +8118,7 @@
     },
     "/playerLineUp": {
       "post": {
-        "operationId": "createPlayerLineUp",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -8156,7 +8156,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllPlayerLineUp",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -8189,7 +8189,7 @@
     },
     "/playerLineUp/query": {
       "get": {
-        "operationId": "getQueryPlayerLineUp",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -8277,7 +8277,7 @@
     },
     "/playerLineUp/count": {
       "get": {
-        "operationId": "getCountPlayerLineUp",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -8335,7 +8335,7 @@
     },
     "/playerLineUp/{id}": {
       "get": {
-        "operationId": "getOnePlayerLineUp",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -8372,7 +8372,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOnePlayerLineUp",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -8412,7 +8412,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOnePlayerLineUp",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -8444,7 +8444,7 @@
     },
     "/playerLineUp/upload": {
       "post": {
-        "operationId": "uploadPlayerLineUp",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -8467,7 +8467,7 @@
     },
     "/playerLineUp/download/{filename}": {
       "get": {
-        "operationId": "downloadPlayerLineUp",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -8499,7 +8499,7 @@
     },
     "/position": {
       "post": {
-        "operationId": "createPosition",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -8537,7 +8537,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllPosition",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -8570,7 +8570,7 @@
     },
     "/position/query": {
       "get": {
-        "operationId": "getQueryPosition",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -8658,7 +8658,7 @@
     },
     "/position/count": {
       "get": {
-        "operationId": "getCountPosition",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -8716,7 +8716,7 @@
     },
     "/position/{id}": {
       "get": {
-        "operationId": "getOnePosition",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -8753,7 +8753,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOnePosition",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -8793,7 +8793,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOnePosition",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -8825,7 +8825,7 @@
     },
     "/position/upload": {
       "post": {
-        "operationId": "uploadPosition",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -8848,7 +8848,7 @@
     },
     "/position/download/{filename}": {
       "get": {
-        "operationId": "downloadPosition",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -8880,7 +8880,7 @@
     },
     "/prediction": {
       "post": {
-        "operationId": "createPrediction",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -8918,7 +8918,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllPrediction",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -8951,7 +8951,7 @@
     },
     "/prediction/query": {
       "get": {
-        "operationId": "getQueryPrediction",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -9039,7 +9039,7 @@
     },
     "/prediction/count": {
       "get": {
-        "operationId": "getCountPrediction",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -9097,7 +9097,7 @@
     },
     "/prediction/{id}": {
       "get": {
-        "operationId": "getOnePrediction",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -9134,7 +9134,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOnePrediction",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -9174,7 +9174,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOnePrediction",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -9206,7 +9206,7 @@
     },
     "/prediction/upload": {
       "post": {
-        "operationId": "uploadPrediction",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -9229,7 +9229,7 @@
     },
     "/prediction/download/{filename}": {
       "get": {
-        "operationId": "downloadPrediction",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -9261,7 +9261,7 @@
     },
     "/referee": {
       "post": {
-        "operationId": "createReferee",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -9299,7 +9299,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllReferee",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -9332,7 +9332,7 @@
     },
     "/referee/query": {
       "get": {
-        "operationId": "getQueryReferee",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -9420,7 +9420,7 @@
     },
     "/referee/count": {
       "get": {
-        "operationId": "getCountReferee",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -9478,7 +9478,7 @@
     },
     "/referee/{id}": {
       "get": {
-        "operationId": "getOneReferee",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -9515,7 +9515,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneReferee",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -9555,7 +9555,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneReferee",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -9587,7 +9587,7 @@
     },
     "/referee/upload": {
       "post": {
-        "operationId": "uploadReferee",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -9610,7 +9610,7 @@
     },
     "/referee/download/{filename}": {
       "get": {
-        "operationId": "downloadReferee",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -9642,7 +9642,7 @@
     },
     "/season": {
       "post": {
-        "operationId": "createSeason",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -9680,7 +9680,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllSeason",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -9713,7 +9713,7 @@
     },
     "/season/query": {
       "get": {
-        "operationId": "getQuerySeason",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -9801,7 +9801,7 @@
     },
     "/season/count": {
       "get": {
-        "operationId": "getCountSeason",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -9859,7 +9859,7 @@
     },
     "/season/{id}": {
       "get": {
-        "operationId": "getOneSeason",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -9896,7 +9896,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneSeason",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -9936,7 +9936,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneSeason",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -9968,7 +9968,7 @@
     },
     "/season/upload": {
       "post": {
-        "operationId": "uploadSeason",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -9991,7 +9991,7 @@
     },
     "/season/download/{filename}": {
       "get": {
-        "operationId": "downloadSeason",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -10023,7 +10023,7 @@
     },
     "/stadium": {
       "post": {
-        "operationId": "createStadium",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -10061,7 +10061,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllStadium",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -10094,7 +10094,7 @@
     },
     "/stadium/query": {
       "get": {
-        "operationId": "getQueryStadium",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -10182,7 +10182,7 @@
     },
     "/stadium/count": {
       "get": {
-        "operationId": "getCountStadium",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -10240,7 +10240,7 @@
     },
     "/stadium/{id}": {
       "get": {
-        "operationId": "getOneStadium",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -10277,7 +10277,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneStadium",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -10317,7 +10317,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneStadium",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -10349,7 +10349,7 @@
     },
     "/stadium/upload": {
       "post": {
-        "operationId": "uploadStadium",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -10372,7 +10372,7 @@
     },
     "/stadium/download/{filename}": {
       "get": {
-        "operationId": "downloadStadium",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -10404,7 +10404,7 @@
     },
     "/substitution": {
       "post": {
-        "operationId": "createSubstitution",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -10442,7 +10442,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllSubstitution",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -10475,7 +10475,7 @@
     },
     "/substitution/query": {
       "get": {
-        "operationId": "getQuerySubstitution",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -10563,7 +10563,7 @@
     },
     "/substitution/count": {
       "get": {
-        "operationId": "getCountSubstitution",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -10621,7 +10621,7 @@
     },
     "/substitution/{id}": {
       "get": {
-        "operationId": "getOneSubstitution",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -10658,7 +10658,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneSubstitution",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -10698,7 +10698,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneSubstitution",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -10730,7 +10730,7 @@
     },
     "/substitution/upload": {
       "post": {
-        "operationId": "uploadSubstitution",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -10753,7 +10753,7 @@
     },
     "/substitution/download/{filename}": {
       "get": {
-        "operationId": "downloadSubstitution",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -10785,7 +10785,7 @@
     },
     "/team": {
       "post": {
-        "operationId": "createTeam",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -10823,7 +10823,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllTeam",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -10856,7 +10856,7 @@
     },
     "/team/query": {
       "get": {
-        "operationId": "getQueryTeam",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -10944,7 +10944,7 @@
     },
     "/team/count": {
       "get": {
-        "operationId": "getCountTeam",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -11002,7 +11002,7 @@
     },
     "/team/{id}": {
       "get": {
-        "operationId": "getOneTeam",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -11039,7 +11039,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneTeam",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -11079,7 +11079,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneTeam",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -11111,7 +11111,7 @@
     },
     "/team/upload": {
       "post": {
-        "operationId": "uploadTeam",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -11134,7 +11134,7 @@
     },
     "/team/download/{filename}": {
       "get": {
-        "operationId": "downloadTeam",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -11166,7 +11166,7 @@
     },
     "/teamCompetitionSeason": {
       "post": {
-        "operationId": "createTeamCompetitionSeason",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11204,7 +11204,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllTeamCompetitionSeason",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -11237,7 +11237,7 @@
     },
     "/teamCompetitionSeason/query": {
       "get": {
-        "operationId": "getQueryTeamCompetitionSeason",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -11325,7 +11325,7 @@
     },
     "/teamCompetitionSeason/count": {
       "get": {
-        "operationId": "getCountTeamCompetitionSeason",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -11383,7 +11383,7 @@
     },
     "/teamCompetitionSeason/{id}": {
       "get": {
-        "operationId": "getOneTeamCompetitionSeason",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -11420,7 +11420,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneTeamCompetitionSeason",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -11460,7 +11460,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneTeamCompetitionSeason",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -11492,7 +11492,7 @@
     },
     "/teamCompetitionSeason/upload": {
       "post": {
-        "operationId": "uploadTeamCompetitionSeason",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -11515,7 +11515,7 @@
     },
     "/teamCompetitionSeason/download/{filename}": {
       "get": {
-        "operationId": "downloadTeamCompetitionSeason",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -11547,7 +11547,7 @@
     },
     "/ticket": {
       "post": {
-        "operationId": "createTicket",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11585,7 +11585,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllTicket",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -11618,7 +11618,7 @@
     },
     "/ticket/query": {
       "get": {
-        "operationId": "getQueryTicket",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -11706,7 +11706,7 @@
     },
     "/ticket/count": {
       "get": {
-        "operationId": "getCountTicket",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -11764,7 +11764,7 @@
     },
     "/ticket/{id}": {
       "get": {
-        "operationId": "getOneTicket",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -11801,7 +11801,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneTicket",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -11841,7 +11841,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneTicket",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -11873,7 +11873,7 @@
     },
     "/ticket/upload": {
       "post": {
-        "operationId": "uploadTicket",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -11896,7 +11896,7 @@
     },
     "/ticket/download/{filename}": {
       "get": {
-        "operationId": "downloadTicket",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -11928,7 +11928,7 @@
     },
     "/transfer": {
       "post": {
-        "operationId": "createTransfer",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11966,7 +11966,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllTransfer",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -11999,7 +11999,7 @@
     },
     "/transfer/query": {
       "get": {
-        "operationId": "getQueryTransfer",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -12087,7 +12087,7 @@
     },
     "/transfer/count": {
       "get": {
-        "operationId": "getCountTransfer",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -12145,7 +12145,7 @@
     },
     "/transfer/{id}": {
       "get": {
-        "operationId": "getOneTransfer",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -12182,7 +12182,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneTransfer",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -12222,7 +12222,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneTransfer",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -12254,7 +12254,7 @@
     },
     "/transfer/upload": {
       "post": {
-        "operationId": "uploadTransfer",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -12277,7 +12277,7 @@
     },
     "/transfer/download/{filename}": {
       "get": {
-        "operationId": "downloadTransfer",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -12309,7 +12309,7 @@
     },
     "/trophy": {
       "post": {
-        "operationId": "createTrophy",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -12347,7 +12347,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllTrophy",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -12380,7 +12380,7 @@
     },
     "/trophy/query": {
       "get": {
-        "operationId": "getQueryTrophy",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -12468,7 +12468,7 @@
     },
     "/trophy/count": {
       "get": {
-        "operationId": "getCountTrophy",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -12526,7 +12526,7 @@
     },
     "/trophy/{id}": {
       "get": {
-        "operationId": "getOneTrophy",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -12563,7 +12563,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneTrophy",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -12603,7 +12603,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneTrophy",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -12635,7 +12635,7 @@
     },
     "/trophy/upload": {
       "post": {
-        "operationId": "uploadTrophy",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -12658,7 +12658,7 @@
     },
     "/trophy/download/{filename}": {
       "get": {
-        "operationId": "downloadTrophy",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
@@ -12690,7 +12690,7 @@
     },
     "/user": {
       "post": {
-        "operationId": "createUser",
+        "operationId": "create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -12728,7 +12728,7 @@
         ]
       },
       "get": {
-        "operationId": "getAllUser",
+        "operationId": "getAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -12761,7 +12761,7 @@
     },
     "/user/query": {
       "get": {
-        "operationId": "getQueryUser",
+        "operationId": "getQuery",
         "parameters": [
           {
             "name": "skip",
@@ -12849,7 +12849,7 @@
     },
     "/user/count": {
       "get": {
-        "operationId": "getCountUser",
+        "operationId": "getCount",
         "parameters": [
           {
             "name": "withDeleted",
@@ -12907,7 +12907,7 @@
     },
     "/user/{id}": {
       "get": {
-        "operationId": "getOneUser",
+        "operationId": "getOne",
         "parameters": [
           {
             "name": "id",
@@ -12944,7 +12944,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateOneUser",
+        "operationId": "updateOne",
         "parameters": [
           {
             "name": "id",
@@ -12984,7 +12984,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteOneUser",
+        "operationId": "deleteOne",
         "parameters": [
           {
             "name": "id",
@@ -13016,7 +13016,7 @@
     },
     "/user/upload": {
       "post": {
-        "operationId": "uploadUser",
+        "operationId": "upload",
         "parameters": [],
         "responses": {
           "201": {
@@ -13039,7 +13039,7 @@
     },
     "/user/download/{filename}": {
       "get": {
-        "operationId": "downloadUser",
+        "operationId": "download",
         "parameters": [
           {
             "name": "filename",
