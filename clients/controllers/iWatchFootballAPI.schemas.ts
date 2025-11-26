@@ -73,7 +73,7 @@ export type StatsBombControllerSyncData200 = {
   timestamp?: string;
 };
 
-export type GetCountParams = {
+export type GetCountUserParams = {
 /**
  * Include soft deleted records
  */
@@ -88,49 +88,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
-/**
- * Number of records to skip
- */
-skip?: number;
-/**
- * Number of records to take
- */
-take?: number;
-/**
- * Include soft deleted records
- */
-withDeleted?: boolean;
-/**
- * Load eager relations
- */
-loadEagerRelations?: boolean;
-/**
- * Use transaction
- */
-transaction?: boolean;
-/**
- * Query comment
- */
-comment?: string;
-};
-
-export type GetCountParams = {
-/**
- * Include soft deleted records
- */
-withDeleted?: boolean;
-/**
- * Use transaction
- */
-transaction?: boolean;
-/**
- * Query comment
- */
-comment?: string;
-};
-
-export type GetQueryParams = {
+export type GetQueryUserParams = {
 /**
  * Number of records to skip
  */
@@ -157,7 +115,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountTrophyParams = {
 /**
  * Include soft deleted records
  */
@@ -172,7 +130,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryTrophyParams = {
 /**
  * Number of records to skip
  */
@@ -199,7 +157,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountTransferParams = {
 /**
  * Include soft deleted records
  */
@@ -214,7 +172,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryTransferParams = {
 /**
  * Number of records to skip
  */
@@ -241,7 +199,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountTicketParams = {
 /**
  * Include soft deleted records
  */
@@ -256,7 +214,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryTicketParams = {
 /**
  * Number of records to skip
  */
@@ -283,7 +241,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountTeamCompetitionSeasonParams = {
 /**
  * Include soft deleted records
  */
@@ -298,7 +256,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryTeamCompetitionSeasonParams = {
 /**
  * Number of records to skip
  */
@@ -325,7 +283,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountTeamParams = {
 /**
  * Include soft deleted records
  */
@@ -340,7 +298,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryTeamParams = {
 /**
  * Number of records to skip
  */
@@ -367,7 +325,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountSubstitutionParams = {
 /**
  * Include soft deleted records
  */
@@ -382,7 +340,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQuerySubstitutionParams = {
 /**
  * Number of records to skip
  */
@@ -409,7 +367,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountStadiumParams = {
 /**
  * Include soft deleted records
  */
@@ -424,7 +382,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryStadiumParams = {
 /**
  * Number of records to skip
  */
@@ -451,7 +409,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountSeasonParams = {
 /**
  * Include soft deleted records
  */
@@ -466,7 +424,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQuerySeasonParams = {
 /**
  * Number of records to skip
  */
@@ -493,7 +451,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountRefereeParams = {
 /**
  * Include soft deleted records
  */
@@ -508,7 +466,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryRefereeParams = {
 /**
  * Number of records to skip
  */
@@ -535,7 +493,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountPredictionParams = {
 /**
  * Include soft deleted records
  */
@@ -550,7 +508,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryPredictionParams = {
 /**
  * Number of records to skip
  */
@@ -577,7 +535,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountPositionParams = {
 /**
  * Include soft deleted records
  */
@@ -592,7 +550,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryPositionParams = {
 /**
  * Number of records to skip
  */
@@ -619,7 +577,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountPlayerLineUpParams = {
 /**
  * Include soft deleted records
  */
@@ -634,7 +592,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryPlayerLineUpParams = {
 /**
  * Number of records to skip
  */
@@ -661,7 +619,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountPlayerParams = {
 /**
  * Include soft deleted records
  */
@@ -676,7 +634,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryPlayerParams = {
 /**
  * Number of records to skip
  */
@@ -703,7 +661,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountLoyaltyEventParams = {
 /**
  * Include soft deleted records
  */
@@ -718,7 +676,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryLoyaltyEventParams = {
 /**
  * Number of records to skip
  */
@@ -745,7 +703,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountLoyaltySchemeParams = {
 /**
  * Include soft deleted records
  */
@@ -760,7 +718,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryLoyaltySchemeParams = {
 /**
  * Number of records to skip
  */
@@ -787,7 +745,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountTransactionParams = {
 /**
  * Include soft deleted records
  */
@@ -802,7 +760,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryTransactionParams = {
 /**
  * Number of records to skip
  */
@@ -829,7 +787,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountCreditParams = {
 /**
  * Include soft deleted records
  */
@@ -844,7 +802,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryCreditParams = {
 /**
  * Number of records to skip
  */
@@ -871,7 +829,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountPaymentProviderParams = {
 /**
  * Include soft deleted records
  */
@@ -886,7 +844,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryPaymentProviderParams = {
 /**
  * Number of records to skip
  */
@@ -913,7 +871,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountPaymentParams = {
 /**
  * Include soft deleted records
  */
@@ -928,7 +886,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryPaymentParams = {
 /**
  * Number of records to skip
  */
@@ -955,7 +913,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountNewsArticleParams = {
 /**
  * Include soft deleted records
  */
@@ -970,7 +928,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryNewsArticleParams = {
 /**
  * Number of records to skip
  */
@@ -997,7 +955,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountManagerEmploymentParams = {
 /**
  * Include soft deleted records
  */
@@ -1012,7 +970,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryManagerEmploymentParams = {
 /**
  * Number of records to skip
  */
@@ -1039,7 +997,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountManagerParams = {
 /**
  * Include soft deleted records
  */
@@ -1054,7 +1012,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryManagerParams = {
 /**
  * Number of records to skip
  */
@@ -1081,7 +1039,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountLogParams = {
 /**
  * Include soft deleted records
  */
@@ -1096,7 +1054,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryLogParams = {
 /**
  * Number of records to skip
  */
@@ -1123,7 +1081,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountLineUpParams = {
 /**
  * Include soft deleted records
  */
@@ -1138,7 +1096,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryLineUpParams = {
 /**
  * Number of records to skip
  */
@@ -1165,7 +1123,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountInjuryParams = {
 /**
  * Include soft deleted records
  */
@@ -1180,7 +1138,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryInjuryParams = {
 /**
  * Number of records to skip
  */
@@ -1207,7 +1165,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountGoalParams = {
 /**
  * Include soft deleted records
  */
@@ -1222,7 +1180,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryGoalParams = {
 /**
  * Number of records to skip
  */
@@ -1249,7 +1207,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountGenericTokenParams = {
 /**
  * Include soft deleted records
  */
@@ -1264,7 +1222,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryGenericTokenParams = {
 /**
  * Number of records to skip
  */
@@ -1291,7 +1249,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountFixtureRefereeParams = {
 /**
  * Include soft deleted records
  */
@@ -1306,7 +1264,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryFixtureRefereeParams = {
 /**
  * Number of records to skip
  */
@@ -1333,7 +1291,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountFixtureParams = {
 /**
  * Include soft deleted records
  */
@@ -1348,7 +1306,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryFixtureParams = {
 /**
  * Number of records to skip
  */
@@ -1375,7 +1333,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountCompetitionParams = {
 /**
  * Include soft deleted records
  */
@@ -1390,7 +1348,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryCompetitionParams = {
 /**
  * Number of records to skip
  */
@@ -1417,7 +1375,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountCommsPreferenceParams = {
 /**
  * Include soft deleted records
  */
@@ -1432,7 +1390,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryCommsPreferenceParams = {
 /**
  * Number of records to skip
  */
@@ -1459,7 +1417,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountParams = {
+export type GetCountCardParams = {
 /**
  * Include soft deleted records
  */
@@ -1474,7 +1432,49 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryParams = {
+export type GetQueryCardParams = {
+/**
+ * Number of records to skip
+ */
+skip?: number;
+/**
+ * Number of records to take
+ */
+take?: number;
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Load eager relations
+ */
+loadEagerRelations?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetCountAddressParams = {
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetQueryAddressParams = {
 /**
  * Number of records to skip
  */

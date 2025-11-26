@@ -1,4 +1,4 @@
-import {ApiBody, ApiOkResponse, ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
+import {ApiBody, ApiOkResponse, ApiOperation, ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
 import {Body, Module, Post, Response} from '@nestjs/common';
 import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
@@ -61,6 +61,7 @@ export class AuthController {
 
     @Post('login')
     @Public()
+    @ApiOperation({summary: 'Login user', operationId: 'login'})
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: LoginBody})
     async login(@Body() auth: LoginBody, @Response() response: FastifyReply) {
@@ -106,6 +107,7 @@ export class AuthController {
 
     @Post('register')
     @Public()
+    @ApiOperation({summary: 'Register new user', operationId: 'register'})
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: RegisterBody})
     async register(@Body() register: RegisterBody, @Response() response: FastifyReply): Promise<User | undefined> {

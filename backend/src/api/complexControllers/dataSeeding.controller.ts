@@ -1,4 +1,4 @@
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Module, Post, Response } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { NoAuthController } from "@iWatchFootball/base-tools/decorators/controller.decorator";
@@ -44,6 +44,7 @@ export class DataSeedingController {
     }
 
     @Post('teams')
+    @ApiOperation({summary: 'Seed teams data', operationId: 'seedTeams'})
     @ApiBody({ type: 'any' })
     async teams(@Response() response: FastifyReply) {
         try {
@@ -72,6 +73,7 @@ export class DataSeedingController {
     }
 
     @Post('leagues')
+    @ApiOperation({summary: 'Seed leagues data', operationId: 'seedLeagues'})
     @ApiBody({ type: 'any' })
     async leagues(@Response() response: FastifyReply) {
         try {
@@ -100,6 +102,7 @@ export class DataSeedingController {
     }
 
     @Post('fixtures')
+    @ApiOperation({summary: 'Seed fixtures data', operationId: 'seedFixtures'})
     @ApiBody({ type: 'any' })
     async fixtures(@Response() response: FastifyReply) {
         try {
@@ -128,6 +131,7 @@ export class DataSeedingController {
     }
 
     @Post('standings')
+    @ApiOperation({summary: 'Seed standings data', operationId: 'seedStandings'})
     @ApiBody({ type: 'any' })
     async standings(@Response() response: FastifyReply) {
         try {
@@ -155,6 +159,7 @@ export class DataSeedingController {
     }
 
     @Post('players')
+    @ApiOperation({summary: 'Seed players data', operationId: 'seedPlayers'})
     @ApiBody({ type: 'any' })
     async players(@Response() response: FastifyReply) {
         try {

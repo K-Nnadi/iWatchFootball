@@ -58,7 +58,7 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         }
 
         @Post()
-        @ApiOperation({summary: `Create ${entity.name}`, operationId: `create`})
+        @ApiOperation({summary: `Create ${entity.name}`, operationId: `create${entity.name}`})
         @ApiOkResponse({type: entity})
         @ApiBody({type: createDTO})
         create(@Body() entity: typeof createDTO) {
@@ -66,14 +66,14 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         }
 
         @Get()
-        @ApiOperation({summary: `Get all ${entity.name}s`, operationId: `getAll`})
+        @ApiOperation({summary: `Get all ${entity.name}s`, operationId: `getAll${entity.name}`})
         @ApiOkResponse({type: entity, isArray: true})
         getAll() {
             return this.service.getAll();
         }
 
         @Get('query')
-        @ApiOperation({summary: `Get all ${entity.name}s`, operationId: `getQuery`})
+        @ApiOperation({summary: `Get all ${entity.name}s`, operationId: `getQuery${entity.name}`})
         @ApiOkResponse({type: entity, isArray: true})
         @ApiQuery({name: 'skip', required: false, type: Number, description: 'Number of records to skip'})
         @ApiQuery({name: 'take', required: false, type: Number, description: 'Number of records to take'})
@@ -94,7 +94,7 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         }
 
         @Get('count')
-        @ApiOperation({summary: `Get count of ${entity.name}s`, operationId: `getCount`})
+        @ApiOperation({summary: `Get count of ${entity.name}s`, operationId: `getCount${entity.name}`})
         @ApiOkResponse({type: Number, description: 'Total count of entities'})
         @ApiQuery({name: 'withDeleted', required: false, type: Boolean, description: 'Include soft deleted records'})
         @ApiQuery({name: 'transaction', required: false, type: Boolean, description: 'Use transaction'})
@@ -116,28 +116,28 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         }
 
         @Get(':id')
-        @ApiOperation({summary: `Get one ${entity.name}`, operationId: `getOne`})
+        @ApiOperation({summary: `Get one ${entity.name}`, operationId: `getOne${entity.name}`})
         @ApiOkResponse({type: entity})
         getOne(@Param('id') id: number) {
             return this.service.getOne(+id);
         }
 
         @Patch(':id')
-        @ApiOperation({summary: `Update one ${entity.name}`, operationId: `updateOne`})
+        @ApiOperation({summary: `Update one ${entity.name}`, operationId: `updateOne${entity.name}`})
         @ApiBody({type: entity})
         update(@Param('id') id: number, @Body() entity: DeepPartial<T>) {
             return this.service.update(+id, entity);
         }
 
         @Delete(':id')
-        @ApiOperation({summary: `Delete one ${entity.name}`, operationId: `deleteOne`})
+        @ApiOperation({summary: `Delete one ${entity.name}`, operationId: `deleteOne${entity.name}`})
         delete(@Param('id') id: number) {
             return this.service.delete(+id);
         }
 
         // File Upload (FastifyMultipart)
         @Post('upload')
-        @ApiOperation({summary: `Upload a file for ${entity.name}`, operationId: `upload`})
+        @ApiOperation({summary: `Upload a file for ${entity.name}`, operationId: `upload${entity.name}`})
         @ApiConsumes('multipart/form-data')
         async uploadFile(@Req() request: FastifyRequest) {
             const data = await (request as any).file(); // FastifyMultipart handles this
@@ -157,7 +157,7 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
 
         // File Download (Fastify Static)
         @Get('download/:filename')
-        @ApiOperation({summary: `Download file related to ${entity.name}`, operationId: `download`})
+        @ApiOperation({summary: `Download file related to ${entity.name}`, operationId: `download${entity.name}`})
         async downloadFile(@Param('filename') filename: string, @Res() response: FastifyReply) {
             const filePath = path.join(__dirname, '..', 'uploads', filename);
 

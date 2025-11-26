@@ -13483,7 +13483,7 @@
     },
     "/auth/login": {
       "post": {
-        "operationId": "AuthController_login",
+        "operationId": "login",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -13507,6 +13507,7 @@
             }
           }
         },
+        "summary": "Login user",
         "tags": [
           "auth"
         ]
@@ -13514,7 +13515,7 @@
     },
     "/auth/register": {
       "post": {
-        "operationId": "AuthController_register",
+        "operationId": "register",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -13538,6 +13539,7 @@
             }
           }
         },
+        "summary": "Register new user",
         "tags": [
           "auth"
         ]

@@ -17,10 +17,14 @@ export const clientInstance = <T>(config: ApiRequestOptions): Promise<T> => {
   const axiosConfig: AxiosRequestConfig = {
     url: config.url,
     method: config.method,
-    headers: config.headers,
+    headers: {
+      ...config.headers,
+    },
     data: config.data,
     params: config.params,
     signal: config.signal,
+    // Use axios defaults for baseURL and withCredentials
+    // These are set in the frontend's configureApiClient()
   };
 
   return axios.request<T>(axiosConfig).then((response) => response.data);

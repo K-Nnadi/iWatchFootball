@@ -23,7 +23,10 @@ import { clientInstance } from '../client-instance';
 
 
 
-export const authControllerLogin = (
+/**
+ * @summary Login user
+ */
+export const login = (
     loginBody: LoginBody,
  ) => {
       
@@ -38,18 +41,18 @@ export const authControllerLogin = (
   
 
 
-export const getAuthControllerLoginMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginBody}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginBody}, TContext> => {
+export const getLoginMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,{data: LoginBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,{data: LoginBody}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerLogin>>, {data: LoginBody}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof login>>, {data: LoginBody}> = (props) => {
           const {data} = props ?? {};
 
-          return  authControllerLogin(data,)
+          return  login(data,)
         }
 
         
@@ -57,24 +60,30 @@ const {mutation: mutationOptions} = options ?? {};
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AuthControllerLoginMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerLogin>>>
-    export type AuthControllerLoginMutationBody = LoginBody
-    export type AuthControllerLoginMutationError = unknown
+    export type LoginMutationResult = NonNullable<Awaited<ReturnType<typeof login>>>
+    export type LoginMutationBody = LoginBody
+    export type LoginMutationError = unknown
 
-    export const useAuthControllerLogin = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginBody}, TContext>, }
+    /**
+ * @summary Login user
+ */
+export const useLogin = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,{data: LoginBody}, TContext>, }
 ): UseMutationResult<
-        Awaited<ReturnType<typeof authControllerLogin>>,
+        Awaited<ReturnType<typeof login>>,
         TError,
         {data: LoginBody},
         TContext
       > => {
 
-      const mutationOptions = getAuthControllerLoginMutationOptions(options);
+      const mutationOptions = getLoginMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
-    export const authControllerRegister = (
+    /**
+ * @summary Register new user
+ */
+export const register = (
     registerBody: RegisterBody,
  ) => {
       
@@ -89,18 +98,18 @@ const {mutation: mutationOptions} = options ?? {};
   
 
 
-export const getAuthControllerRegisterMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterBody}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterBody}, TContext> => {
+export const getRegisterMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,{data: RegisterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,{data: RegisterBody}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerRegister>>, {data: RegisterBody}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof register>>, {data: RegisterBody}> = (props) => {
           const {data} = props ?? {};
 
-          return  authControllerRegister(data,)
+          return  register(data,)
         }
 
         
@@ -108,20 +117,23 @@ const {mutation: mutationOptions} = options ?? {};
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AuthControllerRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerRegister>>>
-    export type AuthControllerRegisterMutationBody = RegisterBody
-    export type AuthControllerRegisterMutationError = unknown
+    export type RegisterMutationResult = NonNullable<Awaited<ReturnType<typeof register>>>
+    export type RegisterMutationBody = RegisterBody
+    export type RegisterMutationError = unknown
 
-    export const useAuthControllerRegister = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterBody}, TContext>, }
+    /**
+ * @summary Register new user
+ */
+export const useRegister = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,{data: RegisterBody}, TContext>, }
 ): UseMutationResult<
-        Awaited<ReturnType<typeof authControllerRegister>>,
+        Awaited<ReturnType<typeof register>>,
         TError,
         {data: RegisterBody},
         TContext
       > => {
 
-      const mutationOptions = getAuthControllerRegisterMutationOptions(options);
+      const mutationOptions = getRegisterMutationOptions(options);
 
       return useMutation(mutationOptions);
     }

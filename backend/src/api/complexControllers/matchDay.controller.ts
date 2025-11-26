@@ -1,4 +1,4 @@
-import {ApiOkResponse, ApiProperty} from '@nestjs/swagger';
+import {ApiOkResponse, ApiOperation, ApiProperty} from '@nestjs/swagger';
 import {Get, Module, Param} from '@nestjs/common';
 import {AuthedController} from '@iWatchFootball/base-tools/decorators/controller.decorator';
 import {Fixture} from '../modules/fixture/fixture';
@@ -42,6 +42,7 @@ export class MatchDayController {
     }
 
     @Get(':fixtureId/complete')
+    @ApiOperation({summary: 'Get complete match day data for a fixture', operationId: 'getCompleteMatchData'})
     @ApiOkResponse({type: MatchDayResponse})
     async getCompleteMatchData(@Param('fixtureId') fixtureId: number): Promise<MatchDayResponse> {
         const [fixture] = await this.fixtureService.getQuery({

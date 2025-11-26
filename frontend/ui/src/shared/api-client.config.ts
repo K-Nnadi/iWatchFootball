@@ -1,4 +1,4 @@
-import { OpenAPI } from '@iWatchFootball/clients/requests';
+import axios from 'axios';
 
 /**
  * Configure the API client with base URL and authentication
@@ -6,17 +6,39 @@ import { OpenAPI } from '@iWatchFootball/clients/requests';
  */
 export function configureApiClient() {
   // Set the base URL from environment variable
-  OpenAPI.BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  
+  // Configure axios defaults
+  axios.defaults.baseURL = baseURL;
+  axios.defaults.withCredentials = true;
 
-  // Configure token handling for authenticated requests
-  // Uncomment and adjust when you implement authentication
-  // OpenAPI.TOKEN = async () => {
-  //   const token = localStorage.getItem('authToken');
-  //   return token || '';
-  // };
+  // Configure request interceptor for authentication
+  axios.interceptors.request.use(
+    (config) => {
+      // Add auth token if available
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
-  // Optional: Configure credentials
-  OpenAPI.WITH_CREDENTIALS = true;
-  OpenAPI.CREDENTIALS = 'include';
+  // Configure response interceptor for error handling
+  axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      // Handle 401 unauthorized - redirect to login
+      if (error.response?.status === 401) {
+        localStorage.removeItem('authToken');
+        // Optionally redirect to login page
+        // window.location.href = '/login';
+      }
+      return Promise.reject(error);
+    }
+  );
 }
 

@@ -20,8 +20,8 @@ import type {
 } from '@tanstack/react-query'
 import type {
   CreateUserDTO,
-  GetCountParams,
-  GetQueryParams,
+  GetCountUserParams,
+  GetQueryUserParams,
   User
 } from './iWatchFootballAPI.schemas'
 import { clientInstance } from '../client-instance';
@@ -32,7 +32,7 @@ import { clientInstance } from '../client-instance';
 /**
  * @summary Create User
  */
-export const create = (
+export const createUser = (
     createUserDTO: CreateUserDTO,
  ) => {
       
@@ -47,18 +47,18 @@ export const create = (
   
 
 
-export const getCreateMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,{data: CreateUserDTO}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,{data: CreateUserDTO}, TContext> => {
+export const getCreateUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserDTO}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserDTO}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof create>>, {data: CreateUserDTO}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, {data: CreateUserDTO}> = (props) => {
           const {data} = props ?? {};
 
-          return  create(data,)
+          return  createUser(data,)
         }
 
         
@@ -66,30 +66,30 @@ const {mutation: mutationOptions} = options ?? {};
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type CreateMutationResult = NonNullable<Awaited<ReturnType<typeof create>>>
-    export type CreateMutationBody = CreateUserDTO
-    export type CreateMutationError = void
+    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
+    export type CreateUserMutationBody = CreateUserDTO
+    export type CreateUserMutationError = void
 
     /**
  * @summary Create User
  */
-export const useCreate = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,{data: CreateUserDTO}, TContext>, }
+export const useCreateUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserDTO}, TContext>, }
 ): UseMutationResult<
-        Awaited<ReturnType<typeof create>>,
+        Awaited<ReturnType<typeof createUser>>,
         TError,
         {data: CreateUserDTO},
         TContext
       > => {
 
-      const mutationOptions = getCreateMutationOptions(options);
+      const mutationOptions = getCreateUserMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
     /**
  * @summary Get all Users
  */
-export const getAll = (
+export const getAllUser = (
     
  signal?: AbortSignal
 ) => {
@@ -102,41 +102,41 @@ export const getAll = (
     }
   
 
-export const getGetAllQueryKey = () => {
+export const getGetAllUserQueryKey = () => {
     return [`/user`] as const;
     }
 
     
-export const getGetAllQueryOptions = <TData = Awaited<ReturnType<typeof getAll>>, TError = void>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAll>>, TError, TData>, }
+export const getGetAllUserQueryOptions = <TData = Awaited<ReturnType<typeof getAllUser>>, TError = void>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAllUser>>, TError, TData>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetAllQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetAllUserQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAll>>> = ({ signal }) => getAll(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllUser>>> = ({ signal }) => getAllUser(signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAll>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllUser>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type GetAllQueryResult = NonNullable<Awaited<ReturnType<typeof getAll>>>
-export type GetAllQueryError = void
+export type GetAllUserQueryResult = NonNullable<Awaited<ReturnType<typeof getAllUser>>>
+export type GetAllUserQueryError = void
 
 /**
  * @summary Get all Users
  */
-export const useGetAll = <TData = Awaited<ReturnType<typeof getAll>>, TError = void>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAll>>, TError, TData>, }
+export const useGetAllUser = <TData = Awaited<ReturnType<typeof getAllUser>>, TError = void>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAllUser>>, TError, TData>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
 
-  const queryOptions = getGetAllQueryOptions(options)
+  const queryOptions = getGetAllUserQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -150,8 +150,8 @@ export const useGetAll = <TData = Awaited<ReturnType<typeof getAll>>, TError = v
 /**
  * @summary Get all Users
  */
-export const getQuery = (
-    params?: GetQueryParams,
+export const getQueryUser = (
+    params?: GetQueryUserParams,
  signal?: AbortSignal
 ) => {
       
@@ -164,41 +164,41 @@ export const getQuery = (
     }
   
 
-export const getGetQueryQueryKey = (params?: GetQueryParams,) => {
+export const getGetQueryUserQueryKey = (params?: GetQueryUserParams,) => {
     return [`/user/query`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getGetQueryQueryOptions = <TData = Awaited<ReturnType<typeof getQuery>>, TError = void>(params?: GetQueryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuery>>, TError, TData>, }
+export const getGetQueryUserQueryOptions = <TData = Awaited<ReturnType<typeof getQueryUser>>, TError = void>(params?: GetQueryUserParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQueryUser>>, TError, TData>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetQueryQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetQueryUserQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuery>>> = ({ signal }) => getQuery(params, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQueryUser>>> = ({ signal }) => getQueryUser(params, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQuery>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQueryUser>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type GetQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getQuery>>>
-export type GetQueryQueryError = void
+export type GetQueryUserQueryResult = NonNullable<Awaited<ReturnType<typeof getQueryUser>>>
+export type GetQueryUserQueryError = void
 
 /**
  * @summary Get all Users
  */
-export const useGetQuery = <TData = Awaited<ReturnType<typeof getQuery>>, TError = void>(
- params?: GetQueryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuery>>, TError, TData>, }
+export const useGetQueryUser = <TData = Awaited<ReturnType<typeof getQueryUser>>, TError = void>(
+ params?: GetQueryUserParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQueryUser>>, TError, TData>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
 
-  const queryOptions = getGetQueryQueryOptions(params,options)
+  const queryOptions = getGetQueryUserQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -212,8 +212,8 @@ export const useGetQuery = <TData = Awaited<ReturnType<typeof getQuery>>, TError
 /**
  * @summary Get count of Users
  */
-export const getCount = (
-    params?: GetCountParams,
+export const getCountUser = (
+    params?: GetCountUserParams,
  signal?: AbortSignal
 ) => {
       
@@ -226,41 +226,41 @@ export const getCount = (
     }
   
 
-export const getGetCountQueryKey = (params?: GetCountParams,) => {
+export const getGetCountUserQueryKey = (params?: GetCountUserParams,) => {
     return [`/user/count`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getGetCountQueryOptions = <TData = Awaited<ReturnType<typeof getCount>>, TError = void>(params?: GetCountParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCount>>, TError, TData>, }
+export const getGetCountUserQueryOptions = <TData = Awaited<ReturnType<typeof getCountUser>>, TError = void>(params?: GetCountUserParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCountUser>>, TError, TData>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetCountQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetCountUserQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCount>>> = ({ signal }) => getCount(params, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCountUser>>> = ({ signal }) => getCountUser(params, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCount>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCountUser>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type GetCountQueryResult = NonNullable<Awaited<ReturnType<typeof getCount>>>
-export type GetCountQueryError = void
+export type GetCountUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCountUser>>>
+export type GetCountUserQueryError = void
 
 /**
  * @summary Get count of Users
  */
-export const useGetCount = <TData = Awaited<ReturnType<typeof getCount>>, TError = void>(
- params?: GetCountParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCount>>, TError, TData>, }
+export const useGetCountUser = <TData = Awaited<ReturnType<typeof getCountUser>>, TError = void>(
+ params?: GetCountUserParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCountUser>>, TError, TData>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
 
-  const queryOptions = getGetCountQueryOptions(params,options)
+  const queryOptions = getGetCountUserQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -274,7 +274,7 @@ export const useGetCount = <TData = Awaited<ReturnType<typeof getCount>>, TError
 /**
  * @summary Get one User
  */
-export const getOne = (
+export const getOneUser = (
     id: number,
  signal?: AbortSignal
 ) => {
@@ -287,41 +287,41 @@ export const getOne = (
     }
   
 
-export const getGetOneQueryKey = (id: number,) => {
+export const getGetOneUserQueryKey = (id: number,) => {
     return [`/user/${id}`] as const;
     }
 
     
-export const getGetOneQueryOptions = <TData = Awaited<ReturnType<typeof getOne>>, TError = void>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOne>>, TError, TData>, }
+export const getGetOneUserQueryOptions = <TData = Awaited<ReturnType<typeof getOneUser>>, TError = void>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOneUser>>, TError, TData>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetOneQueryKey(id);
+  const queryKey =  queryOptions?.queryKey ?? getGetOneUserQueryKey(id);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOne>>> = ({ signal }) => getOne(id, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOneUser>>> = ({ signal }) => getOneUser(id, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOne>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOneUser>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type GetOneQueryResult = NonNullable<Awaited<ReturnType<typeof getOne>>>
-export type GetOneQueryError = void
+export type GetOneUserQueryResult = NonNullable<Awaited<ReturnType<typeof getOneUser>>>
+export type GetOneUserQueryError = void
 
 /**
  * @summary Get one User
  */
-export const useGetOne = <TData = Awaited<ReturnType<typeof getOne>>, TError = void>(
- id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOne>>, TError, TData>, }
+export const useGetOneUser = <TData = Awaited<ReturnType<typeof getOneUser>>, TError = void>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOneUser>>, TError, TData>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
 
-  const queryOptions = getGetOneQueryOptions(id,options)
+  const queryOptions = getGetOneUserQueryOptions(id,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -335,7 +335,7 @@ export const useGetOne = <TData = Awaited<ReturnType<typeof getOne>>, TError = v
 /**
  * @summary Update one User
  */
-export const updateOne = (
+export const updateOneUser = (
     id: number,
     user: User,
  ) => {
@@ -351,18 +351,18 @@ export const updateOne = (
   
 
 
-export const getUpdateOneMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOne>>, TError,{id: number;data: User}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof updateOne>>, TError,{id: number;data: User}, TContext> => {
+export const getUpdateOneUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOneUser>>, TError,{id: number;data: User}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateOneUser>>, TError,{id: number;data: User}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateOne>>, {id: number;data: User}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateOneUser>>, {id: number;data: User}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  updateOne(id,data,)
+          return  updateOneUser(id,data,)
         }
 
         
@@ -370,30 +370,30 @@ const {mutation: mutationOptions} = options ?? {};
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type UpdateOneMutationResult = NonNullable<Awaited<ReturnType<typeof updateOne>>>
-    export type UpdateOneMutationBody = User
-    export type UpdateOneMutationError = void
+    export type UpdateOneUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateOneUser>>>
+    export type UpdateOneUserMutationBody = User
+    export type UpdateOneUserMutationError = void
 
     /**
  * @summary Update one User
  */
-export const useUpdateOne = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOne>>, TError,{id: number;data: User}, TContext>, }
+export const useUpdateOneUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOneUser>>, TError,{id: number;data: User}, TContext>, }
 ): UseMutationResult<
-        Awaited<ReturnType<typeof updateOne>>,
+        Awaited<ReturnType<typeof updateOneUser>>,
         TError,
         {id: number;data: User},
         TContext
       > => {
 
-      const mutationOptions = getUpdateOneMutationOptions(options);
+      const mutationOptions = getUpdateOneUserMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
     /**
  * @summary Delete one User
  */
-export const deleteOne = (
+export const deleteOneUser = (
     id: number,
  ) => {
       
@@ -406,18 +406,18 @@ export const deleteOne = (
   
 
 
-export const getDeleteOneMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOne>>, TError,{id: number}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof deleteOne>>, TError,{id: number}, TContext> => {
+export const getDeleteOneUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOneUser>>, TError,{id: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteOneUser>>, TError,{id: number}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOne>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOneUser>>, {id: number}> = (props) => {
           const {id} = props ?? {};
 
-          return  deleteOne(id,)
+          return  deleteOneUser(id,)
         }
 
         
@@ -425,30 +425,30 @@ const {mutation: mutationOptions} = options ?? {};
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeleteOneMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOne>>>
+    export type DeleteOneUserMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOneUser>>>
     
-    export type DeleteOneMutationError = void
+    export type DeleteOneUserMutationError = void
 
     /**
  * @summary Delete one User
  */
-export const useDeleteOne = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOne>>, TError,{id: number}, TContext>, }
+export const useDeleteOneUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOneUser>>, TError,{id: number}, TContext>, }
 ): UseMutationResult<
-        Awaited<ReturnType<typeof deleteOne>>,
+        Awaited<ReturnType<typeof deleteOneUser>>,
         TError,
         {id: number},
         TContext
       > => {
 
-      const mutationOptions = getDeleteOneMutationOptions(options);
+      const mutationOptions = getDeleteOneUserMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
     /**
  * @summary Upload a file for User
  */
-export const upload = (
+export const uploadUser = (
     
  ) => {
       
@@ -461,18 +461,18 @@ export const upload = (
   
 
 
-export const getUploadMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upload>>, TError,void, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof upload>>, TError,void, TContext> => {
+export const getUploadUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadUser>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof uploadUser>>, TError,void, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upload>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadUser>>, void> = () => {
           
 
-          return  upload()
+          return  uploadUser()
         }
 
         
@@ -480,30 +480,30 @@ const {mutation: mutationOptions} = options ?? {};
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type UploadMutationResult = NonNullable<Awaited<ReturnType<typeof upload>>>
+    export type UploadUserMutationResult = NonNullable<Awaited<ReturnType<typeof uploadUser>>>
     
-    export type UploadMutationError = void
+    export type UploadUserMutationError = void
 
     /**
  * @summary Upload a file for User
  */
-export const useUpload = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upload>>, TError,void, TContext>, }
+export const useUploadUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadUser>>, TError,void, TContext>, }
 ): UseMutationResult<
-        Awaited<ReturnType<typeof upload>>,
+        Awaited<ReturnType<typeof uploadUser>>,
         TError,
         void,
         TContext
       > => {
 
-      const mutationOptions = getUploadMutationOptions(options);
+      const mutationOptions = getUploadUserMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
     /**
  * @summary Download file related to User
  */
-export const download = (
+export const downloadUser = (
     filename: string,
  signal?: AbortSignal
 ) => {
@@ -516,41 +516,41 @@ export const download = (
     }
   
 
-export const getDownloadQueryKey = (filename: string,) => {
+export const getDownloadUserQueryKey = (filename: string,) => {
     return [`/user/download/${filename}`] as const;
     }
 
     
-export const getDownloadQueryOptions = <TData = Awaited<ReturnType<typeof download>>, TError = void>(filename: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof download>>, TError, TData>, }
+export const getDownloadUserQueryOptions = <TData = Awaited<ReturnType<typeof downloadUser>>, TError = void>(filename: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadUser>>, TError, TData>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDownloadQueryKey(filename);
+  const queryKey =  queryOptions?.queryKey ?? getDownloadUserQueryKey(filename);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof download>>> = ({ signal }) => download(filename, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadUser>>> = ({ signal }) => downloadUser(filename, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(filename), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof download>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(filename), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadUser>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type DownloadQueryResult = NonNullable<Awaited<ReturnType<typeof download>>>
-export type DownloadQueryError = void
+export type DownloadUserQueryResult = NonNullable<Awaited<ReturnType<typeof downloadUser>>>
+export type DownloadUserQueryError = void
 
 /**
  * @summary Download file related to User
  */
-export const useDownload = <TData = Awaited<ReturnType<typeof download>>, TError = void>(
- filename: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof download>>, TError, TData>, }
+export const useDownloadUser = <TData = Awaited<ReturnType<typeof downloadUser>>, TError = void>(
+ filename: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadUser>>, TError, TData>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
 
-  const queryOptions = getDownloadQueryOptions(filename,options)
+  const queryOptions = getDownloadUserQueryOptions(filename,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
