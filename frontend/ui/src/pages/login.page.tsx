@@ -2,7 +2,6 @@ import {
 	Anchor,
 	Box,
 	Button,
-	Card,
 	Checkbox,
 	Container,
 	Flex,
@@ -12,11 +11,14 @@ import {
 	Text,
 	TextInput,
 	Title,
-	useMantineTheme
+	Alert
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useLogin } from '@iWatchFootball/clients/controllers/auth';
+import { useAuthStore } from '../shared/stores/auth.store';
+import { notifications } from '@mantine/notifications';
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const upperCase = /[A-Z]/;
@@ -27,9 +29,43 @@ export const passwordValidation = (value: string) => {
 
 export function LoginPage() {
 	const { navigateWithTransition } = usePageTransition();
-	const theme = useMantineTheme();
+	const { login: setAuthState } = useAuthStore();
 	const [rememberMe, setRememberMe] = useState(false);
 	const rememberMeLocalStorage = localStorage.getItem('rememberMe');
+
+	const loginMutation = useLogin({
+		mutation: {
+			onSuccess: (data) => {
+				if (data.access_token && data.user) {
+					setAuthState(data.access_token, data.user);
+					
+					if (rememberMe) {
+						localStorage.setItem('rememberMe', 'true');
+						localStorage.setItem('email', form.values.email);
+					} else {
+						localStorage.removeItem('rememberMe');
+						localStorage.removeItem('email');
+					}
+
+					notifications.show({
+						title: 'Success',
+						message: 'Logged in successfully!',
+						color: 'green',
+					});
+
+					navigateWithTransition('/');
+				}
+			},
+			onError: (error: any) => {
+				const errorMessage = error?.response?.data?.message || error?.message || 'Login failed. Please try again.';
+				notifications.show({
+					title: 'Login Failed',
+					message: errorMessage,
+					color: 'red',
+				});
+			},
+		},
+	});
 
 	const form = useForm({
 		initialValues: {
@@ -49,13 +85,17 @@ export function LoginPage() {
 		if (rememberMeLocalStorage === 'true') {
 			setRememberMe(true);
 			form.setFieldValue('email', localStorage.getItem('email') || '');
-			form.setFieldValue('password', localStorage.getItem('password') || '');
 		}
 	}, [rememberMeLocalStorage]);
 
-	const formSubmit = (values: any) => {
-		// Handle form submit logic here
-		// e.g. login(values)
+	const formSubmit = (values: { email: string; password: string }) => {
+		loginMutation.mutate({
+			data: {
+				email: values.email,
+				password: values.password,
+				userName: values.email // Using email as userName for login
+			}
+		});
 	};
 
 	return (
@@ -108,15 +148,28 @@ export function LoginPage() {
 						</Anchor>
 					</Flex>
 
+					{loginMutation.isError && (
+						<Alert color="red" mb="md">
+							Login failed. Please check your credentials and try again.
+						</Alert>
+					)}
+
 					<Group justify="center" mt="xl" gap="md">
-						<Button type="submit" fullWidth variant="filled" size="md">
+						<Button 
+							type="submit" 
+							fullWidth 
+							variant="filled" 
+							size="md"
+							loading={loginMutation.isPending}
+							disabled={loginMutation.isPending}
+						>
 							Login
 						</Button>
 						<Button
 							fullWidth
 							variant="outline"
 							size="md"
-							onClick={() => navigateWithTransition('/auth/sign-up')}
+							onClick={() => navigateWithTransition('/join')}
 						>
 							Sign up
 						</Button>

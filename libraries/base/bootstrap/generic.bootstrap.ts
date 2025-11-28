@@ -49,7 +49,7 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         console.log('📦 Step 5/7: Configuring CORS...');
         app.enableCors({
             origin: [
-                'http://localhost:8080',
+                'http://localhost:5173',
                 'https://iwatchfootball.web.app',
             ],
             credentials: true,

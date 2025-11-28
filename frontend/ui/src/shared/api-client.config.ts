@@ -31,11 +31,11 @@ export function configureApiClient() {
   axios.interceptors.response.use(
     (response) => response,
     (error) => {
-      // Handle 401 unauthorized - redirect to login
+      // Handle 401 unauthorized - clear auth data
       if (error.response?.status === 401) {
         localStorage.removeItem('authToken');
-        // Optionally redirect to login page
-        // window.location.href = '/login';
+        localStorage.removeItem('user');
+        // The auth store will update on next render/initialization
       }
       return Promise.reject(error);
     }

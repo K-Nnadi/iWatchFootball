@@ -19,11 +19,22 @@ import { useLocalStorage } from "@mantine/hooks";
 import { IconMail, IconUser, IconHeart, IconEdit, IconCheck, IconX } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useAuthStore } from '../shared/stores/auth.store';
+import { notifications } from '@mantine/notifications';
 import '../styles/modern.css';
 
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
-    const { isLoggedIn } = useAuthStore();
+    const { isLoggedIn, logout } = useAuthStore();
+
+    const handleLogout = () => {
+        logout();
+        notifications.show({
+            title: 'Signed Out',
+            message: 'You have been successfully signed out.',
+            color: 'blue',
+        });
+        navigateWithTransition('/');
+    };
 
     const [appColourScheme, setAppColourScheme] = useLocalStorage({
         key: 'color-scheme',
@@ -452,6 +463,29 @@ export function SettingsPage() {
                         Save Changes
                     </Button>
                 </Group>
+
+                {/* Sign Out Section - Only shown when logged in */}
+                {isLoggedIn && (
+                    <>
+                        <Divider my="xl" />
+                        <Group justify="flex-end">
+                            <Button 
+                                variant="outline" 
+                                onClick={handleLogout}
+                                style={{
+                                    borderColor: 'var(--mantine-color-red-6)',
+                                    color: 'var(--mantine-color-red-6)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    fontWeight: 600,
+                                    borderRadius: '0',
+                                }}
+                            >
+                                Sign Out
+                            </Button>
+                        </Group>
+                    </>
+                )}
                 </Stack>
             </Paper>
         </Container>

@@ -15,7 +15,12 @@ export function AppWrapper() {
     const width = 768;
 
     // Retrieve login state from a store or context
-    const { isLoggedIn } = useAuthStore(); // Adjust this based on your actual auth store logic
+    const { isLoggedIn, initializeAuth } = useAuthStore();
+
+    // Initialize auth state on mount
+    useEffect(() => {
+        initializeAuth();
+    }, [initializeAuth]);
 
     const collapsed = {
         desktop: true,
