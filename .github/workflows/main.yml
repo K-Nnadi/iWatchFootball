@@ -100,6 +100,8 @@ jobs:
             --cpu 1 \
             --min-instances 0 \
             --max-instances 10 \
+            --timeout 600 \
+            --cpu-boost \
             --set-env-vars NODE_ENV=production \
             --set-env-vars DATABASE_HOST=${{ secrets.DATABASE_HOST }} \
             --set-env-vars DATABASE_PORT=${{ secrets.DATABASE_PORT }} \
