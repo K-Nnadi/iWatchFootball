@@ -16,7 +16,7 @@ import {
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { usePageTransition } from '../hooks/usePageTransition';
-import { useLogin } from '@iWatchFootball/clients/controllers/auth';
+import { useLogin, type LoginMutationResult } from '@iWatchFootball/clients/controllers/auth';
 import { useAuthStore } from '../shared/stores/auth.store';
 import { notifications } from '@mantine/notifications';
 
@@ -35,13 +35,13 @@ export function LoginPage() {
 
 	const loginMutation = useLogin({
 		mutation: {
-			onSuccess: (data) => {
+			onSuccess: (data: LoginMutationResult) => {
 				if (data.access_token && data.user) {
 					setAuthState(data.access_token, data.user);
 					
 					if (rememberMe) {
 						localStorage.setItem('rememberMe', 'true');
-						localStorage.setItem('email', form.values.email);
+						localStorage.setItem('email', form.values.email.toLowerCase());
 					} else {
 						localStorage.removeItem('rememberMe');
 						localStorage.removeItem('email');
@@ -89,11 +89,12 @@ export function LoginPage() {
 	}, [rememberMeLocalStorage]);
 
 	const formSubmit = (values: { email: string; password: string }) => {
+		const emailLowercase = values.email.toLowerCase();
 		loginMutation.mutate({
 			data: {
-				email: values.email,
+				email: emailLowercase,
 				password: values.password,
-				userName: values.email // Using email as userName for login
+				userName: emailLowercase // Using email as userName for login
 			}
 		});
 	};

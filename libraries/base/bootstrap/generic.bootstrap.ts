@@ -131,8 +131,8 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         console.log(`   Attempting to listen on host: 0.0.0.0, port: ${port}`);
         
         // For Cloud Run, we need to listen on 0.0.0.0 to accept connections from outside the container
-        // Fastify with NestJS requires the options object format
-        await app.listen( port);
+        // NestJS Fastify listen method accepts port and host as separate arguments
+        await app.listen(port, '0.0.0.0');
         
         console.log('='.repeat(60));
         console.log(`✅ SUCCESS: Server is now running on port ${port}`);

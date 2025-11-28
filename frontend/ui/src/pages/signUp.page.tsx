@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { usePageTransition } from "../hooks/usePageTransition";
-import { useRegister } from "@iWatchFootball/clients/controllers/auth";
+import { useRegister, type RegisterMutationResult } from "@iWatchFootball/clients/controllers/auth";
 import { useAuthStore } from "../shared/stores/auth.store";
 import { notifications } from "@mantine/notifications";
 
@@ -28,7 +28,7 @@ export function SignUpPage() {
 
 	const registerMutation = useRegister({
 		mutation: {
-			onSuccess: (data) => {
+			onSuccess: (data: RegisterMutationResult) => {
 				if (data.access_token && data.user) {
 					setAuthState(data.access_token, data.user);
 					
@@ -81,7 +81,7 @@ export function SignUpPage() {
 	const formSubmit = (values: typeof form.values) => {
 		registerMutation.mutate({
 			data: {
-				email: values.email,
+				email: values.email.toLowerCase(),
 				firstName: values.firstName,
 				lastName: values.lastName,
 				userName: values.userName,

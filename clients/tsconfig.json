@@ -3,7 +3,7 @@
 	"include": [
 		"package.json",
 		"tsconfig.json",
-		"src/**/*"
+		"controllers/**/*"
 	],
 	"exclude": [
 		"node_modules",
@@ -20,6 +20,8 @@
 		}
 	],
 	"compilerOptions": {
-		"baseUrl": "./"
+		"baseUrl": "./",
+		"skipLibCheck": true,
+		"noImplicitAny": false
 	}
 }

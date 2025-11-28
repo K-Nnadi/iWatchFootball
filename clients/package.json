@@ -1,5 +1,8 @@
 {
 	"name": "@iWatchFootball/clients",
 	"version": "0.0.1",
-	"description": ""
+	"description": "",
+	"peerDependencies": {
+		"@tanstack/react-query": "^5.0.0"
+	}
 }

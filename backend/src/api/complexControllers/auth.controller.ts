@@ -76,7 +76,7 @@ export class AuthController {
         let user = null;
         if (auth.email) {
             const users = await this.userService.getQuery({
-                where: {email: auth.email}
+                where: {email: auth.email.toLowerCase()}
             });
             user = users[0];
         } else if (auth.userName) {
@@ -113,10 +113,13 @@ export class AuthController {
     async register(@Body() register: RegisterBody, @Response() response: FastifyReply): Promise<User | undefined> {
 
         const registerUser = register;
+        
+        // Convert email to lowercase
+        registerUser.email = register.email.toLowerCase();
         registerUser.password = await hash(register.password, parseInt(process.env.SALT_ROUNDS || '10'));
 
         // Check if user with email already exists
-        let [existingUserByEmail] = await this.userService.getQuery({where: {email: register.email}}) || [];
+        let [existingUserByEmail] = await this.userService.getQuery({where: {email: registerUser.email}}) || [];
 
         // Check if user with userName already exists
         let [existingUserByUserName] = await this.userService.getQuery({where: {userName: register.userName}}) || [];
