@@ -1,12 +1,9 @@
-import {NestFactory} from '@nestjs/core';
+import {NestFactory, Reflector} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {FastifyAdapter, NestFastifyApplication} from "@nestjs/platform-fastify";
 import {NestApplicationOptions} from "@nestjs/common";
-import { Reflector } from '@nestjs/core';
-import {writeFileSync} from "fs";
+import * as fs from "fs";
 import {getMetadataArgsStorage} from "typeorm";
-import * as fs from 'fs';
-
 
 
 export const SWAGGER_DOCUMENT =  new DocumentBuilder()
