@@ -18,6 +18,7 @@ import { FindOptionsWhere } from 'typeorm';
 import {CommsPreference} from "../commsPreference/commsPreference";
 import {Credit} from "../credit/credit";
 import {Transaction} from "../transaction/transaction";
+import {Team} from "../team/team";
 
 
 @Entity('user')
@@ -30,7 +31,7 @@ import {Transaction} from "../transaction/transaction";
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type'
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'
       ],
     },
     default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }), fields: ['id'] },
@@ -45,7 +46,14 @@ import {Transaction} from "../transaction/transaction";
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can update users
-      fields: ['firstName', 'lastName', 'userName', 'email', 'type'],
+      fields: ['firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'],
+    },
+    [UserRole.USER]: {
+      // Users can update their own favouriteTeamId
+      filter: (req: RequestWithUser): FindOptionsWhere<User> => {
+        return { id: req.user?.id };
+      },
+      fields: ['favouriteTeamId'],
     },
     default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }) },
   },
@@ -111,6 +119,18 @@ export class User extends BaseDbEntity {
         description: 'Transactions for this user'
     })
     transactions?: Promise<Transaction[]>;
+
+    @OptionalEntityColumn({db: {type: "int"}})
+    favouriteTeamId?: number;
+
+    @ApiPropertyOptional()
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Team,
+        joinOptions: {name: 'favouriteTeamId'},
+        description: 'User\'s favourite team'
+    })
+    favouriteTeam?: Promise<Team>;
 }
 
 export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {

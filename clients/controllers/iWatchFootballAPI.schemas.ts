@@ -1540,6 +1540,7 @@ export interface User {
   createdAt?: string;
   deletedAt?: string;
   email: string;
+  favouriteTeamId?: number;
   firstName: string;
   id: number;
   lastName: string;

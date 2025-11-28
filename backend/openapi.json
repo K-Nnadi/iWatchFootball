@@ -16507,6 +16507,9 @@
           },
           "commsPreference": {
             "$ref": "#/components/schemas/Promise"
+          },
+          "favouriteTeamId": {
+            "type": "number"
           }
         },
         "required": [

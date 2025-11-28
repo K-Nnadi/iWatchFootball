@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Container,
     Title,
@@ -7,6 +7,7 @@ import {
     Stack,
     Switch,
     Select,
+    Autocomplete,
     Button,
     Text,
     Avatar,
@@ -20,11 +21,14 @@ import { IconMail, IconUser, IconHeart, IconEdit, IconCheck, IconX } from '@tabl
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useAuthStore } from '../shared/stores/auth.store';
 import { notifications } from '@mantine/notifications';
+import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
+import { useUpdateOneUser } from '@iWatchFootball/clients/controllers/user';
+import type { Team } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import '../styles/modern.css';
 
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
-    const { isLoggedIn, logout } = useAuthStore();
+    const { isLoggedIn, logout, user } = useAuthStore();
 
     const handleLogout = () => {
         logout();
@@ -47,45 +51,98 @@ export function SettingsPage() {
     const [language, setLanguage] = useState('en');
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-    // Profile data (only used when logged in)
-    const [userData] = useState({
+    // Team search state
+    const [teamSearchValue, setTeamSearchValue] = useState('');
+    const [isEditingTeam, setIsEditingTeam] = useState(false);
+    const [selectedTeamId, setSelectedTeamId] = useState<number | null>(user?.favouriteTeamId || null);
+    const [favoriteTeamName, setFavoriteTeamName] = useState<string | null>(null);
+
+    // Fetch teams for search - fetch when editing or when user has a favorite team
+    const shouldFetchTeams = isEditingTeam || (user?.favouriteTeamId && !favoriteTeamName);
+    const { data: teamsData = [], isLoading: isLoadingTeams } = useGetQueryTeam(
+        { take: 100 },
+        {
+            query: {
+                enabled: shouldFetchTeams,
+            } as any
+        }
+    );
+
+    // Update favorite team name when teams data is loaded
+    useEffect(() => {
+        if (selectedTeamId && teamsData.length > 0 && !favoriteTeamName) {
+            const team = teamsData.find(t => t.id === selectedTeamId);
+            if (team) {
+                setFavoriteTeamName(team.name);
+            }
+        }
+    }, [selectedTeamId, teamsData, favoriteTeamName]);
+
+    // Update user mutation
+    const updateUserMutation = useUpdateOneUser({
+        mutation: {
+            onSuccess: () => {
+                notifications.show({
+                    title: 'Success',
+                    message: 'Favorite team updated successfully!',
+                    color: 'green',
+                });
+                setIsEditingTeam(false);
+                // Update favorite team name
+                if (selectedTeamId && teamsData.length > 0) {
+                    const team = teamsData.find(t => t.id === selectedTeamId);
+                    if (team) {
+                        setFavoriteTeamName(team.name);
+                    }
+                }
+                // Refresh user data by reloading from localStorage
+                if (user) {
+                    const updatedUser = { ...user, favouriteTeamId: selectedTeamId || undefined };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    // Update auth store
+                    useAuthStore.setState((state) => ({ ...state, user: updatedUser }));
+                }
+            },
+            onError: (error: any) => {
+                notifications.show({
+                    title: 'Error',
+                    message: error?.response?.data?.message || 'Failed to update favorite team',
+                    color: 'red',
+                });
+            },
+        },
+    });
+
+    // Get user data from auth store
+    const userData = user ? {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userName: user.userName,
+        email: user.email,
+    } : {
         firstName: 'John',
         lastName: 'Doe',
         userName: 'johndoe',
         email: 'john.doe@example.com',
-    });
+    };
 
-    const [favoriteTeam, setFavoriteTeam] = useLocalStorage<string | null>({
-        key: 'favorite-team',
-        defaultValue: null,
-    });
 
-    const [isEditingTeam, setIsEditingTeam] = useState(false);
-    const [selectedTeam, setSelectedTeam] = useState<string | null>(favoriteTeam);
+    // Filter teams based on search
+    const filteredTeams = useMemo(() => {
+        if (!teamsData) return [];
+        const searchLower = teamSearchValue.toLowerCase();
+        return teamsData
+            .filter(team => team.name.toLowerCase().includes(searchLower))
+            .slice(0, 20); // Limit to 20 results
+    }, [teamsData, teamSearchValue]);
 
-    // Mock teams list - replace with actual API call
-    const teams = [
-        'Arsenal',
-        'Chelsea',
-        'Liverpool',
-        'Manchester City',
-        'Manchester United',
-        'Tottenham',
-        'Newcastle',
-        'Brighton',
-        'Aston Villa',
-        'West Ham',
-        'Crystal Palace',
-        'Fulham',
-        'Brentford',
-        'Wolves',
-        'Everton',
-        'Nottingham Forest',
-        'Bournemouth',
-        'Burnley',
-        'Sheffield United',
-        'Luton Town'
-    ];
+    // Team options for Autocomplete
+    const teamOptions = useMemo(() => {
+        return filteredTeams.map(team => ({
+            value: team.id.toString(),
+            label: team.name,
+        }));
+    }, [filteredTeams]);
 
     // Get user initials for avatar
     const getInitials = (firstName: string, lastName: string) => {
@@ -102,9 +159,14 @@ export function SettingsPage() {
             isDarkMode, 
             language, 
             notificationsEnabled: isLoggedIn ? notificationsEnabled : undefined,
-            favoriteTeam: isLoggedIn ? favoriteTeam : undefined
+            favoriteTeam: isLoggedIn ? favoriteTeamName : undefined
         });
         // Save to store or backend
+        notifications.show({
+            title: 'Settings Saved',
+            message: 'Your settings have been saved.',
+            color: 'green',
+        });
     }
 
     const toggleColourScheme = (dark: boolean) => {
@@ -120,19 +182,43 @@ export function SettingsPage() {
 
     const handleEditTeam = () => {
         setIsEditingTeam(true);
-        setSelectedTeam(favoriteTeam);
+        setTeamSearchValue(favoriteTeamName || '');
+        // Reset selected team ID to current favorite
+        setSelectedTeamId(user?.favouriteTeamId || null);
     };
 
     const handleSaveTeam = () => {
-        if (selectedTeam) {
-            setFavoriteTeam(selectedTeam);
+        if (selectedTeamId && user) {
+            updateUserMutation.mutate({
+                id: user.id,
+                data: {
+                    ...user,
+                    favouriteTeamId: selectedTeamId,
+                },
+            });
+        } else {
+            setIsEditingTeam(false);
         }
-        setIsEditingTeam(false);
     };
 
     const handleCancelEdit = () => {
-        setSelectedTeam(favoriteTeam);
+        setTeamSearchValue(favoriteTeamName || '');
+        setSelectedTeamId(user?.favouriteTeamId || null);
         setIsEditingTeam(false);
+    };
+
+    const handleTeamSelect = (value: string | null) => {
+        if (value) {
+            const teamId = parseInt(value, 10);
+            setSelectedTeamId(teamId);
+            const selectedTeam = teamsData.find(t => t.id === teamId);
+            if (selectedTeam) {
+                setTeamSearchValue(selectedTeam.name);
+            }
+        } else {
+            setSelectedTeamId(null);
+            setTeamSearchValue('');
+        }
     };
 
     return (
@@ -300,13 +386,15 @@ export function SettingsPage() {
                                     </Group>
                                     {isEditingTeam ? (
                                         <Group gap="sm" style={{ paddingLeft: '28px' }}>
-                                            <Select
-                                                placeholder="Select your favorite team"
-                                                data={teams}
-                                                value={selectedTeam}
-                                                onChange={setSelectedTeam}
-                                                searchable
+                                            <Autocomplete
+                                                placeholder="Start typing to search for your favorite team"
+                                                data={teamOptions}
+                                                value={teamSearchValue}
+                                                onChange={setTeamSearchValue}
+                                                onOptionSubmit={handleTeamSelect}
                                                 style={{ flex: 1 }}
+                                                disabled={isLoadingTeams}
+                                                limit={20}
                                                 styles={{
                                                     input: {
                                                         backgroundColor: 'var(--modern-bg-primary)',
@@ -326,7 +414,8 @@ export function SettingsPage() {
                                             <ActionIcon
                                                 variant="filled"
                                                 onClick={handleSaveTeam}
-                                                disabled={!selectedTeam}
+                                                disabled={!selectedTeamId || updateUserMutation.isPending}
+                                                loading={updateUserMutation.isPending}
                                                 style={{
                                                     backgroundColor: 'var(--modern-lime)',
                                                     color: 'var(--modern-bg-primary)',
@@ -337,6 +426,7 @@ export function SettingsPage() {
                                             <ActionIcon
                                                 variant="subtle"
                                                 onClick={handleCancelEdit}
+                                                disabled={updateUserMutation.isPending}
                                                 style={{
                                                     color: 'var(--modern-text-secondary)',
                                                 }}
@@ -351,7 +441,7 @@ export function SettingsPage() {
                                                 paddingLeft: '28px',
                                             }}
                                         >
-                                            {favoriteTeam || 'Not set'}
+                                            {favoriteTeamName || 'Not set'}
                                         </Text>
                                     )}
                                 </Box>
