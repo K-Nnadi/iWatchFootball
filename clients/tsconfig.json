@@ -3,6 +3,7 @@
 	"include": [
 		"package.json",
 		"tsconfig.json",
+		"client-instance.ts",
 		"controllers/**/*"
 	],
 	"exclude": [
@@ -14,14 +15,13 @@
 	"references": [
 		{
 			"path": "../libraries/base"
-		},
-		{
-			"path": "../clients"
 		}
 	],
 	"compilerOptions": {
 		"baseUrl": "./",
 		"skipLibCheck": true,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"module": "ESNext",
+		"moduleResolution": "node"
 	}
 }

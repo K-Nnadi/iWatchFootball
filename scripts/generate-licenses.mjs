@@ -122,14 +122,14 @@ const dependenciesArray = Array.from(allDependencies.values());
 let fetched = 0;
 
 // Process in batches to avoid overwhelming npm registry
-const batchSize = 10;
+const batchSize = 20;
 for (let i = 0; i < dependenciesArray.length; i += batchSize) {
   const batch = dependenciesArray.slice(i, i + batchSize);
   const promises = batch.map(async (dep) => {
     const license = await fetchLicenseFromNpm(dep.name);
     dep.license = license;
     fetched++;
-    if (fetched % 10 === 0) {
+    if (fetched % 20 === 0) {
       console.log(`Fetched ${fetched}/${dependenciesArray.length} licenses...`);
     }
   });

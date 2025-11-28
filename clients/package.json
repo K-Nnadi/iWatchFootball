@@ -2,7 +2,18 @@
 	"name": "@iWatchFootball/clients",
 	"version": "0.0.1",
 	"description": "",
+	"type": "module",
+	"exports": {
+		"./client-instance": "./client-instance.js",
+		"./controllers/*": "./controllers/*.js"
+	},
+	"scripts": {
+		"build": "tsc"
+	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5.0.0"
+	},
+	"devDependencies": {
+		"@tanstack/react-query": "^5.32.0"
 	}
 }
