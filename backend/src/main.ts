@@ -15,7 +15,7 @@ console.log('✅ Environment variables loaded');
 // Log environment info (safely, without secrets)
 const envInfo = {
     NODE_ENV: process.env.NODE_ENV || 'not set',
-    PORT: process.env.PORT || 'not set',
+    PORT: process.env.PORT || 8080,
     DATABASE_HOST: process.env.DATABASE_HOST ? '***set***' : 'not set',
     DATABASE_PORT: process.env.DATABASE_PORT || 'not set',
     DATABASE_NAME: process.env.DATABASE_NAME ? '***set***' : 'not set',

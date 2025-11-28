@@ -133,12 +133,14 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         console.log('📦 Step 7/7: Starting server and binding to port...');
         console.log(`   Attempting to listen on host: 0.0.0.0, port: ${port}`);
         
-        await app.listen(port, '0.0.0.0');
+        // For Cloud Run, we need to listen on 0.0.0.0 to accept connections from outside the container
+        // Fastify with NestJS requires the options object format
+        await app.listen({ port, host: '0.0.0.0' });
         
         console.log('='.repeat(60));
         console.log(`✅ SUCCESS: Server is now running on port ${port}`);
-        console.log(`   Health check endpoint: http://localhost:${port}/health`);
-        console.log(`   API docs endpoint: http://localhost:${port}/api-docs`);
+        console.log(`   Health check endpoint: http://0.0.0.0:${port}/health`);
+        console.log(`   API docs endpoint: http://0.0.0.0:${port}/api-docs`);
         console.log('='.repeat(60));
     } catch (error: unknown) {
         console.error('='.repeat(60));
