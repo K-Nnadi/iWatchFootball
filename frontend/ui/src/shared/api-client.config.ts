@@ -6,7 +6,7 @@ import axios from 'axios';
  */
 export function configureApiClient() {
   // Set the base URL from environment variable
-  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   
   // Configure axios defaults
   axios.defaults.baseURL = baseURL;

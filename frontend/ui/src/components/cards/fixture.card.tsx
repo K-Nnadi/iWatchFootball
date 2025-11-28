@@ -64,7 +64,7 @@ export function LoggedFixtureCard({ fixtureId, homeTeam, awayTeam, homeScore, aw
         if (!fixtureId) return;
         // TODO: Implement actual ticket download API call
         // For now, we'll create a download link
-        const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/ticket/download/${fixtureId}`;
+        const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ticket/download/${fixtureId}`;
         window.open(apiUrl, '_blank');
     };
 
