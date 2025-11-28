@@ -6,6 +6,8 @@ runConfig:
   # concurrency: 80
   # cpu: 1
   # memoryMiB: 512
+  # timeoutSeconds: 600  # Request timeout (max 3600s, startup timeout is fixed at 4min)
+  # cpuBoost: true  # Enable CPU boost during startup for faster initialization
 
 # Environment variables and secrets.
 # env:
