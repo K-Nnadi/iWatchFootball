@@ -9,9 +9,9 @@ RUN npm install -g pnpm
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
+COPY frontend/ui/package.json ./frontend/ui/
 COPY clients/package.json ./clients/
-COPY libraries/package.json ./libraries/
+COPY libraries/base/package.json ./libraries/base/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -20,13 +20,18 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the applications
-RUN pnpm run build
+# Build shared library first
+RUN pnpm --filter @iWatchFootball/base-tools build
+# Build the backend
+RUN pnpm --filter @iWatchFootball/api build
+# Build the frontend
+RUN pnpm --filter @iWatchFootball/ui build
 
 # Frontend production stage with Nginx
 FROM nginx:alpine AS frontend-production
 
 # Copy the built frontend assets to Nginx serve directory
-COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+COPY --from=builder /app/frontend/ui/dist /usr/share/nginx/html
 
 EXPOSE 8080
 
@@ -41,7 +46,11 @@ RUN npm install -g pnpm
 # Copy built artifacts and necessary files
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 COPY --from=builder /app/backend/package.json ./backend/
+COPY --from=builder /app/clients/package.json ./clients/
+COPY --from=builder /app/libraries/base/package.json ./libraries/base/
 COPY --from=builder /app/backend/dist ./backend/dist
+COPY --from=builder /app/clients ./clients
+COPY --from=builder /app/libraries ./libraries
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile

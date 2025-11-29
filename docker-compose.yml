@@ -10,12 +10,9 @@ services:
       - "8080:8080"
     environment:
       - NODE_ENV=production
-    volumes:
-      - ./backend:/app/backend
-      - /app/backend/node_modules
     depends_on:
       - database
-    command: ["node", "backend/dist/main"]
+    command: ["node", "backend/dist/main.js"]
 
   frontend:
     build:
