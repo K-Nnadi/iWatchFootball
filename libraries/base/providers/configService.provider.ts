@@ -2,7 +2,6 @@ import {TypeOrmModuleOptions, TypeOrmOptionsFactory} from "@nestjs/typeorm";
 import {Injectable} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
 import {join} from "path";
-const entities = [join(__dirname, '../../', 'src/api/modules/**/*{.ts,.js}')];
 
 @Injectable()
 export class ConfigServiceProvider implements TypeOrmOptionsFactory {
@@ -10,34 +9,49 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 
 
 	createTypeOrmOptions(): TypeOrmModuleOptions {
-		const root = __dirname.includes('dist')
-			? join(__dirname, '../../') // in compiled build
-			: join(__dirname, '../../../'); // in dev
+		// In Docker/production: __dirname is /app/libraries/base/dist/providers
+		// In dev: __dirname is /app/libraries/base/providers
+		const isDist = __dirname.includes('dist');
+		const appRoot = isDist 
+			? join(__dirname, '../../../../') // /app (from /app/libraries/base/dist/providers -> ../../../../ = /app)
+			: join(__dirname, '../../../'); // /app (from /app/libraries/base/providers -> ../../../ = /app)
+
+		// Get values from ConfigService, fallback to process.env, then to defaults
+		const getEnv = (key: string, defaultValue?: string): string | undefined => {
+			const configValue = this.configService.get<string>(key);
+			const envValue = process.env[key];
+			const result = configValue || envValue || defaultValue;
+			// Debug logging for DATABASE_TYPE
+			if (key === 'DATABASE_TYPE' && !result) {
+				console.log(`⚠️  ${key} not found - configService: ${configValue}, process.env: ${envValue}, default: ${defaultValue}`);
+			}
+			return result;
+		};
 
 		const typeORMConfig = {
-			type: this.configService.get('DATABASE_TYPE'),
-			host: this.configService.get('DATABASE_HOST'),
-			port: this.configService.get('DATABASE_PORT'),
-			username: this.configService.get('DATABASE_USERNAME'),
+			type: getEnv('DATABASE_TYPE', 'postgres') as any,
+			host: getEnv('DATABASE_HOST', 'localhost'),
+			port: parseInt(getEnv('DATABASE_PORT', '5432') || '5432', 10),
+			username: getEnv('DATABASE_USERNAME', 'postgres'),
 			autoLoadEntities: true,
 			entities: [
-				// ✅ backend entities
-				join(root, 'src/api/modules/**/*{.ts,.js}'),
-				// ✅ shared library entities
-				join(root, '../libraries/base/**/*{.ts,.js}'),
+				// ✅ backend entities (compiled to .js in production)
+				join(appRoot, 'backend', isDist ? 'dist/src/api/modules/**/*.js' : 'src/api/modules/**/*{.ts,.js}'),
+				// ✅ shared library entities (if any)
+				join(appRoot, 'libraries', 'base', isDist ? 'dist/entity/**/*.js' : 'entity/**/*{.ts,.js}'),
 			],
 			// @ts-ignore
-			password: this.configService.get('DATABASE_PASSWORD'),
-			database: this.configService.get('DATABASE_NAME'),
+			password: getEnv('DATABASE_PASSWORD', 'postgres'),
+			database: getEnv('DATABASE_NAME', 'monorepo'),
 			logging: true,
-			synchronize: this.configService.get('DATABASE_SYNCHRONIZE') === 'true',
+			synchronize: (getEnv('DATABASE_SYNCHRONIZE') || 'false') === 'true',
 			migrationsRun: true,
-			migrations: [`src/shared/migrations/*{.ts,.js}`],
+			migrations: [join(appRoot, 'backend', isDist ? 'dist/src/shared/migrations/*.js' : 'src/shared/migrations/*{.ts,.js}')],
 			cli: {
-				migrationsDir: 'src/shared/migrations'
+				migrationsDir: join(appRoot, 'backend', 'src/shared/migrations')
 			},
 			// SSL configuration for remote PostgreSQL connections
-			ssl: this.configService.get('DATABASE_SSL') === 'true' ? {
+			ssl: (getEnv('DATABASE_SSL') || 'false') === 'true' ? {
 				rejectUnauthorized: false
 			} : false
 		}

@@ -65,12 +65,6 @@ export function EntityEnumColumn(opts?: EntityDecorator): ReturnType<typeof appl
  */
 export function EntityRelation(options: RelationshipOptions) {
 	const { type, entity, inverseSide, description, joinOptions } = options;
-
-
-	console.log("EntityRelation - Type:", type);
-	console.log("EntityRelation - Entity:", entity);
-	console.log("EntityRelation - InverseSide:", inverseSide);
-
 	if (!entity) {
 		throw new Error("EntityRelation: 'entity' is undefined. Make sure you're passing the correct class reference.");
 	}

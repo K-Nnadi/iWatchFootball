@@ -45,13 +45,13 @@ COPY backend/package.json ./backend/
 COPY clients/package.json ./clients/
 COPY libraries/base/package.json ./libraries/base/
 
-# Install only production dependencies
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-
-# Copy compiled output & runtime files from builder
+# Copy compiled output & runtime files from builder (needed for workspace linking)
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/clients ./clients
 COPY --from=builder /app/libraries ./libraries
+
+# Install only production dependencies (after copying libraries so workspace links work)
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # Create non-root user
 RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
@@ -65,4 +65,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:8080/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Run the backend service
-CMD ["node", "backend/dist/main.js"]
+CMD ["node", "backend/dist/src/main.js"]

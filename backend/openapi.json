@@ -13566,6 +13566,18 @@
       "CreateAddressDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "address1": {
             "type": "string",
             "description": "Primary address line",
@@ -13609,13 +13621,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "address1": {
             "type": "string",
@@ -13669,6 +13696,18 @@
       "CreateCardDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "fixtureId": {
             "type": "number"
           },
@@ -13696,13 +13735,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "fixtureId": {
             "type": "number"
@@ -13728,6 +13782,18 @@
       "CommsPreferenceDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "userId": {
             "type": "number"
           },
@@ -13835,13 +13901,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "userId": {
             "type": "number"
@@ -13951,6 +14032,18 @@
       "CreateCompetitionDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -13980,13 +14073,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -14025,6 +14133,18 @@
       "CreateFixtureDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "date": {
             "format": "date-time",
             "type": "string",
@@ -14108,13 +14228,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "date": {
             "format": "date-time",
@@ -14205,6 +14340,18 @@
       "CreateFixtureRefereeDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "fixtureId": {
             "type": "number"
           },
@@ -14233,13 +14380,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "fixtureId": {
             "type": "number"
@@ -14268,6 +14430,18 @@
       "CreateGenericTokenDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "token": {
             "type": "string"
           },
@@ -14301,13 +14475,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "token": {
             "type": "string"
@@ -14339,6 +14528,18 @@
       "CreateGoalDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "minute": {
             "type": "number"
           },
@@ -14375,13 +14576,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "minute": {
             "type": "number"
@@ -14419,6 +14635,18 @@
       "CreateInjuryDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "playerId": {
             "type": "number"
           },
@@ -14451,13 +14679,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "playerId": {
             "type": "number"
@@ -14488,6 +14731,18 @@
       "CreateLineUpDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "fixtureId": {
             "type": "number"
           },
@@ -14514,13 +14769,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "fixtureId": {
             "type": "number"
@@ -14549,6 +14819,18 @@
       "CreateLogDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "userId": {
             "type": "number"
           },
@@ -14578,13 +14860,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "userId": {
             "type": "number"
@@ -14614,6 +14911,18 @@
       "CreateManagerDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -14643,13 +14952,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -14685,6 +15009,18 @@
       "CreateManagerEmploymentDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "managerId": {
             "type": "number"
           },
@@ -14716,13 +15052,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "managerId": {
             "type": "number"
@@ -14760,6 +15111,18 @@
       "CreateNewsArticleDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "title": {
             "type": "string",
             "description": "Title of the news article",
@@ -14817,13 +15180,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "title": {
             "type": "string",
@@ -14908,13 +15286,21 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional configuration/metadata as JSON",
+            "example": {}
           },
           "name": {
             "type": "string",
@@ -14951,11 +15337,6 @@
             "type": "string",
             "description": "URL to the provider logo",
             "example": "/logos/stripe.svg"
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Additional configuration/metadata as JSON",
-            "example": {}
           }
         },
         "required": [
@@ -14974,13 +15355,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "method": {
             "type": "string"
@@ -15018,6 +15414,11 @@
       "CreatePaymentProviderDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Additional configuration/metadata as JSON",
+            "example": {}
+          },
           "name": {
             "type": "string",
             "description": "Display name of the payment provider",
@@ -15053,11 +15454,6 @@
             "type": "string",
             "description": "URL to the provider logo",
             "example": "/logos/stripe.svg"
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Additional configuration/metadata as JSON",
-            "example": {}
           }
         },
         "required": [
@@ -15094,13 +15490,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "balance": {
             "type": "number",
@@ -15162,13 +15573,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "type": {
             "type": "string",
@@ -15253,13 +15679,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "eventType": {
             "type": "string",
@@ -15342,13 +15783,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "eventType": {
             "type": "string",
@@ -15388,6 +15844,18 @@
       "CreatePlayerDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -15443,13 +15911,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -15533,6 +16016,18 @@
       "CreatePlayerLineUpDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "lineupId": {
             "type": "number"
           },
@@ -15563,13 +16058,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "lineup": {
             "$ref": "#/components/schemas/Promise"
@@ -15610,6 +16120,18 @@
       "CreatePositionDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -15638,13 +16160,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -15671,6 +16208,18 @@
       "CreatePredictionDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "userId": {
             "type": "number"
           },
@@ -15695,13 +16244,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "userId": {
             "type": "number"
@@ -15724,6 +16288,18 @@
       "CreateRefereeDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -15743,13 +16319,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -15774,6 +16365,18 @@
       "CreateSeasonDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "yearStart": {
             "type": "number"
           },
@@ -15793,13 +16396,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "yearStart": {
             "type": "number"
@@ -15824,6 +16442,18 @@
       "CreateStadiumDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -15859,13 +16489,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -15908,6 +16553,18 @@
       "CreateSubstitutionDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "fixtureId": {
             "type": "number"
           },
@@ -15930,13 +16587,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "playerLineup": {
             "$ref": "#/components/schemas/Promise"
@@ -15969,6 +16641,18 @@
       "CreateTeamDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -16020,13 +16704,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -16129,6 +16828,18 @@
       "CreateTeamCompetitionSeasonDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "teamId": {
             "type": "number"
           },
@@ -16158,13 +16869,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "teamId": {
             "type": "number"
@@ -16207,6 +16933,18 @@
       "CreateTicketDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "category": {
             "type": "string"
           },
@@ -16236,13 +16974,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "category": {
             "type": "string"
@@ -16273,6 +17026,18 @@
       "CreateTransferDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "playerId": {
             "type": "number"
           },
@@ -16307,13 +17072,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "playerId": {
             "type": "number"
@@ -16358,6 +17138,18 @@
       "CreateTrophyDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "name": {
             "type": "string"
           },
@@ -16389,13 +17181,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -16425,6 +17232,18 @@
       "CreateUserDTO": {
         "type": "object",
         "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
           "firstName": {
             "type": "string"
           },
@@ -16462,13 +17281,28 @@
             "type": "number"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
           "updatedAt": {
+            "format": "date-time",
             "type": "string"
           },
           "deletedAt": {
+            "format": "date-time",
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
           },
           "firstName": {
             "type": "string"
