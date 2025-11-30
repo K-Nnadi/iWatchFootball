@@ -26,14 +26,30 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 		const isCloudRun = !!(process.env.K_SERVICE || process.env.GAE_SERVICE);
 		const isDocker = !!(process.env.DOCKER_ENV === 'true' || fs.existsSync('/.dockerenv'));
 		
-		// Database host fallback: explicit env var -> Cloud Run -> Docker -> localhost
-		const defaultHost = getEnv('DATABASE_HOST') || 
-			(isCloudRun ? '/cloudsql/iwatchfootball:europe-west4:iwatchfootball-db' : 
-			 (isDocker ? 'database' : 'localhost'));
+		// In Cloud Run, ALWAYS use Unix socket connection for Cloud SQL (more reliable and secure)
+		// Even if DATABASE_HOST is set to an IP, we override it to use the socket
+		const cloudSqlSocketPath = '/cloudsql/iwatchfootball:europe-west4:iwatchfootball-db';
+		const explicitHost = getEnv('DATABASE_HOST');
 		
-		// Database name fallback: explicit env var -> Cloud Run -> monorepo
-		const defaultDatabase = getEnv('DATABASE_NAME') || 
+		// Database host: In Cloud Run, force socket connection; otherwise use explicit or defaults
+		const defaultHost = isCloudRun 
+			? cloudSqlSocketPath  // Always use socket in Cloud Run
+			: (explicitHost || (isDocker ? 'database' : 'localhost'));
+		
+		// Database name: use explicit, or default to lowercase 'iwatchfootball' in Cloud Run
+		// Normalize to lowercase to avoid case-sensitivity issues with PostgreSQL
+		const rawDatabaseName = getEnv('DATABASE_NAME') || 
 			(isCloudRun ? 'iwatchfootball' : 'monorepo');
+		const defaultDatabase = rawDatabaseName.toLowerCase();
+		
+		// Log if we're overriding DATABASE_HOST in Cloud Run
+		if (isCloudRun && explicitHost && explicitHost !== cloudSqlSocketPath) {
+			console.warn(`[APP] ⚠️  DATABASE_HOST is set to "${explicitHost}" but Cloud Run requires socket connection.`);
+			console.warn(`[APP]    Overriding to use Cloud SQL socket: ${cloudSqlSocketPath}`);
+			console.warn(`[APP]    To use socket connection, either:`);
+			console.warn(`[APP]    1. Remove DATABASE_HOST from environment variables, or`);
+			console.warn(`[APP]    2. Set DATABASE_HOST to "${cloudSqlSocketPath}"`);
+		}
 
 		// Detect if using Cloud SQL socket connection (Unix domain socket)
 		// Socket paths start with /cloudsql/ or contain : (project:region:instance format)

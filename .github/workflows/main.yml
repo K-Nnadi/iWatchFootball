@@ -106,14 +106,13 @@ jobs:
             --max-instances 10 \
             --timeout 600 \
             --cpu-boost \
+            --add-cloudsql-instances iwatchfootball:europe-west4:iwatchfootball-db \
             --set-env-vars NODE_ENV=production \
-            --set-env-vars DATABASE_HOST=${{ secrets.DATABASE_HOST }} \
-            --set-env-vars DATABASE_PORT=${{ secrets.DATABASE_PORT }} \
             --set-env-vars DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
             --set-env-vars DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
-            --set-env-vars DATABASE_NAME=${{ secrets.DATABASE_NAME }} \
-            --set-env-vars DATABASE_TYPE=${{ secrets.DATABASE_TYPE }} \
-            --set-env-vars DATABASE_SYNCHRONIZE=${{ secrets.DATABASE_SYNCHRONIZE }}
+            --set-env-vars DATABASE_NAME=iwatchfootball \
+            --set-env-vars DATABASE_TYPE=postgres \
+            --set-env-vars DATABASE_SYNCHRONIZE=false
 
 
   deploy-frontend:
