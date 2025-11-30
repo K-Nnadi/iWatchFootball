@@ -35,10 +35,34 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 		const defaultDatabase = getEnv('DATABASE_NAME') || 
 			(isCloudRun ? 'iwatchfootball' : 'monorepo');
 
+		// Detect if using Cloud SQL socket connection (Unix domain socket)
+		// Socket paths start with /cloudsql/ or contain : (project:region:instance format)
+		const isSocketConnection = defaultHost.startsWith('/cloudsql/') || (defaultHost.includes(':') && !defaultHost.includes('.'));
+		
+		// For socket connections, verify the socket directory exists (Cloud Run requirement)
+		if (isSocketConnection && isCloudRun) {
+			const socketDir = defaultHost.startsWith('/cloudsql/') 
+				? '/cloudsql' 
+				: defaultHost.split(':')[0];
+			if (!fs.existsSync(socketDir)) {
+				console.warn(`[APP] ⚠️  Warning: Cloud SQL socket directory not found: ${socketDir}`);
+				console.warn(`[APP]    This may indicate Cloud SQL connection is not properly configured.`);
+				console.warn(`[APP]    Ensure the Cloud Run service has Cloud SQL connection configured.`);
+			} else {
+				console.log(`[APP] ✅ Cloud SQL socket directory found: ${socketDir}`);
+			}
+		}
+		
+		// For socket connections, don't set port (it's not used)
+		// For TCP connections, use the provided port or default 5432
+		const databasePort = isSocketConnection 
+			? undefined 
+			: (getEnv('DATABASE_PORT') ? parseInt(getEnv('DATABASE_PORT')!, 10) : 5432);
+
 		const typeORMConfig: TypeOrmModuleOptions = {
 			type: (getEnv('DATABASE_TYPE') || 'postgres') as any,
 			host: defaultHost,
-			port: parseInt(getEnv('DATABASE_PORT') || '5432', 10),
+			...(databasePort !== undefined && { port: databasePort }),
 			username: getEnv('DATABASE_USERNAME') || 'postgres',
 			password: getEnv('DATABASE_PASSWORD') || 'postgres',
 			database: defaultDatabase,
@@ -49,24 +73,32 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 			],
 			migrations: [join(appRoot, 'backend', isDist ? 'dist/src/shared/migrations/*.js' : 'src/shared/migrations/*{.ts,.js}')],
 			migrationsRun: true,
+			migrationsTransactionMode: 'each', // Run each migration in its own transaction
 			synchronize: getEnv('DATABASE_SYNCHRONIZE') === 'true',
 			logging: getEnv('NODE_ENV') !== 'production',
-			ssl: getEnv('DATABASE_SSL') === 'true' ? { rejectUnauthorized: false } : false,
+			// Socket connections don't use SSL
+			ssl: isSocketConnection ? false : (getEnv('DATABASE_SSL') === 'true' ? { rejectUnauthorized: false } : false),
 			extra: {
 				max: 20,
 				min: 5,
 				idleTimeoutMillis: 30000,
-				connectionTimeoutMillis: 10000,
+				connectionTimeoutMillis: 30000, // Increased from 10s to 30s for Cloud SQL
+				// Add retry logic for connection
+				retryAttempts: 3,
+				retryDelay: 3000,
 			},
 		};
 
-		console.log('📊 TypeORM Configuration:');
-		console.log(`   Environment: ${isCloudRun ? 'Cloud Run' : isDocker ? 'Docker' : 'Local'}`);
-		console.log(`   Host: ${typeORMConfig.host}`);
-		console.log(`   Port: ${typeORMConfig.port}`);
-		console.log(`   Database: ${typeORMConfig.database}`);
-		console.log(`   Username: ${typeORMConfig.username}`);
-		console.log(`   SSL: ${typeORMConfig.ssl ? 'enabled' : 'disabled'}`);
+		console.log('[APP] 📊 TypeORM Configuration:');
+		console.log(`[APP]    Environment: ${isCloudRun ? 'Cloud Run' : isDocker ? 'Docker' : 'Local'}`);
+		console.log(`[APP]    Connection Type: ${isSocketConnection ? 'Unix Socket (Cloud SQL)' : 'TCP'}`);
+		console.log(`[APP]    Host: ${typeORMConfig.host}`);
+		console.log(`[APP]    Port: ${databasePort !== undefined ? databasePort : 'N/A (socket connection)'}`);
+		console.log(`[APP]    Database: ${typeORMConfig.database}`);
+		console.log(`[APP]    Username: ${typeORMConfig.username}`);
+		console.log(`[APP]    SSL: ${typeORMConfig.ssl ? 'enabled' : 'disabled'}`);
+		console.log(`[APP]    Connection Timeout: ${typeORMConfig.extra?.connectionTimeoutMillis}ms`);
+		console.log(`[APP]    Migrations: ${typeORMConfig.migrationsRun ? 'enabled' : 'disabled'}`);
 
 		return typeORMConfig;
 	}

@@ -19,37 +19,41 @@ export async function GenericBootstrap(module: any, port: number, options?: {
     SecurityInterceptor?: any;
 }) {
     try {
-        console.log('📦 Step 1/7: Creating Fastify adapter...');
+        console.log('[APP] 📦 Step 1/7: Creating Fastify adapter...');
         // Configure Fastify to listen on 0.0.0.0 for Docker/Cloud Run compatibility
+        // Disable Fastify's default logger to reduce noise - we use our own [APP] prefixed logs
         const fastifyAdapter = new FastifyAdapter({
-            logger: true,
+            logger: false,
         }) as NestApplicationOptions;
-        console.log('✅ Fastify adapter created');
+        console.log('[APP] ✅ Fastify adapter created');
 
-        console.log('📦 Step 2/7: Loading TypeORM entities...');
+        console.log('[APP] 📦 Step 2/7: Loading TypeORM entities...');
         const entities = getMetadataArgsStorage().tables.map((tbl) => tbl.name);
-        console.log(`✅ Loaded ${entities.length} entities:`, entities);
+        console.log(`[APP] ✅ Loaded ${entities.length} entities:`, entities);
 
-        console.log('📦 Step 3/7: Creating NestJS application...');
+        console.log('[APP] 📦 Step 3/7: Creating NestJS application...');
+        console.log('[APP]    This step will connect to the database and run migrations...');
+        const startTime = Date.now();
         // @ts-ignore
         const app = await NestFactory.create<NestFastifyApplication>(
             module,
             fastifyAdapter
         );
-        console.log('✅ NestJS application created successfully');
+        const initTime = Date.now() - startTime;
+        console.log(`[APP] ✅ NestJS application created successfully (took ${initTime}ms)`);
 
         // Add global authentication guard and security interceptor if enabled
         if (options?.enableAuth && options.GlobalAuthGuard && options.SecurityInterceptor) {
-            console.log('📦 Step 4/7: Setting up authentication guards and interceptors...');
+            console.log('[APP] 📦 Step 4/7: Setting up authentication guards and interceptors...');
             const reflector = app.get(Reflector);
             app.useGlobalGuards(new options.GlobalAuthGuard(reflector));
             app.useGlobalInterceptors(new options.SecurityInterceptor(reflector));
-            console.log('✅ Authentication guards and interceptors configured');
+            console.log('[APP] ✅ Authentication guards and interceptors configured');
         } else {
-            console.log('⚠️  Step 4/7: Skipping authentication setup (not enabled)');
+            console.log('[APP] ⚠️  Step 4/7: Skipping authentication setup (not enabled)');
         }
 
-        console.log('📦 Step 5/7: Configuring CORS...');
+        console.log('[APP] 📦 Step 5/7: Configuring CORS...');
         app.enableCors({
             origin: [
                 'http://localhost:5173',
@@ -57,9 +61,9 @@ export async function GenericBootstrap(module: any, port: number, options?: {
             ],
             credentials: true,
         });
-        console.log('✅ CORS configured');
+        console.log('[APP] ✅ CORS configured');
 
-        console.log('📦 Step 6/7: Setting up Swagger/OpenAPI documentation...');
+        console.log('[APP] 📦 Step 6/7: Setting up Swagger/OpenAPI documentation...');
         const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
         SwaggerModule.setup('api-docs', app, document, {
             swaggerOptions: {
@@ -125,62 +129,62 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         // Only write openapi.json if we have write permissions (skip in Cloud Run)
         try {
             fs.writeFileSync('./openapi.json', JSON.stringify(cleanedDocument, null, 2));
-            console.log('✅ OpenAPI JSON file written (cleaned empty $ref values)');
+            console.log('[APP] ✅ OpenAPI JSON file written (cleaned empty $ref values)');
         } catch (error) {
-            console.warn('⚠️  Could not write openapi.json file (this is OK in production):', error);
+            console.warn('[APP] ⚠️  Could not write openapi.json file (this is OK in production):', error);
         }
 
-        console.log('📦 Step 7/7: Starting server and binding to port...');
-        console.log(`   Attempting to listen on host: 0.0.0.0, port: ${port}`);
-        console.log(`   PORT environment variable: ${process.env.PORT || 'not set (using default 8080)'}`);
+        console.log('[APP] 📦 Step 7/7: Starting server and binding to port...');
+        console.log(`[APP]    Attempting to listen on host: 0.0.0.0, port: ${port}`);
+        console.log(`[APP]    PORT environment variable: ${process.env.PORT || 'not set (using default 8080)'}`);
         
         // For Cloud Run/Docker, we need to listen on 0.0.0.0 to accept connections from outside the container
         // NestJS Fastify listen method accepts port and host as separate arguments
         // Using '0.0.0.0' ensures the server listens on all network interfaces (not just localhost)
         try {
             await app.listen(port, '0.0.0.0');
-            console.log(`   ✅ Server successfully bound to 0.0.0.0:${port}`);
+            console.log(`[APP]    ✅ Server successfully bound to 0.0.0.0:${port}`);
         } catch (listenError) {
-            console.error(`   ❌ Failed to bind to 0.0.0.0:${port}`);
-            console.error(`   Error:`, listenError);
+            console.error(`[APP]    ❌ Failed to bind to 0.0.0.0:${port}`);
+            console.error(`[APP]    Error:`, listenError);
             throw listenError;
         }
         
-        console.log('='.repeat(60));
-        console.log(`✅ SUCCESS: Server is now running on port ${port}`);
-        console.log(`   Health check endpoint: http://localhost:${port}/health`);
-        console.log(`   API docs endpoint: http://localhost:${port}/api-docs`);
-        console.log('='.repeat(60));
+        console.log('[APP] ' + '='.repeat(60));
+        console.log(`[APP] ✅ SUCCESS: Server is now running on port ${port}`);
+        console.log(`[APP]    Health check endpoint: http://localhost:${port}/health`);
+        console.log(`[APP]    API docs endpoint: http://localhost:${port}/api-docs`);
+        console.log('[APP] ' + '='.repeat(60));
     } catch (error: unknown) {
-        console.error('='.repeat(60));
-        console.error('❌ ERROR in GenericBootstrap');
-        console.error('='.repeat(60));
+        console.error('[APP] ' + '='.repeat(60));
+        console.error('[APP] ❌ ERROR in GenericBootstrap');
+        console.error('[APP] ' + '='.repeat(60));
         
         if (error instanceof Error) {
-            console.error('Error type:', error.constructor?.name || 'Unknown');
-            console.error('Error message:', error.message || 'Unknown error');
-            console.error('Error stack:', error.stack || 'No stack trace available');
+            console.error('[APP] Error type:', error.constructor?.name || 'Unknown');
+            console.error('[APP] Error message:', error.message || 'Unknown error');
+            console.error('[APP] Error stack:', error.stack || 'No stack trace available');
             if ('cause' in error && error.cause) {
-                console.error('Error cause:', error.cause);
+                console.error('[APP] Error cause:', error.cause);
             }
         } else {
-            console.error('Error (non-Error object):', error);
+            console.error('[APP] Error (non-Error object):', error);
         }
         
         // Log all error properties
         if (error && typeof error === 'object') {
-            console.error('Error properties:', Object.keys(error));
+            console.error('[APP] Error properties:', Object.keys(error));
             for (const key of Object.keys(error)) {
                 if (key !== 'stack' && key !== 'message') {
                     try {
-                        console.error(`  ${key}:`, (error as any)[key]);
+                        console.error(`[APP]   ${key}:`, (error as any)[key]);
                     } catch (e) {
-                        console.error(`  ${key}: [could not serialize]`);
+                        console.error(`[APP]   ${key}: [could not serialize]`);
                     }
                 }
             }
         }
-        console.error('='.repeat(60));
+        console.error('[APP] ' + '='.repeat(60));
         throw error; // Re-throw to be caught by main.ts
     }
 }
