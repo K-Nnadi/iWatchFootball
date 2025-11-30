@@ -6,21 +6,15 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
-    "./config/config": "./dist/config/config.js",
-    "./bootstrap/generic.bootstrap": "./dist/bootstrap/generic.bootstrap.js",
-    "./decorators/controller.decorator": "./dist/decorators/controller.decorator.js",
-    "./decorators/entity.decorator": "./dist/decorators/entity.decorator.js",
-    "./entity/baseDb.entity": "./dist/entity/baseDb.entity.js",
-    "./crud/crud.controller": "./dist/crud/crud.controller.js",
-    "./crud/crud.interface": "./dist/crud/crud.interface.js",
-    "./crud/crud.repo.adapter": "./dist/crud/crud.repo.adapter.js",
-    "./crud/crud.service": "./dist/crud/crud.service.js",
-    "./crud/helper": "./dist/crud/helper.js",
-    "./crud/query.options": "./dist/crud/query.options.js",
-    "./http/httpWrapper": "./dist/http/httpWrapper.js",
-    "./providers/configService.provider": "./dist/providers/configService.provider.js",
-    "./api-docs/doc.builder": "./dist/api-docs/doc.builder.js",
-    "./helpers": "./dist/helpers.js"
+    "./helpers": "./dist/helpers.js",
+    "./config/*": "./dist/config/*.js",
+    "./bootstrap/*": "./dist/bootstrap/*.js",
+    "./decorators/*": "./dist/decorators/*.js",
+    "./entity/*": "./dist/entity/*.js",
+    "./crud/*": "./dist/crud/*.js",
+    "./http/*": "./dist/http/*.js",
+    "./providers/*": "./dist/providers/*.js",
+    "./api-docs/*": "./dist/api-docs/*.js"
   },
   "scripts": {
     "build": "tsc"

@@ -430,14 +430,14 @@ export function HelpPage() {
                   Contact Support
                 </ModernButton>
                 <Anchor
-                  href="mailto:kenneth_nnadi@aol.co.uk"
+                  href="mailto:iwatchfootball@gmail.com"
                   style={{
                     color: 'var(--modern-lime)',
                     textDecoration: 'none',
                     fontWeight: 600,
                   }}
                 >
-                  kenneth_nnadi@aol.co.uk
+                  iwatchfootball@gmail.com
                 </Anchor>
               </Group>
             </Stack>

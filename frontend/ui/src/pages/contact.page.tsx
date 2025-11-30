@@ -50,7 +50,7 @@ export function ContactPage() {
         `Email: ${values.email}\n\n` +
         `Message:\n${values.message}`
       );
-      const mailtoLink = `mailto:kenneth_nnadi@aol.co.uk?subject=${subject}&body=${body}`;
+      const mailtoLink = `mailto:iwatchfootball@gmail.com?subject=${subject}&body=${body}`;
       
       // Open email client
       window.location.href = mailtoLink;
@@ -58,7 +58,7 @@ export function ContactPage() {
       // Show success notification
       notifications.show({
         title: 'Contact Form Submitted',
-        message: 'Your email client should open. If not, please email kenneth_nnadi@aol.co.uk directly.',
+        message: 'Your email client should open. If not, please email iwatchfootball@gmail.com directly.',
         color: 'green',
       });
       
@@ -70,7 +70,7 @@ export function ContactPage() {
     } catch (error) {
       notifications.show({
         title: 'Error',
-        message: 'Failed to submit form. Please email kenneth_nnadi@aol.co.uk directly.',
+        message: 'Failed to submit form. Please email iwatchfootball@gmail.com directly.',
         color: 'red',
       });
       setLoading(false);
@@ -245,14 +245,14 @@ export function ContactPage() {
             <ModernBody style={{ opacity: 0.6, fontSize: '0.875rem' }}>
               Or email us directly at:{' '}
               <a
-                href="mailto:kenneth_nnadi@aol.co.uk"
+                href="mailto:iwatchfootball@gmail.com"
                 style={{
                   color: 'var(--modern-lime)',
                   textDecoration: 'none',
                   fontWeight: 600,
                 }}
               >
-                kenneth_nnadi@aol.co.uk
+                iwatchfootball@gmail.com
               </a>
             </ModernBody>
           </Box>

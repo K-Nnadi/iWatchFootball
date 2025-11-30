@@ -20,7 +20,10 @@ export async function GenericBootstrap(module: any, port: number, options?: {
 }) {
     try {
         console.log('📦 Step 1/7: Creating Fastify adapter...');
-        const fastifyAdapter = new FastifyAdapter() as NestApplicationOptions;
+        // Configure Fastify to listen on 0.0.0.0 for Docker/Cloud Run compatibility
+        const fastifyAdapter = new FastifyAdapter({
+            logger: true,
+        }) as NestApplicationOptions;
         console.log('✅ Fastify adapter created');
 
         console.log('📦 Step 2/7: Loading TypeORM entities...');
@@ -129,10 +132,19 @@ export async function GenericBootstrap(module: any, port: number, options?: {
 
         console.log('📦 Step 7/7: Starting server and binding to port...');
         console.log(`   Attempting to listen on host: 0.0.0.0, port: ${port}`);
+        console.log(`   PORT environment variable: ${process.env.PORT || 'not set (using default 8080)'}`);
         
-        // For Cloud Run, we need to listen on 0.0.0.0 to accept connections from outside the container
+        // For Cloud Run/Docker, we need to listen on 0.0.0.0 to accept connections from outside the container
         // NestJS Fastify listen method accepts port and host as separate arguments
-        await app.listen(port, '0.0.0.0');
+        // Using '0.0.0.0' ensures the server listens on all network interfaces (not just localhost)
+        try {
+            await app.listen(port, '0.0.0.0');
+            console.log(`   ✅ Server successfully bound to 0.0.0.0:${port}`);
+        } catch (listenError) {
+            console.error(`   ❌ Failed to bind to 0.0.0.0:${port}`);
+            console.error(`   Error:`, listenError);
+            throw listenError;
+        }
         
         console.log('='.repeat(60));
         console.log(`✅ SUCCESS: Server is now running on port ${port}`);

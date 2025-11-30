@@ -59,11 +59,11 @@ export function Footer() {
                             <Stack gap="xs">
                                 <Group gap="xs">
                                     <IconMail size={16} color="var(--modern-text-secondary)" />
-                                    <Text size="sm" className={classes.contactInfo}>kenneth_nnadi@aol.co.uk</Text>
+                                    <Text size="sm" className={classes.contactInfo}>iwatchfootball@gmail.com</Text>
                                 </Group>
                                 <Group gap="xs">
                                     <IconPhone size={16} color="var(--modern-text-secondary)" />
-                                    <Text size="sm" className={classes.contactInfo}>+447931100353</Text>
+                                    <Text size="sm" className={classes.contactInfo}>+447912345678</Text>
                                 </Group>
                             </Stack>
                         </Stack>

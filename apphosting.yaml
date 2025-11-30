@@ -2,24 +2,22 @@
 # See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
   minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
-  # timeoutSeconds: 600  # Request timeout (max 3600s, startup timeout is fixed at 4min)
-  # cpuBoost: true  # Enable CPU boost during startup for faster initialization
+  timeoutSeconds: 600  # Request timeout (max 3600s, startup timeout is fixed at 4min)
+  cpuBoost: true  # Enable CPU boost during startup for faster initialization
 
 # Environment variables and secrets.
+# Note: Database connection uses Cloud SQL socket automatically detected by K_SERVICE
+# DATABASE_HOST will default to: /cloudsql/iwatchfootball:europe-west4:iwatchfootball-db
 # env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
+  # - variable: DATABASE_HOST
+  #   value: /cloudsql/iwatchfootball:europe-west4:iwatchfootball-db
   #   availability:
-  #     - BUILD
   #     - RUNTIME
-
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  # - variable: DATABASE_NAME
+  #   value: iwatchfootball
+  #   availability:
+  #     - RUNTIME
+  # - variable: JWT_SECRET
+  #   secret: jwt-secret
+  #   availability:
+  #     - RUNTIME

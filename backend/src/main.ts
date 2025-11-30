@@ -18,13 +18,13 @@ const envInfo = {
     PORT: process.env.PORT || 8080,
     DATABASE_HOST: process.env.DATABASE_HOST ? '***set***' : 'not set',
     DATABASE_PORT: process.env.DATABASE_PORT || 'not set',
-    DATABASE_NAME: process.env.DATABASE_NAME ? '***set***' : 'not set',
-    DATABASE_USERNAME: process.env.DATABASE_USERNAME ? '***set***' : 'not set',
-    DATABASE_PASSWORD: process.env.DATABASE_PASSWORD ? '***set***' : 'not set',
+    DATABASE_NAME: process.env.DATABASE_NAME || 'not set',
+    DATABASE_USERNAME: process.env.DATABASE_USERNAME || 'not set',
+    DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || 'not set',
     DATABASE_SSL: process.env.DATABASE_SSL || 'not set',
     DATABASE_SYNCHRONIZE: process.env.DATABASE_SYNCHRONIZE || 'not set',
-    JWT_SECRET: process.env.JWT_SECRET ? '***set***' : 'not set',
-    REDIS_HOST: process.env.REDIS_HOST ? '***set***' : 'not set',
+    JWT_SECRET: process.env.JWT_SECRET || 'not set',
+    REDIS_HOST: process.env.REDIS_HOST || 'not set',
     REDIS_PORT: process.env.REDIS_PORT || 'not set',
 };
 console.log('📋 Environment Configuration:', JSON.stringify(envInfo, null, 2));

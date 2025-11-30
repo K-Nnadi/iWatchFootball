@@ -3,7 +3,8 @@
 	"scripts": {
 		"run:frontend": "pnpm --filter ./frontend/ui dev",
 		"run:backend": "pnpm --filter ./backend start:dev",
-		"run:clients": "pnpm --filter ./backend generate:client-gen"
+		"run:clients": "pnpm --filter ./backend generate:client-gen",
+		"db:proxy": "ts-node scripts/run-cloud-sql-proxy.ts"
 	},
 	"dependencies": {
 		"@casl/ability": "6.3.3",

@@ -53,8 +53,12 @@ COPY --from=builder /app/libraries ./libraries
 # Install only production dependencies (after copying libraries so workspace links work)
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
-# Create non-root user
+# Verify workspace packages are linked (for debugging)
+RUN ls -la node_modules/@iWatchFootball/ || echo "Workspace packages not found in node_modules"
+
+# Create non-root user and set ownership BEFORE switching user
 RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
+RUN chown -R nestjs:nodejs /app
 USER nestjs
 
 # Expose Cloud Run default port

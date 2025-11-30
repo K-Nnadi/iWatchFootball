@@ -10,6 +10,7 @@ services:
       - "8080:8080"
     environment:
       - NODE_ENV=production
+      - DOCKER_ENV=true
       - PORT=8080
       - DATABASE_TYPE=postgres
       - DATABASE_HOST=database
@@ -19,9 +20,13 @@ services:
       - DATABASE_NAME=monorepo
       - DATABASE_SSL=false
       - DATABASE_SYNCHRONIZE=false
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - SALT_ROUNDS=10
     depends_on:
       database:
         condition: service_healthy
+    networks:
+      - app-network
     command: ["node", "backend/dist/src/main.js"]
 
   frontend:
@@ -41,7 +46,7 @@ services:
   database:
     image: postgres:15-alpine
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Use 5433 on host to avoid conflict with local PostgreSQL
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -53,6 +58,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   postgres_data:

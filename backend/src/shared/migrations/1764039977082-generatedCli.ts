@@ -4,6 +4,134 @@ export class GeneratedCli1764039977082 implements MigrationInterface {
     name = 'GeneratedCli1764039977082'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        // Create all enum types before creating tables that use them
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'competition_type_enum') THEN
+                    CREATE TYPE "public"."competition_type_enum" AS ENUM('League', 'Cup', 'Custom', 'Friendly');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'team_gender_enum') THEN
+                    CREATE TYPE "public"."team_gender_enum" AS ENUM('Male', 'Female', 'Mixed');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'team_type_enum') THEN
+                    CREATE TYPE "public"."team_type_enum" AS ENUM('Club', 'National');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fixtureReferee_role_enum') THEN
+                    CREATE TYPE "public"."fixtureReferee_role_enum" AS ENUM('Main', 'Assistant', 'Fourth', 'VAR');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fixture_status_enum') THEN
+                    CREATE TYPE "public"."fixture_status_enum" AS ENUM('Scheduled', 'Live', 'HalfTime', 'Finished', 'Postponed', 'Cancelled');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fixture_stage_enum') THEN
+                    CREATE TYPE "public"."fixture_stage_enum" AS ENUM('Group', 'Round of 16', 'Quarter Final', 'Semi Final', 'Final', 'Regular Season');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_emailnotifications_enum') THEN
+                    CREATE TYPE "public"."comms_preference_emailnotifications_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_smsnotifications_enum') THEN
+                    CREATE TYPE "public"."comms_preference_smsnotifications_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_pushnotifications_enum') THEN
+                    CREATE TYPE "public"."comms_preference_pushnotifications_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_inappnotifications_enum') THEN
+                    CREATE TYPE "public"."comms_preference_inappnotifications_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_marketingemails_enum') THEN
+                    CREATE TYPE "public"."comms_preference_marketingemails_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_newsletteremails_enum') THEN
+                    CREATE TYPE "public"."comms_preference_newsletteremails_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_matchreminders_enum') THEN
+                    CREATE TYPE "public"."comms_preference_matchreminders_enum" AS ENUM('NEVER', 'DAILY', 'WEEKLY', 'IMMEDIATE');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comms_preference_language_enum') THEN
+                    CREATE TYPE "public"."comms_preference_language_enum" AS ENUM('EN', 'ES', 'FR', 'DE', 'IT', 'PT');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_type_enum') THEN
+                    CREATE TYPE "public"."user_type_enum" AS ENUM('USER', 'ADMIN', 'MODERATOR');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'position_type_enum') THEN
+                    CREATE TYPE "public"."position_type_enum" AS ENUM('Goalkeeper', 'Defender', 'Midfielder', 'Forward');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'genericToken_type_enum') THEN
+                    CREATE TYPE "public"."genericToken_type_enum" AS ENUM('EMAIL_VERIFICATION', 'PASSWORD_RESET', 'API_KEY');
+                END IF;
+            END $$;
+        `);
+        await queryRunner.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'card_type_enum') THEN
+                    CREATE TYPE "public"."card_type_enum" AS ENUM('Yellow', 'Red');
+                END IF;
+            END $$;
+        `);
+        
         await queryRunner.query(`CREATE TABLE "address" ("id" SERIAL NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "address1" character varying(255), "address2" character varying(255), "townOrCity" character varying(100), "postcode" character varying(20), "country" character varying(100), "location" character varying(255), "stadiumId" integer, CONSTRAINT "PK_d92de1f82754668b5f5f5dd4fd5" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "stadium" ("id" SERIAL NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "name" character varying NOT NULL, "country" character varying NOT NULL, "opened" TIMESTAMP, "teamIds" integer array, "capacity" integer, "addressId" integer, CONSTRAINT "PK_e1fec3f13003877cd87a990655d" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "goal" ("id" SERIAL NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "minute" integer NOT NULL, "scorerId" integer NOT NULL, "assistantId" integer, "fixtureId" integer NOT NULL, "teamId" integer NOT NULL, "ownGoal" boolean NOT NULL, "penalty" boolean, CONSTRAINT "PK_88c8e2b461b711336c836b1e130" PRIMARY KEY ("id"))`);
@@ -182,6 +310,26 @@ export class GeneratedCli1764039977082 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "goal"`);
         await queryRunner.query(`DROP TABLE "stadium"`);
         await queryRunner.query(`DROP TABLE "address"`);
+        
+        // Drop all enum types
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."card_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."genericToken_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."position_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."user_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_language_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_matchreminders_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_newsletteremails_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_marketingemails_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_inappnotifications_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_pushnotifications_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_smsnotifications_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."comms_preference_emailnotifications_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."fixture_stage_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."fixture_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."fixtureReferee_role_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."team_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."team_gender_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."competition_type_enum"`);
     }
 
 }
