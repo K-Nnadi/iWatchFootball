@@ -349,50 +349,57 @@ export class StatsBombAdapterService {
     
     const competitions = await this.fetchCompetitions();
     
-    for (const comp of competitions) {
-      // Check if competition already exists
-      let [competition] = await this.competitionService.getQuery({
-        where: { name: comp.competition_name }
-      });
+    // Process competitions in parallel
+    const competitionPromises = competitions.map(async (comp) => {
+      try {
+        // Check if competition already exists
+        let [competition] = await this.competitionService.getQuery({
+          where: { name: comp.competition_name }
+        });
 
-      if (!competition) {
-      competition = await this.competitionService.create({
-        name: comp.competition_name,
-        country: comp.country_name,
-        type: this.mapCompetitionType(comp.competition_name),
-        metadata: {
-          source: 'StatsBomb',
-          statsbombId: comp.competition_id,
-          seasonId: comp.season_id,
-          seasonName: comp.season_name,
-          matchUpdated: comp.match_updated,
-          matchAvailable: comp.match_available,
-          lastSync: new Date().toISOString()
+        if (!competition) {
+          competition = await this.competitionService.create({
+            name: comp.competition_name,
+            country: comp.country_name,
+            type: this.mapCompetitionType(comp.competition_name),
+            metadata: {
+              source: 'StatsBomb',
+              statsbombId: comp.competition_id,
+              seasonId: comp.season_id,
+              seasonName: comp.season_name,
+              matchUpdated: comp.match_updated,
+              matchAvailable: comp.match_available,
+              lastSync: new Date().toISOString()
+            }
+          });
+          this.logger.log(`Created competition: ${comp.competition_name}`);
         }
-      });
-        this.logger.log(`Created competition: ${comp.competition_name}`);
-      }
 
-      // Create season if it doesn't exist
-      const seasonYear = parseInt(comp.season_name.split('/')[0]);
-      let [season] = await this.seasonService.getQuery({
-        where: { yearStart: seasonYear }
-      });
+        // Create season if it doesn't exist
+        const seasonYear = parseInt(comp.season_name.split('/')[0]);
+        let [season] = await this.seasonService.getQuery({
+          where: { yearStart: seasonYear }
+        });
 
-      if (!season) {
-      season = await this.seasonService.create({
-        yearStart: seasonYear,
-        yearEnd: seasonYear + 1,
-        metadata: {
-          source: 'StatsBomb',
-          statsbombSeasonId: comp.season_id,
-          seasonName: comp.season_name,
-          lastSync: new Date().toISOString()
+        if (!season) {
+          season = await this.seasonService.create({
+            yearStart: seasonYear,
+            yearEnd: seasonYear + 1,
+            metadata: {
+              source: 'StatsBomb',
+              statsbombSeasonId: comp.season_id,
+              seasonName: comp.season_name,
+              lastSync: new Date().toISOString()
+            }
+          });
+          this.logger.log(`Created season: ${seasonYear}/${seasonYear + 1}`);
         }
-      });
-        this.logger.log(`Created season: ${seasonYear}/${seasonYear + 1}`);
+      } catch (error) {
+        this.logger.warn(`Error syncing competition ${comp.competition_name}:`, error);
       }
-    }
+    });
+    
+    await Promise.allSettled(competitionPromises);
   }
 
   /**
@@ -657,7 +664,8 @@ export class StatsBombAdapterService {
         return 0;
       }
       
-      let playersCreated = 0;
+      // Collect all player sync promises
+      const playerPromises: Promise<void>[] = [];
       
       for (const teamLineup of lineup) {
         if (!teamLineup) {
@@ -673,15 +681,19 @@ export class StatsBombAdapterService {
         
         this.logger.debug(`Processing ${teamLineup.lineup.length} players for team ${teamLineup.team_id}`);
         
+        // Add all player sync operations to the promises array
         for (const playerData of teamLineup.lineup) {
           if (playerData && playerData.player_name) {
-            await this.syncPlayer(playerData, teamLineup.team_id);
-            playersCreated++;
+            playerPromises.push(this.syncPlayer(playerData, teamLineup.team_id));
           } else {
             this.logger.warn(`Invalid player data in lineup:`, JSON.stringify(playerData));
           }
         }
       }
+      
+      // Process all players in parallel
+      const results = await Promise.allSettled(playerPromises);
+      const playersCreated = results.filter(result => result.status === 'fulfilled').length;
       
       this.logger.debug(`✅ Created ${playersCreated} players for match ${matchId}`);
       return playersCreated;
@@ -858,8 +870,24 @@ export class StatsBombAdapterService {
       try {
         const matches = await this.fetchMatches(comp.competition_id, comp.season_id);
         
-        for (const match of matches) {
-          await this.syncFixture(match);
+        // Process matches in parallel batches of 50
+        const batchSize = 50;
+        for (let i = 0; i < matches.length; i += batchSize) {
+          const batch = matches.slice(i, i + batchSize);
+          
+          this.logger.log(`Processing fixture batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(matches.length / batchSize)} (${batch.length} matches)`);
+          
+          // Process all matches in the batch in parallel
+          const batchPromises = batch.map(async (match) => {
+            try {
+              await this.syncFixture(match);
+            } catch (error) {
+              this.logger.warn(`Error syncing fixture ${match.match_id}:`, error);
+            }
+          });
+          
+          // Wait for all matches in the batch to complete
+          await Promise.allSettled(batchPromises);
         }
       } catch (error) {
         this.logger.warn(`Error syncing fixtures for competition ${comp.competition_name}:`, error);
@@ -936,14 +964,11 @@ export class StatsBombAdapterService {
    */
   private async getFixtureIdByStatsBombMatchId(statsbombMatchId: number): Promise<number | null> {
     try {
-
-
       const [fixture] = await this.fixtureService.getQuery({
         where: {
-          metadata: JsonbWhere('statsbombId', '=', 3895302),
+          metadata: JsonbWhere('statsbombId', '=', statsbombMatchId),
         }
       });
-
 
       return fixture ? fixture.id : null;
     } catch (error) {
@@ -993,9 +1018,32 @@ export class StatsBombAdapterService {
         const matches = await this.fetchMatches(comp.competition_id, comp.season_id);
         this.logger.log(`⚽ Found ${matches.length} matches for events sync`);
         
-        for (const match of matches) {
-          const eventsCreated = await this.syncEventsFromMatch(match.match_id);
-          totalEventsProcessed += eventsCreated;
+        // Process matches in parallel batches of 50
+        const batchSize = 50;
+        for (let i = 0; i < matches.length; i += batchSize) {
+          const batch = matches.slice(i, i + batchSize);
+          
+          this.logger.log(`Processing events batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(matches.length / batchSize)} (${batch.length} matches)`);
+          
+          // Process all matches in the batch in parallel
+          const batchPromises = batch.map(async (match) => {
+            try {
+              return await this.syncEventsFromMatch(match.match_id);
+            } catch (error) {
+              this.logger.warn(`Error syncing events for match ${match.match_id}:`, error);
+              return 0;
+            }
+          });
+          
+          // Wait for all matches in the batch to complete
+          const results = await Promise.allSettled(batchPromises);
+          
+          // Sum up events processed
+          results.forEach((result) => {
+            if (result.status === 'fulfilled') {
+              totalEventsProcessed += result.value;
+            }
+          });
         }
       } catch (error) {
         this.logger.warn(`Error syncing events for competition ${comp.competition_name}:`, error);
@@ -1021,25 +1069,75 @@ export class StatsBombAdapterService {
       const events = await this.fetchEvents(matchId);
       this.logger.debug(`📊 Found ${events.length} events for StatsBomb match ${matchId} (fixture ID: ${fixtureId})`);
       
-      let goalsCreated = 0;
-      let cardsCreated = 0;
-      let substitutionsCreated = 0;
+      // Filter relevant events
+      const goalEvents = events.filter(e => e.type.name === 'Shot' && e.shot?.outcome?.name === 'Goal');
+      const cardEvents = events.filter(e => e.type.name === 'Foul Committed' && e.bad_behaviour);
+      const substitutionEvents = events.filter(e => e.type.name === 'Substitution');
       
-      for (const event of events) {
-        if (event.type.name === 'Shot' && event.shot?.outcome?.name === 'Goal') {
-          await this.syncGoal(event, fixtureId);
-          goalsCreated++;
-        } else if (event.type.name === 'Foul Committed' && event.bad_behaviour) {
-          await this.syncCard(event, fixtureId);
-          cardsCreated++;
-        } else if (event.type.name === 'Substitution') {
-          await this.syncSubstitution(event, fixtureId);
-          substitutionsCreated++;
-        }
-      }
+      // Collect all unique player and team names needed
+      const playerNames = new Set<string>();
+      const teamNames = new Set<string>();
       
-      this.logger.debug(`⚽ Created ${goalsCreated} goals, 🟨🟥 ${cardsCreated} cards, 🔄 ${substitutionsCreated} substitutions for StatsBomb match ${matchId} (fixture ID: ${fixtureId})`);
-      return goalsCreated + cardsCreated + substitutionsCreated;
+      goalEvents.forEach(e => {
+        if (e.player?.name) playerNames.add(e.player.name);
+        if (e.team?.name) teamNames.add(e.team.name);
+      });
+      
+      cardEvents.forEach(e => {
+        if (e.player?.name) playerNames.add(e.player.name);
+      });
+      
+      substitutionEvents.forEach(e => {
+        if (e.player?.name) playerNames.add(e.player.name);
+        if (e.substitution?.replacement?.name) playerNames.add(e.substitution.replacement.name);
+        if (e.team?.name) teamNames.add(e.team.name);
+      });
+      
+      // Batch fetch all players and teams needed
+      const [players, teams] = await Promise.all([
+        Promise.all(Array.from(playerNames).map(name => 
+          this.playerService.getQuery({ where: { name } }).then(([player]) => ({ name, player }))
+        )),
+        Promise.all(Array.from(teamNames).map(name => 
+          this.teamService.getQuery({ where: { name } }).then(([team]) => ({ name, team }))
+        ))
+      ]);
+      
+      // Create lookup maps
+      const playerMap = new Map<string, any>();
+      const teamMap = new Map<string, any>();
+      
+      players.forEach(({ name, player }) => {
+        if (player) playerMap.set(name, player);
+      });
+      
+      teams.forEach(({ name, team }) => {
+        if (team) teamMap.set(name, team);
+      });
+      
+      // Collect all event sync promises
+      const eventPromises: Promise<void>[] = [];
+      
+      // Process goals in parallel
+      goalEvents.forEach(event => {
+        eventPromises.push(this.syncGoal(event, fixtureId, playerMap, teamMap));
+      });
+      
+      // Process cards in parallel
+      cardEvents.forEach(event => {
+        eventPromises.push(this.syncCard(event, fixtureId, playerMap));
+      });
+      
+      // Process substitutions in parallel
+      substitutionEvents.forEach(event => {
+        eventPromises.push(this.syncSubstitution(event, fixtureId, playerMap, teamMap));
+      });
+      
+      // Process all events in parallel
+      await Promise.allSettled(eventPromises);
+      
+      this.logger.debug(`⚽ Processed ${goalEvents.length} goals, 🟨🟥 ${cardEvents.length} cards, 🔄 ${substitutionEvents.length} substitutions for StatsBomb match ${matchId} (fixture ID: ${fixtureId})`);
+      return goalEvents.length + cardEvents.length + substitutionEvents.length;
     } catch (error) {
       this.logger.warn(`Error syncing events for match ${matchId}:`, error);
       return 0;
@@ -1061,7 +1159,7 @@ export class StatsBombAdapterService {
   /**
    * Sync a goal to database
    */
-  private async syncGoal(eventData: StatsBombEvent, fixtureId: number): Promise<void> {
+  private async syncGoal(eventData: StatsBombEvent, fixtureId: number, playerMap?: Map<string, any>, teamMap?: Map<string, any>): Promise<void> {
     try {
       this.logger.debug(`🎯 Processing goal: ${eventData.player.name} at ${eventData.minute}'`);
       
@@ -1079,15 +1177,27 @@ export class StatsBombAdapterService {
         return; // Already exists
       }
 
-      // Get player
-      const [player] = await this.playerService.getQuery({
-        where: { name: eventData.player.name }
-      });
+      // Get player from map or query
+      let player;
+      if (playerMap) {
+        player = playerMap.get(eventData.player.name);
+      } else {
+        const [foundPlayer] = await this.playerService.getQuery({
+          where: { name: eventData.player.name }
+        });
+        player = foundPlayer;
+      }
 
-      // Get team
-      const [team] = await this.teamService.getQuery({
-        where: { name: eventData.team.name }
-      });
+      // Get team from map or query
+      let team;
+      if (teamMap) {
+        team = teamMap.get(eventData.team.name);
+      } else {
+        const [foundTeam] = await this.teamService.getQuery({
+          where: { name: eventData.team.name }
+        });
+        team = foundTeam;
+      }
 
       if (!player) {
         this.logger.warn(`⚠️ Player not found for goal: ${eventData.player.name}`);
@@ -1135,7 +1245,7 @@ export class StatsBombAdapterService {
   /**
    * Sync a card to database
    */
-  private async syncCard(eventData: StatsBombEvent, fixtureId: number): Promise<void> {
+  private async syncCard(eventData: StatsBombEvent, fixtureId: number, playerMap?: Map<string, any>): Promise<void> {
     try {
       this.logger.debug(`🟨🟥 Processing card: ${eventData.player.name} at ${eventData.minute}'`);
       
@@ -1153,10 +1263,16 @@ export class StatsBombAdapterService {
         return; // Already exists
       }
 
-      // Get player
-      const [player] = await this.playerService.getQuery({
-        where: { name: eventData.player.name }
-      });
+      // Get player from map or query
+      let player;
+      if (playerMap) {
+        player = playerMap.get(eventData.player.name);
+      } else {
+        const [foundPlayer] = await this.playerService.getQuery({
+          where: { name: eventData.player.name }
+        });
+        player = foundPlayer;
+      }
 
       if (!player) {
         this.logger.warn(`⚠️ Player not found for card: ${eventData.player.name}`);
@@ -1194,7 +1310,7 @@ export class StatsBombAdapterService {
   /**
    * Sync a substitution to database
    */
-  private async syncSubstitution(eventData: StatsBombEvent, fixtureId: number): Promise<void> {
+  private async syncSubstitution(eventData: StatsBombEvent, fixtureId: number, playerMap?: Map<string, any>, teamMap?: Map<string, any>): Promise<void> {
     try {
       this.logger.debug(`🔄 Processing substitution: ${eventData.player.name} at ${eventData.minute}'`);
       
@@ -1212,19 +1328,37 @@ export class StatsBombAdapterService {
         return; // Already exists
       }
 
-      // Get players
-      const [playerOut] = await this.playerService.getQuery({
-        where: { name: eventData.player.name }
-      });
+      // Get players from map or query
+      let playerOut, playerIn;
+      if (playerMap) {
+        playerOut = playerMap.get(eventData.player.name);
+        playerIn = eventData.substitution?.replacement?.name 
+          ? playerMap.get(eventData.substitution.replacement.name)
+          : null;
+      } else {
+        const [foundPlayerOut] = await this.playerService.getQuery({
+          where: { name: eventData.player.name }
+        });
+        playerOut = foundPlayerOut;
 
-      const [playerIn] = await this.playerService.getQuery({
-        where: { name: eventData.substitution?.replacement?.name }
-      });
+        if (eventData.substitution?.replacement?.name) {
+          const [foundPlayerIn] = await this.playerService.getQuery({
+            where: { name: eventData.substitution.replacement.name }
+          });
+          playerIn = foundPlayerIn;
+        }
+      }
 
-      // Get team
-      const [team] = await this.teamService.getQuery({
-        where: { name: eventData.team.name }
-      });
+      // Get team from map or query
+      let team;
+      if (teamMap) {
+        team = teamMap.get(eventData.team.name);
+      } else {
+        const [foundTeam] = await this.teamService.getQuery({
+          where: { name: eventData.team.name }
+        });
+        team = foundTeam;
+      }
 
       if (!playerOut) {
         this.logger.warn(`⚠️ Player out not found for substitution: ${eventData.player.name}`);
