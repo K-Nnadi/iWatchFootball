@@ -184,10 +184,11 @@ export function LogsPage() {
                 userTeam: 'home',
                 stage: 'League Game',
                 events: [
-                    { time: 10, description: 'Goal by Team A striker', team: 'home', type: 'goal' },
+                    { time: 10, description: 'Goal by John Smith (assist: Mike Johnson)', team: 'home', type: 'goal' },
+                    { time: 25, description: 'Assist by David Brown', team: 'home', type: 'other' },
                     { time: 45, description: 'Yellow card for Team B defender', team: 'away', type: 'card' },
                     { time: 60, description: 'Substitution: Team A midfielder off, new midfielder on', team: 'home', type: 'substitution' },
-                    { time: 75, description: 'Goal by Team B winger', team: 'away', type: 'goal' }
+                    { time: 75, description: 'Goal by Chris Wilson (assisted by Alex Taylor)', team: 'away', type: 'goal' }
                 ]
             },
             {
@@ -206,6 +207,7 @@ export function LogsPage() {
                 events: [
                     { time: 5, description: 'Kick-off', team: 'home', type: 'other' },
                     { time: 30, description: 'Team D missed penalty', team: 'away', type: 'penalty' },
+                    { time: 55, description: 'Assist from James Miller', team: 'home', type: 'other' },
                     { time: 90, description: 'Final whistle', team: 'home', type: 'other' }
                 ]
             }
@@ -246,7 +248,7 @@ export function LogsPage() {
                 userTeam: 'home',
                 stage: 'League Game',
                 events: [
-                    {time: 10, description: 'Goal by home team player', team: 'home', type: 'goal'},
+                    {time: 10, description: 'Goal by Robert Lee (assist: Kevin White)', team: 'home', type: 'goal'},
                     {time: 30, description: 'Yellow card for away team', team: 'away', type: 'card'},
                     {time: 45, description: 'Substitution: Home team midfielder off, new midfielder on', team: 'home', type: 'substitution'}
                 ]

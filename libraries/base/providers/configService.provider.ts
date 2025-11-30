@@ -44,11 +44,11 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 		
 		// Log if we're overriding DATABASE_HOST in Cloud Run
 		if (isCloudRun && explicitHost && explicitHost !== cloudSqlSocketPath) {
-			console.warn(`[APP] ⚠️  DATABASE_HOST is set to "${explicitHost}" but Cloud Run requires socket connection.`);
-			console.warn(`[APP]    Overriding to use Cloud SQL socket: ${cloudSqlSocketPath}`);
-			console.warn(`[APP]    To use socket connection, either:`);
-			console.warn(`[APP]    1. Remove DATABASE_HOST from environment variables, or`);
-			console.warn(`[APP]    2. Set DATABASE_HOST to "${cloudSqlSocketPath}"`);
+			console.warn(`⚠️  DATABASE_HOST is set to "${explicitHost}" but Cloud Run requires socket connection.`);
+			console.warn(`Overriding to use Cloud SQL socket: ${cloudSqlSocketPath}`);
+			console.warn(`To use socket connection, either:`);
+			console.warn(`1. Remove DATABASE_HOST from environment variables, or`);
+			console.warn(`2. Set DATABASE_HOST to "${cloudSqlSocketPath}"`);
 		}
 
 		// Detect if using Cloud SQL socket connection (Unix domain socket)
@@ -61,11 +61,11 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 				? '/cloudsql' 
 				: defaultHost.split(':')[0];
 			if (!fs.existsSync(socketDir)) {
-				console.warn(`[APP] ⚠️  Warning: Cloud SQL socket directory not found: ${socketDir}`);
-				console.warn(`[APP]    This may indicate Cloud SQL connection is not properly configured.`);
-				console.warn(`[APP]    Ensure the Cloud Run service has Cloud SQL connection configured.`);
+				console.warn(`⚠️  Warning: Cloud SQL socket directory not found: ${socketDir}`);
+				console.warn(`This may indicate Cloud SQL connection is not properly configured.`);
+				console.warn(`Ensure the Cloud Run service has Cloud SQL connection configured.`);
 			} else {
-				console.log(`[APP] ✅ Cloud SQL socket directory found: ${socketDir}`);
+				console.log(`✅ Cloud SQL socket directory found: ${socketDir}`);
 			}
 		}
 		
@@ -105,16 +105,16 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 			},
 		};
 
-		console.log('[APP] 📊 TypeORM Configuration:');
-		console.log(`[APP]    Environment: ${isCloudRun ? 'Cloud Run' : isDocker ? 'Docker' : 'Local'}`);
-		console.log(`[APP]    Connection Type: ${isSocketConnection ? 'Unix Socket (Cloud SQL)' : 'TCP'}`);
-		console.log(`[APP]    Host: ${typeORMConfig.host}`);
-		console.log(`[APP]    Port: ${databasePort !== undefined ? databasePort : 'N/A (socket connection)'}`);
-		console.log(`[APP]    Database: ${typeORMConfig.database}`);
-		console.log(`[APP]    Username: ${typeORMConfig.username}`);
-		console.log(`[APP]    SSL: ${typeORMConfig.ssl ? 'enabled' : 'disabled'}`);
-		console.log(`[APP]    Connection Timeout: ${typeORMConfig.extra?.connectionTimeoutMillis}ms`);
-		console.log(`[APP]    Migrations: ${typeORMConfig.migrationsRun ? 'enabled' : 'disabled'}`);
+		console.log('📊 TypeORM Configuration:');
+		console.log(`Environment: ${isCloudRun ? 'Cloud Run' : isDocker ? 'Docker' : 'Local'}`);
+		console.log(`Connection Type: ${isSocketConnection ? 'Unix Socket (Cloud SQL)' : 'TCP'}`);
+		console.log(`Host: ${typeORMConfig.host}`);
+		console.log(`Port: ${databasePort !== undefined ? databasePort : 'N/A (socket connection)'}`);
+		console.log(`Database: ${typeORMConfig.database}`);
+		console.log(`Username: ${typeORMConfig.username}`);
+		console.log(`SSL: ${typeORMConfig.ssl ? 'enabled' : 'disabled'}`);
+		console.log(`Connection Timeout: ${typeORMConfig.extra?.connectionTimeoutMillis}ms`);
+		console.log(`Migrations: ${typeORMConfig.migrationsRun ? 'enabled' : 'disabled'}`);
 
 		return typeORMConfig;
 	}
