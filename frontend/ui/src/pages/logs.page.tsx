@@ -42,6 +42,8 @@ export interface MatchEvent {
     description: string;
     team: 'home' | 'away';
     type: 'goal' | 'card' | 'substitution' | 'other' | 'penalty';
+    playerId?: string; // Optional player ID
+    assistPlayerId?: string; // Optional assist player ID
 }
 
 export interface UserGame {

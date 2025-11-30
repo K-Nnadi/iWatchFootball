@@ -1,12 +1,14 @@
 import { Card, Image, Text, Title, Stack, Group, Divider, ScrollArea, Modal, Badge, Box } from '@mantine/core';
-import { IconBallFootball, IconCalendar, IconMapPin } from '@tabler/icons-react';
+import { IconBallFootball, IconCalendar, IconMapPin, IconExternalLink } from '@tabler/icons-react';
 import { useState } from 'react';
 import { UserGame, MatchEvent } from '../pages/logs.page';
-import { ModernCard, ModernH3, ModernBody } from '../components/modern';
+import { ModernCard, ModernH3, ModernBody, ModernButton } from '../components/modern';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 interface PlayerStats {
     rank: number;
     name: string;
+    id: string; // Player ID for navigation
     team: string;
     crest: string; // Team crest URL
     image?: string; // Player image URL (only for 1st place)
@@ -33,14 +35,59 @@ interface StatsTabProps {
 
 const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedPlayer, setSelectedPlayer] = useState<{ name: string; category: string } | null>(null);
+    const [selectedPlayer, setSelectedPlayer] = useState<{ name: string; id: string; category: string } | null>(null);
+    const [teamModalOpen, setTeamModalOpen] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<{ name: string; id: string } | null>(null);
+    const [venueModalOpen, setVenueModalOpen] = useState(false);
+    const [selectedVenue, setSelectedVenue] = useState<{ name: string; id: string } | null>(null);
+    const { navigateWithTransition } = usePageTransition();
+
+    // Helper function to get player ID from name
+    // In a real app, this would come from the backend/events
+    const getPlayerId = (playerName: string, fixture?: UserGame): string => {
+        // First, try to find player ID from events
+        if (fixture?.events) {
+            for (const event of fixture.events) {
+                if (event.playerId && event.description.toLowerCase().includes(playerName.toLowerCase())) {
+                    return event.playerId;
+                }
+                if (event.assistPlayerId && event.description.toLowerCase().includes(playerName.toLowerCase())) {
+                    return event.assistPlayerId;
+                }
+            }
+        }
+        
+        // Fallback: create a mapping or use a default
+        // In production, this should come from your backend
+        const playerIdMap: Record<string, string> = {
+            // Add your player name to ID mappings here
+            // Example: 'John Smith': 'player-123'
+        };
+        
+        return playerIdMap[playerName] || `player-${playerName.toLowerCase().replace(/\s+/g, '-')}`;
+    };
+
+    // Helper function to get team ID from name
+    const getTeamId = (teamName: string): string => {
+        // In production, this should come from your backend
+        const teamIdMap: Record<string, string> = {
+            // Add your team name to ID mappings here
+        };
+        
+        return teamIdMap[teamName] || `team-${teamName.toLowerCase().replace(/\s+/g, '-')}`;
+    };
 
     // Get all player stats across games
-    const getPlayerGameStats = (playerName: string): PlayerGameStats[] => {
+    const getPlayerGameStats = (playerName: string, playerId: string): PlayerGameStats[] => {
         const playerGames: PlayerGameStats[] = [];
 
         loggedFixtures.forEach((fixture) => {
             const playerEvents = fixture.events?.filter((event) => {
+                // First check if event has player ID that matches
+                if (event.playerId === playerId || event.assistPlayerId === playerId) {
+                    return true;
+                }
+                // Fallback to name matching
                 const description = event.description.toLowerCase();
                 const nameLower = playerName.toLowerCase();
                 // Check if player name appears in the event description
@@ -73,10 +120,10 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
     // Calculate stats from logged fixtures
     const calculateStats = (): StatCategory[] => {
         const stats: {
-            goals: Record<string, number>;
-            assists: Record<string, number>;
+            goals: Record<string, { count: number; id: string }>;
+            assists: Record<string, { count: number; id: string }>;
             venues: Record<string, number>;
-            teams: Record<string, number>;
+            teams: Record<string, { count: number; id: string }>;
         } = {
             goals: {},
             assists: {},
@@ -91,8 +138,16 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
             }
             
             // Count teams
-            stats.teams[fixture.homeTeam] = (stats.teams[fixture.homeTeam] || 0) + 1;
-            stats.teams[fixture.awayTeam] = (stats.teams[fixture.awayTeam] || 0) + 1;
+            const homeTeamId = getTeamId(fixture.homeTeam);
+            const awayTeamId = getTeamId(fixture.awayTeam);
+            if (!stats.teams[fixture.homeTeam]) {
+                stats.teams[fixture.homeTeam] = { count: 0, id: homeTeamId };
+            }
+            stats.teams[fixture.homeTeam].count += 1;
+            if (!stats.teams[fixture.awayTeam]) {
+                stats.teams[fixture.awayTeam] = { count: 0, id: awayTeamId };
+            }
+            stats.teams[fixture.awayTeam].count += 1;
 
             // Count goals and assists from events
             fixture.events?.forEach((event) => {
@@ -103,7 +158,15 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                     const playerMatch = event.description.match(/(?:by|from)\s+([^,()]+)/i);
                     if (playerMatch) {
                         const player = playerMatch[1].trim();
-                        stats.goals[player] = (stats.goals[player] || 0) + 1;
+                        const playerId = event.playerId || getPlayerId(player, fixture);
+                        if (!stats.goals[player]) {
+                            stats.goals[player] = { count: 0, id: playerId };
+                        }
+                        stats.goals[player].count += 1;
+                        // Update ID if we found one in the event
+                        if (event.playerId) {
+                            stats.goals[player].id = event.playerId;
+                        }
                     }
                     
                     // Check for assists mentioned in goal description
@@ -120,7 +183,15 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                             // Remove common words that might be captured
                             const cleanPlayer = assistPlayer.replace(/^(by|from|:)\s*/i, '').trim();
                             if (cleanPlayer && cleanPlayer.length > 0 && !cleanPlayer.match(/^(goal|by|from|team)/i)) {
-                                stats.assists[cleanPlayer] = (stats.assists[cleanPlayer] || 0) + 1;
+                                const assistPlayerId = event.assistPlayerId || getPlayerId(cleanPlayer, fixture);
+                                if (!stats.assists[cleanPlayer]) {
+                                    stats.assists[cleanPlayer] = { count: 0, id: assistPlayerId };
+                                }
+                                stats.assists[cleanPlayer].count += 1;
+                                // Update ID if we found one in the event
+                                if (event.assistPlayerId) {
+                                    stats.assists[cleanPlayer].id = event.assistPlayerId;
+                                }
                                 break; // Only count once per goal event
                             }
                         }
@@ -142,7 +213,15 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                             // Remove common words that might be captured
                             const cleanPlayer = player.replace(/^(by|from|:)\s*/i, '').trim();
                             if (cleanPlayer && cleanPlayer.length > 0 && !cleanPlayer.match(/^(goal|by|from|team)/i)) {
-                                stats.assists[cleanPlayer] = (stats.assists[cleanPlayer] || 0) + 1;
+                                const assistPlayerId = event.assistPlayerId || getPlayerId(cleanPlayer, fixture);
+                                if (!stats.assists[cleanPlayer]) {
+                                    stats.assists[cleanPlayer] = { count: 0, id: assistPlayerId };
+                                }
+                                stats.assists[cleanPlayer].count += 1;
+                                // Update ID if we found one in the event
+                                if (event.assistPlayerId) {
+                                    stats.assists[cleanPlayer].id = event.assistPlayerId;
+                                }
                                 break; // Only count once per assist event
                             }
                         }
@@ -152,14 +231,53 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
         });
 
         // Convert to sorted arrays and format for display
-        const formatStats = (data: Record<string, number>, title: string): StatCategory => {
+        const formatPlayerStats = (data: Record<string, { count: number; id: string }>, title: string): StatCategory => {
+            const sorted = Object.entries(data)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 10)
+                .map(([name, data], index) => ({
+                    rank: index + 1,
+                    name,
+                    id: data.id,
+                    team: '', // Could be enhanced to extract team info
+                    crest: '',
+                    value: data.count,
+                }));
+
+            return {
+                title,
+                topPlayers: sorted,
+            };
+        };
+
+        const formatTeamStats = (data: Record<string, { count: number; id: string }>, title: string): StatCategory => {
+            const sorted = Object.entries(data)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 10)
+                .map(([name, data], index) => ({
+                    rank: index + 1,
+                    name,
+                    id: data.id,
+                    team: '',
+                    crest: '',
+                    value: data.count,
+                }));
+
+            return {
+                title,
+                topPlayers: sorted,
+            };
+        };
+
+        const formatVenueStats = (data: Record<string, number>, title: string): StatCategory => {
             const sorted = Object.entries(data)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 10)
                 .map(([name, value], index) => ({
                     rank: index + 1,
                     name,
-                    team: '', // Could be enhanced to extract team info
+                    id: `venue-${name.toLowerCase().replace(/\s+/g, '-')}`, // Generate venue ID
+                    team: '',
                     crest: '',
                     value,
                 }));
@@ -173,16 +291,16 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
         const result: StatCategory[] = [];
         
         if (Object.keys(stats.goals).length > 0) {
-            result.push(formatStats(stats.goals, 'Top Goals'));
+            result.push(formatPlayerStats(stats.goals, 'Top Goals'));
         }
         if (Object.keys(stats.assists).length > 0) {
-            result.push(formatStats(stats.assists, 'Top Assists'));
+            result.push(formatPlayerStats(stats.assists, 'Top Assists'));
         }
         if (Object.keys(stats.venues).length > 0) {
-            result.push(formatStats(stats.venues, 'Most Visited Venues'));
+            result.push(formatVenueStats(stats.venues, 'Most Visited Venues'));
         }
         if (Object.keys(stats.teams).length > 0) {
-            result.push(formatStats(stats.teams, 'Most Viewed Teams'));
+            result.push(formatTeamStats(stats.teams, 'Most Viewed Teams'));
         }
 
         // If no stats available, return empty array
@@ -199,15 +317,51 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
         );
     }
 
-    const handlePlayerClick = (playerName: string, category: string) => {
+    const handlePlayerClick = (playerName: string, playerId: string, category: string) => {
         // Only show modal for player-related stats (goals, assists)
         if (category === 'Top Goals' || category === 'Top Assists') {
-            setSelectedPlayer({ name: playerName, category });
+            setSelectedPlayer({ name: playerName, id: playerId, category });
             setModalOpen(true);
         }
     };
 
-    const playerGameStats = selectedPlayer ? getPlayerGameStats(selectedPlayer.name) : [];
+    const handleTeamClick = (teamName: string, teamId: string) => {
+        setSelectedTeam({ name: teamName, id: teamId });
+        setTeamModalOpen(true);
+    };
+
+    const handleVenueClick = (venueName: string, venueId: string) => {
+        setSelectedVenue({ name: venueName, id: venueId });
+        setVenueModalOpen(true);
+    };
+
+    const handleViewPlayerPage = (playerId: string) => {
+        navigateWithTransition(`/player/${playerId}`, {
+            transitionType: 'loading',
+            duration: 1200
+        });
+        setModalOpen(false);
+    };
+
+    const handleViewTeamPage = (teamId: string) => {
+        navigateWithTransition(`/team/${teamId}`, {
+            transitionType: 'loading',
+            duration: 1200
+        });
+        setTeamModalOpen(false);
+    };
+
+    const handleViewStadium = (venueId: string) => {
+        // Navigate to matches page - you can add venue filtering later
+        // Alternatively, create a /venue/:id route if needed
+        navigateWithTransition(`/matches?venue=${encodeURIComponent(venueId)}`, {
+            transitionType: 'loading',
+            duration: 1200
+        });
+        setVenueModalOpen(false);
+    };
+
+    const playerGameStats = selectedPlayer ? getPlayerGameStats(selectedPlayer.name, selectedPlayer.id) : [];
     const totalStats = playerGameStats.reduce((acc, game) => ({
         goals: acc.goals + game.goals,
         assists: acc.assists + game.assists,
@@ -226,7 +380,11 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                             <Card shadow="sm" radius="md" withBorder style={{ backgroundColor: 'var(--modern-card-bg)', borderColor: 'var(--modern-border-color)' }}>
                                 <Stack gap="sm">
                                     {category.topPlayers.map((player, index) => {
-                                        const isClickable = category.title === 'Top Goals' || category.title === 'Top Assists';
+                                        const isPlayerClickable = category.title === 'Top Goals' || category.title === 'Top Assists';
+                                        const isTeamClickable = category.title === 'Most Viewed Teams';
+                                        const isVenueClickable = category.title === 'Most Visited Venues';
+                                        const isClickable = isPlayerClickable || isTeamClickable || isVenueClickable;
+                                        
                                         return (
                                             <Card 
                                                 key={`${category.title}-${player.rank}`} 
@@ -239,7 +397,15 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                     cursor: isClickable ? 'pointer' : 'default',
                                                     transition: isClickable ? 'all 0.2s ease' : 'none',
                                                 }}
-                                                onClick={() => isClickable && handlePlayerClick(player.name, category.title)}
+                                                onClick={() => {
+                                                    if (isPlayerClickable) {
+                                                        handlePlayerClick(player.name, player.id, category.title);
+                                                    } else if (isTeamClickable) {
+                                                        handleTeamClick(player.name, player.id);
+                                                    } else if (isVenueClickable) {
+                                                        handleVenueClick(player.name, player.id);
+                                                    }
+                                                }}
                                                 onMouseEnter={(e) => {
                                                     if (isClickable) {
                                                         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -508,6 +674,148 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                 </Stack>
                             </ScrollArea>
                         </Box>
+
+                        {/* Action Buttons */}
+                        <Divider color="var(--modern-border-color)" />
+                        <Group justify="flex-end" gap="md">
+                            <ModernButton
+                                variant="primary"
+                                onClick={() => handleViewPlayerPage(selectedPlayer.id)}
+                                leftSection={<IconExternalLink size={16} />}
+                            >
+                                View Player Page
+                            </ModernButton>
+                        </Group>
+                    </Stack>
+                )}
+            </Modal>
+
+            {/* Team Stats Modal */}
+            <Modal
+                opened={teamModalOpen}
+                onClose={() => {
+                    setTeamModalOpen(false);
+                    setSelectedTeam(null);
+                }}
+                title={
+                    <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
+                        {selectedTeam?.name}
+                    </ModernH3>
+                }
+                size="lg"
+                centered
+                overlayProps={{
+                    backgroundOpacity: 0.85,
+                    blur: 4,
+                }}
+                styles={{
+                    content: {
+                        backgroundColor: 'var(--modern-card-bg)',
+                        boxShadow: '0 20px 60px var(--modern-shadow-color)',
+                        border: '1px solid var(--modern-border-color)',
+                    },
+                    header: {
+                        backgroundColor: 'var(--modern-bg-tertiary)',
+                        borderBottom: '1px solid var(--modern-border-color)',
+                        padding: '1.5rem',
+                    },
+                    body: {
+                        padding: '1.5rem',
+                        backgroundColor: 'var(--modern-card-bg)',
+                    },
+                    close: {
+                        color: 'var(--modern-text-primary)',
+                        '&:hover': {
+                            backgroundColor: 'var(--modern-bg-tertiary)',
+                        },
+                    },
+                }}
+            >
+                {selectedTeam && (
+                    <Stack gap="lg">
+                        <Box>
+                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                                You've watched {stats.find(s => s.title === 'Most Viewed Teams')?.topPlayers.find(p => p.name === selectedTeam.name)?.value || 0} {stats.find(s => s.title === 'Most Viewed Teams')?.topPlayers.find(p => p.name === selectedTeam.name)?.value === 1 ? 'match' : 'matches'} involving {selectedTeam.name}.
+                            </ModernBody>
+                        </Box>
+                        <Divider color="var(--modern-border-color)" />
+                        <Group justify="flex-end" gap="md">
+                            <ModernButton
+                                variant="primary"
+                                onClick={() => handleViewTeamPage(selectedTeam.id)}
+                                leftSection={<IconExternalLink size={16} />}
+                            >
+                                View Team Page
+                            </ModernButton>
+                        </Group>
+                    </Stack>
+                )}
+            </Modal>
+
+            {/* Venue Stats Modal */}
+            <Modal
+                opened={venueModalOpen}
+                onClose={() => {
+                    setVenueModalOpen(false);
+                    setSelectedVenue(null);
+                }}
+                title={
+                    <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
+                        {selectedVenue?.name}
+                    </ModernH3>
+                }
+                size="lg"
+                centered
+                overlayProps={{
+                    backgroundOpacity: 0.85,
+                    blur: 4,
+                }}
+                styles={{
+                    content: {
+                        backgroundColor: 'var(--modern-card-bg)',
+                        boxShadow: '0 20px 60px var(--modern-shadow-color)',
+                        border: '1px solid var(--modern-border-color)',
+                    },
+                    header: {
+                        backgroundColor: 'var(--modern-bg-tertiary)',
+                        borderBottom: '1px solid var(--modern-border-color)',
+                        padding: '1.5rem',
+                    },
+                    body: {
+                        padding: '1.5rem',
+                        backgroundColor: 'var(--modern-card-bg)',
+                    },
+                    close: {
+                        color: 'var(--modern-text-primary)',
+                        '&:hover': {
+                            backgroundColor: 'var(--modern-bg-tertiary)',
+                        },
+                    },
+                }}
+            >
+                {selectedVenue && (
+                    <Stack gap="lg">
+                        <Box>
+                            <Group gap="xs" mb="md">
+                                <IconMapPin size={20} style={{ color: 'var(--modern-text-secondary)' }} />
+                                <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600 }}>
+                                    Stadium Information
+                                </ModernH3>
+                            </Group>
+                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                                You've visited {selectedVenue.name} {stats.find(s => s.title === 'Most Visited Venues')?.topPlayers.find(p => p.name === selectedVenue.name)?.value || 0} {stats.find(s => s.title === 'Most Visited Venues')?.topPlayers.find(p => p.name === selectedVenue.name)?.value === 1 ? 'time' : 'times'}.
+                            </ModernBody>
+                        </Box>
+                        <Divider color="var(--modern-border-color)" />
+                        <Group justify="flex-end" gap="md">
+                            <ModernButton
+                                variant="primary"
+                                onClick={() => handleViewStadium(selectedVenue.id)}
+                                leftSection={<IconExternalLink size={16} />}
+                            >
+                                View Stadium
+                            </ModernButton>
+                        </Group>
                     </Stack>
                 )}
             </Modal>

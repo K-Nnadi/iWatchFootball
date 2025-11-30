@@ -82,15 +82,18 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker europe-west4-docker.pkg.dev
 
+      - name: Grant Cloud SQL access to Cloud Run service account
+        run: |
+          SERVICE_ACCOUNT="firebase-app-hosting-compute@iwatchfootball.iam.gserviceaccount.com"
+          gcloud projects add-iam-policy-binding iwatchfootball \
+            --member="serviceAccount:${SERVICE_ACCOUNT}" \
+            --role="roles/cloudsql.client" \
+            --condition=None || echo "Permission may already exist, continuing..."
 
       - name: Build and push Docker image
         run: |
           docker build -f backend/Dockerfile -t europe-west4-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }} .
           docker push europe-west4-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}
-
-      # 🔍 DEBUG — Check region value
-      - name: Debug Region Value
-        run: echo "GCP_REGION => '${{ secrets.GCP_REGION }}'"
 
       - name: Deploy to Cloud Run
         run: |
