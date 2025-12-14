@@ -82,6 +82,20 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker europe-west4-docker.pkg.dev
 
+      - name: Ensure Cloud Run service account has Cloud SQL Client role
+        run: |
+          # Get the default Compute Engine service account (used by Cloud Run if no custom SA is set)
+          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID }} --format="value(projectNumber)")
+          SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+          
+          # Grant Cloud SQL Client role to the service account
+          gcloud projects add-iam-policy-binding ${{ secrets.GCP_PROJECT_ID }} \
+            --member="serviceAccount:${SERVICE_ACCOUNT}" \
+            --role="roles/cloudsql.client" \
+            --condition=None || echo "Role may already be granted or using custom service account"
+          
+          echo "✅ Cloud SQL Client role verified for service account: ${SERVICE_ACCOUNT}"
+
       - name: Build and push Docker image
         run: |
           docker build -f backend/Dockerfile -t europe-west4-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }} .

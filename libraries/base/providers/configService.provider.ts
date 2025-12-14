@@ -61,11 +61,27 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 				? '/cloudsql' 
 				: defaultHost.split(':')[0];
 			if (!fs.existsSync(socketDir)) {
-				console.warn(`⚠️  Warning: Cloud SQL socket directory not found: ${socketDir}`);
-				console.warn(`This may indicate Cloud SQL connection is not properly configured.`);
-				console.warn(`Ensure the Cloud Run service has Cloud SQL connection configured.`);
+				console.error(`❌ ERROR: Cloud SQL socket directory not found: ${socketDir}`);
+				console.error(`This indicates Cloud SQL connection is not properly configured.`);
+				console.error(`Please verify:`);
+				console.error(`1. Cloud Run service has --add-cloudsql-instances flag set`);
+				console.error(`2. Cloud Run service account has "Cloud SQL Client" IAM role`);
+				console.error(`3. Cloud SQL instance name matches: ${defaultHost.replace('/cloudsql/', '')}`);
+				console.error(`4. Cloud SQL instance is in the same region as Cloud Run service`);
 			} else {
 				console.log(`✅ Cloud SQL socket directory found: ${socketDir}`);
+				// List available sockets for debugging
+				try {
+					const sockets = fs.readdirSync(socketDir);
+					console.log(`📁 Available Cloud SQL sockets: ${sockets.join(', ') || 'none found'}`);
+					if (!sockets.some(s => defaultHost.includes(s))) {
+						console.warn(`⚠️  Warning: Expected socket not found in directory.`);
+						console.warn(`   Looking for: ${defaultHost}`);
+						console.warn(`   Available: ${sockets.join(', ')}`);
+					}
+				} catch (err) {
+					console.warn(`⚠️  Could not read socket directory: ${err}`);
+				}
 			}
 		}
 		
@@ -98,10 +114,19 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 				max: 20,
 				min: 5,
 				idleTimeoutMillis: 30000,
-				connectionTimeoutMillis: 30000, // Increased from 10s to 30s for Cloud SQL
-				// Add retry logic for connection
-				retryAttempts: 3,
-				retryDelay: 3000,
+				// For Cloud SQL socket connections, use longer timeout (socket connections can be slower)
+				// For TCP connections, 30s is usually sufficient
+				connectionTimeoutMillis: isSocketConnection && isCloudRun ? 60000 : 30000,
+				// Reduce retry attempts for Cloud Run to fail faster and provide better error messages
+				// TypeORM will still retry internally, but we want to surface errors sooner
+				retryAttempts: isCloudRun ? 1 : 3,
+				retryDelay: isCloudRun ? 1000 : 3000,
+				// For socket connections, ensure we're using the correct connection method
+				...(isSocketConnection && {
+					// PostgreSQL socket connection specific options
+					keepAlive: true,
+					keepAliveInitialDelayMillis: 10000,
+				}),
 			},
 		};
 

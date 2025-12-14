@@ -34,11 +34,18 @@ function getInstance(environment?: string): string {
 function getProxyPath(): string {
 	const customPath = getArg('proxy-path') || process.env.CLOUD_SQL_PROXY_PATH;
 	if (customPath) {
-		if (!existsSync(customPath)) {
-			console.error(`❌ Cloud SQL Proxy not found at: ${customPath}`);
+		// Clean the path: remove whitespace, "PS " prefix, and quotes
+		let cleanedPath = customPath.trim()
+			.replace(/^PS\s+/i, '') // Remove "PS " prefix if present
+			.replace(/^["']|["']$/g, ''); // Remove surrounding quotes
+		
+		if (!existsSync(cleanedPath)) {
+			console.error(`❌ Cloud SQL Proxy not found at: ${cleanedPath}`);
+			console.error(`   Original path was: ${customPath}`);
+			console.error(`   Make sure the path is correct and the file exists.`);
 			process.exit(1);
 		}
-		return customPath;
+		return cleanedPath;
 	}
 
 	const exeName = process.platform === 'win32' ? 'cloud-sql-proxy.exe' : 'cloud-sql-proxy';
@@ -64,15 +71,28 @@ export function runProxy(): void {
 
 	proxy.on('error', (error) => {
 		console.error('❌ Failed to start:', error.message);
-		console.error('   Make sure cloud-sql-proxy is installed and in your PATH');
-		console.error('   Or set CLOUD_SQL_PROXY_PATH environment variable');
-		console.error('   Install: https://cloud.google.com/sql/docs/postgres/sql-proxy#install');
+		if (error.message.includes('credentials') || error.message.includes('authentication')) {
+			console.error('');
+			console.error('🔐 Authentication Error:');
+			console.error('   You need to authenticate with Google Cloud first.');
+			console.error('');
+			console.error('   Run this command to authenticate:');
+			console.error('   gcloud auth application-default login');
+			console.error('');
+			console.error('   Or set GOOGLE_APPLICATION_CREDENTIALS to point to a service account key file.');
+			console.error('   See: https://cloud.google.com/docs/authentication/external/set-up-adc');
+		} else {
+			console.error('   Make sure cloud-sql-proxy is installed and in your PATH');
+			console.error('   Or set CLOUD_SQL_PROXY_PATH environment variable');
+			console.error('   Install: https://cloud.google.com/sql/docs/postgres/sql-proxy#install');
+		}
 		process.exit(1);
 	});
 
 	proxy.on('exit', (code) => {
 		if (code && code !== 0) {
-			console.error(`❌ Exited with code ${code}`);
+			console.error(`❌ Proxy exited with code ${code}`);
+			// Don't show additional error message here as it's likely already shown in stderr
 			process.exit(code);
 		}
 	});
