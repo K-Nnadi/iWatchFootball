@@ -43,6 +43,29 @@
 	z-index: 1;
 }
 
+.mobileRightSection {
+	position: absolute;
+	right: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+}
+
+.cartIcon {
+	position: relative;
+	cursor: pointer;
+	color: var(--modern-text-primary);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.cartIcon:hover {
+	color: var(--modern-lime);
+	transform: translateY(-2px);
+}
+
 .navButton {
 	color: var(--modern-text-primary);
 	text-transform: uppercase;

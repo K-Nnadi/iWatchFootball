@@ -1,14 +1,35 @@
 import { Paper, Text, Group } from '@mantine/core';
 import { IconClock } from '@tabler/icons-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 interface ReservationTimerProps {
     initialMinutes?: number;
+    reservationStartTime?: number | null; // Timestamp when reservation started
     onExpire?: () => void;
 }
 
-export function ReservationTimer({ initialMinutes = 15, onExpire }: ReservationTimerProps) {
-    const [timeRemaining, setTimeRemaining] = useState(initialMinutes * 60); // Convert to seconds
+export function ReservationTimer({ 
+    initialMinutes = 15, 
+    reservationStartTime = null,
+    onExpire 
+}: ReservationTimerProps) {
+    // Calculate initial time remaining based on persisted start time
+    const initialTimeRemaining = useMemo(() => {
+        if (reservationStartTime) {
+            const elapsed = (Date.now() - reservationStartTime) / 1000; // seconds
+            const total = initialMinutes * 60; // total seconds
+            const remaining = Math.max(0, total - elapsed);
+            return Math.floor(remaining);
+        }
+        return initialMinutes * 60; // Default: full duration
+    }, [reservationStartTime, initialMinutes]);
+
+    const [timeRemaining, setTimeRemaining] = useState(initialTimeRemaining);
+
+    // Recalculate when reservationStartTime or initialMinutes changes
+    useEffect(() => {
+        setTimeRemaining(initialTimeRemaining);
+    }, [initialTimeRemaining]);
 
     useEffect(() => {
         if (timeRemaining <= 0) {

@@ -4,10 +4,11 @@ import {
     Title,
     SimpleGrid,
 } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useAuthStore } from '../shared/stores/auth.store';
+import { useCartStore } from '../shared/stores/cart.store';
 import { AuthenticationStep } from './checkout/AuthenticationStep';
 import { DetailsStep } from './checkout/DetailsStep';
 import { AdditionalInfoStep } from './checkout/AdditionalInfoStep';
@@ -28,19 +29,61 @@ export function CheckoutPage() {
     const location = useLocation();
     const { navigateWithTransition } = usePageTransition();
     const { isLoggedIn } = useAuthStore();
-    const ticketDetails: CheckoutTicketDetails = location.state || {
-        matchId: 'unknown',
-        homeTeam: 'Team A',
-        awayTeam: 'Team B',
-        date: '2023-12-25T18:00:00',
-        venue: 'Stadium X',
-        price: 50,
+    const {
+        items,
+        addItem,
+        checkoutState,
+        setCheckoutState,
+        startReservation,
+        initializeCart,
+        clearCart,
+        clearCheckoutState,
+    } = useCartStore();
+    const hasInitialized = useRef(false);
+    
+    // Get ticket details from location.state or from cart
+    const getTicketDetails = (): CheckoutTicketDetails | null => {
+        if (location.state) {
+            return location.state as CheckoutTicketDetails;
+        }
+        // Try to get from cart (use first item if available)
+        if (items.length > 0) {
+            const cartItem = items[0];
+            // Return ticket details without cart-specific fields
+            return {
+                matchId: cartItem.matchId,
+                homeTeam: cartItem.homeTeam,
+                awayTeam: cartItem.awayTeam,
+                date: cartItem.date,
+                venue: cartItem.venue,
+                price: cartItem.price,
+                competition: cartItem.competition,
+                section: cartItem.section,
+                row: cartItem.row,
+                fanSide: cartItem.fanSide,
+                seatsTogether: cartItem.seatsTogether,
+                ticketType: cartItem.ticketType,
+                unrestrictedView: cartItem.unrestrictedView,
+                quantity: cartItem.quantity,
+                imageUrl: cartItem.imageUrl,
+            };
+        }
+        return null;
     };
 
+    const ticketDetailsFromState = getTicketDetails();
+    
     // Use normalized step indices: 0=Auth, 1=Details, 2=Additional, 3=Payment
     // When logged in, we skip step 0 (auth) but keep the same internal numbering
-    const [activeStep, setActiveStep] = useState(isLoggedIn ? 1 : 0);
-    const [isGuestCheckout, setIsGuestCheckout] = useState(false);
+    const [activeStep, setActiveStep] = useState(() => {
+        if (checkoutState) {
+            return checkoutState.activeStep;
+        }
+        return isLoggedIn ? 1 : 0;
+    });
+    const [isGuestCheckout, setIsGuestCheckout] = useState(() => {
+        return checkoutState?.isGuestCheckout ?? false;
+    });
     
     // Handle stepper click - convert stepper step back to internal step
     const handleStepperClick = (stepperStep: number) => {
@@ -90,35 +133,41 @@ export function CheckoutPage() {
     }, []);
 
     // Step 1: Your Details
-    const [userDetails, setUserDetails] = useState<UserDetails>({
-        email: '',
-        confirmEmail: '',
-        phone: '',
-        phoneCountryCode: '+44',
-        firstName: '',
-        lastName: '',
-        address: '',
-        addressLine2: '',
-        postcode: '',
-        townCity: '',
-        country: 'United Kingdom',
-        regionState: '',
-        addressType: 'Personal',
+    const [userDetails, setUserDetails] = useState<UserDetails>(() => {
+        return checkoutState?.userDetails ?? {
+            email: '',
+            confirmEmail: '',
+            phone: '',
+            phoneCountryCode: '+44',
+            firstName: '',
+            lastName: '',
+            address: '',
+            addressLine2: '',
+            postcode: '',
+            townCity: '',
+            country: 'United Kingdom',
+            regionState: '',
+            addressType: 'Personal',
+        };
     });
 
     // Step 2: Additional Information
-    const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({
-        agreeToTerms: false,
-        agreeToMarketing: false,
+    const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>(() => {
+        return checkoutState?.additionalInfo ?? {
+            agreeToTerms: false,
+            agreeToMarketing: false,
+        };
     });
 
     // Step 3: Payment
-    const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
-        name: '',
-        cardNumber: '',
-        expiration: '',
-        cvv: '',
-        email: '',
+    const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>(() => {
+        return checkoutState?.paymentInfo ?? {
+            name: '',
+            cardNumber: '',
+            expiration: '',
+            cvv: '',
+            email: '',
+        };
     });
 
     const [errors, setErrors] = useState<CheckoutErrors>({
@@ -140,6 +189,36 @@ export function CheckoutPage() {
 
     const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+    // Initialize cart on mount
+    useEffect(() => {
+        if (!hasInitialized.current) {
+            initializeCart();
+            hasInitialized.current = true;
+        }
+    }, [initializeCart]);
+
+    // Save ticket to cart when arriving from seat selection
+    useEffect(() => {
+        if (location.state && ticketDetailsFromState) {
+            addItem(ticketDetailsFromState);
+            // Start reservation when ticket is added
+            if (!checkoutState?.reservationStartTime) {
+                startReservation();
+            }
+        }
+    }, [location.state, ticketDetailsFromState, addItem, startReservation, checkoutState?.reservationStartTime]);
+
+    // Persist checkout state whenever it changes
+    useEffect(() => {
+        setCheckoutState({
+            activeStep,
+            isGuestCheckout,
+            userDetails,
+            additionalInfo,
+            paymentInfo,
+        });
+    }, [activeStep, isGuestCheckout, userDetails, additionalInfo, paymentInfo, setCheckoutState]);
+
     // Handle login state changes - if user logs in during checkout, skip auth step
     useEffect(() => {
         if (isLoggedIn && activeStep === 0 && !isGuestCheckout) {
@@ -147,11 +226,14 @@ export function CheckoutPage() {
         }
     }, [isLoggedIn, activeStep, isGuestCheckout]);
 
-    if (!location.state) {
-        console.error('No ticket details provided. Redirecting to matches page.');
+    // Redirect if no ticket details available
+    if (!ticketDetailsFromState) {
+        console.error('No ticket details available. Redirecting to matches page.');
         navigateWithTransition('/matches');
         return null;
     }
+
+    const ticketDetails = ticketDetailsFromState;
 
     const validateStep1 = () => {
         let valid = true;
@@ -304,6 +386,9 @@ export function CheckoutPage() {
             const isSuccessful = Math.random() > 0.1;
             if (isSuccessful) {
                 setPaymentStatus('success');
+                // Clear cart and checkout state on successful payment
+                clearCart();
+                clearCheckoutState();
                 setTimeout(
                     () =>
                         navigateWithTransition('/thank-you', {
@@ -343,9 +428,13 @@ export function CheckoutPage() {
 
             <ReservationTimer
                 initialMinutes={15}
+                reservationStartTime={checkoutState?.reservationStartTime ?? null}
                 onExpire={() => {
-                    // TODO: Handle reservation expiration
+                    // Clear checkout state when reservation expires
+                    clearCheckoutState();
                     console.warn('Reservation expired');
+                    // Optionally redirect to matches page
+                    // navigateWithTransition('/matches');
                 }}
             />
 

@@ -1,8 +1,9 @@
 import React from 'react';
-import { AppShell, Avatar, Box, Burger, Button, Container, Flex, Group, Menu, Title } from '@mantine/core';
-import { IoSettingsOutline, IoPersonOutline } from 'react-icons/io5';
+import { AppShell, Avatar, Badge, Box, Burger, Button, Container, Flex, Group, Menu, Title } from '@mantine/core';
+import { IoSettingsOutline, IoPersonOutline, IoCartOutline } from 'react-icons/io5';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
+import { useCartStore } from '../../shared/stores/cart.store';
 import classes from './styles/header.module.css';
 
 interface HeaderProps {
@@ -13,6 +14,8 @@ interface HeaderProps {
 export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const { navigateWithTransition } = usePageTransition();
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
+    const { items } = useCartStore();
+    const hasCartItems = items.length > 0;
 
     const pages = [
         { page: 'competitions', label: 'Competitions' },
@@ -48,52 +51,91 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                         className={classes.burgerMenu}
                     />
 
-                    {/* Mobile Avatar - Right side */}
-                    <Box hiddenFrom="md" className={classes.mobileAvatar}>
-                        {isLoggedIn ? (
-                            // Logged in: Click to go to settings
-                            <Avatar
-                                size="md"
-                                radius="xl"
-                                onClick={() => navigateWithTransition('/settings')}
-                                className={classes.avatar}
+                    {/* Mobile Right Section - Cart Icon and Avatar */}
+                    <Group gap="md" hiddenFrom="md" className={classes.mobileRightSection}>
+                        {/* Cart Icon - Only show when there are items */}
+                        {hasCartItems && (
+                            <Box
+                                onClick={() => navigateWithTransition('/checkout')}
+                                className={classes.cartIcon}
+                                style={{ position: 'relative', cursor: 'pointer' }}
                             >
-                                <IoPersonOutline size={20} />
-                            </Avatar>
-                        ) : (
-                            // Not logged in: Menu with Sign In/Sign Up
-                            <Menu
-                                shadow="md"
-                                width={200}
-                                position="bottom-end"
-                                withArrow
-                            >
-                                <Menu.Target>
-                                    <Avatar
-                                        size="md"
-                                        radius="xl"
-                                        className={classes.avatar}
-                                    >
-                                        <IoPersonOutline size={20} />
-                                    </Avatar>
-                                </Menu.Target>
-                                <Menu.Dropdown className={classes.menuDropdown}>
-                                    <Menu.Item
-                                        onClick={() => navigateWithTransition('/signIn')}
-                                        className={classes.menuItem}
-                                    >
-                                        Sign In
-                                    </Menu.Item>
-                                    <Menu.Item
-                                        onClick={() => navigateWithTransition('/join')}
-                                        className={classes.menuItemLime}
-                                    >
-                                        Join
-                                    </Menu.Item>
-                                </Menu.Dropdown>
-                            </Menu>
+                                <IoCartOutline 
+                                    size={24} 
+                                    style={{ color: 'var(--modern-text-primary)' }}
+                                />
+                                <Badge
+                                    size="xs"
+                                    circle
+                                    variant="filled"
+                                    style={{
+                                        position: 'absolute',
+                                        top: -8,
+                                        right: -8,
+                                        minWidth: 18,
+                                        height: 18,
+                                        padding: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '10px',
+                                        fontWeight: 700,
+                                        backgroundColor: 'var(--modern-lime)',
+                                        color: 'var(--modern-bg-primary)',
+                                    }}
+                                >
+                                    {items.length}
+                                </Badge>
+                            </Box>
                         )}
-                    </Box>
+                        
+                        {/* Mobile Avatar */}
+                        <Box>
+                            {isLoggedIn ? (
+                                // Logged in: Click to go to settings
+                                <Avatar
+                                    size="md"
+                                    radius="xl"
+                                    onClick={() => navigateWithTransition('/settings')}
+                                    className={classes.avatar}
+                                >
+                                    <IoPersonOutline size={20} />
+                                </Avatar>
+                            ) : (
+                                // Not logged in: Menu with Sign In/Sign Up
+                                <Menu
+                                    shadow="md"
+                                    width={200}
+                                    position="bottom-end"
+                                    withArrow
+                                >
+                                    <Menu.Target>
+                                        <Avatar
+                                            size="md"
+                                            radius="xl"
+                                            className={classes.avatar}
+                                        >
+                                            <IoPersonOutline size={20} />
+                                        </Avatar>
+                                    </Menu.Target>
+                                    <Menu.Dropdown className={classes.menuDropdown}>
+                                        <Menu.Item
+                                            onClick={() => navigateWithTransition('/signIn')}
+                                            className={classes.menuItem}
+                                        >
+                                            Sign In
+                                        </Menu.Item>
+                                        <Menu.Item
+                                            onClick={() => navigateWithTransition('/join')}
+                                            className={classes.menuItemLime}
+                                        >
+                                            Join
+                                        </Menu.Item>
+                                    </Menu.Dropdown>
+                                </Menu>
+                            )}
+                        </Box>
+                    </Group>
 
                     {/* Title - Mobile: Centered */}
                     <Box hiddenFrom="md" className={classes.mobileTitle}>
@@ -129,6 +171,41 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     <Group gap="lg">
                         {showHeader && (
                             <>
+                                {/* Cart Icon - Desktop: Only show when there are items */}
+                                {hasCartItems && (
+                                    <Box
+                                        onClick={() => navigateWithTransition('/checkout')}
+                                        className={classes.cartIcon}
+                                        style={{ position: 'relative', cursor: 'pointer' }}
+                                    >
+                                        <IoCartOutline 
+                                            size={24} 
+                                            style={{ color: 'var(--modern-text-primary)' }}
+                                        />
+                                        <Badge
+                                            size="xs"
+                                            circle
+                                            variant="filled"
+                                            style={{
+                                                position: 'absolute',
+                                                top: -8,
+                                                right: -8,
+                                                minWidth: 18,
+                                                height: 18,
+                                                padding: 0,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '10px',
+                                                fontWeight: 700,
+                                                backgroundColor: 'var(--modern-lime)',
+                                                color: 'var(--modern-bg-primary)',
+                                            }}
+                                        >
+                                            {items.length}
+                                        </Badge>
+                                    </Box>
+                                )}
                                 <IoSettingsOutline
                                     size={24}
                                     onClick={() => navigateWithTransition('/settings')}

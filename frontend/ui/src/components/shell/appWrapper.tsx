@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useHeaderNavbarStore } from "../../shared/stores/headerNavbar.store";
 // Assume we have an auth store or context that provides isLoggedIn
 import { useAuthStore } from '../../shared/stores/auth.store'; // Example import
+import { useCartStore } from '../../shared/stores/cart.store';
 
 export function AppWrapper() {
     const { navbarOpen } = useHeaderNavbarStore();
@@ -16,11 +17,13 @@ export function AppWrapper() {
 
     // Retrieve login state from a store or context
     const { isLoggedIn, initializeAuth } = useAuthStore();
+    const { initializeCart } = useCartStore();
 
-    // Initialize auth state on mount
+    // Initialize auth and cart state on mount
     useEffect(() => {
         initializeAuth();
-    }, [initializeAuth]);
+        initializeCart();
+    }, [initializeAuth, initializeCart]);
 
     const collapsed = {
         desktop: true,

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Box, Container, Grid, Paper, Stack, Text, Group, ScrollArea, useMantineColorScheme } from '@mantine/core';
 import { useParams, useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useCartStore } from '../shared/stores/cart.store';
 import { StadiumMap } from '../components/stadium/StadiumMap';
 import { ModernH3 } from '../components/modern';
 import { MatchHeader, FiltersPanel, TicketCard, type Ticket, type TicketFilters, type MatchDetails } from '../components/tickets';
@@ -26,6 +27,7 @@ export function SeatSelectionPage() {
     const routerLocation = useLocation();
     const { colorScheme } = useMantineColorScheme();
     const isDark = colorScheme === 'dark';
+    const { addItem, startReservation } = useCartStore();
 
     const matchDetails: MatchDetails = (routerLocation.state as MatchDetails) || DEFAULT_MATCH_DETAILS;
 
@@ -149,16 +151,31 @@ export function SeatSelectionPage() {
     const handleBuyNow = (ticketId: string) => {
         const ticket = allTickets.find((t) => t.id === ticketId);
         if (ticket) {
+            const ticketDetails = {
+                matchId: matchId || 'unknown',
+                homeTeam: matchDetails.homeTeam,
+                awayTeam: matchDetails.awayTeam,
+                date: matchDetails.date,
+                venue: matchDetails.venue,
+                price: ticket.price,
+                quantity: ticket.seatsTogether || 1,
+                section: ticket.block,
+                row: undefined,
+                fanSide: ticket.fanSide,
+                seatsTogether: ticket.seatsTogether,
+                ticketType: ticket.ticketFormat as 'E-Ticket' | 'Print at Home',
+                unrestrictedView: ticket.clearView,
+            };
+            
+            // Add to cart
+            addItem(ticketDetails);
+            
+            // Start reservation timer
+            startReservation();
+            
+            // Navigate to checkout
             navigateWithTransition('/checkout', {
-                state: {
-                    matchId: matchId || 'unknown',
-                    homeTeam: matchDetails.homeTeam,
-                    awayTeam: matchDetails.awayTeam,
-                    date: matchDetails.date,
-                    venue: matchDetails.venue,
-                    price: ticket.price,
-                    ticket: ticket,
-                },
+                state: ticketDetails,
             });
         }
     };
