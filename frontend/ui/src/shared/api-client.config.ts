@@ -3,9 +3,10 @@ import axios from 'axios';
 /**
  * Configure the API client with base URL and authentication
  * This should be called once when the app initializes
+ * Uses VITE_API_URL from .env.development or .env.production
  */
 export function configureApiClient() {
-  // Set the base URL from environment variable
+  // Vite automatically loads .env.development or .env.production based on mode
   const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   
   // Configure axios defaults
