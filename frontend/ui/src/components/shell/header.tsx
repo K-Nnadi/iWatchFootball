@@ -53,17 +53,17 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
 
                     {/* Mobile Right Section - Cart Icon and Avatar */}
                     <Group gap="md" hiddenFrom="md" className={classes.mobileRightSection}>
-                        {/* Cart Icon - Only show when there are items */}
-                        {hasCartItems && (
-                            <Box
-                                onClick={() => navigateWithTransition('/checkout')}
-                                className={classes.cartIcon}
-                                style={{ position: 'relative', cursor: 'pointer' }}
-                            >
-                                <IoCartOutline 
-                                    size={24} 
-                                    style={{ color: 'var(--modern-text-primary)' }}
-                                />
+                        {/* Cart Icon - Always visible */}
+                        <Box
+                            onClick={() => navigateWithTransition('/checkout')}
+                            className={classes.cartIcon}
+                            style={{ position: 'relative', cursor: 'pointer' }}
+                        >
+                            <IoCartOutline 
+                                size={24} 
+                                style={{ color: 'var(--modern-text-primary)' }}
+                            />
+                            {hasCartItems && (
                                 <Badge
                                     size="xs"
                                     circle
@@ -86,8 +86,8 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                 >
                                     {items.length}
                                 </Badge>
-                            </Box>
-                        )}
+                            )}
+                        </Box>
                         
                         {/* Mobile Avatar */}
                         <Box>
@@ -171,17 +171,17 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     <Group gap="lg">
                         {showHeader && (
                             <>
-                                {/* Cart Icon - Desktop: Only show when there are items */}
-                                {hasCartItems && (
-                                    <Box
-                                        onClick={() => navigateWithTransition('/checkout')}
-                                        className={classes.cartIcon}
-                                        style={{ position: 'relative', cursor: 'pointer' }}
-                                    >
-                                        <IoCartOutline 
-                                            size={24} 
-                                            style={{ color: 'var(--modern-text-primary)' }}
-                                        />
+                                {/* Cart Icon - Desktop: Always visible */}
+                                <Box
+                                    onClick={() => navigateWithTransition('/checkout')}
+                                    className={classes.cartIcon}
+                                    style={{ position: 'relative', cursor: 'pointer' }}
+                                >
+                                    <IoCartOutline 
+                                        size={24} 
+                                        style={{ color: 'var(--modern-text-primary)' }}
+                                    />
+                                    {hasCartItems && (
                                         <Badge
                                             size="xs"
                                             circle
@@ -204,8 +204,8 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                         >
                                             {items.length}
                                         </Badge>
-                                    </Box>
-                                )}
+                                    )}
+                                </Box>
                                 <IoSettingsOutline
                                     size={24}
                                     onClick={() => navigateWithTransition('/settings')}

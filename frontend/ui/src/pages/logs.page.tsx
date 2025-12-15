@@ -1,8 +1,11 @@
 import React, {FormEvent, useEffect, useMemo, useRef, useState} from 'react';
+import { createPortal } from 'react-dom';
 import {
+    ActionIcon,
     Box,
     Container,
     Grid,
+    Group,
     LoadingOverlay,
     ScrollArea,
     Select,
@@ -12,7 +15,10 @@ import {
     Tabs
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
+import { IconLock, IconArrowLeft } from '@tabler/icons-react';
 import { ModernButton, ModernCard, ModernH2, ModernH3, ModernBody, ModernCaption } from '../components/modern';
+import { useAuthStore } from '../shared/stores/auth.store';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 import NewStatsTab from "../tabs/newStats.tab";
@@ -68,6 +74,9 @@ interface Team {
 }
 
 export function LogsPage() {
+    const { isLoggedIn } = useAuthStore();
+    const { navigateWithTransition } = usePageTransition();
+
     // States for searching and adding matches
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [seasons, setSeasons] = useState<Season[]>([]);
@@ -347,6 +356,101 @@ export function LogsPage() {
             return loggedFixtures.filter(fixture => fixture.isVerified);
         }
     }, [loggedFixtures, verificationFilter]);
+    // Lock Overlay component - rendered via portal to document body
+    const lockOverlay = !isLoggedIn ? (
+        createPortal(
+            <Box
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    backdropFilter: 'blur(4px)',
+                    zIndex: 9999,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'auto',
+                    margin: 0,
+                    padding: 0,
+                }}
+            >
+                {/* Back Button */}
+                <ActionIcon
+                    onClick={() => window.history.back()}
+                    variant="filled"
+                    size="xl"
+                    radius="xl"
+                    style={{
+                        position: 'absolute',
+                        top: '1.5rem',
+                        left: '1.5rem',
+                        backgroundColor: 'var(--modern-lime)',
+                        color: 'var(--modern-bg-primary)',
+                        zIndex: 10001,
+                        border: '2px solid var(--modern-lime)',
+                    }}
+                >
+                    <IconArrowLeft size={24} />
+                </ActionIcon>
+
+                <ModernCard
+                    style={{
+                        padding: '3rem',
+                        backgroundColor: 'var(--modern-card-bg)',
+                        border: '2px solid var(--modern-lime)',
+                        maxWidth: '500px',
+                        width: '90%',
+                        textAlign: 'center',
+                        position: 'relative',
+                        zIndex: 10000,
+                    }}
+                >
+                    <Stack gap="lg" align="center">
+                        <IconLock 
+                            size={64} 
+                            style={{ 
+                                color: 'var(--modern-lime)',
+                                marginBottom: '1rem'
+                            }} 
+                        />
+                        <ModernH2 style={{ color: 'var(--modern-text-primary)' }}>
+                            Authentication Required
+                        </ModernH2>
+                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
+                            You need to be logged in to access your match logs. Sign in to track and manage your match history.
+                        </ModernBody>
+                        <Group gap="md" mt="md">
+                            <ModernButton
+                                onClick={() => navigateWithTransition('/signIn')}
+                                variant="primary"
+                                size="md"
+                            >
+                                Sign In
+                            </ModernButton>
+                            <ModernButton
+                                onClick={() => navigateWithTransition('/join')}
+                                variant="outline"
+                                size="md"
+                                style={{
+                                    borderColor: 'var(--modern-lime)',
+                                    color: 'var(--modern-lime)',
+                                }}
+                            >
+                                Sign Up
+                            </ModernButton>
+                        </Group>
+                    </Stack>
+                </ModernCard>
+            </Box>,
+            document.body
+        )
+    ) : null;
+
     return (
         <Box className="dark-theme" style={{ 
             minHeight: '100vh', 
@@ -354,8 +458,11 @@ export function LogsPage() {
             width: '100vw',
             marginLeft: 'calc(-50vw + 50%)',
             marginRight: 'calc(-50vw + 50%)',
-            marginTop: '-1rem'
+            marginTop: '-1rem',
+            position: 'relative'
         }}>
+            {lockOverlay}
+            
             <Container>
                 <Grid my={10}>
                     <LoadingOverlay visible={loading} />

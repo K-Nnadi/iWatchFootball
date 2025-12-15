@@ -58,7 +58,7 @@ export function SettingsPage() {
     const [favoriteTeamName, setFavoriteTeamName] = useState<string | null>(null);
 
     // Fetch teams for search - fetch when editing or when user has a favorite team
-    const shouldFetchTeams = isEditingTeam || (user?.favouriteTeamId && !favoriteTeamName);
+    const shouldFetchTeams = !!(isEditingTeam || (user?.favouriteTeamId && !favoriteTeamName));
     const { data: teamsData = [], isLoading: isLoadingTeams } = useGetQueryTeam(
         { take: 100 },
         {
