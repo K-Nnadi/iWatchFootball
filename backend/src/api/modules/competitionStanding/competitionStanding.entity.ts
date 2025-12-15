@@ -1,8 +1,8 @@
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Team} from '../team/team';
-import {Competition} from '../competition/competition';
-import {Season} from '../season/season';
+import {Team} from "../team/team.entity";
+import {Competition} from "../competition/competition.entity";
+import {Season} from "../season/season.entity";
 import {
     EntityColumn,
     EntityRelation,

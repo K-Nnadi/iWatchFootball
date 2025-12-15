@@ -1,9 +1,9 @@
 import {ApiProperty, PickType} from '@nestjs/swagger';
 import {Column, Entity, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {LineUp} from '../lineUp/lineUp';
-import {Player} from '../player/player';
-import {Substitution} from "../substitution/substitution";
+import {LineUp} from "../lineUp/lineUp.entity";
+import {Player} from "../player/player.entity";
+import {Substitution} from "../substitution/substitution.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('playerLineup')

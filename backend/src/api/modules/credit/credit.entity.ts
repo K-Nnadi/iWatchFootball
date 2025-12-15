@@ -1,6 +1,6 @@
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {User} from '../user/user';
+import {User} from '../user/user.entity';
 import {
     EntityColumn,
     EntityRelation,

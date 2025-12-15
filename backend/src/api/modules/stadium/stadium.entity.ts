@@ -1,9 +1,9 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Column, Entity, ManyToMany, OneToMany, OneToOne} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
-import {Address} from "../address/address";
-import {Team} from "../team/team";
-import {Fixture} from "../fixture/fixture";
+import {Address} from "../address/address.entity";
+import {Team} from "../team/team.entity";
+import {Fixture} from "../fixture/fixture.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {forwardRef} from "@nestjs/common";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";

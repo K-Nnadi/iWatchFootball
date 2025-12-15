@@ -1,7 +1,7 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Entity, JoinColumn, OneToMany} from "typeorm";
 import {UserType} from "../../enums/user.enum";
-import {Log} from "../log/log";
+import {Log} from "../log/log.entity";
 import {
     EntityColumn,
     EntityEnumColumn,
@@ -10,25 +10,46 @@ import {
     RelationshipType
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
-import {Prediction} from "../prediction/prediction";
+import {Prediction} from "../prediction/prediction.entity";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
-import {CommsPreference} from "../commsPreference/commsPreference";
-import {Credit} from "../credit/credit";
-import {Transaction} from "../transaction/transaction";
-import {Team} from "../team/team";
+import {CommsPreference} from "../commsPreference/commsPreference.entity";
+import {Credit} from "../credit/credit.entity";
+import {Transaction} from "../transaction/transaction.entity";
+import {Team} from "../team/team.entity";
 
 
 @Entity('user')
 @SecurityFeature<User>({
   base: {
-    // READ operations - All authenticated users can read users (but with limited fields)
-    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
+    // READ operations - Admin and moderator can read all users
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       filter: (req: RequestWithUser): FindOptionsWhere<User> => {
-        // All authenticated users can see all users
+        // Admins and moderators can see all users
         return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'
+      ],
+    },
+    default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }), fields: ['id'] },
+  },
+  [OperationType.READ]: {
+    [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<User> => {
+        // Admins and moderators can see all users
+        return {};
+      },
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'
+      ],
+    },
+    [UserRole.USER]: {
+      // Users can only see their own user record
+      filter: (req: RequestWithUser): FindOptionsWhere<User> => {
+        return { id: req.user?.id };
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'

@@ -1,8 +1,8 @@
 import {PickType} from '@nestjs/swagger';
 import {Column, Entity} from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Fixture} from "../fixture/fixture";
-import {Player} from "../player/player";
+import {Fixture} from "../fixture/fixture.entity";
+import {Player} from "../player/player.entity";
 import {EntityColumn, EntityRelation, OptionalEntityColumn, RelationshipType} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";

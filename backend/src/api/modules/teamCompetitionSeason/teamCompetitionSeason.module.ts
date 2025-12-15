@@ -1,6 +1,6 @@
 import {Injectable, Module} from '@nestjs/common';
 import {InjectRepository, TypeOrmModule} from "@nestjs/typeorm";
-import {CreateTeamCompetitionSeasonDTO, TeamCompetitionSeason} from "./teamCompetitionSeason";
+import {CreateTeamCompetitionSeasonDTO, TeamCompetitionSeason} from "./teamCompetitionSeason.entity";
 import {CrudController} from "@iWatchFootball/base-tools/crud/crud.controller";
 import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";

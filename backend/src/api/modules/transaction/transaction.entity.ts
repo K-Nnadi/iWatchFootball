@@ -1,7 +1,7 @@
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Payment} from '../payment/payment';
-import {User} from '../user/user';
+import {Payment} from "../payment/payment.entity";
+import {User} from '../user/user.entity';
 import {
     EntityColumn,
     EntityEnumColumn,

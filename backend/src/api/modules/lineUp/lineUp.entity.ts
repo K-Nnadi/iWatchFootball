@@ -1,10 +1,10 @@
 import {PickType} from '@nestjs/swagger';
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Fixture} from "../fixture/fixture";
-import {Team} from "../team/team";
-import {Manager} from "../manager/manager";
-import {PlayerLineUp} from "../playerLineUp/playerLineUp";
+import {Fixture} from "../fixture/fixture.entity";
+import {Team} from "../team/team.entity";
+import {Manager} from "../manager/manager.entity";
+import {PlayerLineUp} from "../playerLineUp/playerLineUp.entity";
 import {EntityColumn, EntityRelation, OptionalEntityColumn, RelationshipType} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('lineUp')

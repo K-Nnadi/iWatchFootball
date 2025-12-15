@@ -1,7 +1,7 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {Goal} from '../../modules/goal/goal';
-import {Position} from '../../modules/position/position';
-import {Stadium} from '../../modules/stadium/stadium';
+import {Goal} from '../../modules/goal/goal.entity';
+import {Position} from '../../modules/position/position.entity';
+import {Stadium} from '../../modules/stadium/stadium.entity';
 import {CompetitionType} from '../../enums/competition.enum';
 import {FixtureStage, FixtureStatus} from '../../enums/fixture.enum';
 import {StatsBombHttpService} from './statsbomb-http.service';

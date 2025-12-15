@@ -1,7 +1,7 @@
 import {ApiProperty, PickType} from '@nestjs/swagger';
 import {Entity, OneToMany} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
+import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
 import {EntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";

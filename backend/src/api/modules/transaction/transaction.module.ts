@@ -1,6 +1,6 @@
 import {Injectable, Module, forwardRef, Inject} from '@nestjs/common';
 import {InjectRepository, TypeOrmModule} from "@nestjs/typeorm";
-import {CreateTransactionDTO, Transaction} from "./transaction";
+import {CreateTransactionDTO, Transaction} from "./transaction.entity";
 import {CrudController} from "@iWatchFootball/base-tools/crud/crud.controller";
 import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";

@@ -1,11 +1,11 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Entity, ManyToMany, OneToMany} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
-import {Goal} from "../goal/goal";
-import {Transfer} from "../transfer/transfer";
-import {Team} from "../team/team";
+import {Goal} from "../goal/goal.entity";
+import {Transfer} from "../transfer/transfer.entity";
+import {Team} from "../team/team.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
-import {Trophy} from "../trophy/trophy";
+import {Trophy} from "../trophy/trophy.entity";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";

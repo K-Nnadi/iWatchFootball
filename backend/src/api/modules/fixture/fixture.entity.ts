@@ -1,14 +1,14 @@
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Team} from '../team/team';
-import {Stadium} from '../stadium/stadium';
+import {Team} from "../team/team.entity";
+import {Stadium} from "../stadium/stadium.entity";
 import {FixtureStage, FixtureStatus} from '../../enums/fixture.enum';
-import {LineUp} from '../lineUp/lineUp';
-import {TeamCompetitionSeason} from '../teamCompetitionSeason/teamCompetitionSeason';
-import {Goal} from '../goal/goal';
-import {FixtureReferee} from '../fixtureReferee/fixtureReferee';
-import {Log} from '../log/log';
-import {Prediction} from '../prediction/prediction';
+import {LineUp} from "../lineUp/lineUp.entity";
+import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
+import {Goal} from "../goal/goal.entity";
+import {FixtureReferee} from "../fixtureReferee/fixtureReferee.entity";
+import {Log} from "../log/log.entity";
+import {Prediction} from "../prediction/prediction.entity";
 import {
     EntityColumn,
     EntityEnumColumn,

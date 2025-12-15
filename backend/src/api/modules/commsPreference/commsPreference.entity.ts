@@ -7,7 +7,7 @@ import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/se
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
 import { CommunicationFrequency, Language } from "../../enums/commsPreference.enum";
-import { User } from "../user/user";
+import { User } from "../user/user.entity";
 
 @Entity('commsPreference')
 @SecurityFeature<CommsPreference>({

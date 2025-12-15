@@ -2,8 +2,8 @@ import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Entity, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {CompetitionType} from "../../enums/competition.enum";
-import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason";
-import {Trophy} from "../trophy/trophy";
+import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
+import {Trophy} from "../trophy/trophy.entity";
 import {
     EntityColumn,
     EntityEnumColumn,

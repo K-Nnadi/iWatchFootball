@@ -1,7 +1,7 @@
 import {ApiPropertyOptional, PickType} from '@nestjs/swagger';
 import {Entity, OneToOne} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Stadium} from '../stadium/stadium';
+import {Stadium} from "../stadium/stadium.entity";
 import {OptionalEntityColumn} from '@iWatchFootball/base-tools/decorators/entity.decorator';
 
 @Entity('address')

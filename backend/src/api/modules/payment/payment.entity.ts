@@ -1,8 +1,8 @@
 import {Entity, ManyToOne} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Ticket} from '../ticket/ticket';
-import {PaymentProvider} from '../paymentProvider/paymentProvider';
-import {Transaction} from '../transaction/transaction';
+import {Ticket} from "../ticket/ticket.entity";
+import {PaymentProvider} from "../paymentProvider/paymentProvider.entity";
+import {Transaction} from "../transaction/transaction.entity";
 import {
     EntityColumn,
     EntityEnumColumn,

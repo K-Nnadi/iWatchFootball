@@ -12689,6 +12689,37 @@
       }
     },
     "/user": {
+      "get": {
+        "operationId": "getAllUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Users",
+        "tags": [
+          "user"
+        ]
+      },
       "post": {
         "operationId": "createUser",
         "parameters": [],
@@ -12723,37 +12754,6 @@
           }
         ],
         "summary": "Create User",
-        "tags": [
-          "user"
-        ]
-      },
-      "get": {
-        "operationId": "getAllUser",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all Users",
         "tags": [
           "user"
         ]
@@ -12847,64 +12847,6 @@
         ]
       }
     },
-    "/user/count": {
-      "get": {
-        "operationId": "getCountUser",
-        "parameters": [
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Total count of entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get count of Users",
-        "tags": [
-          "user"
-        ]
-      }
-    },
     "/user/{id}": {
       "get": {
         "operationId": "getOneUser",
@@ -12967,7 +12909,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -13009,6 +12958,64 @@
           }
         ],
         "summary": "Delete one User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/count": {
+      "get": {
+        "operationId": "getCountUser",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Users",
         "tags": [
           "user"
         ]
@@ -17229,51 +17236,6 @@
           "name"
         ]
       },
-      "CreateUserDTO": {
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "type": "object",
-            "description": "Metadata stored as JSON",
-            "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "MODERATOR",
-              "USER"
-            ]
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "userName",
-          "email",
-          "type"
-        ]
-      },
       "User": {
         "type": "object",
         "properties": {
@@ -17357,6 +17319,51 @@
           "logs",
           "credit",
           "transactions"
+        ]
+      },
+      "CreateUserDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MODERATOR",
+              "USER"
+            ]
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "userName",
+          "email",
+          "type"
         ]
       },
       "LoginBody": {

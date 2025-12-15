@@ -6,7 +6,7 @@ import {IsEmail, IsNotEmpty, IsOptional, ValidateIf} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
-import {User} from "../modules/user/user";
+import {User} from "../modules/user/user.entity";
 import {UserModule, UserService} from "../modules/user/user.module";
 import {LogModule, LogService} from "../modules/log/log.module";
 import {Public} from "../../auth/decorators/public.decorator";

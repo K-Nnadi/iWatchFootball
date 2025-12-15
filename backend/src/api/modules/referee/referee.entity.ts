@@ -1,7 +1,7 @@
 import {ApiProperty, PickType} from '@nestjs/swagger';
 import {Entity, OneToMany} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {FixtureReferee} from "../fixtureReferee/fixtureReferee";
+import {FixtureReferee} from "../fixtureReferee/fixtureReferee.entity";
 import {EntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('referee')

@@ -1,13 +1,13 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {Transaction} from '../../modules/transaction/transaction';
+import {Transaction} from '../../modules/transaction/transaction.entity';
 import {TransactionType} from '../../enums/transaction.enum';
-import {Credit} from '../../modules/credit/credit';
-import {LoyaltyScheme} from '../../modules/loyaltyScheme/loyaltyScheme';
-import {LoyaltyEvent} from '../../modules/loyaltyEvent/loyaltyEvent';
+import {Credit} from '../../modules/credit/credit.entity';
+import {LoyaltyScheme} from '../../modules/loyaltyScheme/loyaltyScheme.entity';
+import {LoyaltyEvent} from '../../modules/loyaltyEvent/loyaltyEvent.entity';
 import {LoyaltyEventType} from '../../enums/loyaltyEventType.enum';
-import {User} from '../../modules/user/user';
+import {User} from '../../modules/user/user.entity';
 
 @Injectable()
 export class LoyaltyService {

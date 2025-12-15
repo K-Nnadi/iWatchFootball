@@ -1,11 +1,11 @@
 import {ApiOkResponse, ApiOperation, ApiProperty} from '@nestjs/swagger';
 import {Get, Module, Param} from '@nestjs/common';
 import {AuthedController} from '@iWatchFootball/base-tools/decorators/controller.decorator';
-import {Fixture} from '../modules/fixture/fixture';
-import {LineUp} from '../modules/lineUp/lineUp';
-import {Goal} from '../modules/goal/goal';
-import {Card} from '../modules/card/card';
-import {Substitution} from '../modules/substitution/substitution';
+import {Fixture} from '../modules/fixture/fixture.entity';
+import {LineUp} from '../modules/lineUp/lineUp.entity';
+import {Goal} from '../modules/goal/goal.entity';
+import {Card} from '../modules/card/card.entity';
+import {Substitution} from '../modules/substitution/substitution.entity';
 import {FixtureModule, FixtureService} from '../modules/fixture/fixture.module';
 import {LineUpModule, LineupService} from '../modules/lineUp/lineUp.module';
 import {GoalModule, GoalService} from '../modules/goal/goal.module';

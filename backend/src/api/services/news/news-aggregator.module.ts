@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
-import { NewsArticle } from '../../modules/newsArticle/newsArticle';
+import { NewsArticle } from '../../modules/newsArticle/newsArticle.entity';
 import { NewsAggregatorService } from './news-aggregator.service';
 import { NewsAggregatorProcessor } from './news-aggregator.processor';
 import { NewsAggregatorScheduler } from './news-aggregator.scheduler';

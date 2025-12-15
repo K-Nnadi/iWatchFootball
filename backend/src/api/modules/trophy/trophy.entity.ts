@@ -1,8 +1,8 @@
 import {Entity, ManyToOne, OneToOne} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Competition} from "../competition/competition";
-import {Player} from "../player/player";
-import {Team} from "../team/team";
+import {Competition} from "../competition/competition.entity";
+import {Player} from "../player/player.entity";
+import {Team} from "../team/team.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {PickType} from "@nestjs/swagger";
 

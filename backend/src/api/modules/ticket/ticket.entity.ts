@@ -1,8 +1,8 @@
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Fixture} from '../fixture/fixture';
-import {Payment} from '../payment/payment';
-import {User} from '../user/user';
+import {Fixture} from "../fixture/fixture.entity";
+import {Payment} from "../payment/payment.entity";
+import {User} from '../user/user.entity';
 import {
     EntityColumn, EntityRelation,
     OptionalEntityColumn, RelationshipType,

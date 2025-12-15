@@ -2,8 +2,8 @@ import {PickType} from "@nestjs/swagger";
 import {Column, Entity} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {RefereeRole} from "../../enums/referee.enum";
-import {Fixture} from "../fixture/fixture";
-import {Referee} from "../referee/referee";
+import {Fixture} from "../fixture/fixture.entity";
+import {Referee} from "../referee/referee.entity";
 import {EntityColumn, EntityEnumColumn, EntityRelation, RelationshipType} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 @Entity('fixtureReferee')

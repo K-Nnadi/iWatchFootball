@@ -1,10 +1,10 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
 import {Column, Entity, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
-import {Team} from "../team/team";
-import {Competition} from "../competition/competition";
-import {Season} from "../season/season";
-import {Fixture} from "../fixture/fixture";
+import {Team} from "../team/team.entity";
+import {Competition} from "../competition/competition.entity";
+import {Season} from "../season/season.entity";
+import {Fixture} from "../fixture/fixture.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 

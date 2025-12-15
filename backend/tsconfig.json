@@ -3,7 +3,8 @@
   "include": [
     "package.json",
     "tsconfig.json",
-    "src/**/*"
+    "src/**/*",
+    "src/**/*.entity.ts"
   ],
   "exclude": [
     "node_modules",

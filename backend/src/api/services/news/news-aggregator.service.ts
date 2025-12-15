@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Parser from 'rss-parser';
-import { NewsArticle, CreateNewsArticleDTO } from '../../modules/newsArticle/newsArticle';
+import { NewsArticle, CreateNewsArticleDTO } from '../../modules/newsArticle/newsArticle.entity';
 import { NEWS_FEEDS, NewsFeed } from './news-feeds.config';
 
 interface RSSItem {
