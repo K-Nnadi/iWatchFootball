@@ -1,25 +1,32 @@
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
-import { Module, Post, Response } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Module, Post, Response, UseGuards } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
-import { NoAuthController } from "@iWatchFootball/base-tools/decorators/controller.decorator";
-import { CompetitionService } from "../modules/competition/competition.module";
-import { TeamService } from "../modules/team/team.module";
-import { TeamCompetitionSeasonService } from "../modules/teamCompetitionSeason/teamCompetitionSeason.module";
-import { FixtureService } from "../modules/fixture/fixture.module";
-import { PlayerService } from "../modules/player/player.module";
-import { GoalService } from "../modules/goal/goal.module";
-import { SeasonService } from "../modules/season/season.module";
-import { StadiumService } from "../modules/stadium/stadium.module";
-import { RefereeService } from "../modules/referee/referee.module";
-import { CardService } from "../modules/card/card.module";
-import { LineupService } from "../modules/lineUp/lineUp.module";
-import { PlayerLineUpService } from "../modules/playerLineUp/playerLineUp.module";
-import { ManagerService } from "../modules/manager/manager.module";
-import { CompetitionStandingService } from "../modules/competitionStanding/competitionStanding.module";
-import { SubstitutionService } from "../modules/substitution/substitution.module";
+import { CompetitionModule, CompetitionService } from "../modules/competition/competition.module";
+import { TeamModule, TeamService } from "../modules/team/team.module";
+import { TeamCompetitionSeasonModule, TeamCompetitionSeasonService } from "../modules/teamCompetitionSeason/teamCompetitionSeason.module";
+import { FixtureModule, FixtureService } from "../modules/fixture/fixture.module";
+import { PlayerModule, PlayerService } from "../modules/player/player.module";
+import { GoalModule, GoalService } from "../modules/goal/goal.module";
+import { SeasonModule, SeasonService } from "../modules/season/season.module";
+import { StadiumModule, StadiumService } from "../modules/stadium/stadium.module";
+import { RefereeModule, RefereeService } from "../modules/referee/referee.module";
+import { CardModule, CardService } from "../modules/card/card.module";
+import { LineUpModule, LineupService } from "../modules/lineUp/lineUp.module";
+import { PlayerLineUpModule, PlayerLineUpService } from "../modules/playerLineUp/playerLineUp.module";
+import { ManagerModule, ManagerService } from "../modules/manager/manager.module";
+import { CompetitionStandingModule, CompetitionStandingService } from "../modules/competitionStanding/competitionStanding.module";
+import { SubstitutionModule, SubstitutionService } from "../modules/substitution/substitution.module";
 import {FootballDataApiAdapter} from "../adapters/footballApiSports/footballDataApi.adapter";
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { UserRole } from '../../auth/types/security.types';
 
-@NoAuthController('dataSeeding')
+@ApiTags('dataSeeding')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
+@Controller('dataSeeding')
 export class DataSeedingController {
     private readonly footballApi: FootballDataApiAdapter;
 
@@ -188,7 +195,23 @@ export class DataSeedingController {
 }
 
 @Module({
-    imports: [],
+    imports: [
+        TeamCompetitionSeasonModule,
+        CompetitionModule,
+        CompetitionStandingModule,
+        TeamModule,
+        FixtureModule,
+        LineUpModule,
+        PlayerLineUpModule,
+        PlayerModule,
+        ManagerModule,
+        GoalModule,
+        CardModule,
+        SubstitutionModule,
+        SeasonModule,
+        StadiumModule,
+        RefereeModule
+    ],
     controllers: [DataSeedingController]
 })
 export class DataSeedingModule {}

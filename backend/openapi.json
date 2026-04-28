@@ -13081,6 +13081,16 @@
         "description": "Fetches data from StatsBomb Open Data repository and syncs it with the local database",
         "operationId": "StatsBombController_syncData",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatsBombSyncOptionsDTO"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Data synchronization completed successfully",
@@ -13106,6 +13116,11 @@
             "description": "Internal server error during synchronization"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Sync StatsBomb data to database",
         "tags": [
           "StatsBomb Adapter"
@@ -13145,6 +13160,18 @@
                       "type": "number",
                       "example": 5000
                     },
+                    "cards": {
+                      "type": "number",
+                      "example": 8000
+                    },
+                    "substitutions": {
+                      "type": "number",
+                      "example": 3000
+                    },
+                    "events": {
+                      "type": "number",
+                      "example": 16000
+                    },
                     "lastSync": {
                       "type": "string",
                       "example": "2024-01-15T10:30:00.000Z"
@@ -13155,6 +13182,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Get sync status and statistics",
         "tags": [
           "StatsBomb Adapter"
@@ -13171,6 +13203,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Sync competitions only",
         "tags": [
           "StatsBomb Adapter"
@@ -13187,6 +13224,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Sync teams and players only",
         "tags": [
           "StatsBomb Adapter"
@@ -13203,6 +13245,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Sync fixtures only",
         "tags": [
           "StatsBomb Adapter"
@@ -13243,6 +13290,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Test team type detection",
         "tags": [
           "StatsBomb Adapter"
@@ -13277,6 +13329,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Test team creation",
         "tags": [
           "StatsBomb Adapter"
@@ -13311,6 +13368,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Test sync teams only",
         "tags": [
           "StatsBomb Adapter"
@@ -13345,6 +13407,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Test sync events only",
         "tags": [
           "StatsBomb Adapter"
@@ -13379,6 +13446,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Test sync players only",
         "tags": [
           "StatsBomb Adapter"
@@ -13431,6 +13503,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Test sync complete match data from a single match",
         "tags": [
           "StatsBomb Adapter"
@@ -13482,9 +13559,488 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Get available match IDs for testing",
         "tags": [
           "StatsBomb Adapter"
+        ]
+      }
+    },
+    "/api-sports/sync/standings": {
+      "post": {
+        "description": "Requires API key (API_SPORTS_KEY or FOOTBALLAPISPORTS_API_KEY). Maps teams by metadata.providers.apisports.externalId.",
+        "operationId": "ApiSportsController_syncStandings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsSyncStandingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Standings upsert result"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync league standings from API-Sports",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/enrich/players": {
+      "post": {
+        "description": "Only processes players with metadata.providers.apisports.externalId (or metadata.apisportsPlayerId).",
+        "operationId": "ApiSportsController_enrichPlayers",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsEnrichPlayersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enrich player DOB, nationality, height from API-Sports",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/sync/transfers": {
+      "post": {
+        "description": "Resolves players and teams via metadata.providers.apisports.externalId. Skips rows that cannot be mapped.",
+        "operationId": "ApiSportsController_syncTransfers",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsSyncTransfersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import transfers for an API-Sports team",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/competitionStanding": {
+      "post": {
+        "operationId": "createCompetitionStanding",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompetitionStandingDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompetitionStanding"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      },
+      "get": {
+        "operationId": "getAllCompetitionStanding",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompetitionStanding"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all CompetitionStandings",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/query": {
+      "get": {
+        "operationId": "getQueryCompetitionStanding",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompetitionStanding"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all CompetitionStandings",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/count": {
+      "get": {
+        "operationId": "getCountCompetitionStanding",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of CompetitionStandings",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/{id}": {
+      "get": {
+        "operationId": "getOneCompetitionStanding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompetitionStanding"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneCompetitionStanding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompetitionStanding"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneCompetitionStanding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/upload": {
+      "post": {
+        "operationId": "uploadCompetitionStanding",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/download/{filename}": {
+      "get": {
+        "operationId": "downloadCompetitionStanding",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to CompetitionStanding",
+        "tags": [
+          "competitionStanding"
         ]
       }
     },
@@ -13549,6 +14105,136 @@
         "summary": "Register new user",
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/dataSeeding/teams": {
+      "post": {
+        "operationId": "seedTeams",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seed teams data",
+        "tags": [
+          "dataSeeding"
+        ]
+      }
+    },
+    "/dataSeeding/leagues": {
+      "post": {
+        "operationId": "seedLeagues",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seed leagues data",
+        "tags": [
+          "dataSeeding"
+        ]
+      }
+    },
+    "/dataSeeding/fixtures": {
+      "post": {
+        "operationId": "seedFixtures",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seed fixtures data",
+        "tags": [
+          "dataSeeding"
+        ]
+      }
+    },
+    "/dataSeeding/standings": {
+      "post": {
+        "operationId": "seedStandings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seed standings data",
+        "tags": [
+          "dataSeeding"
+        ]
+      }
+    },
+    "/dataSeeding/players": {
+      "post": {
+        "operationId": "seedPlayers",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seed players data",
+        "tags": [
+          "dataSeeding"
         ]
       }
     }
@@ -14337,6 +15023,8 @@
           "stadiumId",
           "stadium",
           "goals",
+          "cards",
+          "substitutions",
           "referees",
           "status",
           "stage",
@@ -16623,6 +17311,9 @@
           "fixtureId": {
             "type": "number"
           },
+          "fixture": {
+            "$ref": "#/components/schemas/Promise"
+          },
           "teamId": {
             "type": "number"
           },
@@ -16640,6 +17331,7 @@
           "id",
           "playerLineup",
           "fixtureId",
+          "fixture",
           "teamId",
           "team",
           "playerOut"
@@ -16861,6 +17553,27 @@
           },
           "position": {
             "type": "number"
+          },
+          "played": {
+            "type": "number"
+          },
+          "wins": {
+            "type": "number"
+          },
+          "draws": {
+            "type": "number"
+          },
+          "losses": {
+            "type": "number"
+          },
+          "goalsFor": {
+            "type": "number"
+          },
+          "goalsAgainst": {
+            "type": "number"
+          },
+          "goalDifference": {
+            "type": "number"
           }
         },
         "required": [
@@ -16924,6 +17637,27 @@
             "type": "number"
           },
           "position": {
+            "type": "number"
+          },
+          "played": {
+            "type": "number"
+          },
+          "wins": {
+            "type": "number"
+          },
+          "draws": {
+            "type": "number"
+          },
+          "losses": {
+            "type": "number"
+          },
+          "goalsFor": {
+            "type": "number"
+          },
+          "goalsAgainst": {
+            "type": "number"
+          },
+          "goalDifference": {
             "type": "number"
           }
         },
@@ -17364,6 +18098,281 @@
           "userName",
           "email",
           "type"
+        ]
+      },
+      "StatsBombSyncOptionsDTO": {
+        "type": "object",
+        "properties": {
+          "skipFixtures": {
+            "type": "boolean",
+            "description": "Skip syncing fixtures",
+            "default": false
+          },
+          "skipCards": {
+            "type": "boolean",
+            "description": "Skip syncing cards",
+            "default": false
+          },
+          "skipPlayers": {
+            "type": "boolean",
+            "description": "Skip syncing players",
+            "default": false
+          },
+          "skipGoals": {
+            "type": "boolean",
+            "description": "Skip syncing goals",
+            "default": false
+          },
+          "skipStadiums": {
+            "type": "boolean",
+            "description": "Skip creating stadiums during fixture sync",
+            "default": false
+          },
+          "skipLineups": {
+            "type": "boolean",
+            "description": "Skip syncing lineups and player lineups",
+            "default": false
+          }
+        }
+      },
+      "ApiSportsStandingsItemDto": {
+        "type": "object",
+        "properties": {
+          "league": {
+            "type": "number",
+            "description": "API-Sports league id",
+            "example": 39
+          },
+          "season": {
+            "type": "number",
+            "description": "API-Sports season year",
+            "example": 2023
+          },
+          "competitionId": {
+            "type": "number",
+            "description": "Local competition id"
+          },
+          "seasonId": {
+            "type": "number",
+            "description": "Local season id"
+          }
+        },
+        "required": [
+          "league",
+          "season",
+          "competitionId",
+          "seasonId"
+        ]
+      },
+      "ApiSportsSyncStandingsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSportsStandingsItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ApiSportsEnrichPlayersDto": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Max players to process"
+          },
+          "season": {
+            "type": "number",
+            "description": "Season year for /players fallback",
+            "example": 2023
+          }
+        }
+      },
+      "ApiSportsSyncTransfersDto": {
+        "type": "object",
+        "properties": {
+          "teamApiId": {
+            "type": "number",
+            "description": "API-Sports team id"
+          },
+          "season": {
+            "type": "number",
+            "description": "Optional season filter"
+          }
+        },
+        "required": [
+          "teamApiId"
+        ]
+      },
+      "CreateCompetitionStandingDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "competitionId": {
+            "type": "number",
+            "description": "Competition ID"
+          },
+          "seasonId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          },
+          "played": {
+            "type": "number"
+          },
+          "won": {
+            "type": "number"
+          },
+          "drawn": {
+            "type": "number"
+          },
+          "lost": {
+            "type": "number"
+          },
+          "goalsFor": {
+            "type": "number"
+          },
+          "goalsAgainst": {
+            "type": "number"
+          },
+          "goalDifference": {
+            "type": "number"
+          },
+          "points": {
+            "type": "number"
+          },
+          "form": {
+            "type": "string"
+          },
+          "positionChange": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "competitionId",
+          "seasonId",
+          "teamId",
+          "position",
+          "played",
+          "won",
+          "drawn",
+          "lost",
+          "goalsFor",
+          "goalsAgainst",
+          "goalDifference",
+          "points"
+        ]
+      },
+      "CompetitionStanding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "competitionId": {
+            "type": "number",
+            "description": "Competition ID"
+          },
+          "seasonId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          },
+          "played": {
+            "type": "number"
+          },
+          "won": {
+            "type": "number"
+          },
+          "drawn": {
+            "type": "number"
+          },
+          "lost": {
+            "type": "number"
+          },
+          "goalsFor": {
+            "type": "number"
+          },
+          "goalsAgainst": {
+            "type": "number"
+          },
+          "goalDifference": {
+            "type": "number"
+          },
+          "points": {
+            "type": "number"
+          },
+          "form": {
+            "type": "string"
+          },
+          "positionChange": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "competition",
+          "competitionId",
+          "season",
+          "seasonId",
+          "team",
+          "teamId",
+          "position",
+          "played",
+          "won",
+          "drawn",
+          "lost",
+          "goalsFor",
+          "goalsAgainst",
+          "goalDifference",
+          "points"
         ]
       },
       "LoginBody": {

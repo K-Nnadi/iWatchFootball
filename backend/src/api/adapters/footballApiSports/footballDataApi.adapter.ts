@@ -4,12 +4,18 @@ export class FootballDataApiAdapter {
     private http: HttpWrapper;
 
     constructor() {
+        const directKey = process.env.API_SPORTS_KEY || process.env.APISPORTS_KEY;
+        const rapidKey = process.env.FOOTBALLAPISPORTS_API_KEY;
+        const headers: Record<string, string> = { Accept: "application/json" };
+        if (directKey) {
+            headers["x-apisports-key"] = directKey;
+        } else if (rapidKey) {
+            headers["x-rapidapi-host"] = "v3.football.api-sports.io";
+            headers["x-rapidapi-key"] = rapidKey;
+        }
         this.http = new HttpWrapper({
             baseUrl: "https://v3.football.api-sports.io",
-            headers: {
-                "x-rapidapi-host": "v3.football.api-sports.io",
-                "x-rapidapi-key": process.env.FOOTBALLAPISPORTS_API_KEY!,
-            },
+            headers,
         });
     }
 

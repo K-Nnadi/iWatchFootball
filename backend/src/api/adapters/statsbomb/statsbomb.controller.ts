@@ -1,8 +1,29 @@
-import {Controller, Post, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Logger} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {Body, Controller, Post, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Logger} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatsBombAdapterService } from './statsbomb-adapter.service';
 
+export class StatsBombSyncOptionsDTO {
+  @ApiPropertyOptional({ description: 'Skip syncing fixtures', default: false })
+  skipFixtures?: boolean;
+
+  @ApiPropertyOptional({ description: 'Skip syncing cards', default: false })
+  skipCards?: boolean;
+
+  @ApiPropertyOptional({ description: 'Skip syncing players', default: false })
+  skipPlayers?: boolean;
+
+  @ApiPropertyOptional({ description: 'Skip syncing goals', default: false })
+  skipGoals?: boolean;
+
+  @ApiPropertyOptional({ description: 'Skip creating stadiums during fixture sync', default: false })
+  skipStadiums?: boolean;
+
+  @ApiPropertyOptional({ description: 'Skip syncing lineups and player lineups', default: false })
+  skipLineups?: boolean;
+}
+
 @ApiTags('StatsBomb Adapter')
+@ApiBearerAuth()
 @Controller('statsbomb')
 export class StatsBombController {
   private readonly logger = new Logger(StatsBombController.name);
@@ -30,8 +51,8 @@ export class StatsBombController {
     status: 500, 
     description: 'Internal server error during synchronization' 
   })
-  async syncData() {
-    await this.statsBombAdapterService.syncStatsBombData();
+  async syncData(@Body() options?: StatsBombSyncOptionsDTO) {
+    await this.statsBombAdapterService.syncStatsBombData(options);
     return {
       message: 'StatsBomb data synchronization completed successfully',
       timestamp: new Date().toISOString()
@@ -54,6 +75,9 @@ export class StatsBombController {
         players: { type: 'number', example: 5000 },
         fixtures: { type: 'number', example: 2000 },
         goals: { type: 'number', example: 5000 },
+        cards: { type: 'number', example: 8000 },
+        substitutions: { type: 'number', example: 3000 },
+        events: { type: 'number', example: 16000 },
         lastSync: { type: 'string', example: '2024-01-15T10:30:00.000Z' }
       }
     }

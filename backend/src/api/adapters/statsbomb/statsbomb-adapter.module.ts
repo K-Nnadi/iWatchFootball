@@ -12,6 +12,10 @@ import {PositionModule} from '../../modules/position/position.module';
 import {StadiumModule} from '../../modules/stadium/stadium.module';
 import {CardModule} from "../../modules/card/card.module";
 import {SubstitutionModule} from "../../modules/substitution/substitution.module";
+import {TeamCompetitionSeasonModule} from "../../modules/teamCompetitionSeason/teamCompetitionSeason.module";
+import {LineUpModule} from "../../modules/lineUp/lineUp.module";
+import {PlayerLineUpModule} from "../../modules/playerLineUp/playerLineUp.module";
+import {ManagerModule} from "../../modules/manager/manager.module";
 
 @Module({
     imports: [
@@ -19,7 +23,11 @@ import {SubstitutionModule} from "../../modules/substitution/substitution.module
         SeasonModule,
         TeamModule,
         PlayerModule,
+        TeamCompetitionSeasonModule,
         FixtureModule,
+        LineUpModule,
+        PlayerLineUpModule,
+        ManagerModule,
         GoalModule,
         PositionModule,
         StadiumModule,

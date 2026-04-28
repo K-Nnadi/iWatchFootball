@@ -40,7 +40,9 @@ import {LoyaltyModule} from "./api/services/loyalty/loyalty.module";
 import {NewsArticleModule} from "./api/modules/newsArticle/newsArticle.module";
 import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
+import {ApiSportsAdapterModule} from "./api/adapters/api-sports/api-sports-adapter.module";
 import {HealthController} from "./health/health.controller";
+import {DataSeedingModule} from "./api/complexControllers/dataSeeding.controller";
 
 // Only configure BullMQ if Redis is available
 const BULL_MODULE = process.env.REDIS_HOST ? BullModule.forRoot({
@@ -87,11 +89,13 @@ const Modules = [
     TransferModule,
     TrophyModule,
     UserModule,
-    StatsBombAdapterModule
+    StatsBombAdapterModule,
+    ApiSportsAdapterModule
 ];
 
 const ComplexModules = [
     AuthModule,
+    DataSeedingModule,
     CoreAuthModule
 ];
 

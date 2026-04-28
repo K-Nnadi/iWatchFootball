@@ -1,6 +1,7 @@
 import {ApiProperty, PickType} from '@nestjs/swagger';
 import {Column, Entity, ManyToOne} from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
+import {Fixture} from "../fixture/fixture.entity";
 import {Player} from "../player/player.entity";
 import {PlayerLineUp} from "../playerLineUp/playerLineUp.entity";
 import {Team} from "../team/team.entity";
@@ -14,6 +15,10 @@ export class Substitution extends BaseDbEntity {
 
     @EntityColumn({db:{type: "int"}})
     fixtureId!: number;
+
+    @ApiProperty()
+    @ManyToOne(() => Fixture, { lazy: true })
+    fixture!: Promise<Fixture>;
 
     @EntityColumn({db:{type: "int"}})
     teamId!: number;

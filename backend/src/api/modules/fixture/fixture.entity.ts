@@ -6,6 +6,8 @@ import {FixtureStage, FixtureStatus} from '../../enums/fixture.enum';
 import {LineUp} from "../lineUp/lineUp.entity";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
 import {Goal} from "../goal/goal.entity";
+import {Card} from "../card/card.entity";
+import {Substitution} from "../substitution/substitution.entity";
 import {FixtureReferee} from "../fixtureReferee/fixtureReferee.entity";
 import {Log} from "../log/log.entity";
 import {Prediction} from "../prediction/prediction.entity";
@@ -154,6 +156,22 @@ export class Fixture extends BaseDbEntity {
         description: 'Goals scored in this fixture'
     })
     goals!: Goal[];
+
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Card,
+        inverseSide: (card: Card) => card.fixture,
+        description: 'Cards given in this fixture'
+    })
+    cards!: Promise<Card[]>;
+
+    @EntityRelation({
+        type: RelationshipType.ONE_TO_MANY,
+        entity: () => Substitution,
+        inverseSide: (substitution: Substitution) => substitution.fixture,
+        description: 'Substitutions in this fixture'
+    })
+    substitutions!: Promise<Substitution[]>;
 
     @EntityRelation({
         type: RelationshipType.ONE_TO_MANY,
