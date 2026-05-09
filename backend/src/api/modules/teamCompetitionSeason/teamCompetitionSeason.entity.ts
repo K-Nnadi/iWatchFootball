@@ -34,47 +34,11 @@ export class TeamCompetitionSeason extends BaseDbEntity {
     @ApiProperty()
     @OneToMany(() => Fixture, fixture => fixture.teamCompetitionSeasons, {lazy: true})
     fixtures?: Promise<Fixture[]>;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    points?: number; // Optional: Store points for league competitions
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    position?: number; // Optional: Store the position in the competition for that season
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    played?: number;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    wins?: number;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    draws?: number;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    losses?: number;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    goalsFor?: number;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    goalsAgainst?: number;
-
-    @OptionalEntityColumn({db: {type: "int"}})
-    goalDifference?: number;
 }
 
 export class CreateTeamCompetitionSeasonDTO extends PickType(TeamCompetitionSeason, [
   'teamId',
   'competitionId',
   'seasonId',
-  'points',
-  'position',
-  'played',
-  'wins',
-  'draws',
-  'losses',
-  'goalsFor',
-  'goalsAgainst',
-  'goalDifference',
   'metadata',
 ] as const) {}

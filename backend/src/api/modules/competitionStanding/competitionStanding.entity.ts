@@ -1,8 +1,6 @@
 import {Entity} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
-import {Team} from "../team/team.entity";
-import {Competition} from "../competition/competition.entity";
-import {Season} from "../season/season.entity";
+import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
 import {
     EntityColumn,
     EntityRelation,
@@ -12,26 +10,15 @@ import {PickType} from "@nestjs/swagger";
 
 @Entity('competitionStanding')
 export class CompetitionStanding extends BaseDbEntity {
-    @EntityRelation({type: RelationshipType.MANY_TO_ONE, entity: () => Competition, joinOptions: {name: 'competitionId'}})
-    competition?: Competition;
-
-    @EntityColumn({
-        db: {type: 'int'},
-        api: {description: 'Competition ID'},
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => TeamCompetitionSeason,
+        joinOptions: {name: 'teamCompetitionSeasonId'},
     })
-    competitionId!: number;
-
-    @EntityRelation({type: RelationshipType.MANY_TO_ONE, entity: () => Season, joinOptions: {name: 'seasonId'}})
-    season?: Season;
+    teamCompetitionSeason?: TeamCompetitionSeason;
 
     @EntityColumn({db: {type: 'int'}})
-    seasonId!: number;
-
-    @EntityRelation({type: RelationshipType.MANY_TO_ONE, entity: () => Team, joinOptions: {name: 'teamId'}})
-    team!: Team;
-
-    @EntityColumn({db: {type: 'int'}})
-    teamId!: number;
+    teamCompetitionSeasonId!: number;
 
     @EntityColumn({db: {type: 'int'}})
     position!: number;
@@ -68,9 +55,7 @@ export class CompetitionStanding extends BaseDbEntity {
 }
 
 export class CreateCompetitionStandingDTO extends PickType(CompetitionStanding, [
-    'competitionId',
-    'seasonId',
-    'teamId',
+    'teamCompetitionSeasonId',
     'position',
     'played',
     'won',

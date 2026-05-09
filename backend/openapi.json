@@ -13570,6 +13570,37 @@
         ]
       }
     },
+    "/api-sports/sync/import/leagues": {
+      "post": {
+        "description": "Either pass `country` + `season` (fetches live) or paste `response` from discover. Upserts competitions/seasons. By default, also runs up to `maxStandingsRequests` GET /standings calls (one per league) to upsert teams, competitionStanding, and teamCompetitionSeason — skipping cups and leagues without standings coverage to limit API usage.",
+        "operationId": "ApiSportsController_importLeagues",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsImportLeaguesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Import counts"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import competitions + seasons from API-Sports /leagues",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
     "/api-sports/sync/standings": {
       "post": {
         "description": "Requires API key (API_SPORTS_KEY or FOOTBALLAPISPORTS_API_KEY). Maps teams by metadata.providers.apisports.externalId.",
@@ -13632,6 +13663,37 @@
         ]
       }
     },
+    "/api-sports/sync/import/players": {
+      "post": {
+        "description": "Creates players when missing, deduping by API-Sports id first, then strict name+DOB match. Caps pages/requests to protect daily quota.",
+        "operationId": "ApiSportsController_importPlayers",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsImportPlayersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import missing players from API-Sports /players (league+season)",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
     "/api-sports/sync/transfers": {
       "post": {
         "description": "Resolves players and teams via metadata.providers.apisports.externalId. Skips rows that cannot be mapped.",
@@ -13658,6 +13720,192 @@
           }
         ],
         "summary": "Import transfers for an API-Sports team",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/discover/leagues": {
+      "get": {
+        "description": "Proxies GET /leagues. See API-Football leagues docs for full filter list.",
+        "operationId": "ApiSportsController_discoverLeagues",
+        "parameters": [
+          {
+            "name": "current",
+            "required": false,
+            "in": "query",
+            "description": "true / false",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "team",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "description": "League code (e.g. GB)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "League name search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "e.g. league, cup",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "season",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 2023,
+              "type": "number"
+            }
+          },
+          {
+            "name": "country",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "England",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": false,
+            "in": "query",
+            "description": "API-Sports league id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List/search leagues from API-Sports",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/discover/league/{id}": {
+      "get": {
+        "description": "Proxies GET /leagues?id={id}. Use `response[0].seasons` for valid `season` years for standings.",
+        "operationId": "ApiSportsController_discoverLeagueById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "One league + seasons coverage",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/discover/countries": {
+      "get": {
+        "description": "Proxies GET /countries. Optional: `search`, `code`.",
+        "operationId": "ApiSportsController_discoverCountries",
+        "parameters": [
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "description": "ISO country code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Countries from API-Sports",
         "tags": [
           "API-Sports"
         ]
@@ -17547,33 +17795,6 @@
           },
           "seasonId": {
             "type": "number"
-          },
-          "points": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          },
-          "played": {
-            "type": "number"
-          },
-          "wins": {
-            "type": "number"
-          },
-          "draws": {
-            "type": "number"
-          },
-          "losses": {
-            "type": "number"
-          },
-          "goalsFor": {
-            "type": "number"
-          },
-          "goalsAgainst": {
-            "type": "number"
-          },
-          "goalDifference": {
-            "type": "number"
           }
         },
         "required": [
@@ -17632,33 +17853,6 @@
           },
           "fixtures": {
             "$ref": "#/components/schemas/Promise"
-          },
-          "points": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          },
-          "played": {
-            "type": "number"
-          },
-          "wins": {
-            "type": "number"
-          },
-          "draws": {
-            "type": "number"
-          },
-          "losses": {
-            "type": "number"
-          },
-          "goalsFor": {
-            "type": "number"
-          },
-          "goalsAgainst": {
-            "type": "number"
-          },
-          "goalDifference": {
-            "type": "number"
           }
         },
         "required": [
@@ -18135,6 +18329,53 @@
           }
         }
       },
+      "ApiSportsImportLeaguesDto": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "example": "England",
+            "description": "With `season`, calls GET /leagues on API-Sports"
+          },
+          "season": {
+            "type": "number",
+            "example": 2023,
+            "description": "API-Sports season year (with `country`)"
+          },
+          "response": {
+            "type": "array",
+            "description": "Paste the `response` array from a /leagues call (or send full JSON — we read `.response`).",
+            "items": {
+              "type": "object"
+            }
+          },
+          "standingsSeasonYear": {
+            "type": "number",
+            "description": "API season for `/standings` when pasting `response` (e.g. 2023). With `country`+`season`, this is set automatically.",
+            "example": 2023
+          },
+          "syncTeamsAndStandings": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true (default), one GET /standings per eligible league after import (teams + standings in one call; no /teams). Respects onlyStandingsCoverage, onlyLeagueType, maxStandingsRequests."
+          },
+          "onlyStandingsCoverage": {
+            "type": "boolean",
+            "default": true,
+            "description": "Skip leagues where seasons[].coverage.standings is false (saves daily quota)."
+          },
+          "onlyLeagueType": {
+            "type": "boolean",
+            "default": true,
+            "description": "Only sync standings for competition type League, not Cup."
+          },
+          "maxStandingsRequests": {
+            "type": "number",
+            "default": 20,
+            "description": "Cap on extra /standings calls in this request (1 league = 1 call)."
+          }
+        }
+      },
       "ApiSportsStandingsItemDto": {
         "type": "object",
         "properties": {
@@ -18192,6 +18433,40 @@
           }
         }
       },
+      "ApiSportsImportPlayersDto": {
+        "type": "object",
+        "properties": {
+          "league": {
+            "type": "number",
+            "description": "API-Sports league id",
+            "example": 39
+          },
+          "season": {
+            "type": "number",
+            "description": "API-Sports season year",
+            "example": 2024
+          },
+          "skipOnAmbiguousName": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true (default), when multiple local players share the same name with placeholder DOB (1900-01-01), we skip linking/creating to avoid wrong matches and duplicates."
+          },
+          "maxPages": {
+            "type": "number",
+            "default": 2,
+            "description": "Max pages to fetch from GET /players. Each page is one API request. Increase slowly to protect the 100/day quota."
+          },
+          "maxRequests": {
+            "type": "number",
+            "default": 10,
+            "description": "Hard cap on /players requests in this run (safety guard; each page is one request)."
+          }
+        },
+        "required": [
+          "league",
+          "season"
+        ]
+      },
       "ApiSportsSyncTransfersDto": {
         "type": "object",
         "properties": {
@@ -18223,14 +18498,7 @@
               ]
             }
           },
-          "competitionId": {
-            "type": "number",
-            "description": "Competition ID"
-          },
-          "seasonId": {
-            "type": "number"
-          },
-          "teamId": {
+          "teamCompetitionSeasonId": {
             "type": "number"
           },
           "position": {
@@ -18268,9 +18536,7 @@
           }
         },
         "required": [
-          "competitionId",
-          "seasonId",
-          "teamId",
+          "teamCompetitionSeasonId",
           "position",
           "played",
           "won",
@@ -18312,14 +18578,7 @@
               ]
             }
           },
-          "competitionId": {
-            "type": "number",
-            "description": "Competition ID"
-          },
-          "seasonId": {
-            "type": "number"
-          },
-          "teamId": {
+          "teamCompetitionSeasonId": {
             "type": "number"
           },
           "position": {
@@ -18358,12 +18617,8 @@
         },
         "required": [
           "id",
-          "competition",
-          "competitionId",
-          "season",
-          "seasonId",
-          "team",
-          "teamId",
+          "teamCompetitionSeason",
+          "teamCompetitionSeasonId",
           "position",
           "played",
           "won",

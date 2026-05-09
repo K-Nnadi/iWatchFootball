@@ -1,6 +1,8 @@
 import {AppModule} from "./app.module";
 import {GenericBootstrap} from "@iWatchFootball/base-tools/bootstrap/generic.bootstrap";
 import {config} from "dotenv";
+import {existsSync} from 'fs';
+import path from 'path';
 import {GlobalAuthGuard} from "./auth/guards/global-auth.guard";
 import {SecurityInterceptor} from "./auth/interceptors/security.interceptor";
 
@@ -8,14 +10,40 @@ console.log('='.repeat(60));
 console.log('🚀 Starting IWatchFootball Backend');
 console.log( '='.repeat(60));
 
-// Load environment variables
-config();
+/**
+ * Walk upward from this file and merge every `.env` found (repo root → backend → …).
+ * Inner paths override outer ones so `backend/.env` wins over monorepo `.env`.
+ * Fixes cases where only root `.env` had `API_SPORTS_KEY` but cwd was `backend/`.
+ */
+function loadDotEnvChain(): void {
+  const discovered: string[] = [];
+  let dir = path.resolve(__dirname);
+  for (let i = 0; i < 14; i++) {
+    const envPath = path.join(dir, '.env');
+    if (existsSync(envPath)) {
+      discovered.push(envPath);
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  discovered.reverse().forEach((envPath) => {
+    config({path: envPath, override: true});
+    console.log(`✅ Loaded .env: ${envPath}`);
+  });
+  config({override: true});
+}
+
+loadDotEnvChain();
 console.log('✅ Environment variables loaded');
 
 // Log environment info (safely, without secrets)
 const envInfo = {
     NODE_ENV: process.env.NODE_ENV || 'not set',
     PORT: process.env.PORT || 8080,
+    API_SPORTS_KEY: process.env.API_SPORTS_KEY || process.env.FOOTBALLAPISPORTS_API_KEY
+        ? '***set***'
+        : 'not set',
     DATABASE_HOST: process.env.DATABASE_HOST ? '***set***' : 'not set',
     DATABASE_PORT: process.env.DATABASE_PORT || 'not set',
     DATABASE_NAME: process.env.DATABASE_NAME || 'not set',
