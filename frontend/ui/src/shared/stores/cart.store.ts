@@ -37,6 +37,7 @@ interface CartStore {
 }
 
 const RESERVATION_DURATION_MINUTES = 15;
+const CART_ITEM_TTL_HOURS = 2;
 const CART_STORAGE_KEY = 'iwf_cart';
 const CHECKOUT_STATE_STORAGE_KEY = 'iwf_checkout_state';
 
@@ -154,8 +155,13 @@ export const useCartStore = create<CartStore>((set, get) => ({
             const checkoutData = localStorage.getItem(CHECKOUT_STATE_STORAGE_KEY);
             
             if (cartData) {
-                const items = JSON.parse(cartData) as CartItem[];
-                set({ items });
+                const parsed = JSON.parse(cartData) as CartItem[];
+                const cutoff = Date.now() - CART_ITEM_TTL_HOURS * 60 * 60 * 1000;
+                const fresh = parsed.filter(item => item.addedAt > cutoff);
+                if (fresh.length !== parsed.length) {
+                    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(fresh));
+                }
+                set({ items: fresh });
             }
             
             if (checkoutData) {

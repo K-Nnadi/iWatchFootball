@@ -13,7 +13,7 @@ import { useForm } from "@mantine/form";
 import { usePageTransition } from "../hooks/usePageTransition";
 import { useRegister, type RegisterMutationResult } from "@iWatchFootball/clients/controllers/auth";
 import { useAuthStore } from "../shared/stores/auth.store";
-import { notifications } from "@mantine/notifications";
+import { notify } from "../shared/notify";
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const upperCase = /[A-Z]/;
@@ -32,22 +32,14 @@ export function SignUpPage() {
 				if (data.access_token && data.user) {
 					setAuthState(data.access_token, data.user);
 					
-					notifications.show({
-						title: 'Success',
-						message: 'Account created successfully!',
-						color: 'green',
-					});
+					notify.success('Success', 'Account created successfully!');
 
 					navigateWithTransition('/');
 				}
 			},
 			onError: (error: any) => {
 				const errorMessage = error?.response?.data?.message || error?.message || 'Registration failed. Please try again.';
-				notifications.show({
-					title: 'Registration Failed',
-					message: errorMessage,
-					color: 'red',
-				});
+				notify.error('Registration Failed', errorMessage);
 			},
 		},
 	});

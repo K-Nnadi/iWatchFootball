@@ -20,7 +20,8 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const pages = [
         { page: 'competitions', label: 'Competitions' },
         { page: 'matches', label: 'Matches' },
-        { page: 'logs', label: 'Logs' }
+        { page: 'marketplace', label: 'Marketplace' },
+        { page: 'logs', label: 'Logs' },
     ];
 
     return (
@@ -51,19 +52,18 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                         className={classes.burgerMenu}
                     />
 
-                    {/* Mobile Right Section - Cart Icon and Avatar */}
+                    {/* Mobile Right Section - Cart (only when non-empty) and Avatar */}
                     <Group gap="md" hiddenFrom="md" className={classes.mobileRightSection}>
-                        {/* Cart Icon - Always visible */}
-                        <Box
-                            onClick={() => navigateWithTransition('/checkout')}
-                            className={classes.cartIcon}
-                            style={{ position: 'relative', cursor: 'pointer' }}
-                        >
-                            <IoCartOutline 
-                                size={24} 
-                                style={{ color: 'var(--modern-text-primary)' }}
-                            />
-                            {hasCartItems && (
+                        {hasCartItems && (
+                            <Box
+                                onClick={() => navigateWithTransition('/checkout')}
+                                className={classes.cartIcon}
+                                style={{ position: 'relative', cursor: 'pointer' }}
+                            >
+                                <IoCartOutline
+                                    size={24}
+                                    style={{ color: 'var(--modern-text-primary)' }}
+                                />
                                 <Badge
                                     size="xs"
                                     circle
@@ -86,8 +86,8 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                 >
                                     {items.length}
                                 </Badge>
-                            )}
-                        </Box>
+                            </Box>
+                        )}
                         
                         {/* Mobile Avatar */}
                         <Box>
@@ -171,17 +171,16 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     <Group gap="lg">
                         {showHeader && (
                             <>
-                                {/* Cart Icon - Desktop: Always visible */}
-                                <Box
-                                    onClick={() => navigateWithTransition('/checkout')}
-                                    className={classes.cartIcon}
-                                    style={{ position: 'relative', cursor: 'pointer' }}
-                                >
-                                    <IoCartOutline 
-                                        size={24} 
-                                        style={{ color: 'var(--modern-text-primary)' }}
-                                    />
-                                    {hasCartItems && (
+                                {hasCartItems && (
+                                    <Box
+                                        onClick={() => navigateWithTransition('/checkout')}
+                                        className={classes.cartIcon}
+                                        style={{ position: 'relative', cursor: 'pointer' }}
+                                    >
+                                        <IoCartOutline
+                                            size={24}
+                                            style={{ color: 'var(--modern-text-primary)' }}
+                                        />
                                         <Badge
                                             size="xs"
                                             circle
@@ -204,8 +203,8 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                         >
                                             {items.length}
                                         </Badge>
-                                    )}
-                                </Box>
+                                    </Box>
+                                )}
                                 <IoSettingsOutline
                                     size={24}
                                     onClick={() => navigateWithTransition('/settings')}

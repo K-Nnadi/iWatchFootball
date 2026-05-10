@@ -43,6 +43,7 @@ export function Navbar() {
         { label: "Logs", path: "/logs" },
         { label: "Matches", path: "/matches" },
         { label: "Competitions", path: "/competitions" },
+        { label: "Marketplace", path: "/marketplace" },
         { label: "Settings", path: "/settings" }
     ];
     

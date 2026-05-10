@@ -15,10 +15,12 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useLogin, type LoginMutationResult } from '@iWatchFootball/clients/controllers/auth';
+import type { LoginBody } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { useAuthStore } from '../shared/stores/auth.store';
-import { notifications } from '@mantine/notifications';
+import { notify } from '../shared/notify';
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const upperCase = /[A-Z]/;
@@ -28,6 +30,7 @@ export const passwordValidation = (value: string) => {
 };
 
 export function LoginPage() {
+	const location = useLocation();
 	const { navigateWithTransition } = usePageTransition();
 	const { login: setAuthState } = useAuthStore();
 	const [rememberMe, setRememberMe] = useState(false);
@@ -41,39 +44,47 @@ export function LoginPage() {
 					
 					if (rememberMe) {
 						localStorage.setItem('rememberMe', 'true');
-						localStorage.setItem('email', form.values.email.toLowerCase());
+						localStorage.setItem('rememberedLogin', form.values.identifier.trim());
+						localStorage.removeItem('email');
 					} else {
 						localStorage.removeItem('rememberMe');
+						localStorage.removeItem('rememberedLogin');
 						localStorage.removeItem('email');
 					}
 
-					notifications.show({
-						title: 'Success',
-						message: 'Logged in successfully!',
-						color: 'green',
-					});
+					notify.success('Success', 'Logged in successfully!');
 
-					navigateWithTransition('/');
+					const from =
+						(location.state as { from?: { pathname: string } } | null)?.from?.pathname ??
+						'/';
+					navigateWithTransition(from);
 				}
 			},
 			onError: (error: any) => {
 				const errorMessage = error?.response?.data?.message || error?.message || 'Login failed. Please try again.';
-				notifications.show({
-					title: 'Login Failed',
-					message: errorMessage,
-					color: 'red',
-				});
+				notify.error('Login Failed', errorMessage);
 			},
 		},
 	});
 
 	const form = useForm({
 		initialValues: {
-			email: '',
+			identifier: '',
 			password: ''
 		},
 		validate: {
-			email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+			identifier: (value: string) => {
+				const v = value.trim();
+				if (!v) return 'Email or username is required';
+				if (v.includes('@')) {
+					return /^\S+@\S+$/.test(v) ? null : 'Invalid email';
+				}
+				if (v.length < 3) return 'Username must be at least 3 characters';
+				if (!/^[a-zA-Z0-9_]+$/.test(v)) {
+					return 'Username can only contain letters, numbers, and underscores';
+				}
+				return null;
+			},
 			password: (value: string) =>
 				passwordValidation(value)
 					? null
@@ -84,18 +95,22 @@ export function LoginPage() {
 	useEffect(() => {
 		if (rememberMeLocalStorage === 'true') {
 			setRememberMe(true);
-			form.setFieldValue('email', localStorage.getItem('email') || '');
+			const remembered =
+				localStorage.getItem('rememberedLogin') || localStorage.getItem('email') || '';
+			form.setFieldValue('identifier', remembered);
 		}
 	}, [rememberMeLocalStorage]);
 
-	const formSubmit = (values: { email: string; password: string }) => {
-		const emailLowercase = values.email.toLowerCase();
+	const formSubmit = (values: { identifier: string; password: string }) => {
+		const raw = values.identifier.trim();
+		const isEmail = raw.includes('@');
+		// Backend checks email first; omit the other field so username login is not shadowed.
+		// Avoid sending '' for email — class-validator may still run @IsEmail on empty strings.
 		loginMutation.mutate({
 			data: {
-				email: emailLowercase,
 				password: values.password,
-				userName: emailLowercase // Using email as userName for login
-			}
+				...(isEmail ? { email: raw.toLowerCase() } : { userName: raw }),
+			} as LoginBody,
 		});
 	};
 
@@ -113,12 +128,13 @@ export function LoginPage() {
 					</Box>
 
 					<Text size="sm" mb="xs">
-						Email
+						Email or username
 					</Text>
 					<TextInput
 						size="md"
-						placeholder="you@example.com"
-						{...form.getInputProps('email')}
+						placeholder="you@example.com or your_username"
+						autoComplete="username"
+						{...form.getInputProps('identifier')}
 						mb="md"
 					/>
 

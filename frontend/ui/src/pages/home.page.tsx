@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons-react';
 import {Carousel} from '@mantine/carousel';
 import '../styles/homepage.css';
+import carouselClasses from '../components/carousel/news.carousel.module.css';
 import {usePageTransition} from "../hooks/usePageTransition";
 import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
@@ -469,33 +470,16 @@ function TopNewsSection() {
                         loop
                         dragFree
                         height="100%"
-                        styles={{
-                            control: {
-                                opacity: 1,
-                                backgroundColor: 'var(--modern-lime)',
-                                color: 'var(--modern-bg-primary)',
-                                border: 'none',
-                                '&[data-inactive]': {
-                                    opacity: 0.3,
-                                    cursor: 'not-allowed',
-                                },
-                            },
-                            indicator: {
-                                width: 8,
-                                height: 8,
-                                backgroundColor: 'var(--modern-lime)',
-                                opacity: 0.3,
-                                '&[data-active]': {
-                                    opacity: 1,
-                                },
-                            },
-                            indicators: {
-                                position: 'absolute',
-                                bottom: '-24px',
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                            },
-                        }}
+                        classNames={
+                            carouselClasses as {
+                                control?: string;
+                                indicator?: string;
+                                indicators?: string;
+                                card?: string;
+                                category?: string;
+                                title?: string;
+                            }
+                        }
                     >
                         {topNews.map((article) => (
                             <Carousel.Slide key={article.id}>

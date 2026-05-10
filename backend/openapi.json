@@ -1570,6 +1570,387 @@
         ]
       }
     },
+    "/competitionStanding": {
+      "post": {
+        "operationId": "createCompetitionStanding",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompetitionStandingDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompetitionStanding"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      },
+      "get": {
+        "operationId": "getAllCompetitionStanding",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompetitionStanding"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all CompetitionStandings",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/query": {
+      "get": {
+        "operationId": "getQueryCompetitionStanding",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompetitionStanding"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all CompetitionStandings",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/count": {
+      "get": {
+        "operationId": "getCountCompetitionStanding",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of CompetitionStandings",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/{id}": {
+      "get": {
+        "operationId": "getOneCompetitionStanding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompetitionStanding"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneCompetitionStanding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompetitionStanding"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneCompetitionStanding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/upload": {
+      "post": {
+        "operationId": "uploadCompetitionStanding",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
+    "/competitionStanding/download/{filename}": {
+      "get": {
+        "operationId": "downloadCompetitionStanding",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to CompetitionStanding",
+        "tags": [
+          "competitionStanding"
+        ]
+      }
+    },
     "/fixture": {
       "post": {
         "operationId": "createFixture",
@@ -11926,6 +12307,1240 @@
         ]
       }
     },
+    "/ticket-hold/acquire": {
+      "post": {
+        "operationId": "TicketHoldController_acquire",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcquireTicketHoldDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reserve a listing exclusively until expiry or checkout",
+        "tags": [
+          "ticket-hold",
+          "ticket-hold"
+        ]
+      }
+    },
+    "/ticket-hold/release": {
+      "post": {
+        "operationId": "TicketHoldController_release",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseTicketHoldDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel reservation (timeout or user abandoned)",
+        "tags": [
+          "ticket-hold",
+          "ticket-hold"
+        ]
+      }
+    },
+    "/ticket-hold/verify": {
+      "get": {
+        "operationId": "TicketHoldController_verify",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offerKey",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "holderId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check reservation is still valid during checkout",
+        "tags": [
+          "ticket-hold",
+          "ticket-hold"
+        ]
+      }
+    },
+    "/checkout/confirm": {
+      "post": {
+        "operationId": "CheckoutController_confirm",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paymentId": {
+                      "type": "number"
+                    },
+                    "ticketIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
+                    },
+                    "idempotent": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirm ticket purchase (atomic payment + tickets + hold release)",
+        "tags": [
+          "checkout",
+          "checkout"
+        ]
+      }
+    },
+    "/checkout/refund/{paymentId}": {
+      "post": {
+        "description": "Does not initiate Stripe/card network refunds or marketplace reversals.",
+        "operationId": "CheckoutController_refundPrimary",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Full primary-market refund (admin): VOID tickets + REFUND ledger + release discount usage",
+        "tags": [
+          "checkout",
+          "checkout"
+        ]
+      }
+    },
+    "/webhooks/payment": {
+      "post": {
+        "operationId": "PaymentWebhookController_handlePaymentConfirmed",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookConfirmCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Complete checkout after external PSP success (shared-secret trusted relay)",
+        "tags": [
+          "webhooks"
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "operationId": "getAllUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Users",
+        "tags": [
+          "user"
+        ]
+      },
+      "post": {
+        "operationId": "createUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/query": {
+      "get": {
+        "operationId": "getQueryUser",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Users",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "getOneUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one User",
+        "tags": [
+          "user"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one User",
+        "tags": [
+          "user"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/count": {
+      "get": {
+        "operationId": "getCountUser",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Users",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/upload": {
+      "post": {
+        "operationId": "uploadUser",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/user/download/{filename}": {
+      "get": {
+        "operationId": "downloadUser",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to User",
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/discount-code/validate/{code}": {
+      "get": {
+        "operationId": "DiscountCodeController_validate",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderTotal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Validate a discount code for current user & order total",
+        "tags": [
+          "discount-code",
+          "discount-code"
+        ]
+      }
+    },
+    "/discount-code": {
+      "get": {
+        "operationId": "DiscountCodeController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Admin: list all discount codes",
+        "tags": [
+          "discount-code",
+          "discount-code"
+        ]
+      },
+      "post": {
+        "operationId": "DiscountCodeController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "PERCENTAGE",
+                      "FIXED"
+                    ]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "maxUsesPerUser": {
+                    "type": "number"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "code",
+                  "type",
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Admin: create a discount code",
+        "tags": [
+          "discount-code",
+          "discount-code"
+        ]
+      }
+    },
+    "/discount-code/{id}/toggle": {
+      "patch": {
+        "operationId": "DiscountCodeController_toggle",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Admin: toggle a discount code active/inactive",
+        "tags": [
+          "discount-code",
+          "discount-code"
+        ]
+      }
+    },
+    "/user-ticket-log/my": {
+      "get": {
+        "operationId": "UserTicketLogController_getMyLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserTicketLog"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all tickets currently in the logged-in user's wallet",
+        "tags": [
+          "user-ticket-log",
+          "user-ticket-log"
+        ]
+      }
+    },
+    "/marketplace/listings": {
+      "get": {
+        "operationId": "MarketplaceListingController_getListings",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "team",
+            "required": false,
+            "in": "query",
+            "description": "Filter listings whose fixture involves a team matching this substring (home or away, case-insensitive)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Browse active marketplace listings",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      },
+      "post": {
+        "operationId": "MarketplaceListingController_createListing",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateListingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List an owned ticket for resale",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/my": {
+      "get": {
+        "operationId": "MarketplaceListingController_getMyListings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's own listings",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}": {
+      "get": {
+        "operationId": "MarketplaceListingController_getListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single marketplace listing by id",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      },
+      "delete": {
+        "operationId": "MarketplaceListingController_cancelListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel an active listing (seller only). Ticket returned to seller.",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/hold/{listingId}": {
+      "post": {
+        "operationId": "MarketplaceCheckoutController_holdListing",
+        "parameters": [
+          {
+            "name": "listingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "holderId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Pass this back in confirm to prove your hold"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reserve a listing exclusively before payment (15 min hold)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{listingId}/fee-preview": {
+      "get": {
+        "operationId": "MarketplaceCheckoutController_getFeePreview",
+        "parameters": [
+          {
+            "name": "listingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "askPrice": {
+                      "type": "number"
+                    },
+                    "adminFee": {
+                      "type": "number"
+                    },
+                    "adminFeeRate": {
+                      "type": "number"
+                    },
+                    "totalBuyerPays": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the fee breakdown for a listing before purchasing",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/checkout/confirm": {
+      "post": {
+        "operationId": "MarketplaceCheckoutController_confirmPurchase",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmMarketplacePurchaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "marketplaceTransactionId": {
+                      "type": "number"
+                    },
+                    "ticketId": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Complete a marketplace ticket purchase (atomic: payment + ticket transfer + seller credit)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/config/{key}": {
+      "patch": {
+        "operationId": "MarketplaceCheckoutController_updateConfig",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlatformConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a platform config value (admin only)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
     "/transfer": {
       "post": {
         "operationId": "createTransfer",
@@ -12685,394 +14300,6 @@
         "summary": "Download file related to Trophy",
         "tags": [
           "trophy"
-        ]
-      }
-    },
-    "/user": {
-      "get": {
-        "operationId": "getAllUsers",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all Users",
-        "tags": [
-          "user"
-        ]
-      },
-      "post": {
-        "operationId": "createUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create User",
-        "tags": [
-          "user"
-        ]
-      }
-    },
-    "/user/query": {
-      "get": {
-        "operationId": "getQueryUser",
-        "parameters": [
-          {
-            "name": "skip",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to skip",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to take",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "loadEagerRelations",
-            "required": false,
-            "in": "query",
-            "description": "Load eager relations",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all Users",
-        "tags": [
-          "user"
-        ]
-      }
-    },
-    "/user/{id}": {
-      "get": {
-        "operationId": "getOneUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get one User",
-        "tags": [
-          "user"
-        ]
-      },
-      "patch": {
-        "operationId": "updateOneUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update one User",
-        "tags": [
-          "user"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteOneUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete one User",
-        "tags": [
-          "user"
-        ]
-      }
-    },
-    "/user/count": {
-      "get": {
-        "operationId": "getCountUser",
-        "parameters": [
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Total count of entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get count of Users",
-        "tags": [
-          "user"
-        ]
-      }
-    },
-    "/user/upload": {
-      "post": {
-        "operationId": "uploadUser",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload a file for User",
-        "tags": [
-          "user"
-        ]
-      }
-    },
-    "/user/download/{filename}": {
-      "get": {
-        "operationId": "downloadUser",
-        "parameters": [
-          {
-            "name": "filename",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Download file related to User",
-        "tags": [
-          "user"
         ]
       }
     },
@@ -13911,387 +15138,6 @@
         ]
       }
     },
-    "/competitionStanding": {
-      "post": {
-        "operationId": "createCompetitionStanding",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCompetitionStandingDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CompetitionStanding"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create CompetitionStanding",
-        "tags": [
-          "competitionStanding"
-        ]
-      },
-      "get": {
-        "operationId": "getAllCompetitionStanding",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CompetitionStanding"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all CompetitionStandings",
-        "tags": [
-          "competitionStanding"
-        ]
-      }
-    },
-    "/competitionStanding/query": {
-      "get": {
-        "operationId": "getQueryCompetitionStanding",
-        "parameters": [
-          {
-            "name": "skip",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to skip",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to take",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "loadEagerRelations",
-            "required": false,
-            "in": "query",
-            "description": "Load eager relations",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CompetitionStanding"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all CompetitionStandings",
-        "tags": [
-          "competitionStanding"
-        ]
-      }
-    },
-    "/competitionStanding/count": {
-      "get": {
-        "operationId": "getCountCompetitionStanding",
-        "parameters": [
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Total count of entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get count of CompetitionStandings",
-        "tags": [
-          "competitionStanding"
-        ]
-      }
-    },
-    "/competitionStanding/{id}": {
-      "get": {
-        "operationId": "getOneCompetitionStanding",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CompetitionStanding"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get one CompetitionStanding",
-        "tags": [
-          "competitionStanding"
-        ]
-      },
-      "patch": {
-        "operationId": "updateOneCompetitionStanding",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CompetitionStanding"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update one CompetitionStanding",
-        "tags": [
-          "competitionStanding"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteOneCompetitionStanding",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete one CompetitionStanding",
-        "tags": [
-          "competitionStanding"
-        ]
-      }
-    },
-    "/competitionStanding/upload": {
-      "post": {
-        "operationId": "uploadCompetitionStanding",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload a file for CompetitionStanding",
-        "tags": [
-          "competitionStanding"
-        ]
-      }
-    },
-    "/competitionStanding/download/{filename}": {
-      "get": {
-        "operationId": "downloadCompetitionStanding",
-        "parameters": [
-          {
-            "name": "filename",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Download file related to CompetitionStanding",
-        "tags": [
-          "competitionStanding"
-        ]
-      }
-    },
     "/auth/login": {
       "post": {
         "operationId": "login",
@@ -14999,12 +15845,16 @@
           },
           "country": {
             "type": "string"
+          },
+          "featured": {
+            "type": "boolean"
           }
         },
         "required": [
           "name",
           "type",
-          "country"
+          "country",
+          "featured"
         ]
       },
       "Competition": {
@@ -15055,6 +15905,9 @@
           "country": {
             "type": "string"
           },
+          "featured": {
+            "type": "boolean"
+          },
           "teamCompetitionSeasons": {
             "$ref": "#/components/schemas/Promise"
           },
@@ -15067,8 +15920,156 @@
           "name",
           "type",
           "country",
+          "featured",
           "teamCompetitionSeasons",
           "trophies"
+        ]
+      },
+      "CreateCompetitionStandingDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "teamCompetitionSeasonId": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          },
+          "played": {
+            "type": "number"
+          },
+          "won": {
+            "type": "number"
+          },
+          "drawn": {
+            "type": "number"
+          },
+          "lost": {
+            "type": "number"
+          },
+          "goalsFor": {
+            "type": "number"
+          },
+          "goalsAgainst": {
+            "type": "number"
+          },
+          "goalDifference": {
+            "type": "number"
+          },
+          "points": {
+            "type": "number"
+          },
+          "form": {
+            "type": "string"
+          },
+          "positionChange": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "teamCompetitionSeasonId",
+          "position",
+          "played",
+          "won",
+          "drawn",
+          "lost",
+          "goalsFor",
+          "goalsAgainst",
+          "goalDifference",
+          "points"
+        ]
+      },
+      "CompetitionStanding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "teamCompetitionSeasonId": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          },
+          "played": {
+            "type": "number"
+          },
+          "won": {
+            "type": "number"
+          },
+          "drawn": {
+            "type": "number"
+          },
+          "lost": {
+            "type": "number"
+          },
+          "goalsFor": {
+            "type": "number"
+          },
+          "goalsAgainst": {
+            "type": "number"
+          },
+          "goalDifference": {
+            "type": "number"
+          },
+          "points": {
+            "type": "number"
+          },
+          "form": {
+            "type": "string"
+          },
+          "positionChange": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "teamCompetitionSeason",
+          "teamCompetitionSeasonId",
+          "position",
+          "played",
+          "won",
+          "drawn",
+          "lost",
+          "goalsFor",
+          "goalsAgainst",
+          "goalDifference",
+          "points"
         ]
       },
       "CreateFixtureDTO": {
@@ -17958,6 +18959,450 @@
           "payment"
         ]
       },
+      "AcquireTicketHoldDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "offerKey": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "holderId": {
+            "type": "string",
+            "description": "Client-generated UUID for this browser session"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "holdMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60
+          }
+        },
+        "required": [
+          "fixtureId",
+          "offerKey",
+          "holderId",
+          "quantity"
+        ]
+      },
+      "ReleaseTicketHoldDto": {
+        "type": "object",
+        "properties": {
+          "holderId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "holderId"
+        ]
+      },
+      "ConfirmCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "offerKey": {
+            "type": "string"
+          },
+          "holderId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "unitPrice": {
+            "type": "number"
+          },
+          "category": {
+            "type": "string",
+            "description": "Ticket category label stored on Ticket rows"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "CreditCard",
+              "PayPal",
+              "PlatformCredit"
+            ]
+          },
+          "paymentProviderId": {
+            "type": "number"
+          },
+          "providerPaymentRef": {
+            "type": "string",
+            "description": "Provider transaction id (e.g. Stripe payment_intent)"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-generated idempotency key for safe retries"
+          },
+          "discountCodeId": {
+            "type": "number",
+            "description": "Discount code id to apply (primary market only)"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "offerKey",
+          "holderId",
+          "quantity",
+          "unitPrice",
+          "category",
+          "paymentMethod"
+        ]
+      },
+      "WebhookConfirmCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "offerKey": {
+            "type": "string"
+          },
+          "holderId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "unitPrice": {
+            "type": "number"
+          },
+          "category": {
+            "type": "string",
+            "description": "Ticket category label stored on Ticket rows"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "CreditCard",
+              "PayPal",
+              "PlatformCredit"
+            ]
+          },
+          "paymentProviderId": {
+            "type": "number"
+          },
+          "providerPaymentRef": {
+            "type": "string",
+            "description": "Provider transaction id (e.g. Stripe payment_intent)"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-generated idempotency key for safe retries"
+          },
+          "discountCodeId": {
+            "type": "number",
+            "description": "Discount code id to apply (primary market only)"
+          },
+          "userId": {
+            "type": "number",
+            "description": "Purchasing user id (must match Stripe session metadata)"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "offerKey",
+          "holderId",
+          "quantity",
+          "unitPrice",
+          "category",
+          "paymentMethod",
+          "userId"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MODERATOR",
+              "USER"
+            ]
+          },
+          "logs": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "predictions": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "commsPreferenceId": {
+            "type": "number"
+          },
+          "commsPreference": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "favouriteTeamId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "userName",
+          "email",
+          "password",
+          "type",
+          "logs",
+          "credit",
+          "transactions"
+        ]
+      },
+      "CreateUserDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MODERATOR",
+              "USER"
+            ]
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "userName",
+          "email",
+          "type"
+        ]
+      },
+      "UserTicketLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata stored as JSON",
+            "example": {
+              "source": "StatsBomb",
+              "version": "1.0",
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "userId": {
+            "type": "number",
+            "description": "Owner user id"
+          },
+          "ticketId": {
+            "type": "number",
+            "description": "Ticket id"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the ticket is currently in the user's wallet. False when listed for sale."
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "ticketId",
+          "ticket",
+          "active"
+        ]
+      },
+      "CreateListingDto": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "number",
+            "description": "ID of the ticket to list for resale"
+          },
+          "askPrice": {
+            "type": "number",
+            "description": "Asking price set by the seller",
+            "minimum": 0.01
+          }
+        },
+        "required": [
+          "ticketId",
+          "askPrice"
+        ]
+      },
+      "ConfirmMarketplacePurchaseDto": {
+        "type": "object",
+        "properties": {
+          "listingId": {
+            "type": "number",
+            "description": "ID of the marketplace listing to purchase"
+          },
+          "holderId": {
+            "type": "string",
+            "description": "holderId returned by POST /marketplace/hold/:listingId"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "CreditCard",
+              "PayPal",
+              "PlatformCredit"
+            ]
+          },
+          "paymentProviderId": {
+            "type": "number",
+            "description": "ID of the payment provider used"
+          },
+          "providerPaymentRef": {
+            "type": "string",
+            "description": "Provider transaction reference (e.g. Stripe payment_intent)"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-generated idempotency key for safe retries"
+          }
+        },
+        "required": [
+          "listingId",
+          "holderId",
+          "paymentMethod"
+        ]
+      },
+      "UpdatePlatformConfigDto": {
+        "type": "object",
+        "properties": {
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "number",
+              "string",
+              "boolean",
+              "array",
+              "json"
+            ],
+            "description": "Discriminator — indicates which value field holds the data"
+          },
+          "numberValue": {
+            "type": "number",
+            "description": "Populated when valueType is number"
+          },
+          "stringValue": {
+            "type": "string",
+            "description": "Populated when valueType is string"
+          },
+          "booleanValue": {
+            "type": "boolean",
+            "description": "Populated when valueType is boolean"
+          },
+          "arrayValue": {
+            "description": "Populated when valueType is array",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "jsonValue": {
+            "type": "object",
+            "description": "Populated when valueType is json"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description (optional update)"
+          }
+        },
+        "required": [
+          "valueType"
+        ]
+      },
       "CreateTransferDTO": {
         "type": "object",
         "properties": {
@@ -18164,136 +19609,6 @@
           "name"
         ]
       },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Metadata stored as JSON",
-            "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 32
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "MODERATOR",
-              "USER"
-            ]
-          },
-          "logs": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "predictions": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "commsPreferenceId": {
-            "type": "number"
-          },
-          "commsPreference": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "favouriteTeamId": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "firstName",
-          "lastName",
-          "userName",
-          "email",
-          "password",
-          "type",
-          "logs",
-          "credit",
-          "transactions"
-        ]
-      },
-      "CreateUserDTO": {
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "type": "object",
-            "description": "Metadata stored as JSON",
-            "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "MODERATOR",
-              "USER"
-            ]
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "userName",
-          "email",
-          "type"
-        ]
-      },
       "StatsBombSyncOptionsDTO": {
         "type": "object",
         "properties": {
@@ -18481,153 +19796,6 @@
         },
         "required": [
           "teamApiId"
-        ]
-      },
-      "CreateCompetitionStandingDTO": {
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "type": "object",
-            "description": "Metadata stored as JSON",
-            "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "teamCompetitionSeasonId": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          },
-          "played": {
-            "type": "number"
-          },
-          "won": {
-            "type": "number"
-          },
-          "drawn": {
-            "type": "number"
-          },
-          "lost": {
-            "type": "number"
-          },
-          "goalsFor": {
-            "type": "number"
-          },
-          "goalsAgainst": {
-            "type": "number"
-          },
-          "goalDifference": {
-            "type": "number"
-          },
-          "points": {
-            "type": "number"
-          },
-          "form": {
-            "type": "string"
-          },
-          "positionChange": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "teamCompetitionSeasonId",
-          "position",
-          "played",
-          "won",
-          "drawn",
-          "lost",
-          "goalsFor",
-          "goalsAgainst",
-          "goalDifference",
-          "points"
-        ]
-      },
-      "CompetitionStanding": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Metadata stored as JSON",
-            "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "teamCompetitionSeasonId": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          },
-          "played": {
-            "type": "number"
-          },
-          "won": {
-            "type": "number"
-          },
-          "drawn": {
-            "type": "number"
-          },
-          "lost": {
-            "type": "number"
-          },
-          "goalsFor": {
-            "type": "number"
-          },
-          "goalsAgainst": {
-            "type": "number"
-          },
-          "goalDifference": {
-            "type": "number"
-          },
-          "points": {
-            "type": "number"
-          },
-          "form": {
-            "type": "string"
-          },
-          "positionChange": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "teamCompetitionSeason",
-          "teamCompetitionSeasonId",
-          "position",
-          "played",
-          "won",
-          "drawn",
-          "lost",
-          "goalsFor",
-          "goalsAgainst",
-          "goalDifference",
-          "points"
         ]
       },
       "LoginBody": {

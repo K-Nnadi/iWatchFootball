@@ -5,16 +5,22 @@ import { useState, useEffect, useMemo } from 'react';
 interface ReservationTimerProps {
     initialMinutes?: number;
     reservationStartTime?: number | null; // Timestamp when reservation started
+    /** When set (server hold), countdown uses this absolute deadline instead of start+duration */
+    holdDeadlineMs?: number | null;
     onExpire?: () => void;
 }
 
 export function ReservationTimer({ 
-    initialMinutes = 15, 
+    initialMinutes = 10, 
     reservationStartTime = null,
+    holdDeadlineMs = null,
     onExpire 
 }: ReservationTimerProps) {
     // Calculate initial time remaining based on persisted start time
     const initialTimeRemaining = useMemo(() => {
+        if (holdDeadlineMs != null) {
+            return Math.max(0, Math.floor((holdDeadlineMs - Date.now()) / 1000));
+        }
         if (reservationStartTime) {
             const elapsed = (Date.now() - reservationStartTime) / 1000; // seconds
             const total = initialMinutes * 60; // total seconds
@@ -22,7 +28,7 @@ export function ReservationTimer({
             return Math.floor(remaining);
         }
         return initialMinutes * 60; // Default: full duration
-    }, [reservationStartTime, initialMinutes]);
+    }, [holdDeadlineMs, reservationStartTime, initialMinutes]);
 
     const [timeRemaining, setTimeRemaining] = useState(initialTimeRemaining);
 
@@ -38,6 +44,15 @@ export function ReservationTimer({
         }
 
         const interval = setInterval(() => {
+            if (holdDeadlineMs != null) {
+                const next = Math.max(0, Math.floor((holdDeadlineMs - Date.now()) / 1000));
+                setTimeRemaining(next);
+                if (next <= 0) {
+                    clearInterval(interval);
+                    onExpire?.();
+                }
+                return;
+            }
             setTimeRemaining((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
@@ -49,7 +64,7 @@ export function ReservationTimer({
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [timeRemaining, onExpire]);
+    }, [timeRemaining, onExpire, holdDeadlineMs]);
 
     const formatTime = (seconds: number): string => {
         const mins = Math.floor(seconds / 60);

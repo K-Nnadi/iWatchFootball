@@ -2,46 +2,38 @@ import React, {FormEvent, useEffect, useMemo, useRef, useState} from 'react';
 import { createPortal } from 'react-dom';
 import {
     ActionIcon,
+    Badge,
     Box,
     Container,
     Grid,
     Group,
     LoadingOverlay,
+    Paper,
     ScrollArea,
     Select,
     SegmentedControl,
     SimpleGrid,
     Stack,
+    Text,
     Tabs
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { IconLock, IconArrowLeft } from '@tabler/icons-react';
+import { IconLock, IconArrowLeft, IconTicket, IconShoppingBag } from '@tabler/icons-react';
 import { ModernButton, ModernCard, ModernH2, ModernH3, ModernBody, ModernCaption } from '../components/modern';
+import { getMyTicketLog, type TicketLogEntry } from '../shared/api/userTicketLog.api';
 import { useAuthStore } from '../shared/stores/auth.store';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
+import { useGetQueryTeamCompetitionSeason } from '@iWatchFootball/clients/controllers/team-competition-season';
+import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
+import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
+import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
+import { useCreateLog, useGetQueryLog } from '@iWatchFootball/clients/controllers/log';
+import { useQueryClient } from '@tanstack/react-query';
+import { getGetQueryLogQueryKey } from '@iWatchFootball/clients/controllers/log';
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 import NewStatsTab from "../tabs/newStats.tab";
-
-interface Competition {
-    id: string;
-    name: string;
-}
-
-interface Season {
-    id: string;
-    year: string;
-}
-
-interface Fixture {
-    id: string;
-    homeTeam: string;
-    awayTeam: string;
-    date: string;
-    competitionId: string;
-    seasonId: string;
-    venue: string;
-}
 
 export interface MatchEvent {
     time: number;
@@ -68,229 +60,186 @@ export interface UserGame {
     events?: MatchEvent[];
 }
 
-interface Team {
-    id: string;
-    name: string;
-}
-
 export function LogsPage() {
-    const { isLoggedIn } = useAuthStore();
+    const { isLoggedIn, user } = useAuthStore();
     const { navigateWithTransition } = usePageTransition();
+    const queryClient = useQueryClient();
 
-    // States for searching and adding matches
-    const [competitions, setCompetitions] = useState<Competition[]>([]);
-    const [seasons, setSeasons] = useState<Season[]>([]);
-    const [fixtures, setFixtures] = useState<Fixture[]>([]);
-    const [filteredFixtures, setFilteredFixtures] = useState<Fixture[]>([]);
+    const [myTickets, setMyTickets] = useState<TicketLogEntry[]>([]);
+    const [ticketsLoading, setTicketsLoading] = useState(false);
+
+    useEffect(() => {
+        if (!isLoggedIn) return;
+        setTicketsLoading(true);
+        getMyTicketLog()
+            .then(setMyTickets)
+            .catch(() => setMyTickets([]))
+            .finally(() => setTicketsLoading(false));
+    }, [isLoggedIn]);
 
     const [selectedCompetition, setSelectedCompetition] = useState<string | null>(null);
     const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
-
-    const [teams, setTeams] = useState<Team[]>([]);
     const [selectedHomeTeam, setSelectedHomeTeam] = useState<string | null>(null);
     const [selectedAwayTeam, setSelectedAwayTeam] = useState<string | null>(null);
+    const [selectedFixture, setSelectedFixture] = useState<string | null>(null);
 
-    const [loading, setLoading] = useState(false);
-
-    const [loggedFixtures, setLoggedFixtures] = useState<UserGame[]>([]);
     const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified'>('all');
 
-    useEffect(() => {
-        setLoading(true);
-        const mockCompetitions = [
-            {id: 'comp1', name: 'Premier League'},
-            {id: 'comp2', name: 'Champions League'}
-        ];
-        setCompetitions(mockCompetitions);
-        setLoading(false);
-    }, []);
+    const { mutateAsync: createLog, isPending: isCreatingLog } = useCreateLog();
 
-    useEffect(() => {
-        if (selectedCompetition) {
-            setLoading(true);
-            const mockSeasons = [
-                {id: 'season2023', year: '2023/2024'},
-                {id: 'season2022', year: '2022/2023'}
-            ];
-            setSeasons(mockSeasons);
-            setLoading(false);
-        }
-    }, [selectedCompetition]);
+    // Fetch competitions from the API
+    const { data: competitionsData = [], isLoading: isLoadingCompetitions } = useGetQueryCompetition(
+        { take: 200 } as any
+    );
 
-    useEffect(() => {
-        setLoading(true);
-        const mockTeams = [
-            { id: 'team1', name: 'Arsenal' },
-            { id: 'team2', name: 'Chelsea' },
-            { id: 'team3', name: 'Liverpool' },
-            { id: 'team4', name: 'Manchester City' },
-            { id: 'team5', name: 'Manchester United' },
-            { id: 'team6', name: 'Tottenham' },
-            { id: 'team7', name: 'Newcastle' },
-            { id: 'team8', name: 'Brighton' },
-        ];
-        setTeams(mockTeams);
-        setLoading(false);
-    }, []);
+    // Fetch TCS entries to derive seasons for the selected competition
+    const { data: tcsForSeasons = [], isLoading: isLoadingSeasons } = useGetQueryTeamCompetitionSeason(
+        { where: { competitionId: selectedCompetition ? Number(selectedCompetition) : undefined } } as any,
+        { query: { enabled: !!selectedCompetition } as any }
+    );
 
-    useEffect(() => {
-        if (selectedCompetition && selectedSeason && selectedHomeTeam && selectedAwayTeam) {
-            setLoading(true);
-            const homeTeamName = teams.find(t => t.id === selectedHomeTeam)?.name;
-            const awayTeamName = teams.find(t => t.id === selectedAwayTeam)?.name;
+    // Derive unique season IDs from the TCS result
+    const uniqueSeasonIds = useMemo(() => {
+        const seen = new Set<number>();
+        return tcsForSeasons.filter(tcs => {
+            if (seen.has(tcs.seasonId)) return false;
+            seen.add(tcs.seasonId);
+            return true;
+        }).map(tcs => tcs.seasonId);
+    }, [tcsForSeasons]);
 
-            const mockFixtures: Fixture[] = [
-                {
-                    id: 'fix1',
-                    homeTeam: homeTeamName || '',
-                    awayTeam: awayTeamName || '',
-                    date: '2023-09-10',
-                    competitionId: selectedCompetition,
-                    seasonId: selectedSeason,
-                    venue: 'Home Stadium'
-                },
-                {
-                    id: 'fix2',
-                    homeTeam: homeTeamName || '',
-                    awayTeam: awayTeamName || '',
-                    date: '2024-01-15',
-                    competitionId: selectedCompetition,
-                    seasonId: selectedSeason,
-                    venue: 'Away Stadium'
-                }
-            ];
-            setFixtures(mockFixtures);
-            setLoading(false);
-        }
-    }, [selectedCompetition, selectedSeason, selectedHomeTeam, selectedAwayTeam, teams]);
+    // Fetch TCS entries to derive teams for the selected competition + season
+    const { data: tcsForTeams = [], isLoading: isLoadingTeamsTcs } = useGetQueryTeamCompetitionSeason(
+        { where: { competitionId: selectedCompetition ? Number(selectedCompetition) : undefined, seasonId: selectedSeason ? Number(selectedSeason) : undefined } } as any,
+        { query: { enabled: !!(selectedCompetition && selectedSeason) } as any }
+    );
 
-    useEffect(() => {
-        let updated = fixtures;
-        if (selectedHomeTeam && selectedAwayTeam) {
-            // Only show fixtures where the selected teams played against each other
-            updated = updated.filter((f) =>
-                teams.find(t => t.id === selectedHomeTeam)?.name === f.homeTeam &&
-                teams.find(t => t.id === selectedAwayTeam)?.name === f.awayTeam
-            );
-        }
-        setFilteredFixtures(updated);
-        setSelectedFixture(null);
-    }, [fixtures, selectedHomeTeam, selectedAwayTeam, teams]);
+    const uniqueTeamIds = useMemo(() => {
+        const seen = new Set<number>();
+        return tcsForTeams.filter(tcs => {
+            if (seen.has(tcs.teamId)) return false;
+            seen.add(tcs.teamId);
+            return true;
+        }).map(tcs => tcs.teamId);
+    }, [tcsForTeams]);
 
-    useEffect(() => {
-        setLoading(true);
-        // Mock logged fixtures with detailed events including type
-        const mockLoggedFixtures: UserGame[] = [
-            {
-                fixtureId: 'fix1',
-                homeTeam: 'Team A',
-                awayTeam: 'Team B',
-                homeScore: 2,
-                awayScore: 1,
-                date: '2023-09-10',
-                competitionName: 'Premier League',
-                leaguePosition: 3,
-                isVerified: true,
-                venue: 'Stadium A',
-                userTeam: 'home',
-                stage: 'League Game',
-                events: [
-                    { time: 10, description: 'Goal by John Smith (assist: Mike Johnson)', team: 'home', type: 'goal' },
-                    { time: 25, description: 'Assist by David Brown', team: 'home', type: 'other' },
-                    { time: 45, description: 'Yellow card for Team B defender', team: 'away', type: 'card' },
-                    { time: 60, description: 'Substitution: Team A midfielder off, new midfielder on', team: 'home', type: 'substitution' },
-                    { time: 75, description: 'Goal by Chris Wilson (assisted by Alex Taylor)', team: 'away', type: 'goal' }
-                ]
+    // All teams loaded globally so we can resolve names for any fixture (form + logged games)
+    const { data: teamsData = [], isLoading: isLoadingTeams } = useGetQueryTeam(
+        { take: 500 } as any
+    );
+
+    // Filter teams to those registered in the selected competition/season (for the Add New Match form)
+    const teams = useMemo(() => {
+        if (!uniqueTeamIds.length) return [];
+        return teamsData.filter(t => uniqueTeamIds.includes(t.id));
+    }, [teamsData, uniqueTeamIds]);
+
+    // Load all seasons so we can display proper year labels in the season dropdown
+    const { data: allSeasonsData = [] } = useGetAllSeason();
+
+    // Fetch real fixtures from the API when all four filters are set (Add New Match form)
+    const canFetchFixtures = !!(selectedCompetition && selectedSeason && selectedHomeTeam && selectedAwayTeam);
+    const { data: fixturesData = [], isLoading: isLoadingFixtures } = useGetQueryFixture(
+        {
+            where: {
+                competitionId: selectedCompetition ? Number(selectedCompetition) : undefined,
+                seasonId: selectedSeason ? Number(selectedSeason) : undefined,
+                homeTeamId: selectedHomeTeam ? Number(selectedHomeTeam) : undefined,
+                awayTeamId: selectedAwayTeam ? Number(selectedAwayTeam) : undefined,
             },
-            {
-                fixtureId: 'fix2',
-                homeTeam: 'Team C',
-                awayTeam: 'Team D',
+            take: 100,
+        } as any,
+        { query: { enabled: canFetchFixtures } as any }
+    );
+
+    // Fetch this user's saved logs from the DB
+    const { data: userLogsData = [], isLoading: isLoadingLogs } = useGetQueryLog(
+        { where: { userId: user?.id }, take: 200 } as any,
+        { query: { enabled: isLoggedIn && !!user?.id } as any }
+    );
+
+    // Fetch fixtures for the user's logged games so we can display team names / dates
+    const loggedFixtureIds = useMemo(
+        () => Array.from(new Set(userLogsData.map(l => l.fixtureId))),
+        [userLogsData]
+    );
+    const { data: loggedFixturesRaw = [], isLoading: isLoadingLoggedFixtures } = useGetQueryFixture(
+        { where: { id: { $in: loggedFixtureIds } }, take: 200 } as any,
+        { query: { enabled: loggedFixtureIds.length > 0 } as any }
+    );
+
+    // Map DB logs → UserGame using the enriched fixture + team + competition data
+    const loggedFixtures = useMemo((): UserGame[] => {
+        return userLogsData.map(log => {
+            const fixture = loggedFixturesRaw.find(f => f.id === log.fixtureId);
+            const homeTeam = teamsData.find(t => t.id === fixture?.homeTeamId);
+            const awayTeam = teamsData.find(t => t.id === fixture?.awayTeamId);
+            const competition = competitionsData.find(c => c.id === fixture?.competitionId);
+            return {
+                fixtureId: String(log.fixtureId),
+                homeTeam: homeTeam?.name ?? `Team ${fixture?.homeTeamId ?? '?'}`,
+                awayTeam: awayTeam?.name ?? `Team ${fixture?.awayTeamId ?? '?'}`,
                 homeScore: 0,
                 awayScore: 0,
-                date: '2023-09-11',
-                competitionName: 'Champions League',
-                leaguePosition: 1,
-                isVerified: false,
-                venue: 'Stadium B',
-                userTeam: 'away',
-                stage: 'Semi-Finals',
-                events: [
-                    { time: 5, description: 'Kick-off', team: 'home', type: 'other' },
-                    { time: 30, description: 'Team D missed penalty', team: 'away', type: 'penalty' },
-                    { time: 55, description: 'Assist from James Miller', team: 'home', type: 'other' },
-                    { time: 90, description: 'Final whistle', team: 'home', type: 'other' }
-                ]
-            }
-        ];
-        setTimeout(() => {
-            setLoggedFixtures(mockLoggedFixtures);
-            setLoading(false);
-        }, 1000);
-    }, []);
+                date: fixture?.date ?? '',
+                competitionName: competition?.name ?? 'Unknown',
+                isVerified: log.isVerified,
+                stage: fixture?.stage ?? '',
+                events: [],
+            };
+        });
+    }, [userLogsData, loggedFixturesRaw, teamsData, competitionsData]);
+
+    const loading = isLoadingCompetitions || isLoadingSeasons || isLoadingTeamsTcs || isLoadingTeams
+        || isLoadingFixtures || isLoadingLogs || isLoadingLoggedFixtures || isCreatingLog;
 
     const handleAddToLog = async (e: FormEvent) => {
         e.preventDefault();
 
-        if (!selectedFixture) {
+        if (!selectedFixture || !user?.id) {
             return;
         }
 
-        setLoading(true);
+        const addedFixture = fixturesData.find((f) => String(f.id) === selectedFixture);
+        if (!addedFixture) return;
+
+        const homeTeam = teamsData.find(t => t.id === addedFixture.homeTeamId);
+        const awayTeam = teamsData.find(t => t.id === addedFixture.awayTeamId);
 
         try {
-            const addedFixture = fixtures.find((f) => f.id === selectedFixture);
-            if (!addedFixture) {
-                throw new Error('Fixture not found');
-            }
+            await createLog({
+                data: {
+                    userId: user.id,
+                    fixtureId: addedFixture.id,
+                    isVerified: false,
+                },
+            });
 
-            // Creating a new log with detailed events including the type
-            const newLog: UserGame = {
-                fixtureId: addedFixture.id,
-                homeTeam: addedFixture.homeTeam,
-                awayTeam: addedFixture.awayTeam,
-                homeScore: 2, // Mock score, consider making this dynamic if necessary
-                awayScore: 1, // Mock score
-                date: addedFixture.date,
-                competitionName: competitions.find((c) => c.id === addedFixture.competitionId)?.name || 'Unknown',
-                leaguePosition: Math.floor(Math.random() * 10) + 1,
-                isVerified: false,
-                venue: addedFixture.venue,
-                userTeam: 'home',
-                stage: 'League Game',
-                events: [
-                    {time: 10, description: 'Goal by Robert Lee (assist: Kevin White)', team: 'home', type: 'goal'},
-                    {time: 30, description: 'Yellow card for away team', team: 'away', type: 'card'},
-                    {time: 45, description: 'Substitution: Home team midfielder off, new midfielder on', team: 'home', type: 'substitution'}
-                ]
-            };
+            // Invalidate the log query so the right-hand list refreshes
+            queryClient.invalidateQueries({ queryKey: getGetQueryLogQueryKey() });
 
-            setLoggedFixtures((prev) => [...prev, newLog]);
-            setLoading(false);
-
-            // Show success notification
             showNotification({
-                title: 'Match Added Successfully!',
-                message: `${addedFixture.homeTeam} vs ${addedFixture.awayTeam} has been added to your logs`,
+                title: 'Match Added!',
+                message: `${homeTeam?.name ?? 'Home'} vs ${awayTeam?.name ?? 'Away'} has been added to your logs`,
                 color: 'green',
                 autoClose: 3000,
             });
 
-            // Reset all selection fields after successfully logging a game
             setSelectedCompetition(null);
             setSelectedSeason(null);
-            setFixtures([]);
-            setFilteredFixtures([]);
             setSelectedHomeTeam(null);
             setSelectedAwayTeam(null);
             setSelectedFixture(null);
 
-        } catch (err) {
-            setLoading(false);
+        } catch {
+            showNotification({
+                title: 'Failed to save match',
+                message: 'Something went wrong. Please try again.',
+                color: 'red',
+                autoClose: 4000,
+            });
         }
     };
-
-    const [selectedFixture, setSelectedFixture] = useState<string | null>(null);
 
     const [showTopButton, setShowTopButton] = useState(false);
 
@@ -511,13 +460,11 @@ export function LogsPage() {
                                     <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Competition</ModernCaption>
                                     <Select
                                         placeholder="Select competition"
-                                        data={competitions.map((c) => ({value: c.id, label: c.name}))}
+                                        data={competitionsData.map((c) => ({value: String(c.id), label: c.name}))}
                                         value={selectedCompetition}
                                         onChange={(val) => {
                                             setSelectedCompetition(val);
                                             setSelectedSeason(null);
-                                            setFixtures([]);
-                                            setFilteredFixtures([]);
                                             setSelectedHomeTeam(null);
                                             setSelectedAwayTeam(null);
                                             setSelectedFixture(null);
@@ -542,13 +489,17 @@ export function LogsPage() {
                                     <Box>
                                         <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Season</ModernCaption>
                                         <Select
-                                            placeholder="Select season"
-                                            data={seasons.map((s) => ({value: s.id, label: s.year}))}
+                                            placeholder={isLoadingSeasons ? 'Loading seasons…' : 'Select season'}
+                                            data={uniqueSeasonIds.map((seasonId) => {
+                                                const season = allSeasonsData.find(s => s.id === seasonId);
+                                                const label = season
+                                                    ? `${season.yearStart}/${season.yearEnd}`
+                                                    : String(seasonId);
+                                                return { value: String(seasonId), label };
+                                            })}
                                             value={selectedSeason}
                                             onChange={(val) => {
                                                 setSelectedSeason(val);
-                                                setFixtures([]);
-                                                setFilteredFixtures([]);
                                                 setSelectedHomeTeam(null);
                                                 setSelectedAwayTeam(null);
                                                 setSelectedFixture(null);
@@ -576,11 +527,11 @@ export function LogsPage() {
                                             <Box>
                                                 <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Home Team</ModernCaption>
                                                 <Select
-                                                    placeholder="Select home team"
+                                                    placeholder={isLoadingTeams ? 'Loading teams…' : 'Select home team'}
                                                     data={teams
-                                                        .filter(team => team.id !== selectedAwayTeam)
+                                                        .filter(team => String(team.id) !== selectedAwayTeam)
                                                         .map((team) => ({
-                                                            value: team.id,
+                                                            value: String(team.id),
                                                             label: team.name
                                                         }))}
                                                     value={selectedHomeTeam}
@@ -606,11 +557,11 @@ export function LogsPage() {
                                             <Box>
                                                 <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Away Team</ModernCaption>
                                                 <Select
-                                                    placeholder="Select away team"
+                                                    placeholder={isLoadingTeams ? 'Loading teams…' : 'Select away team'}
                                                     data={teams
-                                                        .filter(team => team.id !== selectedHomeTeam)
+                                                        .filter(team => String(team.id) !== selectedHomeTeam)
                                                         .map((team) => ({
-                                                            value: team.id,
+                                                            value: String(team.id),
                                                             label: team.name
                                                         }))}
                                                     value={selectedAwayTeam}
@@ -635,15 +586,19 @@ export function LogsPage() {
                                             </Box>
                                         </SimpleGrid>
 
-                                        {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length > 0 && (
+                                        {selectedHomeTeam && selectedAwayTeam && fixturesData.length > 0 && (
                                             <Box>
                                                 <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Select Fixture</ModernCaption>
                                                 <Select
-                                                    placeholder="Choose a fixture"
-                                                    data={filteredFixtures.map((f) => ({
-                                                        value: f.id,
-                                                        label: `${f.homeTeam} vs ${f.awayTeam} (${new Date(f.date).toLocaleDateString()})`
-                                                    }))}
+                                                    placeholder={isLoadingFixtures ? 'Loading fixtures…' : 'Choose a fixture'}
+                                                    data={fixturesData.map((f) => {
+                                                        const home = teamsData.find(t => t.id === f.homeTeamId)?.name || String(f.homeTeamId);
+                                                        const away = teamsData.find(t => t.id === f.awayTeamId)?.name || String(f.awayTeamId);
+                                                        return {
+                                                            value: String(f.id),
+                                                            label: `${home} vs ${away} (${new Date(f.date).toLocaleDateString()})`,
+                                                        };
+                                                    })}
                                                     value={selectedFixture}
                                                     onChange={setSelectedFixture}
                                                     searchable
@@ -661,12 +616,12 @@ export function LogsPage() {
                                                     }}
                                                 />
                                                 <ModernCaption style={{ color: 'var(--modern-text-secondary)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
-                                                    {filteredFixtures.length} {filteredFixtures.length === 1 ? 'match' : 'matches'} found
+                                                    {fixturesData.length} {fixturesData.length === 1 ? 'match' : 'matches'} found
                                                 </ModernCaption>
                                             </Box>
                                         )}
 
-                                        {selectedHomeTeam && selectedAwayTeam && filteredFixtures.length === 0 && (
+                                        {selectedHomeTeam && selectedAwayTeam && !isLoadingFixtures && fixturesData.length === 0 && (
                                             <Box style={{ textAlign: 'center', padding: '1rem' }}>
                                                 <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
                                                     No matches found between these teams
@@ -695,7 +650,7 @@ export function LogsPage() {
 
                 </Grid.Col>
                 <Grid.Col span={columnSpan}>
-                    <Tabs defaultValue={'matches'}>
+                        <Tabs defaultValue={'matches'}>
                         <Tabs.List style={{ justifyContent: 'center', width: '100%' }}>
                             <Tabs.Tab 
                                 value={'matches'}
@@ -716,6 +671,30 @@ export function LogsPage() {
                                 }}
                             >
                                 Stats
+                            </Tabs.Tab>
+                            <Tabs.Tab
+                                value={'tickets'}
+                                style={{
+                                    fontSize: '1.1rem',
+                                    padding: '1rem 2rem',
+                                    fontWeight: 600
+                                }}
+                            >
+                                <Group gap={6}>
+                                    <IconTicket size={16} />
+                                    My Tickets
+                                    {myTickets.length > 0 && (
+                                        <Badge
+                                            size="xs"
+                                            style={{
+                                                backgroundColor: 'var(--modern-lime)',
+                                                color: 'var(--modern-bg-primary)',
+                                            }}
+                                        >
+                                            {myTickets.length}
+                                        </Badge>
+                                    )}
+                                </Group>
                             </Tabs.Tab>
                         </Tabs.List>
                         <Box mb="md" mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
@@ -814,6 +793,116 @@ export function LogsPage() {
                                 ) : (
                                     // <StatsTab loggedFixtures={filteredLoggedFixtures}/>
                                     <NewStatsTab loggedFixtures={filteredLoggedFixtures} />
+                                )}
+                            </ScrollArea>
+                        </Tabs.Panel>
+
+                        <Tabs.Panel value={'tickets'}>
+                            <ScrollArea
+                                style={{ height: `${scrollAreaHeight}px`, minHeight: '400px' }}
+                                type="never"
+                                scrollbarSize={2}
+                                scrollHideDelay={0}
+                            >
+                                {ticketsLoading ? (
+                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
+                                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
+                                            Loading your tickets…
+                                        </ModernBody>
+                                    </ModernCard>
+                                ) : myTickets.length === 0 ? (
+                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
+                                        <IconTicket size={40} color="var(--modern-text-secondary)" style={{ margin: '0 auto 1rem' }} />
+                                        <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
+                                            No Tickets Yet
+                                        </ModernH3>
+                                        <ModernBody style={{ color: 'var(--modern-text-secondary)', marginBottom: '1.5rem' }}>
+                                            Tickets you purchase will appear here automatically.
+                                        </ModernBody>
+                                        <ModernButton
+                                            variant="primary"
+                                            onClick={() => navigateWithTransition('/tickets')}
+                                        >
+                                            Browse Tickets
+                                        </ModernButton>
+                                    </ModernCard>
+                                ) : (
+                                    <SimpleGrid cols={1} style={{ gap: 'var(--mantine-spacing-md)', padding: '0 8px' }}>
+                                        {myTickets.map((entry) => (
+                                            <Paper
+                                                key={entry.id}
+                                                p="md"
+                                                radius="md"
+                                                style={{
+                                                    backgroundColor: 'var(--modern-card-bg)',
+                                                    border: '1px solid var(--modern-border-color)',
+                                                }}
+                                            >
+                                                <Group justify="space-between" mb="xs">
+                                                    <Group gap="sm">
+                                                        <IconTicket size={18} color="var(--modern-lime)" />
+                                                        <Text fw={600} style={{ color: 'var(--modern-text-primary)' }}>
+                                                            {entry.ticket?.category ?? 'Ticket'}
+                                                        </Text>
+                                                    </Group>
+                                                    <Badge
+                                                        size="sm"
+                                                        style={{
+                                                            backgroundColor: 'rgba(0, 255, 136, 0.15)',
+                                                            color: 'var(--modern-lime)',
+                                                            border: '1px solid rgba(0, 255, 136, 0.3)',
+                                                        }}
+                                                    >
+                                                        In Wallet
+                                                    </Badge>
+                                                </Group>
+
+                                                <Stack gap={4} mb="md">
+                                                    <Group justify="space-between">
+                                                        <Text size="sm" c="dimmed">Fixture</Text>
+                                                        <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
+                                                            {entry.ticket?.fixtureLabel ??
+                                                                `#${entry.ticket?.fixtureId ?? entry.ticketId}`}
+                                                        </Text>
+                                                    </Group>
+                                                    <Group justify="space-between">
+                                                        <Text size="sm" c="dimmed">Ticket #</Text>
+                                                        <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
+                                                            #{entry.ticketId}
+                                                        </Text>
+                                                    </Group>
+                                                    {entry.ticket?.price != null && (
+                                                        <Group justify="space-between">
+                                                            <Text size="sm" c="dimmed">Face Value</Text>
+                                                            <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
+                                                                {new Intl.NumberFormat('en-GB', {
+                                                                    style: 'currency',
+                                                                    currency: 'GBP',
+                                                                }).format(entry.ticket.price)}
+                                                            </Text>
+                                                        </Group>
+                                                    )}
+                                                </Stack>
+
+                                                <Group gap="sm">
+                                                    <ModernButton
+                                                        variant="primary"
+                                                        style={{ flex: 1 }}
+                                                        onClick={() =>
+                                                            navigateWithTransition('/marketplace/sell', {
+                                                                state: { ticketId: entry.ticketId },
+                                                            })
+                                                        }
+                                                    >
+                                                        <Group gap={6}>
+                                                            <IconShoppingBag size={14} />
+                                                            Sell on Marketplace
+                                                        </Group>
+                                                    </ModernButton>
+                                                </Group>
+                                            </Paper>
+                                        ))}
+                                    </SimpleGrid>
                                 )}
                             </ScrollArea>
                         </Tabs.Panel>

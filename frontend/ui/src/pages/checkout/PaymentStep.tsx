@@ -3,7 +3,6 @@ import {
     Title,
     Text,
     Stack,
-    Radio,
     Group,
     Image,
     Badge,
@@ -11,10 +10,14 @@ import {
     TextInput,
     Button,
     Notification,
+    Flex,
+    ThemeIcon,
+    Skeleton,
+    UnstyledButton,
 } from '@mantine/core';
-import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
+import { IconCheck, IconAlertCircle, IconCreditCard, IconCurrencyPound } from '@tabler/icons-react';
 import { ModernButton } from '../../components/modern';
-import { PaymentProvider, PaymentInfo, CheckoutErrors, CheckoutTicketDetails } from './types';
+import { PaymentProvider, PaymentInfo, CheckoutErrors } from './types';
 
 interface PaymentStepProps {
     paymentProviders: PaymentProvider[];
@@ -22,13 +25,66 @@ interface PaymentStepProps {
     paymentInfo: PaymentInfo;
     errors: CheckoutErrors;
     loading: boolean;
+    paymentProcessing: boolean;
     paymentStatus: 'idle' | 'success' | 'error';
-    ticketDetails: CheckoutTicketDetails;
+    /** Total shown on Pay button — primary subtotal − discount when applicable */
+    payAmountDue: number;
     onProviderSelect: (provider: PaymentProvider | null) => void;
     onPaymentInfoChange: (field: string, value: string) => void;
     onBack: () => void;
     onPaymentSubmit: () => void;
     onPaymentStatusChange: (status: 'idle' | 'success' | 'error') => void;
+}
+
+function PaymentMethodIcon({ provider }: { provider: PaymentProvider }) {
+    const isStripe = provider.slug === 'stripe';
+    const isPaypal = provider.slug === 'paypal';
+
+    if (provider.type === 'CREDIT') {
+        return (
+            <ThemeIcon size={44} radius="md" variant="light" color="teal">
+                <IconCurrencyPound size={24} stroke={1.5} />
+            </ThemeIcon>
+        );
+    }
+    if (provider.logoUrl) {
+        /** Brand PNGs from `public/logos`: Stripe needs a light tray on dark chrome; PayPal artwork includes its panel. */
+        return (
+            <Box
+                w={isStripe ? 100 : isPaypal ? 108 : 88}
+                h={40}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    borderRadius: 'var(--mantine-radius-md)',
+                    overflow: 'hidden',
+                    backgroundColor: isStripe ? '#ffffff' : undefined,
+                    padding: isStripe ? '6px 12px' : 0,
+                    border:
+                        isStripe
+                            ? '1px solid var(--mantine-color-default-border)'
+                            : undefined,
+                }}
+            >
+                <Image
+                    src={provider.logoUrl}
+                    alt=""
+                    h={isStripe ? 22 : undefined}
+                    w={isPaypal ? '100%' : undefined}
+                    maw={isPaypal ? '100%' : undefined}
+                    mah={isPaypal ? 36 : undefined}
+                    fit="contain"
+                />
+            </Box>
+        );
+    }
+    return (
+        <ThemeIcon size={44} radius="md" variant="light" color="gray">
+            <IconCreditCard size={24} stroke={1.5} />
+        </ThemeIcon>
+    );
 }
 
 export function PaymentStep({
@@ -37,95 +93,127 @@ export function PaymentStep({
     paymentInfo,
     errors,
     loading,
+    paymentProcessing,
     paymentStatus,
-    ticketDetails,
+    payAmountDue,
     onProviderSelect,
     onPaymentInfoChange,
     onBack,
     onPaymentSubmit,
     onPaymentStatusChange,
 }: PaymentStepProps) {
+    const borderSubtle = 'var(--mantine-color-default-border)';
+    const borderSelected = 'var(--mantine-color-blue-filled)';
+
+    const payLabel = `Pay £${payAmountDue.toFixed(2)}`;
+
     return (
-        <Paper shadow="xs" radius="md" p="md" withBorder>
-            <Title order={3} size="h5" mb="md">
-                Select Payment Method
+        <Paper shadow="sm" radius="md" p="lg" withBorder>
+            <Title order={3} size="h5" mb="md" fw={600}>
+                Select payment method
             </Title>
 
             {loading ? (
-                <Text size="sm" color="dimmed">
-                    Loading payment options...
-                </Text>
+                <Stack gap="sm">
+                    <Skeleton height={64} radius="md" />
+                    <Skeleton height={64} radius="md" />
+                    <Skeleton height={64} radius="md" />
+                </Stack>
             ) : paymentProviders.length === 0 ? (
-                <Text size="sm" color="dimmed">
+                <Text size="sm" c="dimmed">
                     No payment methods available
                 </Text>
             ) : (
-                <Radio.Group
-                    value={selectedProvider?.id?.toString()}
-                    onChange={(value) => {
-                        const provider = paymentProviders.find((p) => p.id.toString() === value);
-                        onProviderSelect(provider || null);
-                        onPaymentInfoChange('name', '');
-                        onPaymentInfoChange('cardNumber', '');
-                        onPaymentInfoChange('expiration', '');
-                        onPaymentInfoChange('cvv', '');
-                        onPaymentInfoChange('email', '');
-                    }}
+                <Stack
+                    gap="sm"
+                    mt="xs"
+                    role="radiogroup"
+                    aria-label="Select payment method"
                 >
-                    <Stack mt="xs">
-                        {paymentProviders.map((provider) => (
-                            <Radio
+                    {paymentProviders.map((provider) => {
+                        const checked = selectedProvider?.id === provider.id;
+                        const select = (): void => {
+                            onProviderSelect(provider);
+                            onPaymentInfoChange('name', '');
+                            onPaymentInfoChange('cardNumber', '');
+                            onPaymentInfoChange('expiration', '');
+                            onPaymentInfoChange('cvv', '');
+                            onPaymentInfoChange('email', '');
+                        };
+                        return (
+                            <UnstyledButton
                                 key={provider.id}
-                                value={provider.id.toString()}
-                                label={
-                                    <Group gap="sm">
-                                        {provider.logoUrl && (
-                                            <Image
-                                                src={provider.logoUrl}
-                                                alt={provider.name}
-                                                width={40}
-                                                height={40}
-                                                fit="contain"
-                                            />
-                                        )}
-                                        <Text fw={500}>{provider.name}</Text>
-                                        <Badge size="sm" variant="light">
-                                            {provider.type}
-                                        </Badge>
-                                    </Group>
-                                }
+                                type="button"
+                                role="radio"
+                                aria-checked={checked}
+                                tabIndex={0}
+                                onClick={select}
+                                onKeyDown={(e) => {
+                                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                                    e.preventDefault();
+                                    select();
+                                }}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    borderRadius: 'var(--mantine-radius-md)',
+                                    border: `1px solid ${checked ? borderSelected : borderSubtle}`,
+                                    backgroundColor: checked ? 'var(--mantine-color-blue-light)' : undefined,
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    transition:
+                                        'border-color 0.15s ease, background-color 0.15s ease',
+                                    textAlign: 'left',
+                                }}
                                 styles={{
-                                    label: {
-                                        padding: '0.75rem',
-                                        cursor: 'pointer',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        borderRadius: '4px',
-                                        transition: 'all 0.2s',
+                                    root: {
+                                        '&:focus-visible': {
+                                            outline: '2px solid var(--mantine-color-blue-filled)',
+                                            outlineOffset: '2px',
+                                        },
                                     },
                                 }}
-                            />
-                        ))}
-                    </Stack>
-                </Radio.Group>
+                            >
+                                <Flex align="center" gap="md" wrap="nowrap" p="md" style={{ flex: 1 }}>
+                                    <PaymentMethodIcon provider={provider} />
+                                    <Box style={{ flex: 1, minWidth: 0 }}>
+                                        <Text fw={600} size="sm" lineClamp={2}>
+                                            {provider.name}
+                                        </Text>
+                                        {provider.type === 'CREDIT' &&
+                                            provider.creditBalance != null && (
+                                                <Text size="xs" c="dimmed" mt={2}>
+                                                    Available balance
+                                                </Text>
+                                            )}
+                                    </Box>
+                                    <Badge size="sm" variant="light" color="blue" tt="uppercase">
+                                        {provider.type}
+                                    </Badge>
+                                </Flex>
+                            </UnstyledButton>
+                        );
+                    })}
+                </Stack>
             )}
 
             {selectedProvider && (
                 <Box mt="xl">
-                    <Title order={4} size="h6" mb="md">
-                        Payment Information
+                    <Title order={4} size="h6" mb="md" fw={600}>
+                        Payment information
                     </Title>
 
                     {selectedProvider.type === 'CARD' && (
                         <Stack gap="md">
                             <TextInput
-                                label="Name on Card"
+                                label="Name on card"
                                 placeholder="John Doe"
                                 value={paymentInfo.name}
                                 error={errors.name}
                                 onChange={(e) => onPaymentInfoChange('name', e.currentTarget.value)}
                             />
                             <TextInput
-                                label="Card Number"
+                                label="Card number"
                                 placeholder="1234 5678 9012 3456"
                                 value={paymentInfo.cardNumber}
                                 onChange={(e) => {
@@ -140,7 +228,7 @@ export function PaymentStep({
 
                             <Group grow>
                                 <TextInput
-                                    label="Expiration Date"
+                                    label="Expiry"
                                     placeholder="MM/YY"
                                     value={paymentInfo.expiration}
                                     onChange={(e) => {
@@ -181,24 +269,30 @@ export function PaymentStep({
                                 error={errors.email}
                                 onChange={(e) => onPaymentInfoChange('email', e.currentTarget.value)}
                             />
-                            <Text size="sm" color="dimmed">
+                            <Text size="sm" c="dimmed">
                                 You will be redirected to {selectedProvider.name} to complete your payment.
                             </Text>
                         </Stack>
                     )}
 
-                    <Group mt="xl">
-                        <Button variant="default" onClick={onBack} style={{ flex: 1 }}>
+                    {selectedProvider.type === 'CREDIT' && (
+                        <Text size="sm" c="dimmed">
+                            Your platform credit balance will be debited when you confirm — no separate card step.
+                        </Text>
+                    )}
+
+                    <Group mt="xl" grow>
+                        <Button variant="default" onClick={onBack}>
                             Back
                         </Button>
                         <ModernButton
-                            variant="primary"
+                            variant="secondary"
                             size="md"
-                            style={{ flex: 1 }}
                             onClick={onPaymentSubmit}
-                            disabled={paymentStatus === 'idle'}
+                            loading={paymentProcessing}
+                            disabled={loading || paymentProcessing || paymentStatus === 'success'}
                         >
-                            {paymentStatus === 'idle' ? 'Processing...' : `Pay £${ticketDetails.price?.toFixed(2) || '0.00'}`}
+                            {payLabel}
                         </ModernButton>
                     </Group>
                 </Box>
@@ -209,10 +303,10 @@ export function PaymentStep({
                     mt="lg"
                     icon={<IconCheck />}
                     color="green"
-                    title="Payment Successful"
+                    title="Payment successful"
                     onClose={() => onPaymentStatusChange('idle')}
                 >
-                    Thank you for your purchase! Redirecting...
+                    Thank you for your purchase! Redirecting…
                 </Notification>
             )}
 
@@ -221,7 +315,7 @@ export function PaymentStep({
                     mt="lg"
                     icon={<IconAlertCircle />}
                     color="red"
-                    title="Payment Failed"
+                    title="Payment failed"
                     onClose={() => onPaymentStatusChange('idle')}
                 >
                     There was an issue with your payment. Please try again.
@@ -230,4 +324,3 @@ export function PaymentStep({
         </Paper>
     );
 }
-

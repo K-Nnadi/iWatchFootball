@@ -1,5 +1,6 @@
 import {Module} from '@nestjs/common';
 import {BullModule} from '@nestjs/bullmq';
+import {ScheduleModule} from '@nestjs/schedule';
 import {CONFIG, TYPEORM_CONFIG} from "@iWatchFootball/base-tools/config/config";
 import {PlayerModule} from "./api/modules/player/player.module";
 import {ManagerEmploymentModule} from "./api/modules/managerEmployment/managerEmployment.module";
@@ -11,6 +12,7 @@ import {UserModule} from "./api/modules/user/user.module";
 import {CommsPreferenceModule} from "./api/modules/commsPreference/commsPreference.module";
 import {FixtureModule} from "./api/modules/fixture/fixture.module";
 import {CompetitionModule} from "./api/modules/competition/competition.module";
+import {CompetitionStandingModule} from "./api/modules/competitionStanding/competitionStanding.module";
 import {TransferModule} from "./api/modules/transfer/transfer.module";
 import {PositionModule} from "./api/modules/position/position.module";
 import {LineUpModule} from "./api/modules/lineUp/lineUp.module";
@@ -32,8 +34,12 @@ import {AuthModule as CoreAuthModule} from "./auth/auth.module";
 import {PaymentModule} from "./api/modules/payment/payment.module";
 import {PaymentProviderModule} from "./api/modules/paymentProvider/paymentProvider.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
+import {TicketHoldModule} from "./api/modules/ticketHold/ticketHold.module";
+import {CheckoutModule} from "./api/modules/checkout/checkout.module";
 import {TransactionModule} from "./api/modules/transaction/transaction.module";
 import {CreditModule} from "./api/modules/credit/credit.module";
+import {MarketplaceModule} from "./api/modules/marketplace/marketplace.module";
+import {DiscountCodeModule} from "./api/modules/discountCode/discountCode.module";
 import {LoyaltySchemeModule} from "./api/modules/loyaltyScheme/loyaltyScheme.module";
 import {LoyaltyEventModule} from "./api/modules/loyaltyEvent/loyaltyEvent.module";
 import {LoyaltyModule} from "./api/services/loyalty/loyalty.module";
@@ -57,6 +63,7 @@ const Modules = [
     CardModule,
     CommsPreferenceModule,
     CompetitionModule,
+    CompetitionStandingModule,
     FixtureModule,
     FixtureRefereeModule,
     GenericTokenModule,
@@ -86,6 +93,10 @@ const Modules = [
     TeamModule,
     TeamCompetitionSeasonModule,
     TicketModule,
+    TicketHoldModule,
+    CheckoutModule,
+    MarketplaceModule,
+    DiscountCodeModule,
     TransferModule,
     TrophyModule,
     UserModule,
@@ -104,6 +115,7 @@ const ComplexModules = [
     imports: [
         CONFIG,
         TYPEORM_CONFIG,
+        ScheduleModule.forRoot(),
         ...(BULL_MODULE ? [BULL_MODULE] : []),
         ...Modules,
         ...ComplexModules

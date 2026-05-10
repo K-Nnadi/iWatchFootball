@@ -1,8 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Container, Grid, Paper, Stack, Text, Group, ScrollArea, useMantineColorScheme } from '@mantine/core';
+import { notify } from '../shared/notify';
 import { useParams, useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useCartStore } from '../shared/stores/cart.store';
+import { acquireTicketHold } from '../shared/api/ticketHold.api';
+import { buildTicketOfferKey } from '../shared/ticketOffer';
 import { StadiumMap } from '../components/stadium/StadiumMap';
 import { ModernH3 } from '../components/modern';
 import { MatchHeader, FiltersPanel, TicketCard, type Ticket, type TicketFilters, type MatchDetails } from '../components/tickets';
@@ -148,35 +151,73 @@ export function SeatSelectionPage() {
         }
     };
 
-    const handleBuyNow = (ticketId: string) => {
+    const handleBuyNow = async (ticketId: string) => {
         const ticket = allTickets.find((t) => t.id === ticketId);
-        if (ticket) {
+        if (!ticket || !matchId) return;
+
+        const fixtureId = Number.parseInt(matchId, 10);
+        if (!Number.isFinite(fixtureId)) {
+            notify.error('Invalid match', 'Cannot reserve tickets for this fixture.');
+            return;
+        }
+
+        let holderId = sessionStorage.getItem('iwf_ticket_holder');
+        if (!holderId) {
+            holderId = crypto.randomUUID();
+            sessionStorage.setItem('iwf_ticket_holder', holderId);
+        }
+
+        const offerKey = buildTicketOfferKey(matchId, ticket.id);
+        const quantity = ticket.seatsTogether || 1;
+
+        try {
+            const { expiresAt, holdMinutes } = await acquireTicketHold({
+                fixtureId,
+                offerKey,
+                holderId,
+                quantity,
+            });
+
             const ticketDetails = {
-                matchId: matchId || 'unknown',
+                matchId,
                 homeTeam: matchDetails.homeTeam,
                 awayTeam: matchDetails.awayTeam,
                 date: matchDetails.date,
                 venue: matchDetails.venue,
                 price: ticket.price,
-                quantity: ticket.seatsTogether || 1,
+                quantity,
                 section: ticket.block,
                 row: undefined,
                 fanSide: ticket.fanSide,
                 seatsTogether: ticket.seatsTogether,
                 ticketType: ticket.ticketFormat as 'E-Ticket' | 'Print at Home',
                 unrestrictedView: ticket.clearView,
+                fixtureId,
+                offerKey,
+                holderId,
+                holdExpiresAt: expiresAt,
+                category: `category-${ticket.category}`,
             };
-            
-            // Add to cart
+
             addItem(ticketDetails);
-            
-            // Start reservation timer
             startReservation();
-            
-            // Navigate to checkout
+
+            notify.success('Tickets reserved', `Your tickets are held for ${holdMinutes} minute${holdMinutes !== 1 ? 's' : ''}. Complete checkout before your reservation expires.`);
+
             navigateWithTransition('/checkout', {
                 state: ticketDetails,
             });
+        } catch (e: unknown) {
+            const status = (e as { response?: { status?: number } })?.response?.status;
+            if (status === 409) {
+                notify.warning('Ticket currently reserved', 'Another customer is holding this ticket right now. Please try again in a few minutes or choose a different option.');
+            } else {
+                const msg =
+                    (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                    (e as Error)?.message ||
+                    'Could not reserve these tickets.';
+                notify.error('Reservation failed', msg);
+            }
         }
     };
 

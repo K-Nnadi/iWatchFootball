@@ -40,9 +40,21 @@ export class LoyaltyService {
     }
 
     /**
-     * Check and process birthday rewards
-     * This should be called daily via a scheduled job
-     * Note: This checks user metadata for birthday. You may need to add a birthday field to User entity
+     * Schedule loyalty tier / first-purchase checks after checkout commits (card/PayPal only — not wallet).
+     */
+    scheduleProcessAfterPurchase(userId: number): void {
+        setImmediate(async () => {
+            try {
+                await this.processLoyaltyRewards(userId, 0);
+            } catch (err) {
+                console.error('Loyalty process after purchase:', err);
+            }
+        });
+    }
+
+    /**
+     * Check and process birthday rewards (scheduled job).
+     * Uses {@link User.metadata} birthday when present.
      */
     async processBirthdayRewards(): Promise<void> {
         const today = new Date();
@@ -64,18 +76,28 @@ export class LoyaltyService {
     }
 
     /**
-     * Get user's total spending (only cash payments)
+     * Qualifying spend for loyalty tiers: net card/PayPal pay-in (CASH_PAYMENT magnitude)
+     * minus REFUND magnitudes (plan: full-order refunds reduce qualifying spend).
+     * Supports legacy rows that used negative CASH_PAYMENT via ABS on purchases.
      */
     private async getUserTotalSpending(userId: number): Promise<number> {
-        const result = await this.transactionRepo
-            .createQueryBuilder('transaction')
-            .select('COALESCE(SUM(ABS(transaction.amount)), 0)', 'total')
-            .where('transaction.userId = :userId', { userId })
-            .andWhere('transaction.type = :type', { type: TransactionType.CASH_PAYMENT })
-            .andWhere('transaction.amount < 0') // Only count payments (negative amounts)
+        const purchaseAgg = await this.transactionRepo
+            .createQueryBuilder('t')
+            .select('COALESCE(SUM(ABS(t.amount)), 0)', 'total')
+            .where('t.userId = :userId', { userId })
+            .andWhere('t.type = :type', { type: TransactionType.CASH_PAYMENT })
             .getRawOne();
 
-        return parseFloat(result?.total || '0');
+        const refundAgg = await this.transactionRepo
+            .createQueryBuilder('t')
+            .select('COALESCE(SUM(ABS(t.amount)), 0)', 'total')
+            .where('t.userId = :userId', { userId })
+            .andWhere('t.type = :type', { type: TransactionType.REFUND })
+            .getRawOne();
+
+        const purchases = parseFloat(purchaseAgg?.total || '0');
+        const refunds = parseFloat(refundAgg?.total || '0');
+        return Math.max(0, purchases - refunds);
     }
 
     /**
@@ -119,16 +141,15 @@ export class LoyaltyService {
     }
 
     /**
-     * Check if this is user's first purchase and award reward if applicable
+     * Qualifying purchases for first-purchase scheme: ledger lines for card/PayPal ticket buys.
      */
     private async checkFirstPurchase(userId: number): Promise<void> {
-        // Count user's cash payment transactions
-        const purchaseCount = await this.transactionRepo.count({
-            where: {
-                userId,
-                type: TransactionType.CASH_PAYMENT,
-            },
-        });
+        const purchaseCount = await this.transactionRepo
+            .createQueryBuilder('t')
+            .where('t.userId = :uid', { uid: userId })
+            .andWhere('t.type = :type', { type: TransactionType.CASH_PAYMENT })
+            .andWhere('ABS(t.amount) > 0')
+            .getCount();
 
         // If this is the first purchase
         if (purchaseCount === 1) {

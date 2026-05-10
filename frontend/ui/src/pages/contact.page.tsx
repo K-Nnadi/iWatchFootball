@@ -7,7 +7,7 @@ import {
   Box,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
+import { notify } from '../shared/notify';
 import { ModernButton, ModernH1, ModernBody, ModernCard } from '../components/modern';
 import '../styles/modern.css';
 
@@ -56,11 +56,7 @@ export function ContactPage() {
       window.location.href = mailtoLink;
       
       // Show success notification
-      notifications.show({
-        title: 'Contact Form Submitted',
-        message: 'Your email client should open. If not, please email iwatchfootball@gmail.com directly.',
-        color: 'green',
-      });
+      notify.success('Contact Form Submitted', 'Your email client should open. If not, please email iwatchfootball@gmail.com directly.');
       
       // Reset form after a short delay
       setTimeout(() => {
@@ -68,11 +64,7 @@ export function ContactPage() {
         setLoading(false);
       }, 1000);
     } catch (error) {
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to submit form. Please email iwatchfootball@gmail.com directly.',
-        color: 'red',
-      });
+      notify.error('Error', 'Failed to submit form. Please email iwatchfootball@gmail.com directly.');
       setLoading(false);
     }
   };

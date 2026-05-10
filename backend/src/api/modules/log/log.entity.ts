@@ -13,12 +13,14 @@ import { FindOptionsWhere } from 'typeorm';
 @Entity('log')
 @SecurityFeature<Log>({
   base: {
-    // READ operations - Only admins and moderators can see logs
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      filter: (req: RequestWithUser): FindOptionsWhere<Log> => {
-        // Admins and moderators can see all logs
-        return {};
-      },
+      filter: (): FindOptionsWhere<Log> => ({}),
+      fields: [
+        'id', 'createdAt', 'updatedAt', 'userId', 'fixtureId', 'ticketNumber', 'isVerified', 'notes', 'metadata'
+      ],
+    },
+    [UserRole.USER]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<Log> => ({ userId: req.user?.id }),
       fields: [
         'id', 'createdAt', 'updatedAt', 'userId', 'fixtureId', 'ticketNumber', 'isVerified', 'notes', 'metadata'
       ],
@@ -27,21 +29,29 @@ import { FindOptionsWhere } from 'typeorm';
   },
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can create logs
       fields: ['userId', 'fixtureId', 'ticketNumber', 'isVerified', 'notes', 'metadata'],
+    },
+    [UserRole.USER]: {
+      fields: ['userId', 'fixtureId', 'ticketNumber', 'notes', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Log> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can update logs
       fields: ['userId', 'fixtureId', 'ticketNumber', 'isVerified', 'notes', 'metadata'],
+    },
+    [UserRole.USER]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<Log> => ({ userId: req.user?.id }),
+      fields: ['ticketNumber', 'notes', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Log> => ({ id: -1 }) },
   },
   [OperationType.DELETE]: {
     [createRoleGroup(UserRole.ADMIN)]: {
-      // Only admin can delete logs
+      fields: [],
+    },
+    [UserRole.USER]: {
+      filter: (req: RequestWithUser): FindOptionsWhere<Log> => ({ userId: req.user?.id }),
       fields: [],
     },
     default: { filter: (): FindOptionsWhere<Log> => ({ id: -1 }) },

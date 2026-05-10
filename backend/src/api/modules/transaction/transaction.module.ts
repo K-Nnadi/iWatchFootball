@@ -27,7 +27,11 @@ export class TransactionService extends CrudRepoAdapter<Transaction, CreateTrans
         const transaction = await super.create(dto);
 
         // Process loyalty rewards if this is a cash payment
-        if (transaction.type === TransactionType.CASH_PAYMENT && transaction.amount < 0 && this.loyaltyService) {
+        if (
+            transaction.type === TransactionType.CASH_PAYMENT &&
+            Number(transaction.amount) !== 0 &&
+            this.loyaltyService
+        ) {
             // Use setTimeout to avoid blocking the response
             setImmediate(async () => {
                 try {

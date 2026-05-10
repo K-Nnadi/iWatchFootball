@@ -23,6 +23,14 @@ import {LicensesPage} from "./pages/licenses.page";
 import {ContactPage} from "./pages/contact.page";
 import {HelpPage} from "./pages/help.page";
 import {TicketsPage} from "./pages/tickets.page";
+import { MarketplacePage } from "./pages/marketplace/marketplace.page";
+import { CreateListingPage } from "./pages/marketplace/createListing.page";
+import { MarketplaceCheckoutPage } from "./pages/marketplace/marketplaceCheckout.page";
+import { MyListingsPage } from "./pages/marketplace/myListings.page";
+import { WalletPage } from "./pages/wallet.page";
+import { DiscountCodesAdminPage } from "./pages/admin/discountCodes.page";
+import { RequireAuth } from "./components/auth/RequireAuth";
+import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -32,23 +40,29 @@ const IWatchFootballElements: ElementMap = {
     logs: <LogsPage/>,
     matches: <MatchesPage/>,
     settings: <SettingsPage/>,
-    join: <SignUpPage />,
-    signIn: <LoginPage />,
     competitions: <CompetitionsPage />,
     checkout: <CheckoutPage/>,
     thankYou: <ThankYouPage/>,
     news: <NewsPage/>,
     tickets: <TicketsPage/>,
+    marketplace: <MarketplacePage/>,
+    'marketplace/my-listings': <MyListingsPage/>,
+    'marketplace/sell': <CreateListingPage/>,
+    'admin/discount-codes': <DiscountCodesAdminPage/>,
 }
 
-const childrenRoutes = Object.entries(IWatchFootballElements).map(([path, element]) => ({
-    path: `/${path}`,
-    element: element
-}));
+/** Relative `wallet` under `/` reliably matches `/wallet` for auth layout children. */
+const childrenRoutes = [
+    { path: 'wallet', element: <WalletPage /> },
+    ...Object.entries(IWatchFootballElements).map(([path, element]) => ({
+        path: `/${path}`,
+        element: element,
+    })),
+];
 
 const additionalRoutes = [
     {
-        path: '/',
+        index: true,
         element: <HomePage />
     },
     {
@@ -76,6 +90,10 @@ const additionalRoutes = [
         element: <SeatSelectionPage />
     },
     {
+        path: '/marketplace/buy/:id',
+        element: <MarketplaceCheckoutPage />
+    },
+    {
         path: '/licenses',
         element: <LicensesPage />
     },
@@ -99,8 +117,29 @@ const router = createBrowserRouter([
     {
         path: '/',
         element: <AppWrapper />,
-        children: [...childrenRoutes, ...additionalRoutes]
-    }
+        children: [
+            {
+                path: 'signIn',
+                element: (
+                    <PublicOnlyRoute>
+                        <LoginPage />
+                    </PublicOnlyRoute>
+                ),
+            },
+            {
+                path: 'join',
+                element: (
+                    <PublicOnlyRoute>
+                        <SignUpPage />
+                    </PublicOnlyRoute>
+                ),
+            },
+            {
+                element: <RequireAuth />,
+                children: [...childrenRoutes, ...additionalRoutes],
+            },
+        ],
+    },
 ])
 
 export function Router() {

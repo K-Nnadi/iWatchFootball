@@ -1,4 +1,7 @@
 export interface CheckoutTicketDetails {
+    /** Marketplace: full match line for summary (e.g. "Arsenal vs Chelsea") */
+    fixtureLabel?: string;
+
     matchId: string;
     homeTeam: string;
     awayTeam: string;
@@ -14,14 +17,27 @@ export interface CheckoutTicketDetails {
     unrestrictedView?: boolean;
     quantity?: number;
     imageUrl?: string;
+    /** Server-enforced hold (fixture id / offer key / session holder) */
+    fixtureId?: number;
+    offerKey?: string;
+    holderId?: string;
+    holdExpiresAt?: string;
+    /** Stored on Ticket rows after purchase */
+    category?: string;
+    /** Marketplace listing fields — present only for resale purchases */
+    listingId?: number;
+    marketplaceHolderId?: string;
 }
 
 export interface PaymentProvider {
     id: number;
     name: string;
     slug: string;
-    type: 'CARD' | 'WALLET' | 'BANK_TRANSFER' | 'CRYPTO';
+    type: 'CARD' | 'WALLET' | 'BANK_TRANSFER' | 'CRYPTO' | 'CREDIT';
     logoUrl?: string;
+    /** Only set for the platform credit option */
+    creditBalance?: number;
+    disabled?: boolean;
 }
 
 export interface UserDetails {

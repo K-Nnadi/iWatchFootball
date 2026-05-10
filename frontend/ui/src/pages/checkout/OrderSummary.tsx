@@ -91,7 +91,10 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
             {ticketDetails.imageUrl && (
                 <Image
                     src={ticketDetails.imageUrl}
-                    alt={`${ticketDetails.homeTeam} vs ${ticketDetails.awayTeam}`}
+                    alt={
+                        ticketDetails.fixtureLabel ??
+                        `${ticketDetails.homeTeam} vs ${ticketDetails.awayTeam}`
+                    }
                     height={200}
                     fit="cover"
                     radius="md"
@@ -107,7 +110,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                 )}
 
                 <Title order={3} size="h4" fw={700}>
-                    {ticketDetails.homeTeam} vs {ticketDetails.awayTeam}
+                    {ticketDetails.fixtureLabel ?? `${ticketDetails.homeTeam} vs ${ticketDetails.awayTeam}`}
                 </Title>
 
                 <Group gap="xs">

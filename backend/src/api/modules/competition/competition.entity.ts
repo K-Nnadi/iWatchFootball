@@ -25,7 +25,7 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'name', 'code', 'type', 'country', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'name', 'code', 'type', 'country', 'featured', 'metadata'
       ],
     },
     // Allow public access (no authentication required)
@@ -34,22 +34,20 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'name', 'code', 'type', 'country', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'name', 'code', 'type', 'country', 'featured', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Competition> => ({ id: -1 }), fields: ['id'] },
   },
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can create competitions
-      fields: ['name', 'code', 'type', 'country', 'metadata'],
+      fields: ['name', 'code', 'type', 'country', 'featured', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Competition> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can update competitions
-      fields: ['name', 'code', 'type', 'country', 'metadata'],
+      fields: ['name', 'code', 'type', 'country', 'featured', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Competition> => ({ id: -1 }) },
   },
@@ -81,6 +79,9 @@ export class Competition extends BaseDbEntity {
     @EntityColumn({db: {type: "varchar"}})
     country!: string;
 
+    @EntityColumn({db: {type: "boolean", default: false}})
+    featured!: boolean;
+
     @ApiProperty()
     @OneToMany(() => TeamCompetitionSeason, teamCompSeason => teamCompSeason.competition, {lazy: true})
     teamCompetitionSeasons!: Promise<TeamCompetitionSeason[]>;
@@ -90,6 +91,6 @@ export class Competition extends BaseDbEntity {
     trophies!: Promise<Trophy[]>;
 }
 
-export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country", 'metadata'] as const) {
+export class CreateCompetitionDTO extends PickType(Competition, ["name", "type", "country", "featured", 'metadata'] as const) {
 }
 

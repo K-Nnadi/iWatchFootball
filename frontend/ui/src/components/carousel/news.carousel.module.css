@@ -1,3 +1,33 @@
+.control {
+    opacity: 1;
+    background-color: var(--modern-lime);
+    color: var(--modern-bg-primary);
+    border: none;
+}
+
+.control[data-inactive] {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    background-color: var(--modern-lime);
+    opacity: 0.3;
+}
+
+.indicator[data-active] {
+    opacity: 1;
+}
+
+.indicators {
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .card {
     height: 250px;
     display: flex;

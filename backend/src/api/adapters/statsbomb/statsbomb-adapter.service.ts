@@ -584,6 +584,7 @@ export class StatsBombAdapterService {
             name: comp.competition_name,
             country: comp.country_name,
             type: this.mapCompetitionType(comp.competition_name),
+            featured: false,
             metadata: {
               source: 'StatsBomb',
               statsbombId: comp.competition_id,
