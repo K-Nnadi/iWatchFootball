@@ -24,6 +24,7 @@
   "include": [
     "package.json",
     "tsconfig.json",
+    "src/**/*.json",
     "src/**/*"
   ],
   "exclude": [

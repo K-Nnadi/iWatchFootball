@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Paper, Title, Tabs, Text } from '@mantine/core';
 import { FormationView } from "./formation";
 import { Lineup, MatchDetails, Player } from "./match.page";  // Verify import paths
+
+/**
+ * Tabs delegate to {@link FormationView}, which expects normalized {@link Lineup} on `matchDetails`.
+ * Lineup rows arrive from the API as {@link import('../../components/match/lineupFromApi').ApiLineUpWire}
+ * and are merged on the match page via `attachLineupsToFixtureSides`.
+ */
 
 interface TeamLineupsProps {
     matchDetails: MatchDetails;
@@ -101,6 +107,13 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                                 />
                             )
                         )}
+                        {!isFuture &&
+                            !matchDetails.homeLineup &&
+                            !matchDetails.homePredictedLineup && (
+                                <Text size="sm" ta="center" c="dimmed">
+                                    Starting lineup not available yet — sync StatsBomb lineups or ensure player lineup rows exist for this fixture.
+                                </Text>
+                            )}
                         {matchDetails.homeLineup?.substitutes && !isFuture && (
                             <SubstitutesList substitutes={matchDetails.homeLineup.substitutes}/>
                         )}
@@ -121,6 +134,13 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                                 />
                             )
                         )}
+                        {!isFuture &&
+                            !matchDetails.awayLineup &&
+                            !matchDetails.awayPredictedLineup && (
+                                <Text size="sm" ta="center" c="dimmed">
+                                    Starting lineup not available yet — sync StatsBomb lineups or ensure player lineup rows exist for this fixture.
+                                </Text>
+                            )}
                         {matchDetails.awayLineup?.substitutes && !isFuture && (
                             <SubstitutesList substitutes={matchDetails.awayLineup.substitutes}/>
                         )}

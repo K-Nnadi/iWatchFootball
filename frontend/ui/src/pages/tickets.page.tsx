@@ -6,6 +6,7 @@ import { usePageTransition } from '../hooks/usePageTransition';
 import {DateNavigation} from "../components/carousel/dateNavigation.carousel";
 import { ModernCard, ModernH1, ModernH3, ModernBody, ModernButton } from '../components/modern';
 import { MatchFilter } from '../components/filters/MatchFilter';
+import { getMatchStatus } from '../components/match/matchCalendarStatus';
 
 interface TicketMatch {
     id: string;
@@ -513,18 +514,24 @@ export function TicketsPage() {
                                                             </Stack>
                                                         </Group>
 
-                                                        {/* Book Tickets Button */}
-                                                        <ModernButton
-                                                            variant="primary"
-                                                            fullWidth
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleViewTickets(m);
-                                                            }}
-                                                        >
-                                                            <IconTicket size={16} style={{ marginRight: '8px' }} />
-                                                            Book Tickets
-                                                        </ModernButton>
+                                                        {/* Book Tickets — not offered for completed calendar days */}
+                                                        {getMatchStatus(m.date) !== 'past' ? (
+                                                            <ModernButton
+                                                                variant="primary"
+                                                                fullWidth
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleViewTickets(m);
+                                                                }}
+                                                            >
+                                                                <IconTicket size={16} style={{ marginRight: '8px' }} />
+                                                                Book Tickets
+                                                            </ModernButton>
+                                                        ) : (
+                                                            <Text size="sm" c="dimmed" ta="center" py="xs">
+                                                                Tickets are not available for past matches.
+                                                            </Text>
+                                                        )}
                                                     </Paper>
                                                 </Grid.Col>
                                             );

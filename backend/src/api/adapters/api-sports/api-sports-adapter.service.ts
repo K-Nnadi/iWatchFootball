@@ -11,6 +11,9 @@ import { CreateCompetitionStandingDTO } from '../../modules/competitionStanding/
 import { CompetitionType } from '../../enums/competition.enum';
 import { TeamType } from '../../enums/team.enum';
 import { TeamCompetitionSeasonService } from '../../modules/teamCompetitionSeason/teamCompetitionSeason.module';
+import { FixtureService } from '../../modules/fixture/fixture.module';
+import { StadiumService } from '../../modules/stadium/stadium.module';
+import { FixtureStatus, FixtureStage } from '../../enums/fixture.enum';
 
 const PROVIDER_KEY = 'apisports';
 
@@ -56,6 +59,18 @@ export type ImportPlayersFromLeagueSeasonOptions = {
   maxRequests?: number;
 };
 
+export type ImportFixturesFromLeagueWindowOptions = {
+  leagueApiId: number;
+  seasonYear: number;
+  from: string;
+  to: string;
+  /** Default true — follow `paging` until done or limits hit. */
+  allPages?: boolean;
+  maxPages?: number;
+  /** Cap total `/fixtures` HTTP calls for this import. */
+  maxRequests?: number;
+};
+
 @Injectable()
 export class ApiSportsAdapterService {
   private readonly logger = new Logger(ApiSportsAdapterService.name);
@@ -69,6 +84,8 @@ export class ApiSportsAdapterService {
     private readonly teamCompetitionSeasonService: TeamCompetitionSeasonService,
     private readonly playerService: PlayerService,
     private readonly transferService: TransferService,
+    private readonly fixtureService: FixtureService,
+    private readonly stadiumService: StadiumService,
   ) {}
 
   private getProviderExternalId(metadata: any): string | null {
@@ -682,14 +699,21 @@ export class ApiSportsAdapterService {
    * 2) Enrich players (DOB, nationality, height) for rows that already have
    * `metadata.providers.apisports.externalId` (or legacy `metadata.apisportsPlayerId`).
    */
-  async enrichPlayers(options?: { limit?: number; season?: number }): Promise<{
+  async enrichPlayers(options?: {
+    limit?: number;
+    season?: number;
+    /** Stop after this many API calls (profiles + fallback /players). */
+    maxRequests?: number;
+  }): Promise<{
     updated: number;
     skipped: number;
+    apiRequests: number;
     errors: string[];
   }> {
     const errors: string[] = [];
     let updated = 0;
     let skipped = 0;
+    let apiRequests = 0;
     const all = await this.getPlayersCached();
     const withId = all.filter((p) => {
       const m = p?.metadata ?? {};
@@ -701,6 +725,9 @@ export class ApiSportsAdapterService {
     const season = options?.season ?? new Date().getFullYear() - 1;
 
     for (const player of slice) {
+      if (options?.maxRequests != null && apiRequests >= options.maxRequests) {
+        break;
+      }
       const m = player?.metadata ?? {};
       const apiId = this.getProviderExternalId(m) ?? String(m.apisportsPlayerId);
       if (!apiId) {
@@ -710,11 +737,13 @@ export class ApiSportsAdapterService {
       try {
         let p: any;
         const prof: any = await this.http.get('/players/profiles', { player: apiId });
+        apiRequests += 1;
         if (prof?.response?.[0]) {
           const raw = prof.response[0];
           p = raw.player ?? raw;
         } else {
           const pl: any = await this.http.get('/players', { id: apiId, season });
+          apiRequests += 1;
           p = pl?.response?.[0]?.player;
         }
         if (!p) {
@@ -755,8 +784,8 @@ export class ApiSportsAdapterService {
       await this.sleep(API_SPORTS_CONFIG.requestDelayMs);
     }
 
-    this.logger.log(`enrichPlayers: ${updated} updated, ${skipped} skipped`);
-    return { updated, skipped, errors };
+    this.logger.log(`enrichPlayers: ${updated} updated, ${skipped} skipped, ${apiRequests} API req`);
+    return { updated, skipped, apiRequests, errors };
   }
 
   /**
@@ -884,6 +913,365 @@ export class ApiSportsAdapterService {
       out[k] = v;
     }
     return this.http.get('/countries', out as any);
+  }
+
+  /** Coerce known numeric GET /fixtures params; leave `date`, `from`, `to`, `timezone`, `status`, etc. as strings. */
+  private cleanFixturesQuery(query: Record<string, string | undefined>): Record<string, string | number> {
+    const numericKeys = new Set([
+      'id',
+      'league',
+      'season',
+      'team',
+      'last',
+      'next',
+      'venue',
+      'page',
+    ]);
+    const out: Record<string, string | number> = {};
+    for (const [k, v] of Object.entries(query)) {
+      if (v === undefined || v === '') continue;
+      if (numericKeys.has(k) && /^\d+$/.test(v)) {
+        out[k] = parseInt(v, 10);
+      } else {
+        out[k] = v;
+      }
+    }
+    return out;
+  }
+
+  /**
+   * GET /fixtures — see https://www.api-football.com/documentation-v3
+   *
+   * Efficient patterns:
+   * - **Day schedule:** `date=YYYY-MM-DD` (+ optional `timezone` so “today” matches local kickoff day).
+   * - **League slice:** add `league` + `season` to shrink payload vs all competitions.
+   * - **Many fixture IDs, one call:** `ids=id1-id2-id3` (hyphen-separated).
+   * - **Live:** use {@link discoverLiveFixtures} (`live=all`) instead of polling each fixture’s events.
+   *
+   * Query params `allPages` / `maxPages` are **local only**: when `allPages=true`, fetches `page=1..n`
+   * until `paging` ends or `maxPages` is hit (counts as multiple API requests).
+   */
+  async discoverFixtures(query: Record<string, string | undefined>): Promise<any> {
+    const allPages =
+      query.allPages === 'true' || query.allPages === '1' || query.allPages === 'yes';
+    let maxPages = 20;
+    if (query.maxPages != null && /^\d+$/.test(String(query.maxPages))) {
+      maxPages = Math.min(50, Math.max(1, parseInt(String(query.maxPages), 10)));
+    }
+
+    const sanitized: Record<string, string | undefined> = {};
+    for (const [k, v] of Object.entries(query)) {
+      if (k === 'allPages' || k === 'maxPages') continue;
+      sanitized[k] = v;
+    }
+
+    if (!allPages) {
+      return this.http.get('/fixtures', this.cleanFixturesQuery(sanitized) as any);
+    }
+
+    let page = 1;
+    const combined: any[] = [];
+    let last: any = null;
+
+    while (page <= maxPages) {
+      const params = this.cleanFixturesQuery({
+        ...sanitized,
+        page: String(page),
+      });
+      const data = await this.http.get('/fixtures', params as any);
+      last = data;
+      const chunk = Array.isArray(data?.response) ? data.response : [];
+      combined.push(...chunk);
+
+      const paging = data?.paging;
+      if (paging?.current != null && paging?.total != null) {
+        if (Number(paging.current) >= Number(paging.total)) {
+          break;
+        }
+      } else {
+        // Without paging, only first page is defined behaviour.
+        break;
+      }
+
+      page += 1;
+      await this.sleep(API_SPORTS_CONFIG.requestDelayMs);
+    }
+
+    return {
+      get: last?.get,
+      parameters: { ...(typeof last?.parameters === 'object' && last.parameters ? last.parameters : {}), allPagesMerged: true },
+      errors: last?.errors ?? [],
+      results: combined.length,
+      paging: { current: 1, total: 1 },
+      response: combined,
+      meta: { allPages: true, pagesFetched: page, maxPagesCap: maxPages },
+    };
+  }
+
+  /** Live fixtures in one call (`GET /fixtures?live=all`) — includes events per API-Football v3 behaviour. */
+  async discoverLiveFixtures(): Promise<any> {
+    return this.http.get('/fixtures', { live: 'all' } as any);
+  }
+
+  private async findFixtureByApiSportsId(apiFixtureId: number): Promise<any | null> {
+    if (!apiFixtureId) return null;
+    const key = String(apiFixtureId);
+    const fixtures = await this.fixtureService.getQuery({});
+    return (
+      fixtures.find((f) => {
+        const m = f?.metadata ?? {};
+        return this.getProviderExternalId(m) === key;
+      }) ?? null
+    );
+  }
+
+  private mapApiFixtureStatus(short: string | undefined): FixtureStatus {
+    const s = (short ?? 'NS').toUpperCase();
+    if (['FT', 'AET', 'PEN', 'AWD'].includes(s)) return FixtureStatus.COMPLETED;
+    if (['NS', 'TBD'].includes(s)) return FixtureStatus.SCHEDULED;
+    if (['LIVE', '1H', '2H', 'HT', 'ET', 'BT', 'P', 'INT'].includes(s)) return FixtureStatus.LIVE;
+    if (s === 'PST') return FixtureStatus.POSTPONED;
+    if (['CANC', 'ABD'].includes(s)) return FixtureStatus.CANCELLED;
+    if (s === 'SUSP') return FixtureStatus.SUSPENDED;
+    return FixtureStatus.SCHEDULED;
+  }
+
+  private mapApiFixtureStage(round: string | undefined): FixtureStage {
+    const r = (round ?? '').toLowerCase();
+    if (r.includes('final') && !r.includes('semi') && !r.includes('quarter')) return FixtureStage.FINAL;
+    if (r.includes('semi')) return FixtureStage.SEMI_FINAL;
+    if (r.includes('quarter')) return FixtureStage.QUARTER_FINAL;
+    if (r.includes('round of 16') || r === '16') return FixtureStage.LAST_16;
+    if (r.includes('round of 32') || r === '32') return FixtureStage.LAST_32;
+    if (r.includes('group')) return FixtureStage.GROUP_STAGE;
+    if (r.includes('3rd') || r.includes('third')) return FixtureStage.THIRD_PLACE;
+    if (r.includes('play-off') || r.includes('playoff')) return FixtureStage.PLAY_OFF;
+    return FixtureStage.LEAGUE;
+  }
+
+  private async ensureStadiumFromApiVenue(venue: any, countryFallback: string): Promise<number> {
+    const country = countryFallback && countryFallback !== '' ? countryFallback : 'Unknown';
+    const vid = venue?.id != null ? Number(venue.id) : null;
+    const vname = venue?.name != null ? String(venue.name).trim() : '';
+    const stadiums = await this.stadiumService.getQuery({});
+    if (vid) {
+      const byProv = stadiums.find(
+        (s) => String(s?.metadata?.providers?.[PROVIDER_KEY]?.externalId ?? '') === String(vid),
+      );
+      if (byProv?.id) return byProv.id;
+    }
+    if (vname) {
+      const [byName] = await this.stadiumService.getQuery({ where: { name: vname } as any });
+      if (byName?.id) return byName.id;
+    }
+    const name = vname || 'Unknown venue';
+    const created = await this.stadiumService.create({
+      name,
+      country,
+      metadata: {
+        source: 'api-sports',
+        apisports: vid != null ? { venueId: vid } : {},
+        providers: vid != null ? { [PROVIDER_KEY]: { externalId: String(vid) } } : {},
+      } as any,
+    } as any);
+    return created.id;
+  }
+
+  /** Prefer `goals`, then full-time `score`, when API returns numeric finals (nullable before kickoff). */
+  private extractApiSportsFixtureScores(row: any): { homeScore?: number; awayScore?: number } {
+    const g = row?.goals;
+    if (g && typeof g === 'object') {
+      const h = g.home != null ? Number(g.home) : NaN;
+      const a = g.away != null ? Number(g.away) : NaN;
+      if (Number.isFinite(h) && Number.isFinite(a)) {
+        return { homeScore: h, awayScore: a };
+      }
+    }
+    const ft = row?.score?.fulltime;
+    if (ft && typeof ft === 'object') {
+      const h = ft.home != null ? Number(ft.home) : NaN;
+      const a = ft.away != null ? Number(ft.away) : NaN;
+      if (Number.isFinite(h) && Number.isFinite(a)) {
+        return { homeScore: h, awayScore: a };
+      }
+    }
+    return {};
+  }
+
+  private async upsertFixtureFromApiSportsRow(
+    row: any,
+    competitionId: number,
+    seasonId: number,
+  ): Promise<'created' | 'updated' | 'skipped'> {
+    const fx = row?.fixture;
+    const league = row?.league;
+    const teams = row?.teams;
+    const apiId = fx?.id != null ? Number(fx.id) : null;
+    if (!apiId) return 'skipped';
+
+    const homeApi = teams?.home?.id != null ? Number(teams.home.id) : null;
+    const awayApi = teams?.away?.id != null ? Number(teams.away.id) : null;
+    if (!homeApi || !awayApi) return 'skipped';
+
+    const home = await this.findLocalTeamByApiSportsId(homeApi);
+    const away = await this.findLocalTeamByApiSportsId(awayApi);
+    if (!home?.id || !away?.id) return 'skipped';
+
+    const leagueCountry = league?.country != null ? String(league.country) : 'Unknown';
+    const stadiumId = await this.ensureStadiumFromApiVenue(fx?.venue, leagueCountry);
+
+    const date = fx?.date ? new Date(fx.date) : null;
+    if (!date || Number.isNaN(date.getTime())) return 'skipped';
+
+    const status = this.mapApiFixtureStatus(fx?.status?.short);
+    const stage = this.mapApiFixtureStage(league?.round);
+    const attendanceRaw = fx?.attendance ?? row?.attendance;
+    const attendance =
+      attendanceRaw != null && !Number.isNaN(Number(attendanceRaw)) ? Number(attendanceRaw) : undefined;
+
+    const scorePair = this.extractApiSportsFixtureScores(row);
+
+    const meta = {
+      source: 'api-sports',
+      apisports: {
+        fixtureId: apiId,
+        lastImportedAt: new Date().toISOString(),
+      },
+      providers: { [PROVIDER_KEY]: { externalId: String(apiId) } },
+      leagueSnapshot: league ? { id: league.id, name: league.name, round: league.round } : undefined,
+      goals: row?.goals,
+      score: row?.score,
+      homeScore: scorePair.homeScore,
+      awayScore: scorePair.awayScore,
+    };
+
+    const payload: any = {
+      date,
+      homeTeamId: home.id,
+      awayTeamId: away.id,
+      competitionId,
+      seasonId,
+      stadiumId,
+      status,
+      stage,
+      attendance,
+      ...scorePair,
+      metadata: meta,
+    };
+
+    const existing = await this.findFixtureByApiSportsId(apiId);
+    if (existing) {
+      await this.fixtureService.update(existing.id, { ...payload, id: existing.id } as any);
+      await this.ensureTeamCompetitionSeasonId(home.id, competitionId, seasonId);
+      await this.ensureTeamCompetitionSeasonId(away.id, competitionId, seasonId);
+      return 'updated';
+    }
+
+    await this.fixtureService.create(payload);
+    await this.ensureTeamCompetitionSeasonId(home.id, competitionId, seasonId);
+    await this.ensureTeamCompetitionSeasonId(away.id, competitionId, seasonId);
+    return 'created';
+  }
+
+  /**
+   * Idempotent import of fixtures for `GET /fixtures?league=&season=&from=&to=` into `fixture` rows.
+   * Requires local `competition` (API league id) and `season` (yearStart=seasonYear, yearEnd=seasonYear+1), and teams with provider ids.
+   */
+  async importFixturesFromLeagueWindow(
+    options: ImportFixturesFromLeagueWindowOptions,
+  ): Promise<{
+    created: number;
+    updated: number;
+    skipped: number;
+    apiRequests: number;
+    errors: string[];
+  }> {
+    const errors: string[] = [];
+    let created = 0;
+    let updated = 0;
+    let skipped = 0;
+    let apiRequests = 0;
+    const allPages = options.allPages !== false;
+    const maxPages = Math.min(50, Math.max(1, options.maxPages ?? 20));
+    const maxReq = Math.max(1, options.maxRequests ?? 50);
+
+    const competition = await this.findCompetitionByApiSportsLeagueId(options.leagueApiId);
+    if (!competition?.id) {
+      return {
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        apiRequests: 0,
+        errors: [`No local competition for API league ${options.leagueApiId}`],
+      };
+    }
+
+    const seasonRow = await this.findSeasonByYearBounds(options.seasonYear, options.seasonYear + 1);
+    if (!seasonRow?.id) {
+      return {
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        apiRequests: 0,
+        errors: [
+          `No local season for ${options.seasonYear}-${options.seasonYear + 1}; import leagues/seasons first`,
+        ],
+      };
+    }
+
+    const baseQuery: Record<string, string | undefined> = {
+      league: String(options.leagueApiId),
+      season: String(options.seasonYear),
+      from: options.from,
+      to: options.to,
+    };
+
+    let page = 1;
+    const rows: any[] = [];
+
+    while (page <= maxPages && apiRequests < maxReq) {
+      const params = this.cleanFixturesQuery({ ...baseQuery, page: String(page) });
+      let data: any;
+      try {
+        data = await this.http.get('/fixtures', params as any);
+        apiRequests += 1;
+      } catch (e: any) {
+        errors.push(`fixtures: ${e?.message ?? e}`);
+        break;
+      }
+      if (data?.errors?.length) {
+        errors.push(JSON.stringify(data.errors));
+        break;
+      }
+      const chunk = Array.isArray(data?.response) ? data.response : [];
+      rows.push(...chunk);
+      if (!allPages) break;
+      const paging = data?.paging;
+      if (paging?.current != null && paging?.total != null) {
+        if (Number(paging.current) >= Number(paging.total)) break;
+      } else {
+        break;
+      }
+      page += 1;
+      await this.sleep(API_SPORTS_CONFIG.requestDelayMs);
+    }
+
+    for (const row of rows) {
+      try {
+        const r = await this.upsertFixtureFromApiSportsRow(row, competition.id, seasonRow.id);
+        if (r === 'created') created += 1;
+        else if (r === 'updated') updated += 1;
+        else skipped += 1;
+      } catch (e: any) {
+        errors.push(`fixture row: ${e?.message ?? e}`);
+        skipped += 1;
+      }
+    }
+
+    this.logger.log(
+      `importFixturesFromLeagueWindow: league ${options.leagueApiId} ${options.from}–${options.to} — +${created} ~${updated} skipped ${skipped} (${apiRequests} req)`,
+    );
+    return { created, updated, skipped, apiRequests, errors };
   }
 
   /** One league with `seasons[]` (year coverage for standings). */
@@ -1157,9 +1545,14 @@ export class ApiSportsAdapterService {
       country,
       season,
     });
-    return this.importLeaguesFromApiPayload(data, {
+    const r = await this.importLeaguesFromApiPayload(data, {
       ...rest,
       standingsSeasonYear: season,
     });
+    return {
+      ...r,
+      /** One call for `/leagues` plus standing requests already in `standingsApiRequests`. */
+      apiRequestsUsed: 1 + (r.standingsApiRequests ?? 0),
+    };
   }
 }

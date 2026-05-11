@@ -23,13 +23,14 @@ export abstract class BaseDbEntity extends BaseTypeOrmEntity {
 	updatedAt!: Date
 
 	@DeleteDateColumn()
-	@ApiPropertyOptional()
-	deletedAt!: Date
+	@ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+	deletedAt!: Date | null
 
 	@Column({ type: 'jsonb', nullable: true })
-	@ApiPropertyOptional({ 
-		description: 'Metadata stored as JSON', 
-		example: { source: 'StatsBomb', version: '1.0', tags: ['premier-league', '2024'] } 
+	@ApiPropertyOptional({
+		description: 'Metadata stored as JSON',
+		nullable: true,
+		example: { source: 'StatsBomb', version: '1.0', tags: ['premier-league', '2024'] },
 	})
-	metadata?: Record<string, any>;
+	metadata?: Record<string, any> | null;
 }

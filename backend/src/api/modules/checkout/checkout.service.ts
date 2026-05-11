@@ -16,6 +16,7 @@ import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
 import { TicketTransferReason } from '../../enums/marketplace.enum';
 import { DiscountCodeService } from '../discountCode/discountCode.service';
 import { LoyaltyService } from '../../services/loyalty/loyalty.service';
+import { assertAndDeductCredit } from '../credit/creditSpend.util';
 
 export interface ConfirmPurchaseParams {
     userId: number;
@@ -117,18 +118,9 @@ export class CheckoutService {
                 }
                 const total = Math.max(0, Math.round((baseTotal - discountAmount) * 100) / 100);
 
-                // Deduct from credit balance
+                // Deduct from credit balance (aggregate across all rows for this user)
                 const creditRepo = manager.getRepository(Credit);
-                const credit = await creditRepo.findOne({ where: { userId: params.userId } });
-                const balance = Number(credit?.balance ?? 0);
-                if (balance < total) {
-                    throw new BadRequestException(
-                        `Insufficient credit balance. Available: £${balance.toFixed(2)}, required: £${total.toFixed(2)}`,
-                    );
-                }
-                if (!credit) throw new BadRequestException('No credit account found');
-                credit.balance = Math.round((balance - total) * 100) / 100;
-                await creditRepo.save(credit);
+                await assertAndDeductCredit(creditRepo, params.userId, total);
 
                 // Ledger entry (no Payment row for credit payments)
                 const ledger = txRepo.create({

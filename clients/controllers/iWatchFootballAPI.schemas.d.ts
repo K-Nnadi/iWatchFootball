@@ -2224,6 +2224,8 @@ export declare const FixtureStage: {
 export interface Fixture {
     /** Attendance for the fixture */
     attendance?: number;
+    /** Final away goals when detailed goal rows are incomplete */
+    awayScore?: number;
     /** ID of the away team */
     awayTeamId?: number;
     /** Competition ID associated with the fixture */
@@ -2232,6 +2234,8 @@ export interface Fixture {
     /** Date and time of the fixture */
     date: string;
     deletedAt?: string;
+    /** Final home goals when detailed goal rows are incomplete */
+    homeScore?: number;
     /** ID of the home team */
     homeTeamId?: number;
     id: number;
@@ -2490,6 +2494,8 @@ export interface Card {
     id: number;
     minute: number;
     playerId: number;
+    /** Team whose player received the card */
+    teamId?: number;
     type: string;
     updatedAt?: string;
 }
@@ -2497,6 +2503,7 @@ export interface CreateCardDTO {
     fixtureId: number;
     minute: number;
     playerId: number;
+    teamId?: number;
     type: string;
 }
 export interface Promise {

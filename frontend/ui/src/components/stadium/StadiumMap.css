@@ -66,3 +66,16 @@
     min-width: 60px;
 }
 
+/* seatmap-canvas defaults: 80px zoom-layer stroke + heavy drop-shadows scale into ugly banded halos at block/seat zoom */
+.stadium-map-wrapper .seatmap-svg .stage .blocks .block .zoom-layers-container .zoom-layer-hull {
+    stroke-width: 3px !important;
+}
+
+.stadium-map-wrapper .seatmap-svg .stage .blocks .block {
+    filter: none;
+}
+
+.stadium-map-wrapper .seatmap-svg.zoom-level-VENUE .stage .blocks .block:hover {
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.12));
+}
+

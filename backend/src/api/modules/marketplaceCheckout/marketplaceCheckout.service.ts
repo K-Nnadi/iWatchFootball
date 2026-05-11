@@ -21,6 +21,7 @@ import { TicketOwnershipHistoryService } from '../ticketOwnershipHistory/ticketO
 import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
 import { TicketHoldService } from '../ticketHold/ticketHold.service';
 import { LoyaltyService } from '../../services/loyalty/loyalty.service';
+import { assertAndDeductCredit } from '../credit/creditSpend.util';
 
 const HOLD_MINUTES_CONFIG_KEY = 'ticket_hold_minutes';
 const DEFAULT_HOLD_MINUTES = 10;
@@ -159,17 +160,7 @@ export class MarketplaceCheckoutService {
             let buyerPaymentId: number;
 
             if (isPlatformCredit) {
-                // Deduct from buyer's credit balance
-                const buyerCredit = await creditRepo.findOne({ where: { userId: params.buyerId } });
-                const balance = Number(buyerCredit?.balance ?? 0);
-                if (balance < totalBuyerPays) {
-                    throw new BadRequestException(
-                        `Insufficient credit balance. Available: £${balance.toFixed(2)}, required: £${totalBuyerPays.toFixed(2)}`,
-                    );
-                }
-                if (!buyerCredit) throw new BadRequestException('No credit account found');
-                buyerCredit.balance = Math.round((balance - totalBuyerPays) * 100) / 100;
-                await creditRepo.save(buyerCredit);
+                await assertAndDeductCredit(creditRepo, params.buyerId, totalBuyerPays);
 
                 const buyerLedger = txRepo.create({
                     type: TransactionType.CREDIT_USAGE,

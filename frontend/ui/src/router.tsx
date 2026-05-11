@@ -6,6 +6,7 @@ import {MatchesPage} from "./pages/matches.page";
 import {SettingsPage} from "./pages/settings.page";
 import {SignUpPage} from "./pages/signUp.page";
 import {LoginPage} from "./pages/login.page";
+import {ForgotPasswordPage} from "./pages/forgotPassword.page";
 import {CompetitionsPage} from "./pages/competitions.page";
 // import {TransitionDemoPage} from "./pages/transition-demo.page"; // File not found
 import {AppWrapper} from "./components/shell/appWrapper";
@@ -131,6 +132,14 @@ const router = createBrowserRouter([
                 element: (
                     <PublicOnlyRoute>
                         <SignUpPage />
+                    </PublicOnlyRoute>
+                ),
+            },
+            {
+                path: 'forgot-password',
+                element: (
+                    <PublicOnlyRoute>
+                        <ForgotPasswordPage />
                     </PublicOnlyRoute>
                 ),
             },

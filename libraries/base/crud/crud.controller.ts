@@ -21,6 +21,19 @@ import * as fs from 'fs';
 import * as path from 'path';
 import qs from 'qs';
 
+/** Prefer Node `raw.url` — Nest/Fastify may expose path-only `request.url`, which drops `where[...]` parsing. */
+function fastifyQuerySearch(request: FastifyRequest): string {
+	const rawUrl = (request as FastifyRequest & { raw?: { url?: string } }).raw?.url;
+	const sliceSearch = (full?: string): string => {
+		if (!full || typeof full !== 'string') return '';
+		const q = full.indexOf('?');
+		return q === -1 ? '' : full.slice(q + 1);
+	};
+	const fromRaw = sliceSearch(rawUrl);
+	if (fromRaw.length > 0) return fromRaw;
+	return sliceSearch(request.url);
+}
+
 
 export class QueryOptions<T> {
     @ApiPropertyOptional({type: Number})
@@ -89,7 +102,7 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
                  @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction?: boolean,
                  @Query('comment') comment?: string) {
 
-            const query = qs.parse(request.url.split('?')[1], QS_OPTIONS)
+            const query = qs.parse(fastifyQuerySearch(request), QS_OPTIONS)
             return this.service.getQuery({...query, skip, take, withDeleted, loadEagerRelations, transaction});
         }
 
@@ -104,7 +117,7 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
                  @Query('transaction', new DefaultValuePipe(false), ParseBoolPipe) transaction?: boolean,
                  @Query('comment') comment?: string) {
 
-            const query = qs.parse(request.url.split('?')[1], QS_OPTIONS)
+            const query = qs.parse(fastifyQuerySearch(request), QS_OPTIONS)
             // Remove pagination parameters for count
             const { skip, take, loadEagerRelations, ...countQuery } = query;
             return this.service.count({...countQuery, withDeleted, transaction});

@@ -48,7 +48,11 @@ export class FootballDataApiAdapter {
     }
 
     /**
-     * Fetch fixtures based on league and season
+     * Fetch fixtures based on league and season.
+     *
+     * If you persist incidents into local entities (`Goal`, `Card`, `Substitution`), resolve API-Football
+     * `team.id` on each incident to your local **`Team`** primary key — **`Card`** rows should always receive **`teamId`**
+     * alongside `fixtureId` and `playerId` when seeding (same convention as goals).
      */
     async getFixtures(league: number, season: number): Promise<any | undefined> {
         return this.fetchData("fixtures", { league, season });

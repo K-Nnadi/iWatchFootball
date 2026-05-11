@@ -2,88 +2,82 @@ import React from 'react';
 import {Avatar, Box, Paper, Text, Stack} from "@mantine/core";
 import { Lineup, Player } from "./match.page";
 
+/**
+ * Formation pitch UI consumes normalized {@link Lineup} (players + buckets + formation string).
+ * API payloads use TypeORM wire keys (`__playerLineups__`, `__player__`, …); map them with
+ * `buildLineupFromRow` / `attachLineupsToFixtureSides` in `../../components/match/lineupFromApi`.
+ * Wire typings: {@link import('../../components/match/lineupFromApi').ApiLineUpWire}.
+ */
+
 interface FormationViewProps {
     lineup: Lineup;
     isPredicted?: boolean;
 }
 
-function arrangePlayersByFormation(players: Player[], formation: string) {
-    const formationParts = formation.split('-').map(Number);
-    
-    // Separate players by position for easier access
-    const gk = players.filter(p => p.position === 'GK');
-    const df = players.filter(p => p.position === 'DF');
-    const mf = players.filter(p => p.position === 'MF');
-    const fw = players.filter(p => p.position === 'FW');
-    
-    // Build formation structure based on formation string
-    // Format: "4-2-3-1" means: 4 defenders, 2 midfielders, 3 midfielders, 1 forward
-    const rows: Player[][] = [];
-    
-    // Goalkeeper (always first, always 1)
-    if (gk.length > 0) {
-        rows.push([gk[0]]);
-    } else {
-        rows.push([]);
+function sortByPositionId(a: Player, b: Player): number {
+    return (a.positionId ?? 99999) - (b.positionId ?? 99999);
+}
+
+function formationDigits(formation: string): number[] {
+    return formation.split('-').map((s) => Number(String(s).trim())).filter((n) => Number.isFinite(n));
+}
+
+/** True when bands are exactly 4 + 2 + 2 + 2 (classic 4-2-2-2). */
+function isFourTwoTwoTwo(formation: string): boolean {
+    const p = formationDigits(formation);
+    return p.length === 4 && p[0] === 4 && p[1] === 2 && p[2] === 2 && p[3] === 2;
+}
+
+/** Widen horizontal gap for the middle pair only (second "2") in 4-2-2-2. */
+function midfieldPairRowGap(is4222: boolean, midfieldRowIndex: number): string {
+    if (is4222 && midfieldRowIndex === 1) {
+        return 'clamp(2.75rem, 20vw, 8rem)';
     }
-    
-    // Defenders (first number in formation)
-    const defendersCount = formationParts[0];
-    rows.push(df.slice(0, defendersCount));
-    
-    // Midfield rows (all numbers between first and last)
-    const midfieldRows = formationParts.slice(1, -1);
-    let mfIndex = 0;
-    midfieldRows.forEach(count => {
-        const row = mf.slice(mfIndex, mfIndex + count);
-        rows.push(row);
-        mfIndex += count;
-    });
-    
-    // Forwards (last number in formation)
-    const forwardsCount = formationParts[formationParts.length - 1];
-    rows.push(fw.slice(0, forwardsCount));
-    
-    // Return structured data
-    const result = {
-        gk: rows[0] || [],
-        df: rows[1] || [],
-        mf: rows.slice(2, -1).filter(row => row.length > 0), // All rows except first (GK), second (DF), and last (FW)
-        fw: rows[rows.length - 1] || []
+    return 'clamp(0.5rem, 2vw, 1rem)';
+}
+
+/**
+ * Lay out starters using **positionId order** for the whole outfield: sort non-GKs by `positionId`,
+ * then cut rows using formation digits (e.g. 3-4-2-1 → 3 + 4 + 2 + 1 slots). Any extras stay on the
+ * forward band so we never hide starters when DF/MF/FW buckets disagree with the formation label.
+ */
+function arrangePlayersByFormation(players: Player[], formation: string) {
+    let formationParts = formation.split('-').map(Number).filter((n) => Number.isFinite(n));
+    if (formationParts.length < 2) {
+        formationParts = [4, 4, 2];
+    }
+
+    const gkCandidates = players.filter((p) => p.position === 'GK').sort(sortByPositionId);
+    const gk: Player[] = gkCandidates.length > 0 ? [gkCandidates[0]] : [];
+
+    const outfield = players.filter((p) => p.position !== 'GK').sort(sortByPositionId);
+
+    let i = 0;
+    const df = outfield.slice(i, (i += formationParts[0]));
+
+    const mf: Player[][] = [];
+    for (let k = 1; k < formationParts.length - 1; k++) {
+        mf.push(outfield.slice(i, (i += formationParts[k])));
+    }
+
+    const fwTarget = formationParts[formationParts.length - 1];
+    let fw = outfield.slice(i, (i += fwTarget));
+    const overflow = outfield.slice(i);
+    if (overflow.length > 0) {
+        fw = [...fw, ...overflow];
+    }
+
+    return {
+        gk,
+        df,
+        mf,
+        fw,
     };
-    
-    // Debug log
-    console.log('Formation arrangement:', {
-        formation,
-        totalPlayers: players.length,
-        arranged: result.gk.length + result.df.length + result.mf.reduce((sum, row) => sum + row.length, 0) + result.fw.length,
-        breakdown: {
-            gk: result.gk.length,
-            df: result.df.length,
-            mf: result.mf.map(r => r.length),
-            fw: result.fw.length
-        }
-    });
-    
-    return result;
 }
 
 export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
     const { gk, df, mf, fw } = arrangePlayersByFormation(lineup.players, lineup.formation);
-    
-    // Debug: Log to ensure all players are accounted for
-    const totalPlayers = gk.length + df.length + mf.reduce((sum, row) => sum + row.length, 0) + fw.length;
-    const expectedPlayers = 11;
-    
-    if (totalPlayers !== expectedPlayers) {
-        console.warn(`Formation mismatch: Expected ${expectedPlayers} players, got ${totalPlayers}`, {
-            gk: gk.length,
-            df: df.length,
-            mf: mf.map(row => row.length),
-            fw: fw.length,
-            formation: lineup.formation
-        });
-    }
+    const is4222 = isFourTwoTwoTwo(lineup.formation);
 
     return (
         <Box>
@@ -93,13 +87,16 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                 style={{
                     backgroundColor: 'var(--modern-bg-tertiary)',
                     border: isPredicted ? '1px dashed var(--modern-border-color)' : '1px solid var(--modern-border-color)',
-                    height: 'clamp(500px, 60vh, 600px)',
-                    minHeight: 'clamp(500px, 60vh, 600px)',
-                    maxHeight: 'clamp(500px, 60vh, 600px)',
+                    /** Grow with rows — avoids clipping forwards; page scrolls on small viewports */
+                    minHeight: 'clamp(420px, 44vh, 560px)',
+                    height: 'auto',
+                    overflowX: 'hidden',
+                    overflowY: 'visible',
                     position: 'relative',
-                    overflow: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
+                    boxSizing: 'border-box',
+                    paddingBottom: 'clamp(1rem, 3vw, 1.75rem)',
                 }}
             >
                 {/* Pitch background effect */}
@@ -115,31 +112,44 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                     }}
                 />
                 
-                <Text 
-                    size="sm"
-                    style={{
-                        fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', 
-                        textAlign: 'center', 
-                        width: '100%', 
-                        marginBottom: 'clamp(1rem, 3vw, 2rem)',
-                        color: 'var(--modern-text-secondary)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        fontWeight: 600,
-                        position: 'relative',
-                        zIndex: 1,
-                    }}
-                >
-                    {isPredicted ? 'Predicted Formation' : 'Formation'}: {lineup.formation}
-                </Text>
+                <Stack gap={6} align="center" style={{ marginBottom: 'clamp(0.65rem, 2vw, 1.25rem)', position: 'relative', zIndex: 1, flexShrink: 0 }}>
+                    {lineup.managerName ? (
+                        <Text
+                            size="sm"
+                            fw={600}
+                            style={{
+                                fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+                                color: 'var(--modern-text-primary)',
+                                textAlign: 'center',
+                            }}
+                        >
+                            {lineup.managerName}
+                        </Text>
+                    ) : null}
+                    <Text 
+                        size="sm"
+                        style={{
+                            fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', 
+                            textAlign: 'center', 
+                            width: '100%', 
+                            color: 'var(--modern-text-secondary)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            fontWeight: 600,
+                        }}
+                    >
+                        {isPredicted ? 'Predicted Formation' : 'Formation'}: {lineup.formation}
+                    </Text>
+                </Stack>
 
                 <Box style={{ 
                     position: 'relative', 
                     zIndex: 1,
-                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between',
+                    gap: 'clamp(0.45rem, 1.75vw, 1rem)',
+                    paddingBottom: 'clamp(0.35rem, 1.25vw, 0.65rem)',
+                    flexShrink: 0,
                 }}>
                     {/* Goalkeeper */}
                     <Box style={{ display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
@@ -151,15 +161,15 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                         {renderPlayerRow(df)}
                     </Box>
 
-                    {/* Midfield rows - flex grow to fill space */}
-                    <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(0.5rem, 2vw, 1rem)' }}>
+                    {/* Midfield rows */}
+                    <Box style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(0.4rem, 1.5vw, 0.85rem)', flexShrink: 0 }}>
                         {mf.map((row, index) => (
                             <Box 
                                 key={index} 
                                 style={{ 
                                     display: 'flex', 
                                     justifyContent: 'center', 
-                                    gap: 'clamp(0.5rem, 2vw, 1rem)',
+                                gap: midfieldPairRowGap(is4222, index),
                                     flexWrap: 'wrap',
                                 }}
                             >
@@ -177,12 +187,6 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                         )}
                     </Box>
                     
-                    {/* Debug info - remove in production */}
-                    {totalPlayers !== expectedPlayers && (
-                        <Text size="xs" c="red" ta="center" mt="md">
-                            Warning: {totalPlayers} players displayed (expected {expectedPlayers})
-                        </Text>
-                    )}
                 </Box>
             </Paper>
         </Box>
@@ -197,10 +201,10 @@ function renderPlayerRow(players: Player[]) {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 padding: 'clamp(0.25rem, 1.5vw, 0.75rem)',
-                minWidth: 'clamp(50px, 12vw, 100px)',
-                maxWidth: 'clamp(60px, 18vw, 120px)',
+                minWidth: 'clamp(52px, 14vw, 110px)',
+                maxWidth: 'clamp(72px, 18vw, 140px)',
                 textAlign: 'center',
             }}
         >
@@ -224,13 +228,18 @@ function renderPlayerRow(players: Player[]) {
                     size="sm"
                     fw={500}
                     style={{
-                        fontSize: 'clamp(0.6rem, 1.2vw, 0.875rem)', 
+                        fontSize: 'clamp(0.55rem, 1.15vw, 0.8rem)', 
                         color: 'var(--modern-text-primary)',
-                        maxWidth: 'clamp(50px, 12vw, 100px)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
+                        width: '100%',
+                        maxWidth: 'clamp(68px, 17vw, 132px)',
                         lineHeight: 1.2,
+                        wordBreak: 'break-word',
+                        hyphens: 'auto',
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 2,
+                        overflow: 'hidden',
+                        textAlign: 'center',
                     }}
                 >
                     {player.name}

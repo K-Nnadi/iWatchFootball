@@ -6,10 +6,10 @@ import { usePageTransition } from '../hooks/usePageTransition';
 import { useCartStore } from '../shared/stores/cart.store';
 import { acquireTicketHold } from '../shared/api/ticketHold.api';
 import { buildTicketOfferKey } from '../shared/ticketOffer';
-import { StadiumMap } from '../components/stadium/StadiumMap';
+import { StadiumSeatmapPanel } from '../components/stadium/StadiumSeatmapPanel';
 import { ModernH3 } from '../components/modern';
 import { MatchHeader, FiltersPanel, TicketCard, type Ticket, type TicketFilters, type MatchDetails } from '../components/tickets';
-import { getAllSections, type StadiumSection } from '../components/stadium/anfieldStadium';
+import { getAllSections } from '../components/stadium/anfieldStadium';
 import './seatSelection.page.css';
 
 // Default match details for fallback
@@ -43,16 +43,15 @@ export function SeatSelectionPage() {
         splitType: null,
         fanSide: null,
     });
-    const [viewMode, setViewMode] = useState<'zone' | 'block'>('zone');
     const [selectedSectionId, setSelectedSectionId] = useState<string | undefined>();
     const [filtersOpen, setFiltersOpen] = useState(true);
 
     // Mock tickets data
-    const [allTickets, setAllTickets] = useState<Ticket[]>([
+    const [allTickets] = useState<Ticket[]>([
         {
             id: '1',
             category: 4,
-            block: '334',
+            block: 'CE4',
             seatsTogether: 2,
             ticketType: 'Up To 2 Seats Together',
             ticketFormat: 'E-Ticket',
@@ -64,7 +63,7 @@ export function SeatSelectionPage() {
         {
             id: '2',
             category: 4,
-            block: '327',
+            block: '102',
             seatsTogether: 1,
             ticketType: 'Single Seats',
             ticketFormat: 'E-Ticket',
@@ -76,7 +75,7 @@ export function SeatSelectionPage() {
         {
             id: '3',
             category: 3,
-            block: '218',
+            block: 'L5',
             seatsTogether: 4,
             ticketType: 'Up To 4 Seats Together',
             fanSide: 'Home',
@@ -89,7 +88,7 @@ export function SeatSelectionPage() {
         {
             id: '4',
             category: 1,
-            block: '101',
+            block: 'U1',
             seatsTogether: 2,
             ticketType: 'Up To 2 Seats Together',
             fanSide: 'Home',
@@ -102,7 +101,7 @@ export function SeatSelectionPage() {
         {
             id: '5',
             category: 2,
-            block: '201',
+            block: 'AU1',
             seatsTogether: 2,
             ticketType: 'Up To 2 Seats Together',
             ticketFormat: 'Print at Home',
@@ -145,10 +144,7 @@ export function SeatSelectionPage() {
 
     const handleSectionClick = (sectionId: string) => {
         setSelectedSectionId(sectionId);
-        // Filter tickets by block if in block view
-        if (viewMode === 'block') {
-            handleFiltersChange({ blockLocation: sectionId });
-        }
+        handleFiltersChange({ blockLocation: sectionId });
     };
 
     const handleBuyNow = async (ticketId: string) => {
@@ -252,10 +248,12 @@ export function SeatSelectionPage() {
                 <Grid gutter="lg">
                     {/* Stadium Map */}
                     <Grid.Col span={{base: 12, lg: 8}}>
-                        <StadiumMap
+                        <StadiumSeatmapPanel
                             sections={stadiumSections}
                             onSectionClick={handleSectionClick}
                             selectedSectionId={selectedSectionId}
+                            blocksWithListings={availableBlocks}
+                            isDark={isDark}
                         />
                     </Grid.Col>
 

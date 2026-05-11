@@ -1,62 +1,100 @@
 import { Box, Paper, Text, Title } from '@mantine/core';
 import { useState, useMemo, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { clientInstance } from '@iWatchFootball/clients/client-instance';
+import { useCreatePrediction } from '@iWatchFootball/clients/controllers/prediction';
+import { useAuthStore } from '../../shared/stores/auth.store';
+import { notify } from '../../shared/notify';
 
-interface ScorePredictionCardProps {
+export interface ScorePredictionCardProps {
     homeTeam: string;
     awayTeam: string;
-    date: string; // ISO date string
+    date: string;
+    /** When set, poll totals load from `GET /prediction/fixture/:id/tally`. */
+    fixtureId?: number;
 }
+
+type PredictionSide = 'home' | 'draw' | 'away';
 
 type MatchStatus = 'past' | 'today' | 'future';
 
 function getMatchStatus(matchDateStr: string): MatchStatus {
     const matchDate = new Date(matchDateStr);
     const now = new Date();
-    
-    // Reset time to compare dates only
+
     const matchDateOnly = new Date(matchDate.getFullYear(), matchDate.getMonth(), matchDate.getDate());
     const todayOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
+
     if (matchDateOnly < todayOnly) return 'past';
     if (matchDateOnly.getTime() === todayOnly.getTime()) {
-        // If today, check if match time has passed
         return matchDate < now ? 'past' : 'today';
     }
     return 'future';
+}
+
+type FixturePredictionTally = { home: number; draw: number; away: number; total: number };
+
+function toApiPredicted(side: PredictionSide): string {
+    switch (side) {
+        case 'home':
+            return 'Home';
+        case 'draw':
+            return 'Draw';
+        case 'away':
+            return 'Away';
+    }
 }
 
 export function ScorePredictionCard({
     homeTeam,
     awayTeam,
     date,
+    fixtureId,
 }: ScorePredictionCardProps) {
-    const [userScorePrediction, setUserScorePrediction] = useState<'home' | 'draw' | 'away' | null>(null);
-    const [allPredictions, setAllPredictions] = useState<Array<{
-        userId: string;
-        username: string;
-        prediction: 'home' | 'draw' | 'away';
-    }>>([]);
+    const queryClient = useQueryClient();
+    const { isLoggedIn, user } = useAuthStore();
+
+    const useFixturePoll =
+        typeof fixtureId === 'number' && Number.isFinite(fixtureId);
+
+    const [userScorePrediction, setUserScorePrediction] = useState<PredictionSide | null>(null);
+    const [demoPredictions, setDemoPredictions] = useState<
+        Array<{ userId: string; username: string; prediction: PredictionSide }>
+    >([]);
     const [matchResult, setMatchResult] = useState<{
         homeScore: number;
         awayScore: number;
-        winner: 'home' | 'draw' | 'away';
+        winner: PredictionSide;
     } | null>(null);
 
     const status = useMemo(() => getMatchStatus(date), [date]);
 
-    // Log when user prediction changes
-    useEffect(() => {
-        if (userScorePrediction) {
-            console.log('User has selected:', userScorePrediction);
-        } else {
-            console.log('User has not selected a prediction yet');
-        }
-    }, [userScorePrediction]);
+    const tallyQueryKey = ['/prediction/fixture', fixtureId, 'tally'] as const;
 
-    // Fetch predictions and match result
+    const { data: tally, isLoading: tallyLoading } = useQuery({
+        queryKey: tallyQueryKey,
+        queryFn: () =>
+            clientInstance<FixturePredictionTally>({
+                url: `/prediction/fixture/${fixtureId}/tally`,
+                method: 'GET',
+            }),
+        enabled: useFixturePoll,
+    });
+
+    const createPredictionMut = useCreatePrediction({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({ queryKey: tallyQueryKey });
+            },
+            onError: () => {
+                notify.error('Could not save prediction', 'Please try again.');
+            },
+        },
+    });
+
     useEffect(() => {
-        // Mock API call - replace with actual API call
-        setTimeout(() => {
+        if (useFixturePoll) return;
+        const t = setTimeout(() => {
             const mockPredictions = [
                 { userId: '1', username: 'JohnDoe', prediction: 'home' as const },
                 { userId: '2', username: 'JaneSmith', prediction: 'draw' as const },
@@ -66,9 +104,8 @@ export function ScorePredictionCard({
                 { userId: '6', username: 'EmmaDavis', prediction: 'draw' as const },
                 { userId: '7', username: 'ChrisWilson', prediction: 'away' as const },
             ];
-            setAllPredictions(mockPredictions);
+            setDemoPredictions(mockPredictions);
 
-            // If match is past, set mock result
             if (status === 'past') {
                 setMatchResult({
                     homeScore: 2,
@@ -77,78 +114,113 @@ export function ScorePredictionCard({
                 });
             }
         }, 100);
-    }, [status]);
+        return () => clearTimeout(t);
+    }, [status, useFixturePoll]);
 
-    function handleScorePrediction(prediction: 'home' | 'draw' | 'away') {
-        if (!userScorePrediction && status !== 'past') {
-            console.log('User selected prediction:', prediction);
-            setUserScorePrediction(prediction);
-            // In a real app, you would make an API call here to save the prediction
+    function handleScorePrediction(prediction: PredictionSide) {
+        if (userScorePrediction || status === 'past') return;
+
+        if (useFixturePoll) {
+            if (!isLoggedIn || !user?.id) {
+                notify.warning('Sign in required', 'Log in to submit your prediction.');
+                return;
+            }
+            createPredictionMut.mutate(
+                {
+                    data: {
+                        fixtureId: fixtureId!,
+                        userId: user.id,
+                        predicted: toApiPredicted(prediction),
+                    },
+                },
+                {
+                    onSuccess: () => setUserScorePrediction(prediction),
+                }
+            );
+            return;
         }
+
+        setUserScorePrediction(prediction);
     }
 
-    // Percentages should only show after user selects a prediction
-    // Removed handleShowPercentages - percentages only show after selection
+    const demoPredictionsWithUser =
+        userScorePrediction && !useFixturePoll
+            ? [
+                  ...demoPredictions,
+                  { userId: 'current-user', username: 'You', prediction: userScorePrediction },
+              ]
+            : demoPredictions;
 
-    const allPredictionsWithUser = userScorePrediction 
-        ? [...allPredictions, { userId: 'current-user', username: 'You', prediction: userScorePrediction }]
-        : allPredictions;
-    
-    // Count predictions for display (use allPredictions for initial percentages, allPredictionsWithUser after selection)
-    const predictionsForCount = userScorePrediction ? allPredictionsWithUser : allPredictions;
-    const predictionCounts = predictionsForCount.reduce((acc, pred) => {
-        acc[pred.prediction] = (acc[pred.prediction] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-    
-    const homePredictionCount = predictionCounts['home'] || 0;
-    const drawPredictionCount = predictionCounts['draw'] || 0;
-    const awayPredictionCount = predictionCounts['away'] || 0;
-    const totalPredictions = predictionsForCount.length;
+    const demoPredictionCounts = demoPredictionsWithUser.reduce(
+        (acc, pred) => {
+            acc[pred.prediction] = (acc[pred.prediction] || 0) + 1;
+            return acc;
+        },
+        {} as Record<string, number>
+    );
 
-    // Determine if we should show equal sections (future match, no user prediction)
-    // Percentages only show after user selects a prediction
-    const shouldShowEqualSections = status === 'future' && !userScorePrediction;
-    
-    // Calculate percentages - show equal sections if needed, otherwise show actual percentages
-    const homePercentage = shouldShowEqualSections 
-        ? 33.33 
-        : totalPredictions > 0 
-            ? (homePredictionCount / totalPredictions) * 100 
-            : 0;
-    const drawPercentage = shouldShowEqualSections 
-        ? 33.33 
-        : totalPredictions > 0 
-            ? (drawPredictionCount / totalPredictions) * 100 
-            : 0;
-    const awayPercentage = shouldShowEqualSections 
-        ? 33.34 
-        : totalPredictions > 0 
-            ? (awayPredictionCount / totalPredictions) * 100 
-            : 0;
+    const homePredictionCount = useFixturePoll ? (tally?.home ?? 0) : demoPredictionCounts['home'] || 0;
+    const drawPredictionCount = useFixturePoll ? (tally?.draw ?? 0) : demoPredictionCounts['draw'] || 0;
+    const awayPredictionCount = useFixturePoll ? (tally?.away ?? 0) : demoPredictionCounts['away'] || 0;
+
+    const totalPredictions = homePredictionCount + drawPredictionCount + awayPredictionCount;
+
+    const showEqualSections =
+        status === 'future' &&
+        !userScorePrediction &&
+        ((!useFixturePoll && demoPredictions.length === 0) ||
+            (useFixturePoll && tallyLoading) ||
+            (useFixturePoll && !tallyLoading && totalPredictions === 0));
+
+    const homePercentage = showEqualSections
+        ? 33.33
+        : totalPredictions > 0
+          ? (homePredictionCount / totalPredictions) * 100
+          : 0;
+    const drawPercentage = showEqualSections
+        ? 33.33
+        : totalPredictions > 0
+          ? (drawPredictionCount / totalPredictions) * 100
+          : 0;
+    const awayPercentage = showEqualSections
+        ? 33.34
+        : totalPredictions > 0
+          ? (awayPredictionCount / totalPredictions) * 100
+          : 0;
+
+    const pollLocked =
+        status === 'past' ||
+        !!userScorePrediction ||
+        createPredictionMut.isPending ||
+        (useFixturePoll && tallyLoading);
+
+    const showPredictionTotalFooter =
+        totalPredictions > 0 && (!showEqualSections || userScorePrediction);
 
     return (
-        <Paper 
-            p={{ base: 'md', sm: 'xl' }} 
-            radius="lg" 
-            withBorder 
+        <Paper
+            p={{ base: 'md', sm: 'xl' }}
+            radius="lg"
+            withBorder
             mb={{ base: 'md', sm: 'xl' }}
-            style={{ backgroundColor: 'var(--modern-card-bg)', border: '1px solid var(--modern-border-color)' }}
+            style={{
+                backgroundColor: 'var(--modern-card-bg)',
+                border: '1px solid var(--modern-border-color)',
+            }}
         >
-            <Title 
-                order={3} 
-                mb="lg" 
+            <Title
+                order={3}
+                mb="lg"
                 ta="center"
-                style={{ 
-                    color: 'var(--modern-text-primary)', 
-                    textTransform: 'uppercase', 
+                style={{
+                    color: 'var(--modern-text-primary)',
+                    textTransform: 'uppercase',
                     letterSpacing: '0.1em',
                 }}
             >
                 Who Will Win?
             </Title>
-            
-            {/* Prediction bar - same for all statuses */}
+
             <Box>
                 <Box
                     style={{
@@ -162,47 +234,46 @@ export function ScorePredictionCard({
                         marginBottom: '1rem',
                     }}
                 >
-                    {/* Home Team Section */}
                     <Box
                         onClick={() => {
-                            if (!userScorePrediction && status !== 'past') {
-                                handleScorePrediction('home');
-                            }
+                            if (!pollLocked) handleScorePrediction('home');
                         }}
                         style={{
                             width: `${homePercentage}%`,
-                            backgroundColor: status === 'past' && matchResult?.winner === 'home' 
-                                ? 'rgba(0, 255, 136, 0.3)' 
-                                : userScorePrediction === 'home' 
-                                ? 'rgba(0, 255, 136, 0.3)' 
-                                : 'rgba(34, 139, 230, 0.3)',
+                            backgroundColor:
+                                status === 'past' && matchResult?.winner === 'home'
+                                    ? 'rgba(0, 255, 136, 0.3)'
+                                    : userScorePrediction === 'home'
+                                      ? 'rgba(0, 255, 136, 0.3)'
+                                      : 'rgba(34, 139, 230, 0.3)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRight: '2px solid var(--modern-border-color)',
-                            cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
+                            cursor: pollLocked ? 'default' : 'pointer',
                             transition: 'all 0.2s ease',
                             position: 'relative',
                             borderRadius: '30px 0 0 30px',
+                            opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
                         }}
                         onMouseEnter={(e) => {
-                            if (!userScorePrediction && status !== 'past') {
+                            if (!pollLocked) {
                                 e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.5)';
                             }
                         }}
                         onMouseLeave={(e) => {
-                            if (!userScorePrediction && status !== 'past') {
+                            if (!pollLocked) {
                                 e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.3)';
                             }
                         }}
                     >
-                        {shouldShowEqualSections ? (
-                            <Text 
-                                size="sm" 
-                                fw={700} 
-                                style={{ 
-                                    color: 'var(--modern-text-primary)', 
-                                    textAlign: 'center', 
+                        {showEqualSections ? (
+                            <Text
+                                size="sm"
+                                fw={700}
+                                style={{
+                                    color: 'var(--modern-text-primary)',
+                                    textAlign: 'center',
                                     padding: '0 8px',
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
@@ -217,47 +288,46 @@ export function ScorePredictionCard({
                             </Text>
                         )}
                     </Box>
-                    
-                    {/* Draw Section */}
+
                     <Box
                         onClick={() => {
-                            if (!userScorePrediction && status !== 'past') {
-                                handleScorePrediction('draw');
-                            }
+                            if (!pollLocked) handleScorePrediction('draw');
                         }}
                         style={{
                             width: `${drawPercentage}%`,
-                            backgroundColor: status === 'past' && matchResult?.winner === 'draw' 
-                                ? 'rgba(0, 255, 136, 0.3)' 
-                                : userScorePrediction === 'draw' 
-                                ? 'rgba(0, 255, 136, 0.3)' 
-                                : 'rgba(250, 176, 5, 0.3)',
+                            backgroundColor:
+                                status === 'past' && matchResult?.winner === 'draw'
+                                    ? 'rgba(0, 255, 136, 0.3)'
+                                    : userScorePrediction === 'draw'
+                                      ? 'rgba(0, 255, 136, 0.3)'
+                                      : 'rgba(250, 176, 5, 0.3)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRight: '2px solid var(--modern-border-color)',
-                            cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
+                            cursor: pollLocked ? 'default' : 'pointer',
                             transition: 'all 0.2s ease',
+                            opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
                         }}
                         onMouseEnter={(e) => {
-                            if (!userScorePrediction && status !== 'past') {
+                            if (!pollLocked) {
                                 e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.5)';
                             }
                         }}
                         onMouseLeave={(e) => {
-                            if (!userScorePrediction && status !== 'past') {
+                            if (!pollLocked) {
                                 e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.3)';
                             }
                         }}
                     >
-                        {shouldShowEqualSections ? (
-                            <Text 
-                                size="sm" 
-                                fw={700} 
-                                style={{ 
-                                    color: 'var(--modern-text-primary)', 
-                                    textAlign: 'center', 
-                                    padding: '0 8px' 
+                        {showEqualSections ? (
+                            <Text
+                                size="sm"
+                                fw={700}
+                                style={{
+                                    color: 'var(--modern-text-primary)',
+                                    textAlign: 'center',
+                                    padding: '0 8px',
                                 }}
                             >
                                 Draw
@@ -268,46 +338,45 @@ export function ScorePredictionCard({
                             </Text>
                         )}
                     </Box>
-                    
-                    {/* Away Team Section */}
+
                     <Box
                         onClick={() => {
-                            if (!userScorePrediction && status !== 'past') {
-                                handleScorePrediction('away');
-                            }
+                            if (!pollLocked) handleScorePrediction('away');
                         }}
                         style={{
                             width: `${awayPercentage}%`,
-                            backgroundColor: status === 'past' && matchResult?.winner === 'away' 
-                                ? 'rgba(0, 255, 136, 0.3)' 
-                                : userScorePrediction === 'away' 
-                                ? 'rgba(0, 255, 136, 0.3)' 
-                                : 'rgba(250, 82, 82, 0.3)',
+                            backgroundColor:
+                                status === 'past' && matchResult?.winner === 'away'
+                                    ? 'rgba(0, 255, 136, 0.3)'
+                                    : userScorePrediction === 'away'
+                                      ? 'rgba(0, 255, 136, 0.3)'
+                                      : 'rgba(250, 82, 82, 0.3)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            cursor: userScorePrediction || status === 'past' ? 'default' : 'pointer',
+                            cursor: pollLocked ? 'default' : 'pointer',
                             transition: 'all 0.2s ease',
                             borderRadius: '0 30px 30px 0',
+                            opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
                         }}
                         onMouseEnter={(e) => {
-                            if (!userScorePrediction && status !== 'past') {
+                            if (!pollLocked) {
                                 e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.5)';
                             }
                         }}
                         onMouseLeave={(e) => {
-                            if (!userScorePrediction && status !== 'past') {
+                            if (!pollLocked) {
                                 e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.3)';
                             }
                         }}
                     >
-                        {shouldShowEqualSections ? (
-                            <Text 
-                                size="sm" 
-                                fw={700} 
-                                style={{ 
-                                    color: 'var(--modern-text-primary)', 
-                                    textAlign: 'center', 
+                        {showEqualSections ? (
+                            <Text
+                                size="sm"
+                                fw={700}
+                                style={{
+                                    color: 'var(--modern-text-primary)',
+                                    textAlign: 'center',
                                     padding: '0 8px',
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
@@ -323,20 +392,28 @@ export function ScorePredictionCard({
                         )}
                     </Box>
                 </Box>
-                {userScorePrediction && (
+
+                {showPredictionTotalFooter && (
                     <Text size="sm" c="dimmed" ta="center" mt="md">
-                        Based on <Text span fw={700} style={{ color: 'var(--modern-text-primary)' }}>{totalPredictions}</Text> predictions
+                        Based on{' '}
+                        <Text span fw={700} style={{ color: 'var(--modern-text-primary)' }}>
+                            {totalPredictions}
+                        </Text>{' '}
+                        predictions
                     </Text>
                 )}
-                
+
                 {userScorePrediction && status !== 'past' && (
                     <Text size="sm" c="var(--modern-lime)" ta="center" mt="md" fw={600}>
-                        Your prediction: {userScorePrediction === 'home' ? homeTeam : 
-                         userScorePrediction === 'away' ? awayTeam : 'Draw'}
+                        Your prediction:{' '}
+                        {userScorePrediction === 'home'
+                            ? homeTeam
+                            : userScorePrediction === 'away'
+                              ? awayTeam
+                              : 'Draw'}
                     </Text>
                 )}
             </Box>
         </Paper>
     );
 }
-

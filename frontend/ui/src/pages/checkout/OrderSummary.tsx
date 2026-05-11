@@ -34,10 +34,46 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryProps) {
     const [quantity, setQuantity] = useState(ticketDetails.quantity || 1);
-    const pricePerTicket = ticketDetails.price || 0;
-    const serviceFeePerTicket = pricePerTicket * 0.3;
-    const totalPerTicket = pricePerTicket + serviceFeePerTicket;
+    const isMarketplace = ticketDetails.listingId != null;
+    /** Primary checkout still uses this placeholder fee model in the UI until checkout is wired to backend fees. */
+    const primaryServiceFeeRatio = 0.3;
+
+    let pricePerTicket: number;
+    let serviceFeePerTicket: number;
+    let totalPerTicket: number;
+    let feeLineLabel = 'Service Fee + Tax';
+
+    if (
+        isMarketplace &&
+        typeof ticketDetails.marketplaceSellerAskPrice === 'number' &&
+        typeof ticketDetails.marketplacePlatformFee === 'number'
+    ) {
+        pricePerTicket = ticketDetails.marketplaceSellerAskPrice;
+        serviceFeePerTicket = ticketDetails.marketplacePlatformFee;
+        totalPerTicket = ticketDetails.price ?? pricePerTicket + serviceFeePerTicket;
+        feeLineLabel = 'Platform service fee';
+    } else if (isMarketplace) {
+        // Older cart payloads: total is stored on price — do not invent a fake 30% on top.
+        totalPerTicket = ticketDetails.price || 0;
+        pricePerTicket = totalPerTicket;
+        serviceFeePerTicket = 0;
+        feeLineLabel = 'Included';
+    } else {
+        pricePerTicket = ticketDetails.price || 0;
+        serviceFeePerTicket = pricePerTicket * primaryServiceFeeRatio;
+        totalPerTicket = pricePerTicket + serviceFeePerTicket;
+    }
+
     const total = totalPerTicket * quantity;
+    const priceSubtext =
+        isMarketplace &&
+        typeof ticketDetails.marketplaceSellerAskPrice === 'number' &&
+        typeof ticketDetails.marketplacePlatformFee === 'number' &&
+        ticketDetails.marketplacePlatformFee > 0
+            ? 'Seller asking price'
+            : isMarketplace
+              ? 'Total to pay'
+              : 'Per ticket';
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -120,7 +156,7 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
 
                 <Group gap="xs">
                     <IconMapPin size={16} />
-                    <Text size="sm">{ticketDetails.venue}</Text>
+                    <Text size="sm">{ticketDetails.venue.trim() !== '' ? ticketDetails.venue : '—'}</Text>
                 </Group>
 
                 <Divider variant="dashed" />
@@ -243,24 +279,26 @@ export function OrderSummary({ ticketDetails, isGuestCheckout }: OrderSummaryPro
                             £{pricePerTicket.toFixed(2)}
                         </Text>
                         <Text size="xs" color="dimmed">
-                            Per ticket
+                            {priceSubtext}
                         </Text>
                     </Box>
                 </Group>
 
-                <Group justify="space-between">
-                    <Text size="sm" color="dimmed">
-                        Service Fee + Tax
-                    </Text>
-                    <Box style={{ textAlign: 'right' }}>
+                {!(isMarketplace && serviceFeePerTicket === 0) && (
+                    <Group justify="space-between">
                         <Text size="sm" color="dimmed">
-                            £{serviceFeePerTicket.toFixed(2)}
+                            {feeLineLabel}
                         </Text>
-                        <Text size="xs" color="dimmed">
-                            Per ticket
-                        </Text>
-                    </Box>
-                </Group>
+                        <Box style={{ textAlign: 'right' }}>
+                            <Text size="sm" color="dimmed">
+                                £{serviceFeePerTicket.toFixed(2)}
+                            </Text>
+                            <Text size="xs" color="dimmed">
+                                Per ticket
+                            </Text>
+                        </Box>
+                    </Group>
+                )}
 
                 <Divider variant="dashed" />
 

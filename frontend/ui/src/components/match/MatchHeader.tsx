@@ -3,6 +3,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { ModernButton } from '../modern';
 import { type MatchDetails } from './types';
+import { getMatchStatus } from './matchCalendarStatus';
 
 export interface MatchHeaderProps {
     matchDetails: MatchDetails;
@@ -21,7 +22,18 @@ export function MatchHeader({
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
 
+    const ticketStatus = getMatchStatus(matchDetails.date);
+    const canViewTickets =
+        showViewTicketsButton && ticketStatus !== 'past';
+
+    const hasFixtureScore =
+        typeof matchDetails.homeScore === 'number' &&
+        typeof matchDetails.awayScore === 'number' &&
+        Number.isFinite(matchDetails.homeScore) &&
+        Number.isFinite(matchDetails.awayScore);
+
     const handleViewTickets = () => {
+        if (ticketStatus === 'past') return;
         if (onViewTickets) {
             onViewTickets();
         } else {
@@ -112,6 +124,7 @@ export function MatchHeader({
                                 weekday: 'short',
                                 day: 'numeric',
                                 month: 'short',
+                                year: 'numeric',
                             }).toUpperCase()}
                         </Text>
                         <Text
@@ -209,17 +222,32 @@ export function MatchHeader({
                                 order: isMobile ? 3 : 2,
                             }}
                         >
-                            <Text
-                                size="xl"
-                                fw={900}
-                                style={{
-                                    color: 'var(--modern-lime)',
-                                    fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
-                                }}
-                            >
-                                VS
-                            </Text>
-                            {showViewTicketsButton && (
+                            {hasFixtureScore ? (
+                                <Text
+                                    size="xl"
+                                    fw={900}
+                                    style={{
+                                        color: 'var(--modern-text-primary)',
+                                        fontSize: 'clamp(1.75rem, 5vw, 2.25rem)',
+                                        letterSpacing: '0.06em',
+                                        fontVariantNumeric: 'tabular-nums',
+                                    }}
+                                >
+                                    {matchDetails.homeScore} – {matchDetails.awayScore}
+                                </Text>
+                            ) : (
+                                <Text
+                                    size="xl"
+                                    fw={900}
+                                    style={{
+                                        color: 'var(--modern-lime)',
+                                        fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
+                                    }}
+                                >
+                                    VS
+                                </Text>
+                            )}
+                            {canViewTickets && (
                                 <ModernButton
                                     variant="primary"
                                     size={isMobile ? 'md' : 'sm'}

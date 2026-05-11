@@ -1,70 +1,108 @@
 import { Paper, Text, Group } from '@mantine/core';
 import { IconClock } from '@tabler/icons-react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 
 interface ReservationTimerProps {
     initialMinutes?: number;
-    reservationStartTime?: number | null; // Timestamp when reservation started
+    reservationStartTime?: number | null;
     /** When set (server hold), countdown uses this absolute deadline instead of start+duration */
     holdDeadlineMs?: number | null;
     onExpire?: () => void;
 }
 
-export function ReservationTimer({ 
-    initialMinutes = 10, 
+function computeWallClockSecondsRemaining(
+    holdDeadlineMs: number | null | undefined,
+    reservationStartTime: number | null | undefined,
+    initialMinutes: number,
+): number | null {
+    if (holdDeadlineMs != null) {
+        return Math.max(0, Math.floor((holdDeadlineMs - Date.now()) / 1000));
+    }
+    if (reservationStartTime) {
+        const elapsed = (Date.now() - reservationStartTime) / 1000;
+        const total = initialMinutes * 60;
+        return Math.max(0, Math.floor(total - elapsed));
+    }
+    return null;
+}
+
+export function ReservationTimer({
+    initialMinutes = 10,
     reservationStartTime = null,
     holdDeadlineMs = null,
-    onExpire 
+    onExpire,
 }: ReservationTimerProps) {
-    // Calculate initial time remaining based on persisted start time
     const initialTimeRemaining = useMemo(() => {
-        if (holdDeadlineMs != null) {
-            return Math.max(0, Math.floor((holdDeadlineMs - Date.now()) / 1000));
-        }
-        if (reservationStartTime) {
-            const elapsed = (Date.now() - reservationStartTime) / 1000; // seconds
-            const total = initialMinutes * 60; // total seconds
-            const remaining = Math.max(0, total - elapsed);
-            return Math.floor(remaining);
-        }
-        return initialMinutes * 60; // Default: full duration
+        const wall = computeWallClockSecondsRemaining(
+            holdDeadlineMs,
+            reservationStartTime,
+            initialMinutes,
+        );
+        return wall != null ? wall : initialMinutes * 60;
     }, [holdDeadlineMs, reservationStartTime, initialMinutes]);
 
     const [timeRemaining, setTimeRemaining] = useState(initialTimeRemaining);
+    const onExpireRef = useRef(onExpire);
+    onExpireRef.current = onExpire;
 
-    // Recalculate when reservationStartTime or initialMinutes changes
+    /** Ensures onExpire runs at most once per reservation window (parent often passes a new inline callback each render). */
+    const expireFiredRef = useRef(false);
+
+    useEffect(() => {
+        expireFiredRef.current = false;
+    }, [holdDeadlineMs, reservationStartTime, initialMinutes]);
+
     useEffect(() => {
         setTimeRemaining(initialTimeRemaining);
     }, [initialTimeRemaining]);
 
     useEffect(() => {
-        if (timeRemaining <= 0) {
-            onExpire?.();
+        const fireExpireOnce = () => {
+            if (expireFiredRef.current) return;
+            expireFiredRef.current = true;
+            onExpireRef.current?.();
+        };
+
+        const wall =
+            computeWallClockSecondsRemaining(
+                holdDeadlineMs,
+                reservationStartTime,
+                initialMinutes,
+            ) != null;
+
+        let rem = initialTimeRemaining;
+        setTimeRemaining(rem);
+        if (rem <= 0) {
+            fireExpireOnce();
             return;
         }
 
         const interval = setInterval(() => {
-            if (holdDeadlineMs != null) {
-                const next = Math.max(0, Math.floor((holdDeadlineMs - Date.now()) / 1000));
+            if (wall) {
+                const next = computeWallClockSecondsRemaining(
+                    holdDeadlineMs,
+                    reservationStartTime,
+                    initialMinutes,
+                )!;
                 setTimeRemaining(next);
                 if (next <= 0) {
                     clearInterval(interval);
-                    onExpire?.();
+                    fireExpireOnce();
                 }
                 return;
             }
-            setTimeRemaining((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    onExpire?.();
-                    return 0;
-                }
-                return prev - 1;
-            });
+
+            rem -= 1;
+            const next = Math.max(0, rem);
+            setTimeRemaining(next);
+            if (next <= 0) {
+                clearInterval(interval);
+                fireExpireOnce();
+            }
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [timeRemaining, onExpire, holdDeadlineMs]);
+    }, [holdDeadlineMs, reservationStartTime, initialMinutes, initialTimeRemaining]);
 
     const formatTime = (seconds: number): string => {
         const mins = Math.floor(seconds / 60);
@@ -72,7 +110,7 @@ export function ReservationTimer({
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const isLowTime = timeRemaining < 300; // Less than 5 minutes
+    const isLowTime = timeRemaining < 300;
 
     return (
         <Paper
@@ -99,4 +137,3 @@ export function ReservationTimer({
         </Paper>
     );
 }
-

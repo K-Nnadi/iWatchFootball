@@ -65,13 +65,7 @@ export async function GenericBootstrap(module: any, port: number, options?: {
 
         console.log('📦 Step 6/7: Setting up Swagger/OpenAPI documentation...');
         const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
-        SwaggerModule.setup('api-docs', app, document, {
-            swaggerOptions: {
-                docExpansion: 'none', // All accordions closed by default
-            },
-        });
-        console.log('✅ Swagger documentation setup complete');
-        
+
         // Clean up empty $ref values that can occur with lazy-loaded relations
         function hasEmptyRef(obj: any): boolean {
             if (obj && typeof obj === 'object') {
@@ -124,9 +118,49 @@ export async function GenericBootstrap(module: any, port: number, options?: {
             return obj;
         }
 
+        /** After stripping broken relation properties, OpenAPI still lists them in `required` — Swagger UI then crashes ("Could not render responses"). */
+        function pruneOrphanRequiredDeep(node: unknown): void {
+            if (node === null || node === undefined) return;
+            if (Array.isArray(node)) {
+                node.forEach(pruneOrphanRequiredDeep);
+                return;
+            }
+            if (typeof node !== 'object') return;
+
+            const obj = node as Record<string, unknown>;
+            const props = obj.properties;
+            const req = obj.required;
+            if (
+                props &&
+                typeof props === 'object' &&
+                !Array.isArray(props) &&
+                Array.isArray(req)
+            ) {
+                const keys = Object.keys(props as object);
+                const filtered = (req as string[]).filter((r) => keys.includes(r));
+                if (filtered.length === 0) {
+                    delete obj.required;
+                } else if (filtered.length !== req.length) {
+                    obj.required = filtered;
+                }
+            }
+
+            for (const value of Object.values(obj)) {
+                pruneOrphanRequiredDeep(value);
+            }
+        }
+
         const cleanedDocument = cleanRefs(document);
-        
-        // Only write openapi.json if we have write permissions (skip in Cloud Run)
+        pruneOrphanRequiredDeep(cleanedDocument);
+
+        SwaggerModule.setup('api-docs', app, cleanedDocument, {
+            swaggerOptions: {
+                docExpansion: 'none', // All accordions closed by default
+            },
+        });
+        console.log('✅ Swagger documentation setup complete');
+
+        // openapi.json on disk (same cleaned doc as /api-docs)
         try {
             fs.writeFileSync('./openapi.json', JSON.stringify(cleanedDocument, null, 2));
             console.log('✅ OpenAPI JSON file written (cleaned empty $ref values)');

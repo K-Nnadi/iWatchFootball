@@ -1,5 +1,5 @@
-import {PickType} from '@nestjs/swagger';
-import {Column, Entity} from 'typeorm';
+import {ApiPropertyOptional, PickType} from '@nestjs/swagger';
+import {Entity} from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Fixture} from "../fixture/fixture.entity";
 import {Player} from "../player/player.entity";
@@ -87,12 +87,13 @@ export class Goal extends BaseDbEntity {
     @EntityColumn({db: {type: "int"}})
     teamId!: number;
 
+    @ApiPropertyOptional({ type: Boolean, nullable: true })
     @OptionalEntityColumn({db: {type: "boolean"}})
-    @Column()
-    ownGoal?: boolean;
+    ownGoal?: boolean | null;
 
+    @ApiPropertyOptional({ type: Boolean, nullable: true })
     @OptionalEntityColumn({db: {type: "boolean"}})
-    penalty?: boolean;
+    penalty?: boolean | null;
 }
 
 export class CreateGoalDTO extends PickType(Goal, ["fixtureId", "scorerId", "assistantId", "teamId", "minute", "ownGoal", "penalty", "metadata"] as const) {}

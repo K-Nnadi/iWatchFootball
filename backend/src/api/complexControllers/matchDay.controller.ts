@@ -54,7 +54,7 @@ export class MatchDayController {
 
         const lineUps = await this.lineUpService.getQuery({
             where: {fixtureId},
-            relations: ['playerLineUps', 'playerLineUps.player']
+            relations: ['playerLineups', 'playerLineups.player']
         });
 
         const goals = await this.goalService.getQuery({
@@ -64,7 +64,7 @@ export class MatchDayController {
 
         const cards = await this.cardService.getQuery({
             where: {fixtureId},
-            relations: ['player']
+            relations: ['player', 'team'],
         });
 
         const substitutions = await this.substitutionService.getQuery({

@@ -28,6 +28,7 @@ export function MatchHeader({ matchDetails }: MatchHeaderProps) {
             weekday: 'short',
             day: 'numeric',
             month: 'short',
+            year: 'numeric',
         }).toUpperCase();
     };
 

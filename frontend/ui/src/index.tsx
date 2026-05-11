@@ -3,6 +3,10 @@ import {createRoot} from 'react-dom/client'
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import App from "./App";
+import { configureApiClient } from './shared/api-client.config';
+
+/** Must run before first paint so axios.defaults.baseURL is set; otherwise relative URLs hit the Vite origin (5173). */
+configureApiClient();
 
 
 

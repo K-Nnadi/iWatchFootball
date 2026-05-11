@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@alisaitteke/seatmap-canvas": "^2.7.6",
     "@gsap/react": "^2.1.2",
     "@iWatchFootball/base-tools": "workspace:*",
     "@iWatchFootball/clients": "workspace:*",

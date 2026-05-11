@@ -100,8 +100,10 @@ export function MarketplaceCheckoutPage() {
                 date:
                     listing.ticket?.fixtureDate ??
                     new Date(listing.expiresAt).toISOString(),
-                venue: '',
+                venue: listing.ticket?.stadiumName?.trim() ?? '',
                 price: feePreview.totalBuyerPays,
+                marketplaceSellerAskPrice: feePreview.askPrice,
+                marketplacePlatformFee: feePreview.adminFee,
                 category: listing.ticket?.category ?? 'General Admission',
                 quantity: 1,
                 holdExpiresAt: expiresAt,

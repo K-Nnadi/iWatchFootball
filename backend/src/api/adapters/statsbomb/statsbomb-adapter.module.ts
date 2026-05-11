@@ -1,4 +1,5 @@
 import {Module} from '@nestjs/common';
+import {TypeOrmModule} from '@nestjs/typeorm';
 import {StatsBombAdapterService} from './statsbomb-adapter.service';
 import {StatsBombController} from './statsbomb.controller';
 import {StatsBombHttpService} from './statsbomb-http.service';
@@ -16,9 +17,13 @@ import {TeamCompetitionSeasonModule} from "../../modules/teamCompetitionSeason/t
 import {LineUpModule} from "../../modules/lineUp/lineUp.module";
 import {PlayerLineUpModule} from "../../modules/playerLineUp/playerLineUp.module";
 import {ManagerModule} from "../../modules/manager/manager.module";
+import {Card} from '../../modules/card/card.entity';
+import {Goal} from '../../modules/goal/goal.entity';
+import {Substitution} from '../../modules/substitution/substitution.entity';
 
 @Module({
     imports: [
+        TypeOrmModule.forFeature([Card, Goal, Substitution]),
         CompetitionModule,
         SeasonModule,
         TeamModule,

@@ -22,6 +22,18 @@ import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserRole } from '../../auth/types/security.types';
 
+/**
+ * Admin-only stub endpoints for pulling API-Football samples into local entities.
+ *
+ * When you enable persistence for fixtures or incidents (`Goal`, `Card`, `Substitution`):
+ * - **Goals**: already require `teamId` (the scorer's side). Map API-Football `team.id` → local `Team` FK.
+ * - **Cards**: set **`teamId`** to the booked player's club side in that fixture (same mapping).
+ *   Do not omit `teamId` on new rows unless ingesting legacy data; timelines / aggregations assume it is present.
+ * - **Substitutions**: already carry `teamId`; keep mapping consistent with goals/cards.
+ *
+ * `GoalModule`, `CardModule`, `SubstitutionModule` are wired here for upcoming ingest implementations.
+ */
+
 @ApiTags('dataSeeding')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -120,14 +132,18 @@ export class DataSeedingController {
             }
 
             for (const fixture of fixturesData.response) {
-                // await this.fixtureService.createOrUpdate({
-                //     fixtureId: fixture.fixture.id,
-                //     date: fixture.fixture.date,
-                //     venue: fixture.fixture.venue.name,
-                //     referee: fixture.fixture.referee,
-                //     homeTeam: fixture.teams.home.name,
-                //     awayTeam: fixture.teams.away.name,
-                // });
+                void fixture;
+                // When enabling persistence, map scores from API-Football `goals` / `score.fulltime`
+                // onto Fixture.homeScore / Fixture.awayScore so standings work without goal rows.
+                // Example: const g = fixture.goals;
+                //   homeScore: g?.home != null ? Number(g.home) : undefined,
+                //   awayScore: g?.away != null ? Number(g.away) : undefined,
+                // await this.fixtureService.createOrUpdate({ ... });
+
+                // Events ingest (e.g. `/fixtures/events`): each incident lists `team.id` — resolve to local team id and pass:
+                // - goalService.create({ ..., teamId })
+                // - cardService.create({ ..., teamId })  // required for new seeds; see module doc comment above
+                // Map players similarly (`player.id` → local `Player`).
             }
 
             return response.status(201).send({ message: 'Fixtures seeded successfully' });

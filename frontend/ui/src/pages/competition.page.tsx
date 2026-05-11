@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     Container, LoadingOverlay, Tabs, Text, Box, Group, Badge,
-    Stack, Center, Table, Select, ThemeIcon,
+    Stack, Center, Table, Select, ThemeIcon, UnstyledButton,
 } from '@mantine/core';
 import { IconTable, IconCalendar, IconWorld, IconFlag, IconTrophy, IconArrowUp, IconArrowDown, IconMinus } from '@tabler/icons-react';
-import { ModernCard, ModernH2, ModernBody } from '../components/modern';
+import { ModernCard, ModernH2 } from '../components/modern';
 import { useGetOneCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useGetQueryTeamCompetitionSeason } from '@iWatchFootball/clients/controllers/team-competition-season';
 import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
@@ -13,6 +13,7 @@ import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
 import { clientInstance } from '@iWatchFootball/clients/client-instance';
 import { useQuery } from '@tanstack/react-query';
+import { usePageTransition } from '../hooks/usePageTransition';
 import '../styles/modern.css';
 
 interface CompetitionStanding {
@@ -46,6 +47,7 @@ function useGetStandings(tcsIds: number[]) {
 export function CompetitionPage() {
     const { id: competitionIdStr } = useParams<{ id: string }>();
     const competitionId = Number(competitionIdStr);
+    const { navigateWithTransition } = usePageTransition();
 
     const { data: competition, isLoading: isLoadingComp } = useGetOneCompetition(competitionId);
     const { data: allSeasons = [] } = useGetAllSeason();
@@ -272,23 +274,48 @@ export function CompetitionPage() {
                                             const away = teamsData.find(t => t.id === fix.awayTeamId)?.name ?? `Team ${fix.awayTeamId}`;
                                             const isCompleted = fix.status === 'Completed';
                                             return (
-                                                <ModernCard key={fix.id} hover={false} style={{ padding: '0.75rem 1rem' }}>
-                                                    <Group justify="space-between" wrap="nowrap">
-                                                        <Text size="sm" fw={500} style={{ flex: 1, textAlign: 'right' }}>{home}</Text>
-                                                        <Box style={{ minWidth: 64, textAlign: 'center' }}>
-                                                            {isCompleted ? (
-                                                                <Text size="sm" fw={700}>— : —</Text>
-                                                            ) : (
-                                                                <Text size="xs" c="dimmed">
-                                                                    {new Date(fix.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                                                                </Text>
-                                                            )}
-                                                            <Badge size="xs" variant="dot" color={fix.status === 'Live' ? 'red' : 'gray'} style={{ fontSize: 9 }}>
-                                                                {fix.status}
-                                                            </Badge>
-                                                        </Box>
-                                                        <Text size="sm" fw={500} style={{ flex: 1 }}>{away}</Text>
-                                                    </Group>
+                                                <ModernCard key={fix.id} hover={false} style={{ padding: 0, overflow: 'hidden' }}>
+                                                    <UnstyledButton
+                                                        type="button"
+                                                        w="100%"
+                                                        onClick={() =>
+                                                            navigateWithTransition(`/match/${fix.id}`, {
+                                                                transitionType: 'loading',
+                                                                duration: 1200,
+                                                            })
+                                                        }
+                                                        styles={{
+                                                            root: {
+                                                                display: 'block',
+                                                                padding: '0.75rem 1rem',
+                                                                cursor: 'pointer',
+                                                                width: '100%',
+                                                                borderRadius: 0,
+                                                                transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(0, 255, 136, 0.06)',
+                                                                },
+                                                            },
+                                                        }}
+                                                        aria-label={`Open match ${home} versus ${away}`}
+                                                    >
+                                                        <Group justify="space-between" wrap="nowrap">
+                                                            <Text size="sm" fw={500} style={{ flex: 1, textAlign: 'right' }}>{home}</Text>
+                                                            <Box style={{ minWidth: 64, textAlign: 'center' }}>
+                                                                {isCompleted ? (
+                                                                    <Text size="sm" fw={700}>— : —</Text>
+                                                                ) : (
+                                                                    <Text size="xs" c="dimmed">
+                                                                        {new Date(fix.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                                                                    </Text>
+                                                                )}
+                                                                <Badge size="xs" variant="dot" color={fix.status === 'Live' ? 'red' : 'gray'} style={{ fontSize: 9 }}>
+                                                                    {fix.status}
+                                                                </Badge>
+                                                            </Box>
+                                                            <Text size="sm" fw={500} style={{ flex: 1 }}>{away}</Text>
+                                                        </Group>
+                                                    </UnstyledButton>
                                                 </ModernCard>
                                             );
                                         })}

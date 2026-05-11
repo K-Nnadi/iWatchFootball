@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 /**
- * Configure the API client with base URL and authentication
- * This should be called once when the app initializes
- * Uses VITE_API_URL from .env.development or .env.production
+ * Configure API base URL and auth interceptors.
+ * Call once at startup **before** `createRoot(...).render(...)` (see `index.tsx`) so the first
+ * React Query requests use `axios.defaults.baseURL`. If this runs only in `useEffect`, early
+ * requests resolve relative URLs against the Vite dev server (e.g. `localhost:5173`).
  */
 export function configureApiClient() {
   // Vite automatically loads .env.development or .env.production based on mode

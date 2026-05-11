@@ -40,8 +40,7 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 		// Normalize to lowercase to avoid case-sensitivity issues with PostgreSQL
 		const rawDatabaseName = getEnv('DATABASE_NAME') || 
 			(isCloudRun ? 'iwatchfootball' : 'monorepo');
-		const defaultDatabase = rawDatabaseName.toLowerCase();
-		
+
 		// Log if we're overriding DATABASE_HOST in Cloud Run
 		if (isCloudRun && explicitHost && explicitHost !== cloudSqlSocketPath) {
 			console.warn(`⚠️  DATABASE_HOST is set to "${explicitHost}" but Cloud Run requires socket connection.`);
@@ -97,7 +96,7 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 			...(databasePort !== undefined && { port: databasePort }),
 			username: getEnv('DATABASE_USERNAME') || 'postgres',
 			password: getEnv('DATABASE_PASSWORD') || 'postgres',
-			database: defaultDatabase,
+			database: rawDatabaseName,
 			autoLoadEntities: true,
 			entities: [
 				join(appRoot, 'backend', isDist ? 'dist/src/api/modules/**/*.js' : 'src/api/modules/**/*{.ts,.js}'),

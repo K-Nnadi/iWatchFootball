@@ -2332,6 +2332,71 @@
         ]
       }
     },
+    "/fixture/{fixtureId}/events": {
+      "get": {
+        "operationId": "FixtureTimelineController_getFixtureEvents",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Timeline entities scoped to the fixture",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "goals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "cards": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "substitutions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "players": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Goals, cards and substitutions for a fixture (public)",
+        "tags": [
+          "fixture"
+        ]
+      }
+    },
     "/fixtureReferee": {
       "post": {
         "operationId": "createFixtureReferee",
@@ -9259,6 +9324,46 @@
         ]
       }
     },
+    "/prediction/fixture/{fixtureId}/tally": {
+      "get": {
+        "operationId": "PredictionController_getFixtureTally",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FixturePredictionTallyDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Aggregate prediction counts for a fixture (public poll totals)",
+        "tags": [
+          "prediction",
+          "prediction"
+        ]
+      }
+    },
     "/prediction": {
       "post": {
         "operationId": "createPrediction",
@@ -9295,6 +9400,7 @@
         ],
         "summary": "Create Prediction",
         "tags": [
+          "prediction",
           "prediction"
         ]
       },
@@ -9326,6 +9432,7 @@
         ],
         "summary": "Get all Predictions",
         "tags": [
+          "prediction",
           "prediction"
         ]
       }
@@ -9414,6 +9521,7 @@
         ],
         "summary": "Get all Predictions",
         "tags": [
+          "prediction",
           "prediction"
         ]
       }
@@ -9472,6 +9580,7 @@
         ],
         "summary": "Get count of Predictions",
         "tags": [
+          "prediction",
           "prediction"
         ]
       }
@@ -9511,6 +9620,7 @@
         ],
         "summary": "Get one Prediction",
         "tags": [
+          "prediction",
           "prediction"
         ]
       },
@@ -9551,6 +9661,7 @@
         ],
         "summary": "Update one Prediction",
         "tags": [
+          "prediction",
           "prediction"
         ]
       },
@@ -9581,6 +9692,7 @@
         ],
         "summary": "Delete one Prediction",
         "tags": [
+          "prediction",
           "prediction"
         ]
       }
@@ -9604,6 +9716,7 @@
         ],
         "summary": "Upload a file for Prediction",
         "tags": [
+          "prediction",
           "prediction"
         ]
       }
@@ -9636,6 +9749,7 @@
         ],
         "summary": "Download file related to Prediction",
         "tags": [
+          "prediction",
           "prediction"
         ]
       }
@@ -14890,6 +15004,37 @@
         ]
       }
     },
+    "/api-sports/sync/import/fixtures": {
+      "post": {
+        "description": "Upserts `fixture` rows by `metadata.providers.apisports.externalId`. Requires competition + season (yearStart/yearEnd) and teams already linked for that league.",
+        "operationId": "ApiSportsController_importFixtures",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsImportFixturesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import fixtures into DB (API-Football /fixtures)",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
     "/api-sports/sync/import/players": {
       "post": {
         "description": "Creates players when missing, deduping by API-Sports id first, then strict name+DOB match. Caps pages/requests to protect daily quota.",
@@ -15091,6 +15236,211 @@
         ]
       }
     },
+    "/api-sports/discover/fixtures": {
+      "get": {
+        "description": "Proxies **GET /fixtures** — see [API-Football documentation v3](https://www.api-football.com/documentation-v3). **Efficient:** `date=YYYY-MM-DD` (+ optional `timezone` for “today”); narrow with `league`+`season`; batch with `ids=id1-id2`; use **GET /api-sports/discover/fixtures/live** for all live matches in one call. **allPages=true** merges pagination server-side (multiple upstream requests, capped by `maxPages`).",
+        "operationId": "ApiSportsController_discoverFixtures",
+        "parameters": [
+          {
+            "name": "next",
+            "required": false,
+            "in": "query",
+            "description": "Next N fixtures for a team (requires team)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "last",
+            "required": false,
+            "in": "query",
+            "description": "Last N fixtures for a team (requires team)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "live",
+            "required": false,
+            "in": "query",
+            "description": "e.g. all",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "timezone",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "maxPages",
+            "required": false,
+            "in": "query",
+            "description": "Cap when allPages=true (default 20, max 50)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "allPages",
+            "required": false,
+            "in": "query",
+            "description": "If true, fetch all pages until API paging ends (max `maxPages` requests)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Pagination (starts at 1)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "round",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "venue",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "team",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "season",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "league",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ids",
+            "required": false,
+            "in": "query",
+            "description": "Hyphen-separated fixture ids (one call for many)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05-10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fixtures from API-Sports (API-Football v3)",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/discover/fixtures/live": {
+      "get": {
+        "description": "Proxies **GET /fixtures?live=all** — preferred over polling `/fixtures/events` per fixture. See [API-Football v3](https://www.api-football.com/documentation-v3).",
+        "operationId": "ApiSportsController_discoverLiveFixtures",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Live fixtures + events (one API call)",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
     "/api-sports/discover/countries": {
       "get": {
         "description": "Proxies GET /countries. Optional: `search`, `code`.",
@@ -15135,6 +15485,189 @@
         "summary": "Countries from API-Sports",
         "tags": [
           "API-Sports"
+        ]
+      }
+    },
+    "/insights/integrations/llm": {
+      "get": {
+        "operationId": "InsightsController_listLlm",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List configured LLM integrations (staff)",
+        "tags": [
+          "insights"
+        ]
+      }
+    },
+    "/insights/fixtures/{fixtureId}/stream": {
+      "post": {
+        "operationId": "InsightsController_streamFixtureInsight",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StreamFixtureInsightDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stream AI match insight as SSE",
+        "tags": [
+          "insights"
+        ]
+      }
+    },
+    "/admin/data-sync/run": {
+      "post": {
+        "description": "Runs StatsBomb (optional) then API-Sports steps under a shared maxApiRequests budget. When Redis is configured, defaults to async (BullMQ) to avoid HTTP timeouts; poll GET /admin/data-sync/jobs/:id. Use resumeJobId to continue checkpoints after partial runs or crashes.",
+        "operationId": "DataSyncController_run",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataSyncRunDto"
+              },
+              "examples": {
+                "premierLeagueSlice": {
+                  "summary": "PL — bounded API budget",
+                  "description": "Typical free-tier pattern: keep maxApiRequests modest, re-run with resumeJobId if status is partial. StatsBomb does not count toward the API budget.",
+                  "value": {
+                    "statsbomb": true,
+                    "statsbombOptions": {
+                      "skipLineups": true
+                    },
+                    "apiSports": {
+                      "enabled": true,
+                      "season": 2024,
+                      "country": "England",
+                      "leagueApiIds": [
+                        39
+                      ],
+                      "maxApiRequests": 80,
+                      "leagues": {
+                        "maxStandingsRequests": 15
+                      },
+                      "players": {
+                        "maxPages": 2,
+                        "maxRequestsPerLeague": 8
+                      },
+                      "fixtures": {
+                        "from": "2024-08-01",
+                        "to": "2025-05-31",
+                        "maxRequestsPerLeague": 20
+                      },
+                      "enrich": {
+                        "limit": 25,
+                        "maxRequests": 20
+                      }
+                    }
+                  }
+                },
+                "apiOnlyTight": {
+                  "summary": "API-Sports only — small window",
+                  "value": {
+                    "statsbomb": false,
+                    "async": false,
+                    "apiSports": {
+                      "enabled": true,
+                      "season": 2024,
+                      "country": "England",
+                      "leagueApiIds": [
+                        39
+                      ],
+                      "maxApiRequests": 40,
+                      "fixtures": {
+                        "from": "2024-08-16",
+                        "to": "2024-08-18",
+                        "maxRequestsPerLeague": 5
+                      }
+                    }
+                  }
+                },
+                "resume": {
+                  "summary": "Resume previous job",
+                  "value": {
+                    "resumeJobId": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "One-click bulk sync (StatsBomb + budgeted API-Sports)",
+        "tags": [
+          "Admin data sync"
+        ]
+      }
+    },
+    "/admin/data-sync/jobs/{id}": {
+      "get": {
+        "operationId": "DataSyncController_getJob",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get sync job, steps, and cursors",
+        "tags": [
+          "Admin data sync"
         ]
       }
     },
@@ -15356,6 +15889,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15416,12 +15950,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15486,6 +16022,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15500,6 +16037,10 @@
           },
           "playerId": {
             "type": "number"
+          },
+          "teamId": {
+            "type": "number",
+            "description": "Team whose player received the card"
           },
           "type": {
             "type": "string"
@@ -15530,12 +16071,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15550,6 +16093,10 @@
           },
           "playerId": {
             "type": "number"
+          },
+          "teamId": {
+            "type": "number",
+            "description": "Team whose player received the card"
           },
           "type": {
             "type": "string"
@@ -15572,6 +16119,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15696,12 +16244,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15822,6 +16372,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15872,12 +16423,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -15931,6 +16484,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16005,12 +16559,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16059,7 +16615,6 @@
         },
         "required": [
           "id",
-          "teamCompetitionSeason",
           "teamCompetitionSeasonId",
           "position",
           "played",
@@ -16078,6 +16633,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16152,6 +16708,16 @@
             "type": "number",
             "description": "Attendance for the fixture",
             "example": 50000
+          },
+          "homeScore": {
+            "type": "number",
+            "description": "Final goals for home team when detailed goal rows are missing or incomplete.",
+            "example": 2
+          },
+          "awayScore": {
+            "type": "number",
+            "description": "Final goals for away team when detailed goal rows are missing or incomplete.",
+            "example": 1
           }
         },
         "required": [
@@ -16178,12 +16744,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16258,27 +16826,26 @@
             "type": "number",
             "description": "Attendance for the fixture",
             "example": 50000
+          },
+          "homeScore": {
+            "type": "number",
+            "description": "Final goals for home team when detailed goal rows are missing or incomplete.",
+            "example": 2
+          },
+          "awayScore": {
+            "type": "number",
+            "description": "Final goals for away team when detailed goal rows are missing or incomplete.",
+            "example": 1
           }
         },
         "required": [
           "id",
           "date",
-          "homeTeam",
-          "awayTeam",
-          "lineUps",
           "competitionId",
           "seasonId",
-          "teamCompetitionSeasons",
           "stadiumId",
-          "stadium",
-          "goals",
-          "cards",
-          "substitutions",
-          "referees",
           "status",
-          "stage",
-          "logs",
-          "predictions"
+          "stage"
         ]
       },
       "CreateFixtureRefereeDTO": {
@@ -16287,6 +16854,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16332,12 +16900,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16365,9 +16935,7 @@
         "required": [
           "id",
           "fixtureId",
-          "fixture",
           "refereeId",
-          "referee",
           "role"
         ]
       },
@@ -16377,6 +16945,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16427,12 +16996,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16475,6 +17046,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16500,10 +17072,12 @@
             "type": "number"
           },
           "ownGoal": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           },
           "penalty": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           }
         },
         "required": [
@@ -16528,12 +17102,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16559,20 +17135,19 @@
             "type": "number"
           },
           "ownGoal": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           },
           "penalty": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           }
         },
         "required": [
           "id",
           "minute",
           "scorerId",
-          "scorer",
-          "assistant",
           "fixtureId",
-          "fixture",
           "teamId"
         ]
       },
@@ -16582,6 +17157,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16631,12 +17207,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16678,6 +17256,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16721,12 +17300,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16752,12 +17333,8 @@
         "required": [
           "id",
           "fixtureId",
-          "fixture",
           "teamId",
-          "team",
-          "managerId",
-          "manager",
-          "playerLineups"
+          "managerId"
         ]
       },
       "CreateLogDTO": {
@@ -16766,6 +17343,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16812,12 +17390,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16846,9 +17426,7 @@
         "required": [
           "id",
           "userId",
-          "user",
           "fixtureId",
-          "fixture",
           "isVerified"
         ]
       },
@@ -16858,6 +17436,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16904,12 +17483,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -16956,6 +17537,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17004,12 +17586,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17058,6 +17642,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17132,12 +17717,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17238,12 +17825,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Additional configuration/metadata as JSON",
+            "nullable": true,
             "example": {}
           },
           "name": {
@@ -17307,12 +17896,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17350,9 +17941,7 @@
         "required": [
           "id",
           "method",
-          "status",
-          "tickets",
-          "transactions"
+          "status"
         ]
       },
       "CreatePaymentProviderDTO": {
@@ -17361,6 +17950,7 @@
           "metadata": {
             "type": "object",
             "description": "Additional configuration/metadata as JSON",
+            "nullable": true,
             "example": {}
           },
           "name": {
@@ -17442,12 +18032,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17471,8 +18063,7 @@
         "required": [
           "id",
           "balance",
-          "userId",
-          "user"
+          "userId"
         ]
       },
       "CreateTransactionDTO": {
@@ -17525,12 +18116,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17570,9 +18163,7 @@
           "id",
           "type",
           "amount",
-          "payment",
-          "userId",
-          "user"
+          "userId"
         ]
       },
       "CreateLoyaltySchemeDTO": {
@@ -17631,12 +18222,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17735,12 +18328,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17780,8 +18375,6 @@
           "id",
           "eventType",
           "userId",
-          "user",
-          "loyaltyScheme",
           "rewardAmount"
         ]
       },
@@ -17791,6 +18384,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17863,12 +18457,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -17963,6 +18559,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18010,12 +18607,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18067,6 +18666,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18112,12 +18712,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18149,12 +18751,40 @@
           "type"
         ]
       },
+      "FixturePredictionTallyDto": {
+        "type": "object",
+        "properties": {
+          "home": {
+            "type": "number",
+            "description": "Votes for home win"
+          },
+          "draw": {
+            "type": "number",
+            "description": "Votes for draw"
+          },
+          "away": {
+            "type": "number",
+            "description": "Votes for away win"
+          },
+          "total": {
+            "type": "number",
+            "description": "Total predictions with a result set"
+          }
+        },
+        "required": [
+          "home",
+          "draw",
+          "away",
+          "total"
+        ]
+      },
       "CreatePredictionDTO": {
         "type": "object",
         "properties": {
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18176,9 +18806,7 @@
         },
         "required": [
           "userId",
-          "user",
-          "fixtureId",
-          "fixture"
+          "fixtureId"
         ]
       },
       "Prediction": {
@@ -18196,12 +18824,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18224,9 +18854,7 @@
         "required": [
           "id",
           "userId",
-          "user",
-          "fixtureId",
-          "fixture"
+          "fixtureId"
         ]
       },
       "CreateRefereeDTO": {
@@ -18235,6 +18863,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18271,12 +18900,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18312,6 +18943,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18348,12 +18980,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18389,6 +19023,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18441,12 +19076,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18500,6 +19137,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18539,12 +19177,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18592,6 +19232,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18660,12 +19301,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18779,6 +19422,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18819,12 +19463,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18872,6 +19518,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18918,12 +19565,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -18953,10 +19602,7 @@
           "id",
           "category",
           "price",
-          "fixtureId",
-          "fixture",
-          "user",
-          "payment"
+          "fixtureId"
         ]
       },
       "AcquireTicketHoldDto": {
@@ -19135,12 +19781,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19200,9 +19848,7 @@
           "email",
           "password",
           "type",
-          "logs",
-          "credit",
-          "transactions"
+          "logs"
         ]
       },
       "CreateUserDTO": {
@@ -19211,6 +19857,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19265,12 +19912,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19297,7 +19946,6 @@
           "id",
           "userId",
           "ticketId",
-          "ticket",
           "active"
         ]
       },
@@ -19409,6 +20057,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19460,12 +20109,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19521,6 +20172,7 @@
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19569,12 +20221,14 @@
             "type": "string"
           },
           "deletedAt": {
+            "type": "string",
             "format": "date-time",
-            "type": "string"
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "description": "Metadata stored as JSON",
+            "nullable": true,
             "example": {
               "source": "StatsBomb",
               "version": "1.0",
@@ -19624,7 +20278,7 @@
           },
           "skipPlayers": {
             "type": "boolean",
-            "description": "Skip syncing players",
+            "description": "Skip team + player ingest from match lineups (Step 2). Managers still attach from match payloads when fixtures run.",
             "default": false
           },
           "skipGoals": {
@@ -19639,7 +20293,12 @@
           },
           "skipLineups": {
             "type": "boolean",
-            "description": "Skip syncing lineups and player lineups",
+            "description": "Skip StatsBomb lineups/{match}.json merge (no PlayerLineUp rows from squad file; substitutes missing unless filled elsewhere). When false, starters + bench are synced with isStarting from start_reason.",
+            "default": false
+          },
+          "skipStartingXi": {
+            "type": "boolean",
+            "description": "Skip Starting XI events when syncing match events (formation / eleven from tactics block only). Independent of skipLineups.",
             "default": false
           }
         }
@@ -19745,8 +20404,56 @@
             "type": "number",
             "description": "Season year for /players fallback",
             "example": 2023
+          },
+          "maxRequests": {
+            "type": "number",
+            "description": "Hard cap on API calls in this run (each player may use 1–2 requests)"
           }
         }
+      },
+      "ApiSportsImportFixturesDto": {
+        "type": "object",
+        "properties": {
+          "leagueApiId": {
+            "type": "number",
+            "description": "API-Sports league id",
+            "example": 39
+          },
+          "seasonYear": {
+            "type": "number",
+            "description": "API-Football season year (e.g. 2024 for 2024/25)",
+            "example": 2024
+          },
+          "from": {
+            "type": "string",
+            "description": "from date YYYY-MM-DD"
+          },
+          "to": {
+            "type": "string",
+            "description": "to date YYYY-MM-DD"
+          },
+          "allPages": {
+            "type": "boolean",
+            "default": true,
+            "description": "Follow paging until complete (within maxPages/maxRequests)"
+          },
+          "maxPages": {
+            "type": "number",
+            "default": 20,
+            "description": "Max fixture list pages"
+          },
+          "maxRequests": {
+            "type": "number",
+            "default": 50,
+            "description": "Max /fixtures HTTP calls"
+          }
+        },
+        "required": [
+          "leagueApiId",
+          "seasonYear",
+          "from",
+          "to"
+        ]
       },
       "ApiSportsImportPlayersDto": {
         "type": "object",
@@ -19797,6 +20504,207 @@
         "required": [
           "teamApiId"
         ]
+      },
+      "StreamFixtureInsightDto": {
+        "type": "object",
+        "properties": {
+          "integrationSlug": {
+            "type": "string"
+          },
+          "externalIntegrationId": {
+            "type": "number"
+          },
+          "question": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          }
+        }
+      },
+      "StatsBombPipelineOptionsDto": {
+        "type": "object",
+        "properties": {
+          "skipFixtures": {
+            "type": "boolean"
+          },
+          "skipCards": {
+            "type": "boolean"
+          },
+          "skipPlayers": {
+            "type": "boolean"
+          },
+          "skipGoals": {
+            "type": "boolean"
+          },
+          "skipStadiums": {
+            "type": "boolean"
+          },
+          "skipLineups": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiSportsLeaguesPipelineDto": {
+        "type": "object",
+        "properties": {
+          "syncTeamsAndStandings": {
+            "type": "boolean",
+            "default": true
+          },
+          "onlyStandingsCoverage": {
+            "type": "boolean",
+            "default": true
+          },
+          "onlyLeagueType": {
+            "type": "boolean",
+            "default": true
+          },
+          "maxStandingsRequests": {
+            "type": "number",
+            "default": 20,
+            "description": "Cap on /standings calls (plus one /leagues)"
+          }
+        }
+      },
+      "ApiSportsPlayersPipelineDto": {
+        "type": "object",
+        "properties": {
+          "maxPages": {
+            "type": "number",
+            "default": 2
+          },
+          "maxRequestsPerLeague": {
+            "type": "number",
+            "default": 10,
+            "description": "Per league; also bounded by remaining budget"
+          },
+          "skipOnAmbiguousName": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "ApiSportsFixturesPipelineDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "to": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "allPages": {
+            "type": "boolean",
+            "default": true
+          },
+          "maxPages": {
+            "type": "number",
+            "default": 20
+          },
+          "maxRequestsPerLeague": {
+            "type": "number",
+            "default": 50,
+            "description": "Per league"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "ApiSportsEnrichPipelineDto": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Max players to try (also limited by budget via maxRequests)"
+          },
+          "season": {
+            "type": "number",
+            "description": "Season fallback for /players?id="
+          },
+          "maxRequests": {
+            "type": "number",
+            "description": "Hard stop on API calls for this enrich step"
+          }
+        }
+      },
+      "ApiSportsPipelineDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "When false, the API-Sports block is skipped (useful with preset objects)"
+          },
+          "season": {
+            "type": "number",
+            "description": "API-Football season year (e.g. 2024 for 2024/25)",
+            "example": 2024
+          },
+          "country": {
+            "type": "string",
+            "example": "England",
+            "description": "With season, runs GET /leagues then import + optional standings"
+          },
+          "leagueApiIds": {
+            "example": [
+              39
+            ],
+            "description": "API league ids for players + fixtures passes",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "maxApiRequests": {
+            "type": "number",
+            "description": "Global cap on API-Sports HTTP requests for this run (leagues + players + fixtures + enrich)",
+            "example": 80
+          },
+          "leagues": {
+            "$ref": "#/components/schemas/ApiSportsLeaguesPipelineDto"
+          },
+          "players": {
+            "$ref": "#/components/schemas/ApiSportsPlayersPipelineDto"
+          },
+          "fixtures": {
+            "$ref": "#/components/schemas/ApiSportsFixturesPipelineDto"
+          },
+          "enrich": {
+            "$ref": "#/components/schemas/ApiSportsEnrichPipelineDto"
+          }
+        },
+        "required": [
+          "season",
+          "maxApiRequests"
+        ]
+      },
+      "DataSyncRunDto": {
+        "type": "object",
+        "properties": {
+          "resumeJobId": {
+            "type": "number",
+            "description": "Continue a previous job (uses stored preset + step cursors)"
+          },
+          "statsbomb": {
+            "type": "boolean",
+            "description": "Run StatsBomb open-data sync first (does not count toward maxApiRequests)"
+          },
+          "statsbombOptions": {
+            "$ref": "#/components/schemas/StatsBombPipelineOptionsDto"
+          },
+          "apiSports": {
+            "$ref": "#/components/schemas/ApiSportsPipelineDto"
+          },
+          "async": {
+            "type": "boolean",
+            "description": "When Redis is configured, defaults true so Swagger returns immediately with bullJobId. Set false to run synchronously."
+          }
+        }
       },
       "LoginBody": {
         "type": "object",

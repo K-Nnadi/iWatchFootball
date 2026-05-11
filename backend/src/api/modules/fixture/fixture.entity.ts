@@ -35,7 +35,8 @@ import { FindOptionsWhere } from 'typeorm';
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'date', 'homeTeamId', 'awayTeamId',
-        'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'
+        'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance',
+        'homeScore', 'awayScore', 'metadata'
       ],
     },
     // Allow public access (no authentication required)
@@ -45,7 +46,8 @@ import { FindOptionsWhere } from 'typeorm';
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'date', 'homeTeamId', 'awayTeamId',
-        'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'
+        'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance',
+        'homeScore', 'awayScore', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }), fields: ['id'] },
@@ -53,14 +55,14 @@ import { FindOptionsWhere } from 'typeorm';
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can create fixtures
-      fields: ['date', 'homeTeamId', 'awayTeamId', 'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'],
+      fields: ['date', 'homeTeamId', 'awayTeamId', 'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'homeScore', 'awayScore', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can update fixtures
-      fields: ['date', 'homeTeamId', 'awayTeamId', 'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'metadata'],
+      fields: ['date', 'homeTeamId', 'awayTeamId', 'competitionId', 'seasonId', 'stadiumId', 'status', 'stage', 'attendance', 'homeScore', 'awayScore', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Fixture> => ({ id: -1 }) },
   },
@@ -199,6 +201,26 @@ export class Fixture extends BaseDbEntity {
     })
     attendance?: number;
 
+    @OptionalEntityColumn({
+        db: { type: 'int' },
+        api: {
+            description:
+                'Final goals for home team when detailed goal rows are missing or incomplete.',
+            example: 2,
+        },
+    })
+    homeScore?: number;
+
+    @OptionalEntityColumn({
+        db: { type: 'int' },
+        api: {
+            description:
+                'Final goals for away team when detailed goal rows are missing or incomplete.',
+            example: 1,
+        },
+    })
+    awayScore?: number;
+
     @EntityRelation({
         type: RelationshipType.ONE_TO_MANY,
         entity: () => Log,
@@ -223,6 +245,8 @@ export class CreateFixtureDTO extends PickType(Fixture, [
     'stadiumId',
     'date',
     'attendance',
+    'homeScore',
+    'awayScore',
     'status',
     'stage',
     'seasonId',

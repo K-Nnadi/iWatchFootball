@@ -79,8 +79,7 @@ export function EntityRelation(options: RelationshipOptions) {
 			);
 		case RelationshipType.ONE_TO_MANY:
 			return applyDecorators(
-				// @ts-ignore
-				OneToMany(entity, inverseSide ? () => inverseSide : undefined, { lazy: true }), // ✅ Ensure inverseSide is a function
+				OneToMany(entity, inverseSide as (object: never) => any, { lazy: true }),
 				ApiProperty({ description, type: () => [entity] })
 			);
 		case RelationshipType.MANY_TO_ONE:
@@ -91,7 +90,7 @@ export function EntityRelation(options: RelationshipOptions) {
 			);
 		case RelationshipType.MANY_TO_MANY:
 			return applyDecorators(
-				ManyToMany(() => entity, inverseSide ? () => inverseSide : undefined, { lazy: true }), // ✅ Removed eager: true
+				ManyToMany(entity, inverseSide as (object: never) => any, { lazy: true }),
 				JoinTable(joinOptions),
 				ApiProperty({ description, type: () => [entity] })
 			);

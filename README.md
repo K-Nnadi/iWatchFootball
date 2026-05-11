@@ -110,6 +110,7 @@ pnpm run:backend
 
 The API will be available at `http://localhost:8080`
 - API Documentation: `http://localhost:8080/api-docs` (Swagger UI)
+- Admin bulk data sync (StatsBomb + budgeted API-Sports): [backend/DATA_SYNC.md](backend/DATA_SYNC.md)
 
 #### Run Frontend
 

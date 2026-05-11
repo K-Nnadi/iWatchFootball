@@ -9,6 +9,8 @@ import { TeamModule } from '../../modules/team/team.module';
 import { PlayerModule } from '../../modules/player/player.module';
 import { TransferModule } from '../../modules/transfer/transfer.module';
 import { TeamCompetitionSeasonModule } from '../../modules/teamCompetitionSeason/teamCompetitionSeason.module';
+import { FixtureModule } from '../../modules/fixture/fixture.module';
+import { StadiumModule } from '../../modules/stadium/stadium.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { TeamCompetitionSeasonModule } from '../../modules/teamCompetitionSeason
     TeamCompetitionSeasonModule,
     PlayerModule,
     TransferModule,
+    FixtureModule,
+    StadiumModule,
   ],
   providers: [ApiSportsHttpService, ApiSportsAdapterService],
   controllers: [ApiSportsController],

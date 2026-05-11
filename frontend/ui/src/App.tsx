@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import '@mantine/notifications/styles.css';
@@ -8,8 +8,6 @@ import { Notifications } from '@mantine/notifications';
 
 import {Router} from "./router";
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import { configureApiClient } from './shared/api-client.config';
-
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -21,11 +19,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-    // Configure API client on app initialization
-    useEffect(() => {
-        configureApiClient();
-    }, []);
-
     return (
         <QueryClientProvider client={queryClient}>
             <MantineProvider defaultColorScheme={'dark'}>

@@ -9,7 +9,11 @@ export class StatsBombSyncOptionsDTO {
   @ApiPropertyOptional({ description: 'Skip syncing cards', default: false })
   skipCards?: boolean;
 
-  @ApiPropertyOptional({ description: 'Skip syncing players', default: false })
+  @ApiPropertyOptional({
+    description:
+      'Skip team + player ingest from match lineups (Step 2). Managers still attach from match payloads when fixtures run.',
+    default: false,
+  })
   skipPlayers?: boolean;
 
   @ApiPropertyOptional({ description: 'Skip syncing goals', default: false })
@@ -18,8 +22,19 @@ export class StatsBombSyncOptionsDTO {
   @ApiPropertyOptional({ description: 'Skip creating stadiums during fixture sync', default: false })
   skipStadiums?: boolean;
 
-  @ApiPropertyOptional({ description: 'Skip syncing lineups and player lineups', default: false })
+  @ApiPropertyOptional({
+    description:
+      'Skip StatsBomb lineups/{match}.json merge (no PlayerLineUp rows from squad file; substitutes missing unless filled elsewhere). When false, starters + bench are synced with isStarting from start_reason.',
+    default: false,
+  })
   skipLineups?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'Skip Starting XI events when syncing match events (formation / eleven from tactics block only). Independent of skipLineups.',
+    default: false,
+  })
+  skipStartingXi?: boolean;
 }
 
 @ApiTags('StatsBomb Adapter')
@@ -330,14 +345,13 @@ export class StatsBombController {
       await this.statsBombAdapterService.syncTeam(match.home_team);
       await this.statsBombAdapterService.syncTeam(match.away_team);
       
-      // Sync fixture (required before events)
+      // Sync players first — lineup sync needs Player rows for PlayerLineUp.
+      const playersCreated = await this.statsBombAdapterService.syncPlayersFromMatch(matchId);
+
       await this.statsBombAdapterService.syncFixture(match);
       
-      // Sync players
-      const playersCreated = await this.statsBombAdapterService.syncPlayersFromMatch(matchId);
-      
       // Sync all events (goals, cards, substitutions)
-      const eventsCreated = await this.statsBombAdapterService.syncEventsFromMatch(matchId);
+      const eventsCreated = await this.statsBombAdapterService.syncEventsFromMatch(matchId, { matchData: match });
       
       return {
         success: true,

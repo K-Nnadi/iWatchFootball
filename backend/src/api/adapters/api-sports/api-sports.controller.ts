@@ -53,6 +53,12 @@ export class ApiSportsEnrichPlayersDto {
 
   @ApiProperty({ required: false, description: 'Season year for /players fallback', example: 2023 })
   season?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Hard cap on API calls in this run (each player may use 1–2 requests)',
+  })
+  maxRequests?: number;
 }
 
 export class ApiSportsSyncTransfersDto {
@@ -61,6 +67,29 @@ export class ApiSportsSyncTransfersDto {
 
   @ApiProperty({ required: false, description: 'Optional season filter' })
   season?: number;
+}
+
+export class ApiSportsImportFixturesDto {
+  @ApiProperty({ description: 'API-Sports league id', example: 39 })
+  leagueApiId!: number;
+
+  @ApiProperty({ description: 'API-Football season year (e.g. 2024 for 2024/25)', example: 2024 })
+  seasonYear!: number;
+
+  @ApiProperty({ description: 'from date YYYY-MM-DD' })
+  from!: string;
+
+  @ApiProperty({ description: 'to date YYYY-MM-DD' })
+  to!: string;
+
+  @ApiPropertyOptional({ default: true, description: 'Follow paging until complete (within maxPages/maxRequests)' })
+  allPages?: boolean;
+
+  @ApiPropertyOptional({ default: 20, description: 'Max fixture list pages' })
+  maxPages?: number;
+
+  @ApiPropertyOptional({ default: 50, description: 'Max /fixtures HTTP calls' })
+  maxRequests?: number;
 }
 
 export class ApiSportsImportPlayersDto {
@@ -220,6 +249,27 @@ export class ApiSportsController {
     return this.apiSportsAdapterService.enrichPlayers({
       limit: body.limit,
       season: body.season,
+      maxRequests: body.maxRequests,
+    });
+  }
+
+  @Post('sync/import/fixtures')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Import fixtures into DB (API-Football /fixtures)',
+    description:
+      'Upserts `fixture` rows by `metadata.providers.apisports.externalId`. Requires competition + season (yearStart/yearEnd) and teams already linked for that league.',
+  })
+  @ApiBody({ type: ApiSportsImportFixturesDto })
+  async importFixtures(@Body() body: ApiSportsImportFixturesDto) {
+    return this.apiSportsAdapterService.importFixturesFromLeagueWindow({
+      leagueApiId: Number(body.leagueApiId),
+      seasonYear: Number(body.seasonYear),
+      from: String(body.from),
+      to: String(body.to),
+      allPages: body.allPages,
+      maxPages: body.maxPages != null ? Number(body.maxPages) : undefined,
+      maxRequests: body.maxRequests != null ? Number(body.maxRequests) : undefined,
     });
   }
 
@@ -284,6 +334,53 @@ export class ApiSportsController {
   @ApiOkResponse(apiSportsRawResponseSchema)
   async discoverLeagueById(@Param('id', ParseIntPipe) id: number) {
     return this.apiSportsAdapterService.discoverLeagueByApiId(id);
+  }
+
+  @Get('discover/fixtures')
+  @ApiOperation({
+    summary: 'Fixtures from API-Sports (API-Football v3)',
+    description:
+      'Proxies **GET /fixtures** — see [API-Football documentation v3](https://www.api-football.com/documentation-v3). ' +
+      '**Efficient:** `date=YYYY-MM-DD` (+ optional `timezone` for “today”); narrow with `league`+`season`; batch with `ids=id1-id2`; ' +
+      'use **GET /api-sports/discover/fixtures/live** for all live matches in one call. ' +
+      '**allPages=true** merges pagination server-side (multiple upstream requests, capped by `maxPages`).',
+  })
+  @ApiQuery({ name: 'date', required: false, type: String, example: '2026-05-10' })
+  @ApiQuery({ name: 'from', required: false, type: String, description: 'YYYY-MM-DD' })
+  @ApiQuery({ name: 'to', required: false, type: String, description: 'YYYY-MM-DD' })
+  @ApiQuery({ name: 'ids', required: false, type: String, description: 'Hyphen-separated fixture ids (one call for many)' })
+  @ApiQuery({ name: 'league', required: false, type: Number })
+  @ApiQuery({ name: 'season', required: false, type: Number })
+  @ApiQuery({ name: 'team', required: false, type: Number })
+  @ApiQuery({ name: 'venue', required: false, type: Number })
+  @ApiQuery({ name: 'round', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Pagination (starts at 1)' })
+  @ApiQuery({
+    name: 'allPages',
+    required: false,
+    type: String,
+    description: 'If true, fetch all pages until API paging ends (max `maxPages` requests)',
+  })
+  @ApiQuery({ name: 'maxPages', required: false, type: Number, description: 'Cap when allPages=true (default 20, max 50)' })
+  @ApiQuery({ name: 'timezone', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'live', required: false, type: String, description: 'e.g. all' })
+  @ApiQuery({ name: 'last', required: false, type: Number, description: 'Last N fixtures for a team (requires team)' })
+  @ApiQuery({ name: 'next', required: false, type: Number, description: 'Next N fixtures for a team (requires team)' })
+  @ApiOkResponse(apiSportsRawResponseSchema)
+  async discoverFixtures(@Query() query: Record<string, string | undefined>) {
+    return this.apiSportsAdapterService.discoverFixtures(query);
+  }
+
+  @Get('discover/fixtures/live')
+  @ApiOperation({
+    summary: 'Live fixtures + events (one API call)',
+    description:
+      'Proxies **GET /fixtures?live=all** — preferred over polling `/fixtures/events` per fixture. See [API-Football v3](https://www.api-football.com/documentation-v3).',
+  })
+  @ApiOkResponse(apiSportsRawResponseSchema)
+  async discoverLiveFixtures() {
+    return this.apiSportsAdapterService.discoverLiveFixtures();
   }
 
   @Get('discover/countries')

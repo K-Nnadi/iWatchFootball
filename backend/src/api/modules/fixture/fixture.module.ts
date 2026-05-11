@@ -5,6 +5,12 @@ import {CrudController} from "@iWatchFootball/base-tools/crud/crud.controller";
 import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";
 import {Repository} from "typeorm";
+import { Goal } from '../goal/goal.entity';
+import { Card } from '../card/card.entity';
+import { Substitution } from '../substitution/substitution.entity';
+import { Player } from '../player/player.entity';
+import { FixtureTimelineService } from './fixture-timeline.service';
+import { FixtureTimelineController } from './fixture-timeline.controller';
 
 
 @Injectable()
@@ -22,9 +28,9 @@ export class FixtureController extends CrudController<Fixture, CreateFixtureDTO>
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Fixture])],
-  controllers: [FixtureController],
-  providers: [FixtureService],
+  imports: [TypeOrmModule.forFeature([Fixture, Goal, Card, Substitution, Player])],
+  controllers: [FixtureController, FixtureTimelineController],
+  providers: [FixtureService, FixtureTimelineService],
   exports: [FixtureService]
 })
 

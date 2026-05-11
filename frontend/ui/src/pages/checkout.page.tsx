@@ -20,7 +20,7 @@ import { useAuthStore } from '../shared/stores/auth.store';
 import { useCartStore } from '../shared/stores/cart.store';
 import { releaseTicketHold, verifyTicketHold } from '../shared/api/ticketHold.api';
 import { confirmCheckout } from '../shared/api/checkout.api';
-import { confirmMarketplacePurchase } from '../shared/api/marketplace.api';
+import { confirmMarketplacePurchase, getListing } from '../shared/api/marketplace.api';
 import { getMyCredit } from '../shared/api/wallet.api';
 import { validateDiscountCode } from '../shared/api/discountCode.api';
 import { AuthenticationStep } from './checkout/AuthenticationStep';
@@ -31,6 +31,7 @@ import { OrderSummary } from './checkout/OrderSummary';
 import { ReservationTimer } from './checkout/ReservationTimer';
 import { CheckoutStepper } from './checkout/CheckoutStepper';
 import {
+    buildThankYouPageState,
     CheckoutTicketDetails,
     PaymentProvider,
     UserDetails,
@@ -54,6 +55,7 @@ export function CheckoutPage() {
         clearCheckoutState,
     } = useCartStore();
     const hasInitialized = useRef(false);
+    const noTicketNavigateWarnedRef = useRef(false);
     
     // Get ticket details from location.state or from cart
     const getTicketDetails = (): CheckoutTicketDetails | null => {
@@ -62,30 +64,8 @@ export function CheckoutPage() {
         }
         // Try to get from cart (use first item if available)
         if (items.length > 0) {
-            const cartItem = items[0];
-            // Return ticket details without cart-specific fields
-            return {
-                matchId: cartItem.matchId,
-                homeTeam: cartItem.homeTeam,
-                awayTeam: cartItem.awayTeam,
-                date: cartItem.date,
-                venue: cartItem.venue,
-                price: cartItem.price,
-                competition: cartItem.competition,
-                section: cartItem.section,
-                row: cartItem.row,
-                fanSide: cartItem.fanSide,
-                seatsTogether: cartItem.seatsTogether,
-                ticketType: cartItem.ticketType,
-                unrestrictedView: cartItem.unrestrictedView,
-                quantity: cartItem.quantity,
-                imageUrl: cartItem.imageUrl,
-                fixtureId: cartItem.fixtureId,
-                offerKey: cartItem.offerKey,
-                holderId: cartItem.holderId,
-                holdExpiresAt: cartItem.holdExpiresAt,
-                category: cartItem.category,
-            };
+            const { id: _cartId, addedAt: _addedAt, ...rest } = items[0];
+            return rest;
         }
         return null;
     };
@@ -128,6 +108,55 @@ export function CheckoutPage() {
     } | null>(null);
     const [discountError, setDiscountError] = useState('');
     const [applyingDiscount, setApplyingDiscount] = useState(false);
+
+    /** Fresh stadium / fixture label for resale carts (cart may omit venue if created before enrichment). */
+    const [listingHydrate, setListingHydrate] = useState<{ venue?: string; fixtureLabel?: string }>();
+    const marketplaceListingIdHydrate = ticketDetailsFromState?.listingId ?? undefined;
+
+    useEffect(() => {
+        if (marketplaceListingIdHydrate == null) {
+            setListingHydrate(undefined);
+            return;
+        }
+        let cancelled = false;
+        void getListing(marketplaceListingIdHydrate)
+            .then((listing) => {
+                if (cancelled) return;
+                const stadium = listing.ticket?.stadiumName?.trim();
+                const fl = listing.ticket?.fixtureLabel?.trim();
+                setListingHydrate({
+                    venue: stadium || undefined,
+                    fixtureLabel: fl || undefined,
+                });
+            })
+            .catch(() => {});
+        return () => {
+            cancelled = true;
+        };
+    }, [marketplaceListingIdHydrate]);
+
+    /** Keep platform credit label in sync with the server when the user reaches payment (avoids stale £ vs API). */
+    useEffect(() => {
+        const onPaymentStep = activeStep === (isLoggedIn ? 2 : 3);
+        if (!onPaymentStep) return;
+        void (async () => {
+            const credit = await getMyCredit();
+            const creditBalance = Number(credit?.balance ?? 0);
+            setPaymentProviders((prev) =>
+                prev.length === 0
+                    ? prev
+                    : prev.map((p) =>
+                          p.slug === 'platform-credit'
+                              ? {
+                                    ...p,
+                                    name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
+                                    creditBalance,
+                                }
+                              : p,
+                      ),
+            );
+        })();
+    }, [activeStep, isLoggedIn]);
 
     useEffect(() => {
         void (async () => {
@@ -318,15 +347,28 @@ export function CheckoutPage() {
     // Redirect once cart is ready and there are no ticket details
     useEffect(() => {
         if (!cartReady) return;
-        if (!ticketDetailsFromState) {
-            notify.warning('No ticket selected', 'Your session expired or the ticket is no longer available.');
-            navigateWithTransition('/matches');
+        if (ticketDetailsFromState != null) {
+            noTicketNavigateWarnedRef.current = false;
+            return;
         }
+        if (noTicketNavigateWarnedRef.current) return;
+        noTicketNavigateWarnedRef.current = true;
+        notify.warning('No ticket selected', 'Your session expired or the ticket is no longer available.');
+        navigateWithTransition('/matches');
     }, [cartReady, ticketDetailsFromState, navigateWithTransition]);
 
     if (!cartReady || !ticketDetailsFromState) return null;
 
-    const ticketDetails = ticketDetailsFromState;
+    const td = ticketDetailsFromState;
+    const hasVenue = (td.venue ?? '').trim().length > 0;
+    const hasFixtureLabel = td.fixtureLabel != null && td.fixtureLabel.trim().length > 0;
+    const ticketDetails: CheckoutTicketDetails = {
+        ...td,
+        venue: hasVenue ? td.venue : (listingHydrate?.venue ?? ''),
+        fixtureLabel: hasFixtureLabel
+            ? td.fixtureLabel
+            : (listingHydrate?.fixtureLabel ?? td.fixtureLabel),
+    };
 
     const checkoutQuantity =
         ticketDetails.quantity ?? ticketDetails.seatsTogether ?? 1;
@@ -546,6 +588,29 @@ export function CheckoutPage() {
                             ? 'PlatformCredit'
                             : 'PayPal';
 
+                    if (selectedProvider.type === 'CREDIT') {
+                        const credit = await getMyCredit();
+                        const creditBalance = Number(credit?.balance ?? 0);
+                        setPaymentProviders((prev) =>
+                            prev.map((p) =>
+                                p.slug === 'platform-credit'
+                                    ? {
+                                          ...p,
+                                          name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
+                                          creditBalance,
+                                      }
+                                    : p,
+                            ),
+                        );
+                        if (creditBalance + 1e-6 < payAmountDue) {
+                            notify.error(
+                                'Insufficient credit',
+                                `Available £${creditBalance.toFixed(2)} — required £${payAmountDue.toFixed(2)}.`,
+                            );
+                            return;
+                        }
+                    }
+
                     if (isMarketplace) {
                         await confirmMarketplacePurchase({
                             listingId: ticketDetails.listingId!,
@@ -573,10 +638,16 @@ export function CheckoutPage() {
 
                     setPaymentStatus('success');
                     sessionStorage.removeItem('iwf_checkout_idem');
+                    const thankYouState = buildThankYouPageState(getTicketDetails(), listingHydrate);
                     clearCart();
                     clearCheckoutState();
                     setTimeout(
-                        () => navigateWithTransition('/thank-you', { transitionType: 'loading', duration: 1200 }),
+                        () =>
+                            navigateWithTransition('/thank-you', {
+                                transitionType: 'loading',
+                                duration: 1200,
+                                state: thankYouState,
+                            }),
                         1500,
                     );
                 } catch (e: unknown) {

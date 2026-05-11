@@ -46,15 +46,15 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 
 	async create(entity: U): Promise<any | null> {
 		this.logger.log(`create - ${this.repository.metadata.name} - ${JSON.stringify(entity)}`)
-		// @ts-ignore`
-		const resp = this.repository.save(entity);
-		return resp
+		// Plain objects often omit FK scalars when columns are shared with relations — hydrate via metadata first.
+		const model = this.repository.create(entity as unknown as DeepPartial<T>)
+		return await this.repository.save(model)
 	}
 
 	async update(id: number, entity: DeepPartial<T>): Promise<DeepPartial<T> | null> {
 		this.logger.log(`update - ${this.repository.metadata.name} - ${id} - ${JSON.stringify(entity)}`)
-		const resp = await this.repository.save(entity)
-		return resp
+		await this.repository.update({ id } as FindOptionsWhere<T>, entity as any)
+		return { id, ...entity } as DeepPartial<T>
 	}
 
 	async delete(id: number): Promise<DeleteResult | null> {
@@ -76,13 +76,19 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 		let parsedRelations: object | FindOptionsRelations<T>;
 
 		if (query.relations) {
-			parsedRelations = (await recurseWithAsyncValueFunction(query.relations, async (obj, key, val) => {
-				if (val === 'true') {
-					return true;
-				} else {
-					return val;
-				}
-			})) as FindOptionsRelations<T>;
+			const rel = query.relations as unknown;
+			// String arrays must bypass recurse helpers — otherwise each relation string is iterated like an object (chars).
+			if (Array.isArray(rel) && rel.every((item) => typeof item === 'string')) {
+				parsedRelations = rel as FindOptionsRelations<T>;
+			} else {
+				parsedRelations = (await recurseWithAsyncValueFunction(query.relations, async (obj, key, val) => {
+					if (val === 'true') {
+						return true;
+					} else {
+						return val;
+					}
+				})) as FindOptionsRelations<T>;
+			}
 		} else {
 			parsedRelations = {};
 		}

@@ -11,7 +11,6 @@ import {
 	Text,
 	TextInput,
 	Title,
-	Alert
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
@@ -61,7 +60,11 @@ export function LoginPage() {
 				}
 			},
 			onError: (error: any) => {
-				const errorMessage = error?.response?.data?.message || error?.message || 'Login failed. Please try again.';
+				const raw = error?.response?.data?.message || error?.message;
+				const errorMessage =
+					raw === 'Invalid Login'
+						? 'Login failed. Please check your credentials and try again.'
+						: raw || 'Login failed. Please try again.';
 				notify.error('Login Failed', errorMessage);
 			},
 		},
@@ -154,22 +157,16 @@ export function LoginPage() {
 							onChange={(e) => setRememberMe(e.currentTarget.checked)}
 						/>
 						<Anchor
-							href="#"
+							href="/forgot-password"
 							size="sm"
 							onClick={(e) => {
 								e.preventDefault();
-								// Handle forgot password logic
+								navigateWithTransition('/forgot-password');
 							}}
 						>
 							Forgot password?
 						</Anchor>
 					</Flex>
-
-					{loginMutation.isError && (
-						<Alert color="red" mb="md">
-							Login failed. Please check your credentials and try again.
-						</Alert>
-					)}
 
 					<Group justify="center" mt="xl" gap="md">
 						<Button 

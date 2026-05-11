@@ -27,7 +27,9 @@ export async function getMyCredit(): Promise<CreditBalance | null> {
     try {
         const { data } = await axios.get<CreditBalance[]>('/credit');
         const rows = Array.isArray(data) ? data : [];
-        return rows[0] ?? null;
+        if (rows.length === 0) return null;
+        const totalBalance = rows.reduce((s, r) => s + Number(r.balance ?? 0), 0);
+        return { ...rows[0], balance: totalBalance };
     } catch {
         return null;
     }
