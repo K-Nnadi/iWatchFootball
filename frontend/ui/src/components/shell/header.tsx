@@ -1,10 +1,20 @@
 import React from 'react';
 import { AppShell, Avatar, Badge, Box, Burger, Button, Container, Flex, Group, Menu, Title } from '@mantine/core';
 import { IoSettingsOutline, IoPersonOutline, IoCartOutline } from 'react-icons/io5';
+import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
 import { useCartStore } from '../../shared/stores/cart.store';
 import classes from './styles/header.module.css';
+
+/** Navbar cart + Sign In / Join are redundant on public auth screens (already on login / register / recover). */
+const AUTH_LANDING_SEGMENTS = new Set(['signin', 'join', 'forgot-password']);
+
+function isAuthLandingPath(pathname: string): boolean {
+    const normalized = pathname.toLowerCase().replace(/\/+$/, '');
+    const last = normalized.split('/').filter(Boolean).pop() ?? '';
+    return AUTH_LANDING_SEGMENTS.has(last);
+}
 
 interface HeaderProps {
     showHeader: boolean;
@@ -12,6 +22,8 @@ interface HeaderProps {
 }
 
 export function Header({ showHeader, isLoggedIn }: HeaderProps) {
+    const location = useLocation();
+    const hideCartAndNavbarAuth = isAuthLandingPath(location.pathname);
     const { navigateWithTransition } = usePageTransition();
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
     const { items } = useCartStore();
@@ -54,7 +66,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
 
                     {/* Mobile Right Section - Cart (only when non-empty) and Avatar */}
                     <Group gap="md" hiddenFrom="md" className={classes.mobileRightSection}>
-                        {hasCartItems && (
+                        {hasCartItems && !hideCartAndNavbarAuth && (
                             <Box
                                 onClick={() => navigateWithTransition('/checkout')}
                                 className={classes.cartIcon}
@@ -101,7 +113,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                 >
                                     <IoPersonOutline size={20} />
                                 </Avatar>
-                            ) : (
+                            ) : !hideCartAndNavbarAuth ? (
                                 // Not logged in: Menu with Sign In/Sign Up
                                 <Menu
                                     shadow="md"
@@ -133,7 +145,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                         </Menu.Item>
                                     </Menu.Dropdown>
                                 </Menu>
-                            )}
+                            ) : null}
                         </Box>
                     </Group>
 
@@ -171,7 +183,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                     <Group gap="lg">
                         {showHeader && (
                             <>
-                                {hasCartItems && (
+                                {hasCartItems && !hideCartAndNavbarAuth && (
                                     <Box
                                         onClick={() => navigateWithTransition('/checkout')}
                                         className={classes.cartIcon}
@@ -210,7 +222,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                     onClick={() => navigateWithTransition('/settings')}
                                     className={classes.settingsIcon}
                                 />
-                                {!isLoggedIn && (
+                                {!isLoggedIn && !hideCartAndNavbarAuth && (
                                     <>
                                         <Button
                                             variant="outline"

@@ -29,34 +29,43 @@ import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
 import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
 import { useCreateLog, useGetQueryLog } from '@iWatchFootball/clients/controllers/log';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery, useQueries } from '@tanstack/react-query';
 import { getGetQueryLogQueryKey } from '@iWatchFootball/clients/controllers/log';
+import { clientInstance } from '@iWatchFootball/clients/client-instance';
+import { resolveFixtureScores, type FixtureScoresInput } from '../shared/fixtureScores';
+import {
+    buildLogFixtureTimelineEvents,
+    type FixtureEventsForLogPayload,
+} from '../shared/loggedFixtureTimeline.events';
 
 import {LoggedFixtureCard} from '../components/cards/fixture.card';
 import NewStatsTab from "../tabs/newStats.tab";
+import type { LogFixtureTimelineEvent } from '../shared/loggedFixtureTimeline.events';
 
-export interface MatchEvent {
-    time: number;
-    description: string;
-    team: 'home' | 'away';
-    type: 'goal' | 'card' | 'substitution' | 'other' | 'penalty';
-    playerId?: string; // Optional player ID
-    assistPlayerId?: string; // Optional assist player ID
-}
+export type MatchEvent = LogFixtureTimelineEvent;
 
 export interface UserGame {
     fixtureId: string;
     homeTeam: string;
     awayTeam: string;
+    homeTeamId?: number;
+    awayTeamId?: number;
     homeScore: number;
     awayScore: number;
+    /** False when API has no final score — avoid showing 0–0 as real */
+    scoresAvailable: boolean;
     date: string;
     competitionName: string;
+    competitionId?: number;
     leaguePosition?: number;
     isVerified: boolean;
     venue?: string;
+    stadiumId?: number;
     userTeam?: 'home' | 'away';
     stage: string;
+    homeTeamLogo?: string;
+    awayTeamLogo?: string;
+    /** Optional per-log events (leaderboards); timeline lives on the API for the match page. */
     events?: MatchEvent[];
 }
 
@@ -168,27 +177,97 @@ export function LogsPage() {
         { query: { enabled: loggedFixtureIds.length > 0 } as any }
     );
 
+    const loggedStadiumIds = useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    loggedFixturesRaw
+                        .map((f) => f.stadiumId)
+                        .filter((id): id is number => typeof id === 'number'),
+                ),
+            ),
+        [loggedFixturesRaw],
+    );
+
+    const { data: loggedStadiumRows = [] } = useQuery({
+        queryKey: ['/stadium/query', 'logs', loggedStadiumIds],
+        queryFn: () =>
+            clientInstance<{ id: number; name: string }[]>({
+                url: '/stadium/query',
+                method: 'GET',
+                params: { where: { id: { $in: loggedStadiumIds } }, take: 200 },
+            }),
+        enabled: loggedStadiumIds.length > 0,
+    });
+
+    /** Match timelines for stats leaderboards — same `/fixture/:id/events` data as MatchEventsSection. */
+    const fixtureEventsQueries = useQueries({
+        queries: loggedFixtureIds.map((fixtureId) => ({
+            queryKey: ['/fixture', fixtureId, 'events'],
+            queryFn: async ({ signal }: { signal?: AbortSignal }) =>
+                clientInstance<FixtureEventsForLogPayload>({
+                    url: `/fixture/${fixtureId}/events`,
+                    method: 'GET',
+                    signal,
+                }),
+            enabled: isLoggedIn && loggedFixtureIds.length > 0,
+            staleTime: 5 * 60 * 1000,
+        })),
+    });
     // Map DB logs → UserGame using the enriched fixture + team + competition data
     const loggedFixtures = useMemo((): UserGame[] => {
+        const ix = new Map<number, number>();
+        loggedFixtureIds.forEach((id, i) => {
+            ix.set(id, i);
+        });
+
         return userLogsData.map(log => {
             const fixture = loggedFixturesRaw.find(f => f.id === log.fixtureId);
-            const homeTeam = teamsData.find(t => t.id === fixture?.homeTeamId);
-            const awayTeam = teamsData.find(t => t.id === fixture?.awayTeamId);
+            const homeTeamDoc = teamsData.find(t => t.id === fixture?.homeTeamId);
+            const awayTeamDoc = teamsData.find(t => t.id === fixture?.awayTeamId);
             const competition = competitionsData.find(c => c.id === fixture?.competitionId);
+            const resolved = fixture ? resolveFixtureScores(fixture as FixtureScoresInput) : null;
+            const venue =
+                typeof fixture?.stadiumId === 'number'
+                    ? loggedStadiumRows.find((s) => s.id === fixture.stadiumId)?.name
+                    : undefined;
+            const payloadIdx = ix.get(log.fixtureId);
+            const eventsPayload =
+                typeof payloadIdx === 'number' ? fixtureEventsQueries[payloadIdx]?.data : undefined;
+            const events =
+                eventsPayload != null && fixture != null
+                    ? buildLogFixtureTimelineEvents(eventsPayload, fixture.homeTeamId, fixture.awayTeamId)
+                    : undefined;
             return {
                 fixtureId: String(log.fixtureId),
-                homeTeam: homeTeam?.name ?? `Team ${fixture?.homeTeamId ?? '?'}`,
-                awayTeam: awayTeam?.name ?? `Team ${fixture?.awayTeamId ?? '?'}`,
-                homeScore: 0,
-                awayScore: 0,
+                homeTeam: homeTeamDoc?.name ?? `Team ${fixture?.homeTeamId ?? '?'}`,
+                awayTeam: awayTeamDoc?.name ?? `Team ${fixture?.awayTeamId ?? '?'}`,
+                homeTeamLogo: homeTeamDoc?.logoUrl,
+                awayTeamLogo: awayTeamDoc?.logoUrl,
+                homeTeamId: fixture?.homeTeamId,
+                awayTeamId: fixture?.awayTeamId,
+                homeScore: resolved?.home ?? 0,
+                awayScore: resolved?.away ?? 0,
+                scoresAvailable: resolved != null,
                 date: fixture?.date ?? '',
                 competitionName: competition?.name ?? 'Unknown',
+                competitionId: fixture?.competitionId,
                 isVerified: log.isVerified,
                 stage: fixture?.stage ?? '',
-                events: [],
+                venue,
+                stadiumId: typeof fixture?.stadiumId === 'number' ? fixture.stadiumId : undefined,
+                events,
             };
         });
-    }, [userLogsData, loggedFixturesRaw, teamsData, competitionsData]);
+    }, [
+        userLogsData,
+        loggedFixturesRaw,
+        teamsData,
+        competitionsData,
+        loggedStadiumRows,
+        loggedFixtureIds,
+        fixtureEventsQueries,
+    ]);
 
     const loading = isLoadingCompetitions || isLoadingSeasons || isLoadingTeamsTcs || isLoadingTeams
         || isLoadingFixtures || isLoadingLogs || isLoadingLoggedFixtures || isCreatingLog;
@@ -650,38 +729,39 @@ export function LogsPage() {
 
                 </Grid.Col>
                 <Grid.Col span={columnSpan}>
-                        <Tabs defaultValue={'matches'}>
-                        <Tabs.List style={{ justifyContent: 'center', width: '100%' }}>
-                            <Tabs.Tab 
-                                value={'matches'}
-                                style={{ 
-                                    fontSize: '1.1rem',
-                                    padding: '1rem 2rem',
-                                    fontWeight: 600
-                                }}
-                            >
-                                Matches
-                            </Tabs.Tab>
-                            <Tabs.Tab 
-                                value={'stats'}
-                                style={{ 
-                                    fontSize: '1.1rem',
-                                    padding: '1rem 2rem',
-                                    fontWeight: 600
-                                }}
-                            >
-                                Stats
-                            </Tabs.Tab>
-                            <Tabs.Tab
-                                value={'tickets'}
-                                style={{
-                                    fontSize: '1.1rem',
-                                    padding: '1rem 2rem',
-                                    fontWeight: 600
-                                }}
-                            >
-                                <Group gap={6}>
-                                    <IconTicket size={16} />
+                        <Tabs
+                            defaultValue={'matches'}
+                            styles={{
+                                list: {
+                                    flexWrap: 'nowrap',
+                                    width: '100%',
+                                    justifyContent: 'stretch',
+                                    gap: 0,
+                                    overflowX: 'auto',
+                                    scrollbarWidth: 'none',
+                                    msOverflowStyle: 'none',
+                                    WebkitOverflowScrolling: 'touch',
+                                    '&::-webkit-scrollbar': { display: 'none' },
+                                },
+                                tab: {
+                                    flex: '1 1 0',
+                                    minWidth: 0,
+                                    maxWidth: '100%',
+                                    justifyContent: 'center',
+                                    fontWeight: 600,
+                                    fontSize: 'clamp(0.8125rem, 2.8vw, 1.1rem)',
+                                    padding:
+                                        'clamp(0.5rem, 1.75vw, 0.875rem) clamp(0.25rem, 1.75vw, 1rem)',
+                                    whiteSpace: 'nowrap',
+                                },
+                            }}
+                        >
+                        <Tabs.List>
+                            <Tabs.Tab value={'matches'}>Matches</Tabs.Tab>
+                            <Tabs.Tab value={'stats'}>Stats</Tabs.Tab>
+                            <Tabs.Tab value={'tickets'}>
+                                <Group gap={6} wrap="nowrap" justify="center">
+                                    <IconTicket size={16} style={{ flexShrink: 0 }} />
                                     My Tickets
                                     {myTickets.length > 0 && (
                                         <Badge
@@ -755,16 +835,21 @@ export function LogsPage() {
                                                 fixtureId={fixture.fixtureId}
                                                 homeTeam={fixture.homeTeam}
                                                 awayTeam={fixture.awayTeam}
+                                                homeTeamId={fixture.homeTeamId}
+                                                awayTeamId={fixture.awayTeamId}
                                                 homeScore={fixture.homeScore}
                                                 awayScore={fixture.awayScore}
+                                                scoresAvailable={fixture.scoresAvailable}
                                                 date={fixture.date}
                                                 competitionName={fixture.competitionName}
+                                                competitionId={fixture.competitionId}
                                                 leaguePosition={fixture.leaguePosition}
                                                 isVerified={fixture.isVerified}
                                                 venue={fixture.venue}
                                                 userTeam={fixture.userTeam}
                                                 stage={fixture.stage}
-                                                events={fixture.events}
+                                                homeTeamLogo={fixture.homeTeamLogo}
+                                                awayTeamLogo={fixture.awayTeamLogo}
                                             />
                                         ))}
                                     </SimpleGrid>

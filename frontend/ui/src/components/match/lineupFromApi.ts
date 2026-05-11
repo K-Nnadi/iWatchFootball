@@ -173,6 +173,15 @@ export function buildLineupFromRow(
                     ? Number(pl.player.kitNumber)
                     : 0;
 
+        const lineupSlotRaw = meta.lineupSlotIndex;
+        const lineupSlotIndex =
+            typeof lineupSlotRaw === 'number' && Number.isFinite(lineupSlotRaw)
+                ? lineupSlotRaw
+                : undefined;
+        const sbPosRaw = meta.statsbombPositionId;
+        const statsbombPositionId =
+            typeof sbPosRaw === 'number' && Number.isFinite(sbPosRaw) ? sbPosRaw : undefined;
+
         if (pl.player?.id) {
             return {
                 id: String(pl.player.id),
@@ -180,6 +189,8 @@ export function buildLineupFromRow(
                 number: jersey,
                 position: bucket,
                 ...(posId != null ? { positionId: posId } : {}),
+                ...(lineupSlotIndex !== undefined ? { lineupSlotIndex } : {}),
+                ...(statsbombPositionId !== undefined ? { statsbombPositionId } : {}),
             };
         }
         if (pl.playerId > 0) {
@@ -189,6 +200,8 @@ export function buildLineupFromRow(
                 number: jersey,
                 position: bucket,
                 ...(posId != null ? { positionId: posId } : {}),
+                ...(lineupSlotIndex !== undefined ? { lineupSlotIndex } : {}),
+                ...(statsbombPositionId !== undefined ? { statsbombPositionId } : {}),
             };
         }
         return null;

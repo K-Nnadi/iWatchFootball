@@ -1864,15 +1864,8 @@ export class StatsBombAdapterService {
       if (fromMatch?.id) return fromMatch.id;
     }
 
-    if (localTeamId) {
-      const [teamRow] = await this.teamService.getQuery({ where: { id: localTeamId } });
-      if (
-        teamRow?.managerId &&
-        !(await this.managerIsStatsBombPlaceholder(teamRow.managerId))
-      ) {
-        return teamRow.managerId;
-      }
-    }
+    // Do not fall back to Team.managerId: it is club-level and often wrong for historical fixtures
+    // (e.g. previous coach still stored). Match payload or placeholder only.
 
     return this.getOrCreateStatsBombPlaceholderManager(localTeamId);
   }
@@ -1953,6 +1946,18 @@ export class StatsBombAdapterService {
 
           const players: any[] = Array.isArray(teamLineup?.lineup) ? teamLineup.lineup : [];
 
+          const slotByStatsBombPlayerId = new Map<number, number>();
+          let starterOrdinal = 0;
+          for (const p of players) {
+            const st =
+              Array.isArray(p?.positions) &&
+              p.positions.some((pp: any) => String(pp?.start_reason ?? '').toLowerCase().includes('starting'));
+            const pid = p?.player_id;
+            if (st && pid != null && Number.isFinite(Number(pid))) {
+              slotByStatsBombPlayerId.set(Number(pid), starterOrdinal++);
+            }
+          }
+
           await Promise.all(
             players.map(async (p: any) => {
               const statsbombPlayerId = p?.player_id;
@@ -1963,8 +1968,20 @@ export class StatsBombAdapterService {
               }
               if (!player) return;
 
+              const startingSlot =
+                Array.isArray(p?.positions) &&
+                p.positions.find((pp: any) =>
+                  String(pp?.start_reason ?? '').toLowerCase().includes('starting'),
+                );
+              const posEntry =
+                startingSlot ?? (Array.isArray(p?.positions) ? p.positions[0] : undefined);
+              const posName = posEntry?.position ? String(posEntry.position) : null;
+              const statsbombPositionId =
+                posEntry?.position_id != null && Number.isFinite(Number(posEntry.position_id))
+                  ? Number(posEntry.position_id)
+                  : undefined;
+
               let positionId: number | undefined = undefined;
-              const posName = Array.isArray(p?.positions) && p.positions[0]?.position ? String(p.positions[0].position) : null;
               if (posName) {
                 const pos = await this.getOrCreatePosition(posName);
                 positionId = pos?.id;
@@ -1978,17 +1995,33 @@ export class StatsBombAdapterService {
                 where: { lineupId: lineUp.id, playerId: player.id } as any,
               });
 
-              const baseMeta = {
+              const lineupSlotFromFile =
+                statsbombPlayerId != null && Number.isFinite(Number(statsbombPlayerId))
+                  ? slotByStatsBombPlayerId.get(Number(statsbombPlayerId))
+                  : undefined;
+
+              const baseMeta: Record<string, unknown> = {
                 source: 'StatsBomb',
                 statsbombMatchId: matchData.match_id,
                 statsbombPlayerId,
                 statsbombTeamId,
                 lastSync: new Date().toISOString(),
               };
-              const mergedMeta =
+              if (lineupSlotFromFile !== undefined) {
+                baseMeta.lineupSlotIndex = lineupSlotFromFile;
+              }
+              if (statsbombPositionId !== undefined) {
+                baseMeta.statsbombPositionId = statsbombPositionId;
+              }
+
+              const prev =
                 existingPLU?.metadata && typeof existingPLU.metadata === 'object'
-                  ? { ...(existingPLU.metadata as object), ...baseMeta }
-                  : baseMeta;
+                  ? { ...(existingPLU.metadata as object) }
+                  : {};
+              const mergedMeta: Record<string, unknown> = { ...prev, ...baseMeta };
+              if (typeof (prev as { lineupSlotIndex?: number }).lineupSlotIndex === 'number') {
+                mergedMeta.lineupSlotIndex = (prev as { lineupSlotIndex: number }).lineupSlotIndex;
+              }
 
               const resolvedPositionId = positionId ?? existingPLU?.positionId;
 
@@ -2308,12 +2341,13 @@ export class StatsBombAdapterService {
     name: string;
     positionName: string;
     jerseyNumber?: number;
+    statsbombPositionId?: number;
   }> {
     const tactics = ev.tactics as StatsBombEvent['tactics'] | undefined;
     if (!tactics) return [];
     const raw = ((tactics as { lineup?: unknown[] }).lineup ?? tactics.line_up ?? []) as Array<{
       player?: { id?: number; name?: string };
-      position?: { name?: string };
+      position?: { name?: string; id?: number };
       jersey_number?: number;
     }>;
     if (!Array.isArray(raw)) return [];
@@ -2322,11 +2356,13 @@ export class StatsBombAdapterService {
       name: string;
       positionName: string;
       jerseyNumber?: number;
+      statsbombPositionId?: number;
     }> = [];
     for (const row of raw) {
       const pid = row?.player?.id;
       const name = row?.player?.name;
       if (pid === undefined || pid === null || !name) continue;
+      const sbPosId = row?.position?.id;
       out.push({
         statsbombPlayerId: Number(pid),
         name: String(name),
@@ -2335,6 +2371,9 @@ export class StatsBombAdapterService {
           row?.jersey_number !== undefined && row?.jersey_number !== null
             ? Number(row.jersey_number)
             : undefined,
+        ...(sbPosId !== undefined && sbPosId !== null && Number.isFinite(Number(sbPosId))
+          ? { statsbombPositionId: Number(sbPosId) }
+          : {}),
       });
     }
     return out;
@@ -2351,6 +2390,7 @@ export class StatsBombAdapterService {
       name: string;
       positionName: string;
       jerseyNumber?: number;
+      statsbombPositionId?: number;
     }>,
   ): Promise<void> {
     const [fx] = await this.fixtureService.getQuery({ where: { id: fixtureId } });
@@ -2419,13 +2459,6 @@ export class StatsBombAdapterService {
         managerId = await this.resolveLineupManagerForTeam(matchData, localTeamId, sbTeamId);
       }
       if (!managerId || (await this.managerIsStatsBombPlaceholder(managerId))) {
-        const [teamRow] = await this.teamService.getQuery({ where: { id: localTeamId } });
-        const tid = teamRow?.managerId ?? null;
-        if (tid && !(await this.managerIsStatsBombPlaceholder(tid))) {
-          managerId = tid;
-        }
-      }
-      if (!managerId || (await this.managerIsStatsBombPlaceholder(managerId))) {
         if (
           lineUp?.managerId &&
           !(await this.managerIsStatsBombPlaceholder(lineUp.managerId))
@@ -2484,7 +2517,8 @@ export class StatsBombAdapterService {
         continue;
       }
 
-      for (const row of rows) {
+      for (let slotIdx = 0; slotIdx < rows.length; slotIdx++) {
+        const row = rows[slotIdx];
         let player = await this.findPlayerByStatsBombPlayerId(row.statsbombPlayerId);
         if (!player) {
           const [byName] = await this.playerService.getQuery({ where: { name: row.name } });
@@ -2506,14 +2540,18 @@ export class StatsBombAdapterService {
           existingPLU?.metadata && typeof existingPLU.metadata === 'object'
             ? { ...(existingPLU.metadata as object) }
             : {};
-        const pluMeta = {
+        const pluMeta: Record<string, unknown> = {
           ...prevMeta,
           statsbombMatchId: matchId,
           statsbombPlayerId: row.statsbombPlayerId,
           statsbombTeamId: sbTeamId,
           jerseyNumber: row.jerseyNumber,
           lastStartingXiSync: new Date().toISOString(),
+          lineupSlotIndex: slotIdx,
         };
+        if (row.statsbombPositionId != null && Number.isFinite(row.statsbombPositionId)) {
+          pluMeta.statsbombPositionId = row.statsbombPositionId;
+        }
 
         if (existingPLU) {
           await this.playerLineUpService.update(existingPLU.id, {

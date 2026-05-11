@@ -1,9 +1,106 @@
-import { Box, Container, Paper, Badge, Text, Group, Stack, Image, useMantineTheme } from '@mantine/core';
+import {
+    Avatar,
+    Box,
+    Badge,
+    Container,
+    Paper,
+    Text,
+    Group,
+    Stack,
+    UnstyledButton,
+    useMantineTheme,
+    useMantineColorScheme,
+} from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { ModernButton } from '../modern';
 import { type MatchDetails } from './types';
 import { getMatchStatus } from './matchCalendarStatus';
+
+function teamInitials(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '?';
+    if (parts.length === 1) {
+        const w = parts[0];
+        if (w.length <= 2) return w.toUpperCase();
+        return (w[0] + w[w.length - 1]).toUpperCase();
+    }
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
+interface TeamCrestProps {
+    teamName: string;
+    logoUrl?: string;
+    teamId?: number;
+    onTeamPress: () => void;
+}
+
+function TeamCrest({ teamName, logoUrl, teamId, onTeamPress }: TeamCrestProps) {
+    const clickable = typeof teamId === 'number';
+
+    const avatar = (
+        <Avatar
+            src={logoUrl?.trim() ? logoUrl.trim() : undefined}
+            alt={teamName}
+            radius={999}
+            styles={{
+                root: {
+                    width: 'clamp(72px, 16vw, 96px)',
+                    height: 'clamp(72px, 16vw, 96px)',
+                    border: '2px solid var(--modern-border-color)',
+                    backgroundColor: 'var(--modern-bg-secondary)',
+                    transition: 'border-color 0.2s ease, transform 0.2s ease',
+                    flexShrink: 0,
+                },
+                image: {
+                    objectFit: 'contain',
+                    padding: '10px',
+                },
+            }}
+        >
+            <Text fw={800} fz="clamp(1.1rem, 3.5vw, 1.5rem)" c="var(--modern-lime)" lh={1}>
+                {teamInitials(teamName)}
+            </Text>
+        </Avatar>
+    );
+
+    if (!clickable) {
+        return avatar;
+    }
+
+    return (
+        <Box
+            component="button"
+            type="button"
+            onClick={onTeamPress}
+            style={{
+                cursor: 'pointer',
+                padding: 0,
+                border: 'none',
+                background: 'none',
+                lineHeight: 0,
+                display: 'inline-block',
+                borderRadius: 999,
+            }}
+            onMouseEnter={(e) => {
+                const root = e.currentTarget.querySelector('.mantine-Avatar-root') as HTMLElement | null;
+                if (root) {
+                    root.style.borderColor = 'var(--modern-lime)';
+                    root.style.transform = 'scale(1.05)';
+                }
+            }}
+            onMouseLeave={(e) => {
+                const root = e.currentTarget.querySelector('.mantine-Avatar-root') as HTMLElement | null;
+                if (root) {
+                    root.style.borderColor = 'var(--modern-border-color)';
+                    root.style.transform = 'scale(1)';
+                }
+            }}
+        >
+            {avatar}
+        </Box>
+    );
+}
 
 export interface MatchHeaderProps {
     matchDetails: MatchDetails;
@@ -20,6 +117,7 @@ export function MatchHeader({
 }: MatchHeaderProps) {
     const { navigateWithTransition } = usePageTransition();
     const theme = useMantineTheme();
+    const { colorScheme } = useMantineColorScheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
 
     const ticketStatus = getMatchStatus(matchDetails.date);
@@ -31,6 +129,23 @@ export function MatchHeader({
         typeof matchDetails.awayScore === 'number' &&
         Number.isFinite(matchDetails.homeScore) &&
         Number.isFinite(matchDetails.awayScore);
+
+    const competitionNavId =
+        typeof matchDetails.competitionId === 'number' &&
+        Number.isFinite(matchDetails.competitionId)
+            ? matchDetails.competitionId
+            : undefined;
+
+    const competitionBadgeStyle = {
+        borderColor: 'rgba(0, 255, 136, 0.35)',
+        backgroundColor: 'rgba(0, 255, 136, 0.06)',
+        color: 'var(--modern-text-primary)',
+        padding: '0.5rem 1rem',
+        textTransform: 'uppercase' as const,
+        letterSpacing: '0.11em',
+        fontWeight: 600,
+        fontSize: 'clamp(0.625rem, 1.25vw, 0.6875rem)',
+    };
 
     const handleViewTickets = () => {
         if (ticketStatus === 'past') return;
@@ -63,19 +178,20 @@ export function MatchHeader({
                     backgroundColor: 'var(--modern-card-bg)',
                     border: '1px solid var(--modern-border-color)',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    boxShadow: 'var(--modern-shadow-md)',
                 }}
             >
-                {/* Background decorative elements */}
                 <Box
                     style={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
-                        width: '200px',
-                        height: '200px',
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
-                        borderRadius: '0 0 100% 0',
+                        width: 'clamp(220px, 40vw, 320px)',
+                        height: 'clamp(220px, 40vw, 320px)',
+                        background:
+                            'radial-gradient(circle at 0% 0%, rgba(0, 255, 136, 0.06) 0%, transparent 65%)',
+                        pointerEvents: 'none',
                     }}
                 />
                 <Box
@@ -83,165 +199,193 @@ export function MatchHeader({
                         position: 'absolute',
                         top: 0,
                         right: 0,
-                        width: '200px',
-                        height: '200px',
-                        background: 'linear-gradient(225deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)',
-                        borderRadius: '0 0 0 100%',
+                        width: 'clamp(220px, 40vw, 320px)',
+                        height: 'clamp(220px, 40vw, 320px)',
+                        background:
+                            'radial-gradient(circle at 100% 0%, rgba(0, 255, 136, 0.05) 0%, transparent 65%)',
+                        pointerEvents: 'none',
                     }}
                 />
 
-                <Stack gap="lg" align="center" style={{ position: 'relative', zIndex: 1 }}>
-                    {/* Competition/Event Badge */}
-                    <Badge
-                        size="lg"
-                        variant="outline"
+                <Stack gap="md" align="center" style={{ position: 'relative', zIndex: 1 }}>
+                    {competitionNavId !== undefined ? (
+                        <UnstyledButton
+                            type="button"
+                            onClick={() => navigateWithTransition(`/competition/${competitionNavId}`)}
+                            aria-label={`Open competition: ${matchDetails.competition || 'Match'}`}
+                            styles={{
+                                root: {
+                                    border: 'none',
+                                    background: 'transparent',
+                                    padding: 0,
+                                    borderRadius: 'var(--mantine-radius-xl)',
+                                    cursor: 'pointer',
+                                    transition: 'transform 0.15s ease, filter 0.15s ease',
+                                    '&:hover': {
+                                        transform: 'scale(1.02)',
+                                        filter: 'brightness(1.08)',
+                                    },
+                                    '&:focus-visible': {
+                                        outline: '2px solid var(--modern-lime)',
+                                        outlineOffset: 4,
+                                    },
+                                },
+                            }}
+                        >
+                            <Badge size="lg" variant="outline" style={competitionBadgeStyle}>
+                                {matchDetails.competition || 'Match'}
+                            </Badge>
+                        </UnstyledButton>
+                    ) : (
+                        <Badge size="lg" variant="outline" style={competitionBadgeStyle}>
+                            {matchDetails.competition || 'Match'}
+                        </Badge>
+                    )}
+
+                    <Text
+                        fw={650}
                         style={{
-                            borderColor: 'var(--modern-border-color)',
-                            backgroundColor: 'transparent',
-                            color: 'var(--modern-text-primary)',
-                            padding: '0.5rem 1rem',
+                            color:
+                                colorScheme === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.58)'
+                                    : 'var(--modern-text-secondary)',
                             textTransform: 'uppercase',
-                            letterSpacing: '0.1em',
-                            fontWeight: 600,
+                            letterSpacing: '0.07em',
+                            fontSize: 'clamp(0.75rem, 1.85vw, 0.8125rem)',
+                            textAlign: 'center',
                         }}
                     >
-                        {matchDetails.competition || 'Match'}
-                    </Badge>
+                        {new Date(matchDetails.date).toLocaleDateString('en-GB', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                        })}
+                        {' · '}
+                        {new Date(matchDetails.date).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                        })}
+                    </Text>
 
-                    {/* Date and Time */}
-                    <Stack gap={4} align="center">
-                        <Text
-                            size="xl"
-                            fw={900}
-                            style={{
-                                color: 'var(--modern-text-primary)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                            }}
-                        >
-                            {new Date(matchDetails.date).toLocaleDateString('en-GB', {
-                                weekday: 'short',
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                            }).toUpperCase()}
-                        </Text>
-                        <Text
-                            size="md"
-                            fw={600}
-                            style={{
-                                color: 'var(--modern-text-primary)',
-                                fontSize: '1.25rem',
-                            }}
-                        >
-                            {new Date(matchDetails.date).toLocaleTimeString('en-GB', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                            })}
-                        </Text>
-                    </Stack>
-
-                    {/* Teams */}
                     <Group
-                        justify="space-between"
-                        style={{ width: '100%', maxWidth: '700px' }}
-                        align="flex-end"
+                        justify="center"
+                        style={{
+                            width: '100%',
+                            maxWidth: 'min(940px, 100%)',
+                            marginTop: '0.25rem',
+                        }}
+                        align={isMobile ? 'stretch' : 'flex-start'}
                         wrap={isMobile ? 'wrap' : 'nowrap'}
-                        gap="md"
+                        gap={isMobile ? 'lg' : 'xl'}
                     >
-                        {/* Home Team */}
                         <Stack
                             gap="sm"
                             align="center"
                             style={{
-                                flex: isMobile ? '0 0 100%' : 1,
+                                flex: isMobile ? '1 1 100%' : '1 1 0',
                                 minWidth: 0,
-                                width: isMobile ? '100%' : 'auto',
                                 order: 1,
                             }}
                         >
-                            <Box
-                                onClick={() => matchDetails.homeTeamId && navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
-                                style={{
-                                    width: 'clamp(60px, 15vw, 80px)',
-                                    height: 'clamp(60px, 15vw, 80px)',
-                                    borderRadius: '50%',
-                                    overflow: 'hidden',
-                                    border: '2px solid var(--modern-border-color)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: 'var(--modern-bg-secondary)',
-                                    cursor: matchDetails.homeTeamId ? 'pointer' : 'default',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (matchDetails.homeTeamId) {
-                                        e.currentTarget.style.borderColor = 'var(--modern-lime)';
-                                        e.currentTarget.style.transform = 'scale(1.05)';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (matchDetails.homeTeamId) {
-                                        e.currentTarget.style.borderColor = 'var(--modern-border-color)';
-                                        e.currentTarget.style.transform = 'scale(1)';
-                                    }
-                                }}
-                            >
-                                <Image
-                                    src={matchDetails.homeTeamLogo || 'https://via.placeholder.com/70'}
-                                    width="clamp(50px, 12vw, 70px)"
-                                    height="clamp(50px, 12vw, 70px)"
-                                    fit="contain"
-                                    style={{ borderRadius: '50%' }}
-                                />
-                            </Box>
+                            <TeamCrest
+                                teamName={matchDetails.homeTeam}
+                                logoUrl={matchDetails.homeTeamLogo}
+                                teamId={matchDetails.homeTeamId}
+                                onTeamPress={() => navigateWithTransition(`/team/${matchDetails.homeTeamId}`)}
+                            />
                             <Text
-                                size="md"
-                                fw={700}
+                                fw={800}
                                 style={{
                                     color: 'var(--modern-text-primary)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
-                                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+                                    fontSize: 'clamp(0.9375rem, 2.2vw, 1.0625rem)',
+                                    lineHeight: 1.25,
                                 }}
                             >
                                 {matchDetails.homeTeam}
                             </Text>
                         </Stack>
 
-                        {/* Center VS block */}
                         <Stack
                             gap="xs"
                             align="center"
+                            justify="flex-start"
                             style={{
-                                padding: '0 clamp(0.5rem, 2vw, 1.5rem)',
-                                width: isMobile ? '100%' : 'auto',
+                                padding: isMobile ? '0.25rem 0 0.5rem' : 'clamp(2rem, 5vw, 2.75rem) 0 0',
+                                width: isMobile ? '100%' : 'clamp(152px, 18vw, 200px)',
+                                flexShrink: 0,
                                 order: isMobile ? 3 : 2,
                             }}
                         >
                             {hasFixtureScore ? (
-                                <Text
-                                    size="xl"
-                                    fw={900}
-                                    style={{
-                                        color: 'var(--modern-text-primary)',
-                                        fontSize: 'clamp(1.75rem, 5vw, 2.25rem)',
-                                        letterSpacing: '0.06em',
-                                        fontVariantNumeric: 'tabular-nums',
-                                    }}
-                                >
-                                    {matchDetails.homeScore} – {matchDetails.awayScore}
-                                </Text>
+                                <>
+                                    <Group gap={10} justify="center" wrap="nowrap" align="baseline">
+                                        <Text
+                                            component="span"
+                                            fw={900}
+                                            style={{
+                                                color: 'var(--modern-text-primary)',
+                                                fontSize: 'clamp(2.75rem, 9vw, 3.85rem)',
+                                                lineHeight: 1,
+                                                fontVariantNumeric: 'tabular-nums',
+                                            }}
+                                        >
+                                            {matchDetails.homeScore}
+                                        </Text>
+                                        <Text
+                                            component="span"
+                                            fw={800}
+                                            style={{
+                                                color: 'var(--modern-lime)',
+                                                opacity: 0.92,
+                                                fontSize: 'clamp(1.85rem, 6vw, 2.65rem)',
+                                                lineHeight: 1,
+                                                paddingInline: '0.12em',
+                                                fontVariantNumeric: 'tabular-nums',
+                                            }}
+                                        >
+                                            –
+                                        </Text>
+                                        <Text
+                                            component="span"
+                                            fw={900}
+                                            style={{
+                                                color: 'var(--modern-text-primary)',
+                                                fontSize: 'clamp(2.75rem, 9vw, 3.85rem)',
+                                                lineHeight: 1,
+                                                fontVariantNumeric: 'tabular-nums',
+                                            }}
+                                        >
+                                            {matchDetails.awayScore}
+                                        </Text>
+                                    </Group>
+                                    {ticketStatus === 'past' && (
+                                        <Text
+                                            fz="xs"
+                                            tt="uppercase"
+                                            fw={650}
+                                            style={{
+                                                letterSpacing: '0.14em',
+                                                color:
+                                                    colorScheme === 'dark'
+                                                        ? 'rgba(255, 255, 255, 0.45)'
+                                                        : 'var(--modern-text-secondary)',
+                                            }}
+                                        >
+                                            Final score
+                                        </Text>
+                                    )}
+                                </>
                             ) : (
                                 <Text
-                                    size="xl"
                                     fw={900}
                                     style={{
                                         color: 'var(--modern-lime)',
-                                        fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
+                                        fontSize: 'clamp(1.85rem, 5.5vw, 2.25rem)',
+                                        letterSpacing: '0.2em',
                                     }}
                                 >
                                     VS
@@ -255,6 +399,7 @@ export function MatchHeader({
                                     style={{
                                         width: isMobile ? '100%' : 'auto',
                                         maxWidth: isMobile ? '300px' : 'none',
+                                        marginTop: '0.25rem',
                                     }}
                                 >
                                     View Tickets
@@ -262,61 +407,29 @@ export function MatchHeader({
                             )}
                         </Stack>
 
-                        {/* Away Team */}
                         <Stack
                             gap="sm"
                             align="center"
                             style={{
-                                flex: isMobile ? '0 0 100%' : 1,
+                                flex: isMobile ? '1 1 100%' : '1 1 0',
                                 minWidth: 0,
-                                width: isMobile ? '100%' : 'auto',
                                 order: isMobile ? 2 : 3,
                             }}
                         >
-                            <Box
-                                onClick={() => matchDetails.awayTeamId && navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
-                                style={{
-                                    width: 'clamp(60px, 15vw, 80px)',
-                                    height: 'clamp(60px, 15vw, 80px)',
-                                    borderRadius: '50%',
-                                    overflow: 'hidden',
-                                    border: '2px solid var(--modern-border-color)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: 'var(--modern-bg-secondary)',
-                                    cursor: matchDetails.awayTeamId ? 'pointer' : 'default',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (matchDetails.awayTeamId) {
-                                        e.currentTarget.style.borderColor = 'var(--modern-lime)';
-                                        e.currentTarget.style.transform = 'scale(1.05)';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (matchDetails.awayTeamId) {
-                                        e.currentTarget.style.borderColor = 'var(--modern-border-color)';
-                                        e.currentTarget.style.transform = 'scale(1)';
-                                    }
-                                }}
-                            >
-                                <Image
-                                    src={matchDetails.awayTeamLogo || 'https://via.placeholder.com/70'}
-                                    width="clamp(50px, 12vw, 70px)"
-                                    height="clamp(50px, 12vw, 70px)"
-                                    fit="contain"
-                                    style={{ borderRadius: '50%' }}
-                                />
-                            </Box>
+                            <TeamCrest
+                                teamName={matchDetails.awayTeam}
+                                logoUrl={matchDetails.awayTeamLogo}
+                                teamId={matchDetails.awayTeamId}
+                                onTeamPress={() => navigateWithTransition(`/team/${matchDetails.awayTeamId}`)}
+                            />
                             <Text
-                                size="md"
-                                fw={700}
+                                fw={800}
                                 style={{
                                     color: 'var(--modern-text-primary)',
                                     textAlign: 'center',
                                     wordBreak: 'break-word',
-                                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+                                    fontSize: 'clamp(0.9375rem, 2.2vw, 1.0625rem)',
+                                    lineHeight: 1.25,
                                 }}
                             >
                                 {matchDetails.awayTeam}
@@ -324,17 +437,31 @@ export function MatchHeader({
                         </Stack>
                     </Group>
 
-                    {/* Venue */}
-                    <Text
-                        size="sm"
-                        style={{
-                            color: 'var(--modern-text-secondary)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.1em',
-                        }}
-                    >
-                        {matchDetails.venue}
-                    </Text>
+                    <Group gap={8} mt="xs" justify="center" wrap="nowrap">
+                        <Text aria-hidden fw={650} fz="xs" component="span" style={{ opacity: 0.7 }}>
+                            ◆
+                        </Text>
+                        <Text
+                            size="sm"
+                            fw={550}
+                            style={{
+                                color:
+                                    colorScheme === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.72)'
+                                        : 'var(--modern-text-secondary)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.12em',
+                                fontSize: 'clamp(0.6875rem, 1.5vw, 0.8125rem)',
+                                textAlign: 'center',
+                                maxWidth: 520,
+                            }}
+                        >
+                            {matchDetails.venue}
+                        </Text>
+                        <Text aria-hidden fw={650} fz="xs" component="span" style={{ opacity: 0.7 }}>
+                            ◆
+                        </Text>
+                    </Group>
                 </Stack>
             </Paper>
         </Container>

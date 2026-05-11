@@ -14,7 +14,19 @@ interface FormationViewProps {
     isPredicted?: boolean;
 }
 
-function sortByPositionId(a: Player, b: Player): number {
+function sortByTacticalOrder(a: Player, b: Player): number {
+    const slotA = a.lineupSlotIndex;
+    const slotB = b.lineupSlotIndex;
+    if (slotA !== undefined && slotB !== undefined && slotA !== slotB) {
+        return slotA - slotB;
+    }
+    if (slotA !== undefined && slotB === undefined) return -1;
+    if (slotB !== undefined && slotA === undefined) return 1;
+
+    const sbA = a.statsbombPositionId ?? 99999;
+    const sbB = b.statsbombPositionId ?? 99999;
+    if (sbA !== sbB) return sbA - sbB;
+
     return (a.positionId ?? 99999) - (b.positionId ?? 99999);
 }
 
@@ -35,11 +47,9 @@ function midfieldPairRowGap(is4222: boolean, midfieldRowIndex: number): string {
     }
     return 'clamp(0.5rem, 2vw, 1rem)';
 }
-
 /**
- * Lay out starters using **positionId order** for the whole outfield: sort non-GKs by `positionId`,
- * then cut rows using formation digits (e.g. 3-4-2-1 → 3 + 4 + 2 + 1 slots). Any extras stay on the
- * forward band so we never hide starters when DF/MF/FW buckets disagree with the formation label.
+ * Lay out starters using StatsBomb tactical order when present (`lineupSlotIndex`, then
+ * `statsbombPositionId`), else DB `positionId`. Rows are still sized by the formation label digits.
  */
 function arrangePlayersByFormation(players: Player[], formation: string) {
     let formationParts = formation.split('-').map(Number).filter((n) => Number.isFinite(n));
@@ -47,10 +57,10 @@ function arrangePlayersByFormation(players: Player[], formation: string) {
         formationParts = [4, 4, 2];
     }
 
-    const gkCandidates = players.filter((p) => p.position === 'GK').sort(sortByPositionId);
+    const gkCandidates = players.filter((p) => p.position === 'GK').sort(sortByTacticalOrder);
     const gk: Player[] = gkCandidates.length > 0 ? [gkCandidates[0]] : [];
 
-    const outfield = players.filter((p) => p.position !== 'GK').sort(sortByPositionId);
+    const outfield = players.filter((p) => p.position !== 'GK').sort(sortByTacticalOrder);
 
     let i = 0;
     const df = outfield.slice(i, (i += formationParts[0]));
@@ -88,7 +98,7 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                     backgroundColor: 'var(--modern-bg-tertiary)',
                     border: isPredicted ? '1px dashed var(--modern-border-color)' : '1px solid var(--modern-border-color)',
                     /** Grow with rows — avoids clipping forwards; page scrolls on small viewports */
-                    minHeight: 'clamp(420px, 44vh, 560px)',
+                    minHeight: 'clamp(300px, 48vh, 560px)',
                     height: 'auto',
                     overflowX: 'hidden',
                     overflowY: 'visible',
@@ -151,102 +161,122 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                     paddingBottom: 'clamp(0.35rem, 1.25vw, 0.65rem)',
                     flexShrink: 0,
                 }}>
-                    {/* Goalkeeper */}
-                    <Box style={{ display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
-                        {renderPlayerRow(gk)}
-                    </Box>
+                    <FormationBand players={gk} />
+                    <FormationBand players={df} />
 
-                    {/* Defenders */}
-                    <Box style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(0.5rem, 2vw, 1rem)', flexShrink: 0, flexWrap: 'wrap' }}>
-                        {renderPlayerRow(df)}
-                    </Box>
-
-                    {/* Midfield rows */}
-                    <Box style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(0.4rem, 1.5vw, 0.85rem)', flexShrink: 0 }}>
+                    <Box style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(0.35rem, 1.35vw, 0.82rem)', flexShrink: 0 }}>
                         {mf.map((row, index) => (
-                            <Box 
-                                key={index} 
-                                style={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'center', 
-                                gap: midfieldPairRowGap(is4222, index),
-                                    flexWrap: 'wrap',
-                                }}
-                            >
-                                {renderPlayerRow(row)}
-                            </Box>
+                            <FormationBand
+                                key={index}
+                                players={row}
+                                columnGap={midfieldPairRowGap(is4222, index)}
+                            />
                         ))}
                     </Box>
 
-                    {/* Forwards */}
-                    <Box style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(0.5rem, 2vw, 1rem)', flexShrink: 0, flexWrap: 'wrap' }}>
-                        {fw.length > 0 ? renderPlayerRow(fw) : (
-                            <Text size="sm" c="dimmed" style={{ padding: '1rem' }}>
-                                No forwards in formation
-                            </Text>
-                        )}
-                    </Box>
-                    
+                    {fw.length > 0 ? (
+                        <FormationBand players={fw} />
+                    ) : (
+                        <Text size="sm" c="dimmed" style={{ padding: '1rem', textAlign: 'center' }}>
+                            No forwards in formation
+                        </Text>
+                    )}
                 </Box>
             </Paper>
         </Box>
     );
 };
 
-function renderPlayerRow(players: Player[]) {
-    return players.map(player => (
+/** Default spacing between adjacent players inside one tactical line */
+const FORMATION_BAND_GAP_DEFAULT = 'clamp(4px, 1.4vmin, 11px)';
+
+/**
+ * Single horizontal band — `repeat(n, minmax(0, 1fr))` keeps GK + back line + mids + FW visually correct
+ * instead of wrapping into vertical columns on narrow screens.
+ */
+function FormationBand({
+    players,
+    columnGap,
+}: {
+    players: Player[];
+    columnGap?: string;
+}) {
+    if (players.length === 0) return null;
+
+    const n = players.length;
+    return (
         <Box
-            key={player.id}
             style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                padding: 'clamp(0.25rem, 1.5vw, 0.75rem)',
-                minWidth: 'clamp(52px, 14vw, 110px)',
-                maxWidth: 'clamp(72px, 18vw, 140px)',
-                textAlign: 'center',
+                display: 'grid',
+                gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
+                columnGap: columnGap ?? FORMATION_BAND_GAP_DEFAULT,
+                width: '100%',
+                justifyItems: 'center',
+                alignItems: 'start',
             }}
         >
-            <Stack align="center" gap={4}>
-                <Avatar
-                    size="lg"
-                    radius="xl"
+            {players.map((player) => (
+                <Box
+                    key={player.id}
                     style={{
-                        backgroundColor: 'var(--modern-bg-secondary)',
-                        border: '2px solid var(--modern-lime)',
-                        color: 'var(--modern-text-primary)',
-                        fontWeight: 700,
-                        fontSize: 'clamp(0.65rem, 1.5vw, 1.1rem)',
-                        width: 'clamp(2.5rem, 5vw, 3.5rem)',
-                        height: 'clamp(2.5rem, 5vw, 3.5rem)',
-                    }}
-                >
-                    {player.number}
-                </Avatar>
-                <Text 
-                    size="sm"
-                    fw={500}
-                    style={{
-                        fontSize: 'clamp(0.55rem, 1.15vw, 0.8rem)', 
-                        color: 'var(--modern-text-primary)',
+                        minWidth: 0,
                         width: '100%',
-                        maxWidth: 'clamp(68px, 17vw, 132px)',
-                        lineHeight: 1.2,
-                        wordBreak: 'break-word',
-                        hyphens: 'auto',
-                        display: '-webkit-box',
-                        WebkitBoxOrient: 'vertical',
-                        WebkitLineClamp: 2,
-                        overflow: 'hidden',
-                        textAlign: 'center',
+                        maxWidth: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
                     }}
                 >
-                    {player.name}
-                </Text>
-            </Stack>
+                    <FormationChip player={player} />
+                </Box>
+            ))}
         </Box>
-    ));
+    );
+}
+
+/** Jersey circle + nametag — uniform circle size per pitch; grid columns only share width for layout */
+function FormationChip({ player }: { player: Player }) {
+    const avatarSz = 'clamp(2rem, 8.25vmin, 3.2rem)';
+    const jerseyFs = 'clamp(0.68rem, 3.6vmin, 1.02rem)';
+    const labelFs = 'clamp(0.44rem, 2.45vmin, 0.78rem)';
+
+    return (
+        <Stack align="center" gap={4} miw={0} maw="100%" px={4} pb={6} pt={2}>
+            <Avatar
+                radius="xl"
+                style={{
+                    flexShrink: 0,
+                    backgroundColor: 'var(--modern-bg-secondary)',
+                    border: '2px solid var(--modern-lime)',
+                    color: 'var(--modern-text-primary)',
+                    fontWeight: 700,
+                    fontSize: jerseyFs,
+                    width: avatarSz,
+                    height: avatarSz,
+                }}
+            >
+                {player.number}
+            </Avatar>
+            <Text
+                size="sm"
+                fw={500}
+                maw="100%"
+                ta="center"
+                style={{
+                    fontSize: labelFs,
+                    color: 'var(--modern-text-primary)',
+                    lineHeight: 1.22,
+                    wordBreak: 'break-word',
+                    hyphens: 'auto',
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2,
+                    overflow: 'hidden',
+                }}
+            >
+                {player.name}
+            </Text>
+        </Stack>
+    );
 }
 
 export default FormationView;

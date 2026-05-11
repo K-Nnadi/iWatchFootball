@@ -1,4 +1,4 @@
-import { Box, Paper, Text, Title } from '@mantine/core';
+import { Box, Center, Loader, Paper, Text, Title } from '@mantine/core';
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { clientInstance } from '@iWatchFootball/clients/client-instance';
@@ -58,9 +58,21 @@ export function ScorePredictionCard({
         typeof fixtureId === 'number' && Number.isFinite(fixtureId);
 
     const [userScorePrediction, setUserScorePrediction] = useState<PredictionSide | null>(null);
-    const [demoPredictions, setDemoPredictions] = useState<
+    const [demoPredictions] = useState<
         Array<{ userId: string; username: string; prediction: PredictionSide }>
-    >([]);
+    >(() =>
+        useFixturePoll
+            ? []
+            : [
+                  { userId: '1', username: 'JohnDoe', prediction: 'home' as const },
+                  { userId: '2', username: 'JaneSmith', prediction: 'draw' as const },
+                  { userId: '3', username: 'MikeJohnson', prediction: 'away' as const },
+                  { userId: '4', username: 'SarahWilliams', prediction: 'home' as const },
+                  { userId: '5', username: 'TomBrown', prediction: 'home' as const },
+                  { userId: '6', username: 'EmmaDavis', prediction: 'draw' as const },
+                  { userId: '7', username: 'ChrisWilson', prediction: 'away' as const },
+              ],
+    );
     const [matchResult, setMatchResult] = useState<{
         homeScore: number;
         awayScore: number;
@@ -93,28 +105,12 @@ export function ScorePredictionCard({
     });
 
     useEffect(() => {
-        if (useFixturePoll) return;
-        const t = setTimeout(() => {
-            const mockPredictions = [
-                { userId: '1', username: 'JohnDoe', prediction: 'home' as const },
-                { userId: '2', username: 'JaneSmith', prediction: 'draw' as const },
-                { userId: '3', username: 'MikeJohnson', prediction: 'away' as const },
-                { userId: '4', username: 'SarahWilliams', prediction: 'home' as const },
-                { userId: '5', username: 'TomBrown', prediction: 'home' as const },
-                { userId: '6', username: 'EmmaDavis', prediction: 'draw' as const },
-                { userId: '7', username: 'ChrisWilson', prediction: 'away' as const },
-            ];
-            setDemoPredictions(mockPredictions);
-
-            if (status === 'past') {
-                setMatchResult({
-                    homeScore: 2,
-                    awayScore: 1,
-                    winner: 'home',
-                });
-            }
-        }, 100);
-        return () => clearTimeout(t);
+        if (useFixturePoll || status !== 'past') return;
+        setMatchResult({
+            homeScore: 2,
+            awayScore: 1,
+            winner: 'home',
+        });
     }, [status, useFixturePoll]);
 
     function handleScorePrediction(prediction: PredictionSide) {
@@ -197,6 +193,17 @@ export function ScorePredictionCard({
     const showPredictionTotalFooter =
         totalPredictions > 0 && (!showEqualSections || userScorePrediction);
 
+    const pollHeading = status === 'past' ? 'Pregame predictions' : 'Who will win?';
+
+    const pastFixturePollAwaitingData =
+        status === 'past' && useFixturePoll && tallyLoading;
+    const pastFixturePollNothingToShow =
+        status === 'past' && useFixturePoll && !tallyLoading && totalPredictions === 0;
+
+    if (pastFixturePollNothingToShow) {
+        return null;
+    }
+
     return (
         <Paper
             p={{ base: 'md', sm: 'xl' }}
@@ -218,17 +225,22 @@ export function ScorePredictionCard({
                     letterSpacing: '0.1em',
                 }}
             >
-                Who Will Win?
+                {pollHeading}
             </Title>
 
             <Box>
+                {pastFixturePollAwaitingData ? (
+                    <Center py="xl" style={{ minHeight: 60 }}>
+                        <Loader size="sm" color="var(--modern-text-secondary)" />
+                    </Center>
+                ) : null}
                 <Box
                     style={{
                         width: '100%',
                         height: '60px',
                         border: '2px solid var(--modern-border-color)',
                         borderRadius: '30px',
-                        display: 'flex',
+                        display: pastFixturePollAwaitingData ? 'none' : 'flex',
                         overflow: 'hidden',
                         position: 'relative',
                         marginBottom: '1rem',

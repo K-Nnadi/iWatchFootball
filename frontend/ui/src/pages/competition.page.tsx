@@ -15,6 +15,7 @@ import { clientInstance } from '@iWatchFootball/clients/client-instance';
 import { useQuery } from '@tanstack/react-query';
 import { usePageTransition } from '../hooks/usePageTransition';
 import '../styles/modern.css';
+import { resolveFixtureScores } from '../shared/fixtureScores';
 
 interface CompetitionStanding {
     id: number;
@@ -273,6 +274,8 @@ export function CompetitionPage() {
                                             const home = teamsData.find(t => t.id === fix.homeTeamId)?.name ?? `Team ${fix.homeTeamId}`;
                                             const away = teamsData.find(t => t.id === fix.awayTeamId)?.name ?? `Team ${fix.awayTeamId}`;
                                             const isCompleted = fix.status === 'Completed';
+                                            const scores = resolveFixtureScores(fix);
+                                            const isLive = fix.status === 'Live';
                                             return (
                                                 <ModernCard key={fix.id} hover={false} style={{ padding: 0, overflow: 'hidden' }}>
                                                     <UnstyledButton
@@ -302,14 +305,43 @@ export function CompetitionPage() {
                                                         <Group justify="space-between" wrap="nowrap">
                                                             <Text size="sm" fw={500} style={{ flex: 1, textAlign: 'right' }}>{home}</Text>
                                                             <Box style={{ minWidth: 64, textAlign: 'center' }}>
-                                                                {isCompleted ? (
-                                                                    <Text size="sm" fw={700}>— : —</Text>
+                                                                {scores ? (
+                                                                    <Text
+                                                                        size="sm"
+                                                                        fw={800}
+                                                                        style={{
+                                                                            fontVariantNumeric: 'tabular-nums',
+                                                                        }}
+                                                                    >
+                                                                        {scores.home} : {scores.away}
+                                                                    </Text>
+                                                                ) : isCompleted ? (
+                                                                    <Text size="sm" fw={600} c="dimmed">
+                                                                        — : —
+                                                                    </Text>
                                                                 ) : (
                                                                     <Text size="xs" c="dimmed">
-                                                                        {new Date(fix.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                                                                        {new Date(fix.date).toLocaleTimeString('en-GB', {
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                        })}
                                                                     </Text>
                                                                 )}
-                                                                <Badge size="xs" variant="dot" color={fix.status === 'Live' ? 'red' : 'gray'} style={{ fontSize: 9 }}>
+                                                                <Badge
+                                                                    size="xs"
+                                                                    variant="dot"
+                                                                    color={
+                                                                        isLive
+                                                                            ? 'red'
+                                                                            : isCompleted
+                                                                              ? 'gray'
+                                                                              : 'blue'
+                                                                    }
+                                                                    style={{
+                                                                        fontSize: 9,
+                                                                        textTransform: 'capitalize',
+                                                                    }}
+                                                                >
                                                                     {fix.status}
                                                                 </Badge>
                                                             </Box>

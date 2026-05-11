@@ -10,7 +10,7 @@ import {
 } from '@mantine/core';
 import {useParams} from 'react-router-dom';
 import {ScorePredictionCard} from '../../components/predictions';
-import {MatchHeader, MatchEventsSection, TeamFormSection, type MatchDetails, getMatchStatus} from '../../components/match';
+import {MatchHeader, MatchEventsSection, TeamFormSection, type MatchDetails, type TeamFormResult, getMatchStatus} from '../../components/match';
 import TeamLineups from "./teamLineup";
 import { MatchInsightPanel } from '../../components/match/MatchInsightPanel';
 import { useGetOneFixture } from '@iWatchFootball/clients/controllers/fixture';
@@ -29,15 +29,34 @@ import {
 export type { MatchDetails, Player, Lineup } from '../../components/match';
 export { getMatchStatus } from '../../components/match';
 
-/** Mock function returning last 5 games form for a team. (W, D, L) */
-function getTeamForm(): ('W' | 'D' | 'L')[] {
-    const outcomes = ['W', 'D', 'L'];
-    const form: ('W' | 'D' | 'L')[] = [];
-    for (let i = 0; i < 5; i++) {
-        const rand = Math.floor(Math.random() * outcomes.length);
-        form.push(outcomes[rand] as 'W' | 'D' | 'L');
+/** Validates last-five form from fixture metadata (array of letters or five-char string). */
+function parseRecentForm(value: unknown): TeamFormResult[] | null {
+    const letter = (c: string): TeamFormResult | null => {
+        const u = c.toUpperCase();
+        return u === 'W' || u === 'D' || u === 'L' ? u : null;
+    };
+    if (typeof value === 'string') {
+        const s = value.trim();
+        if (s.length !== 5) return null;
+        const out: TeamFormResult[] = [];
+        for (let i = 0; i < 5; i++) {
+            const r = letter(s[i]!);
+            if (!r) return null;
+            out.push(r);
+        }
+        return out;
     }
-    return form;
+    if (Array.isArray(value) && value.length === 5) {
+        const out: TeamFormResult[] = [];
+        for (const x of value) {
+            if (typeof x !== 'string' || x.trim().length !== 1) return null;
+            const r = letter(x.trim()[0]!);
+            if (!r) return null;
+            out.push(r);
+        }
+        return out;
+    }
+    return null;
 }
 
 /** Demo routes use ids like `match2`; numeric ids load fixture `GET /fixture/:id`. */
@@ -61,6 +80,7 @@ export function MatchPage() {
             date: '2025-01-24T15:00:00Z',
             venue: 'Anfield',
             competition: 'Premier League',
+            competitionId: 1,
             homeTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png',
             awayTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png',
             homeLineup: {
@@ -207,13 +227,15 @@ export function MatchPage() {
 
     const apiMatchDetails = useMemo((): MatchDetails | null => {
         if (!fixture || !homeTeam || !awayTeam || !stadium || !competition) return null;
-        const meta = (fixture as { metadata?: { homeScore?: number; awayScore?: number } }).metadata;
+        const meta = (fixture as { metadata?: Record<string, unknown> }).metadata;
         const hs =
             fixture.homeScore ??
             (typeof meta?.homeScore === 'number' ? meta.homeScore : undefined);
         const as =
             fixture.awayScore ??
             (typeof meta?.awayScore === 'number' ? meta.awayScore : undefined);
+        const homeRecentForm = meta ? parseRecentForm(meta.homeRecentForm) : null;
+        const awayRecentForm = meta ? parseRecentForm(meta.awayRecentForm) : null;
         const sides = attachLineupsToFixtureSides(
             bundleLineUps,
             fixture.homeTeamId ?? undefined,
@@ -229,6 +251,7 @@ export function MatchPage() {
             date: fixture.date,
             venue: stadium.name,
             competition: competition.name,
+            competitionId: fixture.competitionId ?? competition.id,
             homeTeamLogo: homeTeam.logoUrl,
             awayTeamLogo: awayTeam.logoUrl,
             homeLineup: sides.home,
@@ -238,6 +261,9 @@ export function MatchPage() {
             Number.isFinite(hs) &&
             Number.isFinite(as)
                 ? { homeScore: hs, awayScore: as }
+                : {}),
+            ...(homeRecentForm && awayRecentForm
+                ? { homeRecentForm, awayRecentForm }
                 : {}),
         };
     }, [fixture, homeTeam, awayTeam, stadium, competition, bundleLineUps, positionsById]);
@@ -256,9 +282,6 @@ export function MatchPage() {
             loadingStadium ||
             loadingCompetition ||
             loadingLineupsBundle);
-
-    const homeForm = useMemo(() => getTeamForm(), []);
-    const awayForm = useMemo(() => getTeamForm(), []);
 
     if (!routeFixtureId) {
         return (
@@ -351,8 +374,12 @@ export function MatchPage() {
                         {fetchFromApi && Number.isFinite(fixtureNumericId) && (
                             <MatchInsightPanel fixtureId={fixtureNumericId} />
                         )}
-                        {/* Form Section */}
-                        <TeamFormSection homeForm={homeForm} awayForm={awayForm} />
+                        {matchDetails.homeRecentForm && matchDetails.awayRecentForm ? (
+                            <TeamFormSection
+                                homeForm={matchDetails.homeRecentForm}
+                                awayForm={matchDetails.awayRecentForm}
+                            />
+                        ) : null}
 
                         {/* Score Prediction Section */}
                         <ScorePredictionCard

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Title, Tabs, Text } from '@mantine/core';
+import { Box, Paper, Title, Tabs, Text, SimpleGrid } from '@mantine/core';
 import { FormationView } from "./formation";
 import { Lineup, MatchDetails, Player } from "./match.page";  // Verify import paths
 
@@ -37,18 +37,35 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
             <Tabs 
                 defaultValue={matchDetails.homeTeam}
                 styles={{
+                    list: {
+                        flexWrap: 'nowrap',
+                        width: '100%',
+                        justifyContent: 'stretch',
+                        overflowX: 'auto',
+                        scrollbarWidth: 'none',
+                        '&::-webkit-scrollbar': { display: 'none' },
+                    },
                     tab: {
-                        flex: '1 1 auto',
-                        minWidth: '120px',
+                        flex: '1 1 0',
+                        minWidth: 0,
+                        maxWidth: '100%',
                         borderBottom: '2px solid transparent',
                         transition: 'all 0.2s ease',
+                        paddingLeft: 'clamp(0.25rem, 2vw, 1rem)',
+                        paddingRight: 'clamp(0.25rem, 2vw, 1rem)',
                     },
                     tabLabel: {
                         color: 'var(--modern-text-primary)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: 'clamp(0.7rem, 2.8vw, 0.875rem)',
+                        lineHeight: 1.35,
+                        fontWeight: 500,
                     }
                 }}
             >
-                <Tabs.List style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Tabs.List>
                     <Tabs.Tab 
                         value={matchDetails.homeTeam}
                         styles={{
@@ -66,9 +83,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             }
                         }}
                     >
-                        <Text size="sm" style={{ wordBreak: 'break-word', fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>
-                            {matchDetails.homeTeam}
-                        </Text>
+                        {matchDetails.homeTeam}
                     </Tabs.Tab>
                     <Tabs.Tab 
                         value={matchDetails.awayTeam}
@@ -87,9 +102,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             }
                         }}
                     >
-                        <Text size="sm" style={{ wordBreak: 'break-word', fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>
-                            {matchDetails.awayTeam}
-                        </Text>
+                        {matchDetails.awayTeam}
                     </Tabs.Tab>
                 </Tabs.List>
 
@@ -157,19 +170,39 @@ interface SubstitutesListProps {
 
 function SubstitutesList({ substitutes }: SubstitutesListProps) {
     return (
-        <Box mt="xl">
+        <Box mt="xl" mx="auto" maw={{ base: '100%', sm: 920 }}>
             <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-text-primary)' }}>Substitutes</Title>
-            <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-                {substitutes ? substitutes.map(substitute => (
-                    <Text key={substitute.id} size="sm" style={{ color: 'var(--modern-text-secondary)', margin: '0.25rem' }}>
-                        {substitute.name}
-                    </Text>
-                )) : (
-                    <Text size="sm" style={{ color: 'var(--modern-text-secondary)' }}>No substitutes listed.</Text>
-                )}
-            </Box>
+            {substitutes?.length ? (
+                <SimpleGrid
+                    cols={{ base: 1, xs: 2, sm: 3 }}
+                    spacing={{ base: 'xs', xs: 'sm' }}
+                    verticalSpacing={{ base: 'xs', xs: 'sm' }}
+                >
+                    {substitutes.map((substitute) => (
+                        <Text
+                            key={substitute.id}
+                            fz="sm"
+                            lh={1.45}
+                            ta={{ base: 'left', xs: 'center' }}
+                            style={{
+                                color: 'var(--modern-text-secondary)',
+                                padding: '0.45rem 0.65rem',
+                                borderRadius: 8,
+                                backgroundColor: 'color-mix(in srgb, var(--modern-border-color) 55%, transparent)',
+                                border: '1px solid var(--modern-border-color)',
+                                overflowWrap: 'anywhere',
+                                wordBreak: 'break-word',
+                            }}
+                        >
+                            {substitute.name}
+                        </Text>
+                    ))}
+                </SimpleGrid>
+            ) : (
+                <Text size="sm" ta="center" style={{ color: 'var(--modern-text-secondary)' }}>No substitutes listed.</Text>
+            )}
         </Box>
     );
-};
+}
 
 export default TeamLineups;

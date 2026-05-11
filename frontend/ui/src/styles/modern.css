@@ -1494,3 +1494,31 @@ body {
   max-height: none !important;
   min-height: auto !important;
 }
+
+/* Scrollbars — match shell theme (avoid stray marketing blue globals from page-level CSS chunks) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--modern-text-primary) 34%, transparent) var(--modern-bg-tertiary);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--modern-bg-tertiary);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--modern-text-primary) 36%, transparent);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--modern-lime) 55%, var(--modern-text-primary));
+}
+
+[data-mantine-color-scheme='light'] *::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--modern-lime) 40%, transparent);
+}
