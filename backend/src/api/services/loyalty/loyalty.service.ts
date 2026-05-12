@@ -66,11 +66,11 @@ export class LoyaltyService {
         const users = await this.userRepo.find();
 
         for (const user of users) {
-            if (user.metadata?.birthday) {
-                const birthday = new Date(user.metadata.birthday);
-                if (birthday.getMonth() + 1 === month && birthday.getDate() === day) {
-                    await this.awardBirthdayReward(user.id);
-                }
+            const b = user.metadata?.birthday;
+            if (b == null) continue;
+            const birthday = new Date(b as string | number | Date);
+            if (birthday.getMonth() + 1 === month && birthday.getDate() === day) {
+                await this.awardBirthdayReward(user.id);
             }
         }
     }

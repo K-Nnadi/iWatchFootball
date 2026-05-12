@@ -33,15 +33,26 @@ interface CompetitionStanding {
     positionChange?: number;
 }
 
-function useGetStandings(tcsIds: number[]) {
+function useCompetitionSeasonStandings(competitionId: number, seasonId: number | null) {
     return useQuery({
-        queryKey: ['/competitionStanding/query', tcsIds],
-        queryFn: () => clientInstance<CompetitionStanding[]>({
-            url: '/competitionStanding/query',
-            method: 'GET',
-            params: { where: { teamCompetitionSeasonId: { $in: tcsIds } }, take: 200 },
-        }),
-        enabled: tcsIds.length > 0,
+        queryKey: ['/competitionStanding/query', 'season', competitionId, seasonId],
+        queryFn: () =>
+            clientInstance<CompetitionStanding[]>({
+                url: '/competitionStanding/query',
+                method: 'GET',
+                params: {
+                    relations: ['teamCompetitionSeason'],
+                    where: {
+                        teamCompetitionSeason: {
+                            competitionId,
+                            seasonId,
+                        },
+                    },
+                    take: 500,
+                    order: { position: 'ASC' },
+                },
+            }),
+        enabled: Number.isFinite(competitionId) && seasonId != null,
     });
 }
 
@@ -80,9 +91,11 @@ export function CompetitionPage() {
         () => tcsAll.filter(t => t.seasonId === activeSeasonId),
         [tcsAll, activeSeasonId]
     );
-    const tcsIds = useMemo(() => tcsForSeason.map(t => t.id), [tcsForSeason]);
 
-    const { data: standings = [], isLoading: isLoadingStandings } = useGetStandings(tcsIds);
+    const { data: standings = [], isLoading: isLoadingStandings } = useCompetitionSeasonStandings(
+        competitionId,
+        activeSeasonId,
+    );
 
     // Teams lookup
     const { data: teamsData = [] } = useGetQueryTeam({ take: 500 } as any);

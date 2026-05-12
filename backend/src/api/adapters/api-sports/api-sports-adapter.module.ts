@@ -11,6 +11,7 @@ import { TransferModule } from '../../modules/transfer/transfer.module';
 import { TeamCompetitionSeasonModule } from '../../modules/teamCompetitionSeason/teamCompetitionSeason.module';
 import { FixtureModule } from '../../modules/fixture/fixture.module';
 import { StadiumModule } from '../../modules/stadium/stadium.module';
+import { TeamStadiumModule } from '../../modules/teamStadium/teamStadium.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { StadiumModule } from '../../modules/stadium/stadium.module';
     CompetitionStandingModule,
     TeamModule,
     TeamCompetitionSeasonModule,
+    TeamStadiumModule,
     PlayerModule,
     TransferModule,
     FixtureModule,

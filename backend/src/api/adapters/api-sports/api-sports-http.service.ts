@@ -28,6 +28,44 @@ export class ApiSportsHttpService {
   private readonly httpWrapper: HttpWrapper;
   private readonly authMode: 'direct' | 'rapidapi' | 'none';
 
+  /**
+   * HttpWrapper returns a full Axios response. Some chains may nest another layer.
+   * API-Sports may also return JSON as a string body in edge cases — normalize to a plain object.
+   */
+  private normalizeApiSportsBody(raw: unknown): unknown {
+    let cur: unknown = raw;
+    for (let i = 0; i < 5; i++) {
+      const o = cur as Record<string, unknown> | null;
+      const isAxiosLike =
+        o != null &&
+        typeof o === 'object' &&
+        !Array.isArray(o) &&
+        'data' in o &&
+        typeof o.status === 'number' &&
+        (('config' in o && o.config != null) ||
+          ('headers' in o && typeof o.headers === 'object' && o.headers != null));
+      if (isAxiosLike) {
+        cur = o.data as unknown;
+        continue;
+      }
+      break;
+    }
+    if (typeof cur === 'string') {
+      const t = cur.trim();
+      if (
+        (t.startsWith('{') && t.endsWith('}')) ||
+        (t.startsWith('[') && t.endsWith(']'))
+      ) {
+        try {
+          cur = JSON.parse(t) as unknown;
+        } catch {
+          /* keep string */
+        }
+      }
+    }
+    return cur;
+  }
+
   constructor() {
     const directKey = resolveDirectKey();
     const rapidKey =
@@ -76,7 +114,7 @@ export class ApiSportsHttpService {
         path,
         params: params as any,
       });
-      return resp.data;
+      return this.normalizeApiSportsBody(resp) as T;
     } catch (e: unknown) {
       if (isAxiosError(e) && e.response) {
         const status = e.response.status;

@@ -90,6 +90,61 @@ export class ApiSportsImportFixturesDto {
 
   @ApiPropertyOptional({ default: 50, description: 'Max /fixtures HTTP calls' })
   maxRequests?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'When true, after fixtures, one GET /standings for this league+season and upsert `competitionStanding` (+1 API request).',
+  })
+  syncStandingsAfter?: boolean;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'After fixtures (+0 HTTP), recomputes `competitionStanding` positions from persisted fixtures that have numeric scores (no form string). Runs in parallel with `syncStandingsAfter` when both are true.',
+  })
+  recomputeStandingsFromFixturesAfter?: boolean;
+
+  @ApiPropertyOptional({
+    minimum: 1,
+    maximum: 64,
+    default: 16,
+    description: 'Max concurrent DB upserts for fixture rows.',
+  })
+  fixtureUpsertConcurrency?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'After fixtures, paged `GET /teams?league=&season=` links each club registered **`venue`** to `teamStadium` as primary home (`metadata.relationship: primary_home`). Not derived from match venue.',
+  })
+  syncPrimaryVenuesAfter?: boolean;
+
+  @ApiPropertyOptional({
+    default: 5,
+    description: 'Max `/teams` pages when `syncPrimaryVenuesAfter`.',
+  })
+  primaryVenuesMaxPages?: number;
+
+  @ApiPropertyOptional({
+    default: 8,
+    description: 'Hard cap on `/teams` requests when `syncPrimaryVenuesAfter`.',
+  })
+  primaryVenuesMaxRequests?: number;
+}
+
+export class ApiSportsSyncPrimaryVenuesDto {
+  @ApiProperty({ description: 'API-Sports league id', example: 39 })
+  league!: number;
+
+  @ApiProperty({ description: 'API-Football season year (e.g. 2024)', example: 2024 })
+  season!: number;
+
+  @ApiPropertyOptional({ default: 5, description: 'Max GET /teams pages' })
+  maxPages?: number;
+
+  @ApiPropertyOptional({ default: 15, description: 'Hard cap on /teams HTTP calls' })
+  maxRequests?: number;
 }
 
 export class ApiSportsImportPlayersDto {
@@ -258,7 +313,7 @@ export class ApiSportsController {
   @ApiOperation({
     summary: 'Import fixtures into DB (API-Football /fixtures)',
     description:
-      'Upserts `fixture` rows by `metadata.providers.apisports.externalId`. Requires competition + season (yearStart/yearEnd) and teams already linked for that league.',
+      'Upserts `fixture` rows by `metadata.providers.apisports.externalId`, or merges into an existing same-competition fixture when kickoff differs by ≤6h and teams match (and both sides agree on score when finalized). Requires competition + season (yearStart/yearEnd) and teams already linked for that league. **`syncStandingsAfter`: true** adds one **`/standings`** call; **`recomputeStandingsFromFixturesAfter`: true** rebuilds ladder from scored fixtures (+0 requests). **`syncPrimaryVenuesAfter`: true** runs paged **`GET /teams`** and links each club **`venue`** to **`teamStadium`** as primary home (not match venue). Fixture upserts use **`fixtureUpsertConcurrency`**. With `from`/`to`, API-Football returns all fixtures in one call and rejects `page`; `allPages`/`maxPages` here are ignored.',
   })
   @ApiBody({ type: ApiSportsImportFixturesDto })
   async importFixtures(@Body() body: ApiSportsImportFixturesDto) {
@@ -268,6 +323,33 @@ export class ApiSportsController {
       from: String(body.from),
       to: String(body.to),
       allPages: body.allPages,
+      maxPages: body.maxPages != null ? Number(body.maxPages) : undefined,
+      maxRequests: body.maxRequests != null ? Number(body.maxRequests) : undefined,
+      syncStandingsAfter: body.syncStandingsAfter === true,
+      recomputeStandingsFromFixturesAfter: body.recomputeStandingsFromFixturesAfter === true,
+      fixtureUpsertConcurrency:
+        body.fixtureUpsertConcurrency != null ? Number(body.fixtureUpsertConcurrency) : undefined,
+      syncPrimaryVenuesAfter: body.syncPrimaryVenuesAfter === true,
+      primaryVenuesMaxPages:
+        body.primaryVenuesMaxPages != null ? Number(body.primaryVenuesMaxPages) : undefined,
+      primaryVenuesMaxRequests:
+        body.primaryVenuesMaxRequests != null ? Number(body.primaryVenuesMaxRequests) : undefined,
+    });
+  }
+
+  @Post('sync/import/team-primary-venues')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Link primary stadiums from API-Football GET /teams',
+    description:
+      'Fetches `GET /teams?league=&season=` (paged). For each response row, resolves the local team by `metadata.providers.apisports.externalId`, upserts `stadium` from the club **`venue`** (not fixture venue), and upserts **`teamStadium`** with `metadata.relationship: primary_home` and `source: api-sports-teams`.',
+  })
+  @ApiBody({ type: ApiSportsSyncPrimaryVenuesDto })
+  @ApiResponse({ status: 200, description: 'Counts + errors' })
+  async importTeamPrimaryVenues(@Body() body: ApiSportsSyncPrimaryVenuesDto) {
+    return this.apiSportsAdapterService.syncPrimaryVenuesFromTeamsLeagueSeason({
+      league: Number(body.league),
+      season: Number(body.season),
       maxPages: body.maxPages != null ? Number(body.maxPages) : undefined,
       maxRequests: body.maxRequests != null ? Number(body.maxRequests) : undefined,
     });
@@ -381,6 +463,26 @@ export class ApiSportsController {
   @ApiOkResponse(apiSportsRawResponseSchema)
   async discoverLiveFixtures() {
     return this.apiSportsAdapterService.discoverLiveFixtures();
+  }
+
+  @Get('discover/teams')
+  @ApiOperation({
+    summary: 'Teams (+ club venue) from API-Sports',
+    description:
+      'Proxies **GET /teams** — each entry includes **`team`** and **`venue`** (registered home ground). See [API-Football documentation v3](https://www.api-football.com/documentation-v3). Typical: `league` + `season`, or `id` / `team` for one club.',
+  })
+  @ApiQuery({ name: 'id', required: false, type: Number, description: 'API-Sports team id' })
+  @ApiQuery({ name: 'team', required: false, type: Number })
+  @ApiQuery({ name: 'league', required: false, type: Number })
+  @ApiQuery({ name: 'season', required: false, type: Number })
+  @ApiQuery({ name: 'country', required: false, type: String })
+  @ApiQuery({ name: 'code', required: false, type: String })
+  @ApiQuery({ name: 'venue', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiOkResponse(apiSportsRawResponseSchema)
+  async discoverTeams(@Query() query: Record<string, string | undefined>) {
+    return this.apiSportsAdapterService.discoverTeams(query);
   }
 
   @Get('discover/countries')

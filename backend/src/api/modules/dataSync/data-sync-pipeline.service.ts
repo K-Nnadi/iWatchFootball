@@ -288,8 +288,12 @@ export class DataSyncPipelineService {
         maxPages,
         maxRequests: cap,
       });
-      await this.syncJobService.addApiRequests(jobId, r.apiRequests);
-      remaining = Math.max(0, remaining - r.apiRequests);
+      const fixtureReq = r.apiRequests;
+      const standingsReq = r.standingsApiRequests ?? 0;
+      const primaryVenuesReq = r.primaryVenuesApiRequests ?? 0;
+      const totalUsed = fixtureReq + standingsReq + primaryVenuesReq;
+      await this.syncJobService.addApiRequests(jobId, totalUsed);
+      remaining = Math.max(0, remaining - totalUsed);
       perLeagueResults.push({ league: leagues[i], ...r });
       await this.syncJobService.patchStep(step.id, {
         cursor: { nextLeagueIndex: i + 1 },

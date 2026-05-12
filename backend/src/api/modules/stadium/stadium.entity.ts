@@ -1,11 +1,10 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToMany, OneToMany, OneToOne} from "typeorm";
+import {Entity, OneToMany, OneToOne} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Address} from "../address/address.entity";
-import {Team} from "../team/team.entity";
+import {TeamStadium} from "../teamStadium/teamStadium.entity";
 import {Fixture} from "../fixture/fixture.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
-import {forwardRef} from "@nestjs/common";
 import { SecurityFeature } from "../../../auth/decorators/security-feature.decorator";
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
@@ -22,7 +21,7 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'name', 'country', 'opened', 'teamIds', 'capacity', 'addressId', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'name', 'country', 'opened', 'capacity', 'addressId', 'metadata'
       ],
     },
     // Allow public access (no authentication required)
@@ -31,7 +30,7 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'name', 'country', 'opened', 'teamIds', 'capacity', 'addressId', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'name', 'country', 'opened', 'capacity', 'addressId', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Stadium> => ({ id: -1 }), fields: ['id'] },
@@ -39,14 +38,14 @@ import { FindOptionsWhere } from 'typeorm';
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can create stadiums
-      fields: ['name', 'country', 'opened', 'teamIds', 'capacity', 'addressId', 'metadata'],
+      fields: ['name', 'country', 'opened', 'capacity', 'addressId', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Stadium> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can update stadiums
-      fields: ['name', 'country', 'opened', 'teamIds', 'capacity', 'addressId', 'metadata'],
+      fields: ['name', 'country', 'opened', 'capacity', 'addressId', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Stadium> => ({ id: -1 }) },
   },
@@ -70,12 +69,9 @@ export class Stadium extends BaseDbEntity{
     @OptionalEntityColumn({db: {type: "timestamp"}})
     opened?: Date
 
-    @OptionalEntityColumn({db: {type: "int", array: true}})
-    teamIds?: number[]
-
     @ApiPropertyOptional()
-    @ManyToMany(() => Team, team => team.stadiums, {lazy: true})
-    teams?: Promise<Team[]>
+    @OneToMany(() => TeamStadium, (ts) => ts.stadium, {lazy: true})
+    teamStadiumLinks?: Promise<TeamStadium[]>
 
     @OptionalEntityColumn({db: {type: "int"}})
     capacity?: number
@@ -94,4 +90,4 @@ export class Stadium extends BaseDbEntity{
     fixtures?: Promise<Fixture[]>
 }
 
-export class CreateStadiumDTO extends PickType(Stadium, ["name", "country", "opened", "teamIds", "capacity", "addressId", 'metadata'] as const){}
+export class CreateStadiumDTO extends PickType(Stadium, ["name", "country", "opened", "capacity", "addressId", 'metadata'] as const){}

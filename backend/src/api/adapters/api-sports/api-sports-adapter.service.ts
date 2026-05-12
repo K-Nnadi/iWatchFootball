@@ -13,9 +13,17 @@ import { TeamType } from '../../enums/team.enum';
 import { TeamCompetitionSeasonService } from '../../modules/teamCompetitionSeason/teamCompetitionSeason.module';
 import { FixtureService } from '../../modules/fixture/fixture.module';
 import { StadiumService } from '../../modules/stadium/stadium.module';
+import { TeamStadiumService } from '../../modules/teamStadium/teamStadium.module';
+import {
+  deepMergeEntityMetadata,
+  ENTITY_METADATA_PROVIDER,
+} from '@iWatchFootball/base-tools/entity/entityMetadata';
 import { FixtureStatus, FixtureStage } from '../../enums/fixture.enum';
 
-const PROVIDER_KEY = 'apisports';
+const PROVIDER_KEY = ENTITY_METADATA_PROVIDER.APISPORTS;
+
+/** Max |Δkickoff| when matching API-Sports to an existing DB row from another provider */
+const FIXTURE_CORRELATION_MAX_MS = 6 * 60 * 60 * 1000;
 
 export type ApiSportsStandingsItem = {
   /** API-Sports league id (e.g. 39 = PL) */
@@ -69,11 +77,55 @@ export type ImportFixturesFromLeagueWindowOptions = {
   maxPages?: number;
   /** Cap total `/fixtures` HTTP calls for this import. */
   maxRequests?: number;
+  /**
+   * When true, after fixture upserts, one `GET /standings` for this league+season and upsert `competitionStanding`
+   * (same as `POST …/sync/standings` with one item). Costs +1 API request.
+   */
+  syncStandingsAfter?: boolean;
+  /** When true, recompute league table rows from locally stored fixtures that have numeric scores (+0 API requests). Can run alongside `syncStandingsAfter`; both writers may touch the same `competitionStanding` rows concurrently. */
+  recomputeStandingsFromFixturesAfter?: boolean;
+  /** Max concurrent fixture upserts against the DB (default 16). */
+  fixtureUpsertConcurrency?: number;
+  /**
+   * When true, after fixture upserts, one or more `GET /teams?league=&season=&page=` calls to link each club’s
+   * registered **`venue`** to `teamStadium` as **primary home** (metadata `relationship: primary_home`).
+   * Does **not** use match venue (avoids neutral / cup-final grounds). Costs extra API quota.
+   */
+  syncPrimaryVenuesAfter?: boolean;
+  /** Cap `/teams` pages when `syncPrimaryVenuesAfter` (default 5). */
+  primaryVenuesMaxPages?: number;
+  /** Hard cap on `/teams` requests when `syncPrimaryVenuesAfter` (default 8). */
+  primaryVenuesMaxRequests?: number;
+};
+
+export type SyncPrimaryVenuesFromTeamsOptions = {
+  league: number;
+  season: number;
+  /** Max GET /teams pages (default 5). */
+  maxPages?: number;
+  /** Hard cap on /teams requests (default 8). */
+  maxRequests?: number;
+};
+
+type StadiumImportCache = { rows: any[] | null };
+
+type ApiSportsFixtureImportContext = {
+  competitionId: number;
+  seasonId: number;
+  /** apisports.fixture external id → fixture row */
+  fixtureByApisportsExternalId: Map<string, any>;
+  /** Preloaded fixtures for correlation search (subset for comp+season) */
+  correlationPool: any[];
+  stadiumCache: StadiumImportCache;
+  /** Chain of exclusive sections (correlation + fixture upsert indexing) — must remain ordered. */
+  exclusiveTail: Promise<void>;
 };
 
 @Injectable()
 export class ApiSportsAdapterService {
   private readonly logger = new Logger(ApiSportsAdapterService.name);
+  /** Serialize venue lookups/creates keyed by venue id/name so parallel imports do not duplicate `stadium` rows */
+  private readonly stadiumVenueEnsureTailByKey = new Map<string, Promise<void>>();
 
   constructor(
     private readonly http: ApiSportsHttpService,
@@ -86,11 +138,98 @@ export class ApiSportsAdapterService {
     private readonly transferService: TransferService,
     private readonly fixtureService: FixtureService,
     private readonly stadiumService: StadiumService,
+    private readonly teamStadiumService: TeamStadiumService,
   ) {}
 
   private getProviderExternalId(metadata: any): string | null {
     const v = metadata?.providers?.[PROVIDER_KEY]?.externalId;
     return v != null ? String(v) : null;
+  }
+
+  private mergeApisportsFixtureMetadata(prev: Record<string, any>, incoming: Record<string, any>): any {
+    return deepMergeEntityMetadata(
+      prev && typeof prev === 'object' ? prev : {},
+      incoming && typeof incoming === 'object' ? incoming : {},
+    );
+  }
+
+  private scoresCorrelationCompatible(
+    fixtureRow: { homeScore?: number | null; awayScore?: number | null },
+    incoming: { homeScore?: number; awayScore?: number },
+  ): boolean {
+    const eh = fixtureRow.homeScore;
+    const ea = fixtureRow.awayScore;
+    const ih = incoming.homeScore;
+    const ia = incoming.awayScore;
+    const existingComplete =
+      eh != null && ea != null && Number.isFinite(Number(eh)) && Number.isFinite(Number(ea));
+    const incomingComplete =
+      ih !== undefined && ia !== undefined && Number.isFinite(Number(ih)) && Number.isFinite(Number(ia));
+    if (existingComplete && incomingComplete) {
+      return Number(eh) === Number(ih) && Number(ea) === Number(ia);
+    }
+    return true;
+  }
+
+  private conflictingOtherApisportsId(metadata: any, apiFixtureId: number): boolean {
+    const cur = this.getProviderExternalId(metadata);
+    return cur != null && cur !== '' && cur !== String(apiFixtureId);
+  }
+
+  private pickCorrelationCandidateFromPool(
+    pool: readonly any[],
+    opts: {
+      homeTeamId: number;
+      awayTeamId: number;
+      scheduledAtMs: number;
+      incomingScores: { homeScore?: number; awayScore?: number };
+      apiFixtureId: number;
+    },
+  ): any | null {
+    const ranked: Array<{ f: any; dt: number }> = [];
+    for (const f of pool) {
+      if (!f?.id) continue;
+      if (f.homeTeamId !== opts.homeTeamId || f.awayTeamId !== opts.awayTeamId) continue;
+      if (this.conflictingOtherApisportsId(f.metadata, opts.apiFixtureId)) continue;
+      if (!this.scoresCorrelationCompatible(f, opts.incomingScores)) continue;
+      const t = f.date instanceof Date ? f.date.getTime() : new Date(f.date as any).getTime();
+      if (Number.isNaN(t)) continue;
+      const delta = Math.abs(t - opts.scheduledAtMs);
+      if (delta <= FIXTURE_CORRELATION_MAX_MS) ranked.push({ f, dt: delta });
+    }
+    if (!ranked.length) return null;
+    ranked.sort((a, b) => a.dt - b.dt);
+    return ranked[0].f;
+  }
+
+  private enqueueFixtureImportExclusive(
+    ctx: ApiSportsFixtureImportContext,
+    fn: () => Promise<void>,
+  ): Promise<void> {
+    const prev = ctx.exclusiveTail;
+    const p = prev.then(fn);
+    ctx.exclusiveTail = p.then(
+      () => undefined,
+      () => undefined,
+    );
+    return p;
+  }
+
+  private async runPool<T>(
+    items: readonly T[],
+    concurrency: number,
+    worker: (item: T, index: number) => Promise<void>,
+  ): Promise<void> {
+    const n = Math.max(1, Math.min(64, Math.floor(concurrency)));
+    let next = 0;
+    async function runner() {
+      while (true) {
+        const idx = next++;
+        if (idx >= items.length) break;
+        await worker(items[idx], idx);
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(n, items.length) }, () => runner()));
   }
 
   private async sleep(ms: number) {
@@ -189,24 +328,18 @@ export class ApiSportsAdapterService {
     apiPlayerId: number,
     patch?: Record<string, any>,
   ): Promise<any> {
-    const nextProviders = {
-      ...(player?.metadata?.providers ?? {}),
-      [PROVIDER_KEY]: { externalId: String(apiPlayerId) },
-    };
-    const nextMeta = {
-      ...(player?.metadata ?? {}),
-      source: player?.metadata?.source ?? 'api-sports',
-      providers: nextProviders,
+    const nextMeta = deepMergeEntityMetadata((player?.metadata ?? {}) as Record<string, unknown>, {
+      source: String(player?.metadata?.source ?? 'api-sports'),
+      providers: { [PROVIDER_KEY]: { externalId: String(apiPlayerId) } },
       apisports: {
-        ...(player?.metadata?.apisports ?? {}),
         playerId: apiPlayerId,
         lastImportedAt: new Date().toISOString(),
       },
-    };
+    } as Record<string, unknown>);
     return this.playerService.update(player.id, {
       id: player.id,
-      metadata: nextMeta as any,
       ...(patch ?? {}),
+      metadata: nextMeta as any,
     } as any);
   }
 
@@ -245,20 +378,16 @@ export class ApiSportsAdapterService {
 
   private async attachApiSportsProviderToTeam(team: any, apiTeam: any, teamCountry?: string): Promise<any> {
     const apiId = apiTeam?.id != null ? Number(apiTeam.id) : null;
-    const nextProviders = {
-      ...(team?.metadata?.providers ?? {}),
-      [PROVIDER_KEY]: { externalId: apiId != null ? String(apiId) : String(apiTeam?.id ?? '') },
-    };
-    const nextMeta = {
-      ...(team?.metadata ?? {}),
-      source: team?.metadata?.source ?? 'api-sports',
+    const nextMeta = deepMergeEntityMetadata((team?.metadata ?? {}) as Record<string, unknown>, {
+      source: String(team?.metadata?.source ?? 'api-sports'),
+      providers: {
+        [PROVIDER_KEY]: { externalId: apiId != null ? String(apiId) : String(apiTeam?.id ?? '') },
+      },
       apisports: {
-        ...(team?.metadata?.apisports ?? {}),
         ...(apiId != null ? { teamId: apiId } : {}),
         lastImportedAt: new Date().toISOString(),
       },
-      providers: nextProviders,
-    };
+    } as Record<string, unknown>);
 
     return this.teamService.update(team.id, {
       id: team.id,
@@ -335,7 +464,13 @@ export class ApiSportsAdapterService {
       teamId,
       competitionId,
       seasonId,
-      metadata: { source: 'api-sports', lastSync: new Date().toISOString() },
+      metadata: deepMergeEntityMetadata(
+        {},
+        {
+          source: 'api-sports',
+          lastSync: new Date().toISOString(),
+        } as Record<string, unknown>,
+      ) as any,
     } as any);
     return created.id;
   }
@@ -450,6 +585,14 @@ export class ApiSportsAdapterService {
               photoUrl: existingByApi.photoUrl ?? p?.photo ?? undefined,
               teamIds: existingByApi.teamIds ?? teamIds,
               nickname: existingByApi.nickname ?? (shortName && shortName !== existingByApi.name ? shortName : undefined),
+              metadata: deepMergeEntityMetadata((existingByApi.metadata ?? {}) as Record<string, unknown>, {
+                source: String(existingByApi.metadata?.source ?? 'api-sports'),
+                providers: { [PROVIDER_KEY]: { externalId: String(apiPlayerId) } },
+                apisports: {
+                  playerId: apiPlayerId,
+                  lastImportedAt: new Date().toISOString(),
+                },
+              } as Record<string, unknown>) as any,
             } as any);
             playersUpdated += 1;
             continue;
@@ -621,6 +764,13 @@ export class ApiSportsAdapterService {
           item.competitionId,
           item.seasonId,
         );
+        const standingMeta = {
+          source: 'api-sports',
+          league: item.league,
+          season: item.season,
+          lastSync: new Date().toISOString(),
+          provider: PROVIDER_KEY,
+        };
         const payload: CreateCompetitionStandingDTO = {
           teamCompetitionSeasonId,
           position: Number(row.rank ?? row.position ?? 0) || 0,
@@ -633,13 +783,7 @@ export class ApiSportsAdapterService {
           goalDifference: goalDiff,
           points: Number(row.points) || 0,
           form: row.form != null ? String(row.form) : undefined,
-          metadata: {
-            source: 'api-sports',
-            league: item.league,
-            season: item.season,
-            lastSync: new Date().toISOString(),
-            provider: PROVIDER_KEY,
-          } as any,
+          metadata: standingMeta as any,
         } as any;
 
         const existing = await this.findExistingStanding(
@@ -649,6 +793,10 @@ export class ApiSportsAdapterService {
           await this.competitionStandingService.update(existing.id, {
             ...payload,
             id: existing.id,
+            metadata: deepMergeEntityMetadata(
+              (existing.metadata ?? {}) as Record<string, unknown>,
+              standingMeta as Record<string, unknown>,
+            ) as any,
           } as any);
         } else {
           await this.competitionStandingService.create(payload);
@@ -764,14 +912,12 @@ export class ApiSportsAdapterService {
           id: player.id,
           nationality: nationality != null ? String(nationality) : player.nationality,
           height: heightCm != null && !Number.isNaN(heightCm) ? heightCm : player.height,
-          metadata: {
-            ...m,
+          metadata: deepMergeEntityMetadata(m as Record<string, unknown>, {
             lastApiSportsEnrichAt: new Date().toISOString(),
             providers: {
-              ...m.providers,
               [PROVIDER_KEY]: { externalId: String(apiId) },
             },
-          },
+          } as Record<string, unknown>),
         };
         if (birth) {
           next.dateOfBirth = new Date(birth);
@@ -939,6 +1085,122 @@ export class ApiSportsAdapterService {
     return out;
   }
 
+  /** Coerce numeric GET /teams params; leave `name`, `country`, `code`, `search` as strings. */
+  private cleanTeamsDiscoverQuery(query: Record<string, string | undefined>): Record<string, string | number> {
+    const numericKeys = new Set(['id', 'league', 'season', 'team', 'venue', 'page']);
+    const out: Record<string, string | number> = {};
+    for (const [k, v] of Object.entries(query)) {
+      if (v === undefined || v === '') continue;
+      if (numericKeys.has(k) && /^\d+$/.test(v)) {
+        out[k] = parseInt(v, 10);
+      } else {
+        out[k] = v;
+      }
+    }
+    return out;
+  }
+
+  /** Proxies GET /teams — club `venue` is the registered home ground (see `syncPrimaryVenuesFromTeamsLeagueSeason`). */
+  async discoverTeams(query: Record<string, string | undefined>): Promise<any> {
+    return this.http.get('/teams', this.cleanTeamsDiscoverQuery(query) as any);
+  }
+
+  /**
+   * Links each local team (matched by `metadata.providers.apisports.externalId`) to its **primary** stadium
+   * using API-Football **`GET /teams?league=&season=`** `venue` object — not fixture match venue.
+   */
+  async syncPrimaryVenuesFromTeamsLeagueSeason(options: SyncPrimaryVenuesFromTeamsOptions): Promise<{
+    requests: number;
+    pagesFetched: number;
+    linked: number;
+    skipped: number;
+    errors: string[];
+  }> {
+    const errors: string[] = [];
+    let requests = 0;
+    let pagesFetched = 0;
+    let linked = 0;
+    let skipped = 0;
+    const maxPages = Math.max(1, options.maxPages ?? 5);
+    const maxRequests = Math.max(1, options.maxRequests ?? 8);
+    const stadiumCache: StadiumImportCache = { rows: null };
+
+    for (let page = 1; page <= maxPages; page += 1) {
+      if (requests >= maxRequests) break;
+      let data: any;
+      try {
+        data = await this.http.get('/teams', {
+          league: options.league,
+          season: options.season,
+          page,
+        });
+        requests += 1;
+        pagesFetched += 1;
+      } catch (e: any) {
+        errors.push(`/teams page ${page}: ${e?.message ?? e}`);
+        break;
+      }
+
+      if (data?.errors?.length) {
+        errors.push(`/teams page ${page}: ${JSON.stringify(data.errors)}`);
+        break;
+      }
+
+      const response = Array.isArray(data?.response) ? data.response : [];
+      if (!response.length) break;
+
+      for (const entry of response) {
+        const apiTeam = entry?.team;
+        const venue = entry?.venue;
+        const apiTeamId = apiTeam?.id != null ? Number(apiTeam.id) : null;
+        if (!apiTeamId) {
+          skipped += 1;
+          continue;
+        }
+        const venueId = venue?.id != null ? Number(venue.id) : null;
+        if (!venueId || !Number.isFinite(venueId)) {
+          skipped += 1;
+          continue;
+        }
+
+        const localTeam = await this.findLocalTeamByApiSportsId(apiTeamId);
+        if (!localTeam?.id) {
+          skipped += 1;
+          continue;
+        }
+
+        const country =
+          apiTeam?.country != null && String(apiTeam.country).trim() !== ''
+            ? String(apiTeam.country).trim()
+            : venue?.city != null && String(venue.city).trim() !== ''
+              ? String(venue.city).trim()
+              : 'Unknown';
+
+        try {
+          const stadiumId = await this.ensureStadiumFromApiVenueForImport(stadiumCache, venue, country);
+          await this.teamStadiumService.ensurePrimaryHomeFromApiSportsTeams(localTeam.id, stadiumId);
+          linked += 1;
+        } catch (e: any) {
+          errors.push(`team api id ${apiTeamId} venue ${venueId}: ${e?.message ?? e}`);
+        }
+      }
+
+      const paging = data?.paging;
+      if (paging?.current != null && paging?.total != null) {
+        if (Number(paging.current) >= Number(paging.total)) break;
+      } else {
+        break;
+      }
+
+      await this.sleep(API_SPORTS_CONFIG.requestDelayMs);
+    }
+
+    this.logger.log(
+      `syncPrimaryVenuesFromTeamsLeagueSeason: league ${options.league} season ${options.season} — ${linked} linked, ${skipped} skipped, ${requests} /teams req`,
+    );
+    return { requests, pagesFetched, linked, skipped, errors };
+  }
+
   /**
    * GET /fixtures — see https://www.api-football.com/documentation-v3
    *
@@ -948,8 +1210,11 @@ export class ApiSportsAdapterService {
    * - **Many fixture IDs, one call:** `ids=id1-id2-id3` (hyphen-separated).
    * - **Live:** use {@link discoverLiveFixtures} (`live=all`) instead of polling each fixture’s events.
    *
+   * **Pagination:** upstream rejects `page` when using **`from` + `to` (date-range) together with league context** —
+   * the API returns the full slice in one response; do not send `page`.
+   *
    * Query params `allPages` / `maxPages` are **local only**: when `allPages=true`, fetches `page=1..n`
-   * until `paging` ends or `maxPages` is hit (counts as multiple API requests).
+   * until `paging` ends or `maxPages` is hit (counts as multiple API requests), **unless** `from`+`to` forbid `page`.
    */
   async discoverFixtures(query: Record<string, string | undefined>): Promise<any> {
     const allPages =
@@ -972,16 +1237,21 @@ export class ApiSportsAdapterService {
     let page = 1;
     const combined: any[] = [];
     let last: any = null;
+    /** API-Football: `page` is invalid alongside `from` + `to` → empty response + errors.page */
+    const omitPage = Boolean(sanitized.from && sanitized.to);
 
     while (page <= maxPages) {
-      const params = this.cleanFixturesQuery({
-        ...sanitized,
-        page: String(page),
-      });
+      const params = this.cleanFixturesQuery(
+        omitPage ? sanitized : { ...sanitized, page: String(page) },
+      );
       const data = await this.http.get('/fixtures', params as any);
       last = data;
       const chunk = Array.isArray(data?.response) ? data.response : [];
       combined.push(...chunk);
+
+      if (omitPage) {
+        break;
+      }
 
       const paging = data?.paging;
       if (paging?.current != null && paging?.total != null) {
@@ -999,7 +1269,11 @@ export class ApiSportsAdapterService {
 
     return {
       get: last?.get,
-      parameters: { ...(typeof last?.parameters === 'object' && last.parameters ? last.parameters : {}), allPagesMerged: true },
+      parameters: {
+        ...(typeof last?.parameters === 'object' && last.parameters ? last.parameters : {}),
+        allPagesMerged: true,
+        ...(omitPage ? { note: 'date-range query: single request without page param' } : {}),
+      },
       errors: last?.errors ?? [],
       results: combined.length,
       paging: { current: 1, total: 1 },
@@ -1013,16 +1287,67 @@ export class ApiSportsAdapterService {
     return this.http.get('/fixtures', { live: 'all' } as any);
   }
 
-  private async findFixtureByApiSportsId(apiFixtureId: number): Promise<any | null> {
-    if (!apiFixtureId) return null;
-    const key = String(apiFixtureId);
-    const fixtures = await this.fixtureService.getQuery({});
-    return (
-      fixtures.find((f) => {
-        const m = f?.metadata ?? {};
-        return this.getProviderExternalId(m) === key;
-      }) ?? null
-    );
+
+  /** One stadium load shared per import batch; creates are keyed and serialized across parallel worker tasks. */
+  private async ensureStadiumFromApiVenueForImport(
+    cache: StadiumImportCache,
+    venue: any,
+    countryFallback: string,
+  ): Promise<number> {
+    const country = countryFallback && countryFallback !== '' ? countryFallback : 'Unknown';
+    const vid = venue?.id != null ? Number(venue.id) : null;
+    const vname = venue?.name != null ? String(venue.name).trim() : '';
+    const venueKey =
+      vid != null && Number.isFinite(vid) ? `id:${vid}` : `name:${country}:${vname || '_'}`;
+
+    const previousLock = this.stadiumVenueEnsureTailByKey.get(venueKey) ?? Promise.resolve();
+
+    let stadiumId = NaN;
+
+    const currentLock = previousLock.then(async () => {
+      if (!cache.rows) {
+        cache.rows = await this.stadiumService.getQuery({});
+      }
+      const rows = cache.rows!;
+      if (vid) {
+        const byProv = rows.find(
+          (s) => String(s?.metadata?.providers?.[PROVIDER_KEY]?.externalId ?? '') === String(vid),
+        );
+        if (byProv?.id != null) {
+          stadiumId = byProv.id;
+          return;
+        }
+      }
+      if (vname) {
+        const byName = rows.find((s) => String(s?.name ?? '').trim() === vname);
+        if (byName?.id != null) {
+          stadiumId = byName.id;
+          return;
+        }
+      }
+      const name = vname || 'Unknown venue';
+      const created = await this.stadiumService.create({
+        name,
+        country,
+        metadata: {
+          source: 'api-sports',
+          apisports: vid != null ? { venueId: vid } : {},
+          providers: vid != null ? { [PROVIDER_KEY]: { externalId: String(vid) } } : {},
+        } as any,
+      } as any);
+      rows.push(created);
+      stadiumId = created.id;
+    });
+
+    this.stadiumVenueEnsureTailByKey.set(venueKey, currentLock);
+    try {
+      await currentLock;
+      return stadiumId;
+    } finally {
+      if (this.stadiumVenueEnsureTailByKey.get(venueKey) === currentLock) {
+        this.stadiumVenueEnsureTailByKey.delete(venueKey);
+      }
+    }
   }
 
   private mapApiFixtureStatus(short: string | undefined): FixtureStatus {
@@ -1049,32 +1374,162 @@ export class ApiSportsAdapterService {
     return FixtureStage.LEAGUE;
   }
 
-  private async ensureStadiumFromApiVenue(venue: any, countryFallback: string): Promise<number> {
-    const country = countryFallback && countryFallback !== '' ? countryFallback : 'Unknown';
-    const vid = venue?.id != null ? Number(venue.id) : null;
-    const vname = venue?.name != null ? String(venue.name).trim() : '';
-    const stadiums = await this.stadiumService.getQuery({});
-    if (vid) {
-      const byProv = stadiums.find(
-        (s) => String(s?.metadata?.providers?.[PROVIDER_KEY]?.externalId ?? '') === String(vid),
-      );
-      if (byProv?.id) return byProv.id;
+  /**
+   * Build `competitionStanding` positions from persisted fixtures (+0 HTTP). Cups / multi-groups are flattened into one ladder.
+   */
+  private async recomputeCompetitionStandingFromFixtures(
+    competitionId: number,
+    seasonId: number,
+  ): Promise<number> {
+    const fixtures = await this.fixtureService.getQuery({
+      where: { competitionId, seasonId } as any,
+    });
+    type Acc = {
+      played: number;
+      wins: number;
+      draws: number;
+      losses: number;
+      goalsFor: number;
+      goalsAgainst: number;
+      points: number;
+    };
+    const statsByTeamId = new Map<number, Acc>();
+    const ensureBucket = (teamId: number): Acc => {
+      const ex = statsByTeamId.get(teamId);
+      if (ex) return ex;
+      const init: Acc = {
+        played: 0,
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        goalsFor: 0,
+        goalsAgainst: 0,
+        points: 0,
+      };
+      statsByTeamId.set(teamId, init);
+      return init;
+    };
+
+    for (const fixture of fixtures ?? []) {
+      let homeScore: number;
+      let awayScore: number;
+      const fh = fixture.homeScore;
+      const fa = fixture.awayScore;
+      if (
+        fh !== undefined &&
+        fh !== null &&
+        fa !== undefined &&
+        fa !== null &&
+        Number.isFinite(Number(fh)) &&
+        Number.isFinite(Number(fa))
+      ) {
+        homeScore = Number(fh);
+        awayScore = Number(fa);
+      } else {
+        const meta: any = fixture?.metadata ?? {};
+        homeScore =
+          typeof meta.homeScore === 'number' ? meta.homeScore : Number(meta.homeScore);
+        awayScore =
+          typeof meta.awayScore === 'number' ? meta.awayScore : Number(meta.awayScore);
+      }
+      const hasScores = Number.isFinite(homeScore) && Number.isFinite(awayScore);
+      if (!fixture?.homeTeamId || !fixture?.awayTeamId || !hasScores) continue;
+
+      const home = ensureBucket(fixture.homeTeamId);
+      const away = ensureBucket(fixture.awayTeamId);
+
+      home.played += 1;
+      away.played += 1;
+      home.goalsFor += homeScore;
+      home.goalsAgainst += awayScore;
+      away.goalsFor += awayScore;
+      away.goalsAgainst += homeScore;
+
+      if (homeScore > awayScore) {
+        home.wins += 1;
+        away.losses += 1;
+        home.points += 3;
+      } else if (homeScore < awayScore) {
+        away.wins += 1;
+        home.losses += 1;
+        away.points += 3;
+      } else {
+        home.draws += 1;
+        away.draws += 1;
+        home.points += 1;
+        away.points += 1;
+      }
     }
-    if (vname) {
-      const [byName] = await this.stadiumService.getQuery({ where: { name: vname } as any });
-      if (byName?.id) return byName.id;
+
+    const joins = await this.teamCompetitionSeasonService.getQuery({
+      where: { competitionId, seasonId } as any,
+    });
+
+    type Row = { teamCompetitionSeasonId: number; teamId: number; stats: Acc };
+    const table: Row[] = (joins ?? []).map((j: any) => ({
+      teamCompetitionSeasonId: j.id,
+      teamId: j.teamId,
+      stats:
+        statsByTeamId.get(j.teamId) ?? {
+          played: 0,
+          wins: 0,
+          draws: 0,
+          losses: 0,
+          goalsFor: 0,
+          goalsAgainst: 0,
+          points: 0,
+        },
+    }));
+
+    table.sort((a, b) => {
+      if (b.stats.points !== a.stats.points) return b.stats.points - a.stats.points;
+      const gda = a.stats.goalsFor - a.stats.goalsAgainst;
+      const gdb = b.stats.goalsFor - b.stats.goalsAgainst;
+      if (gdb !== gda) return gdb - gda;
+      if (b.stats.goalsFor !== a.stats.goalsFor) return b.stats.goalsFor - a.stats.goalsFor;
+      return Number(a.teamId) - Number(b.teamId);
+    });
+
+    let processed = 0;
+    for (let idx = 0; idx < table.length; idx += 1) {
+      const { teamCompetitionSeasonId, stats } = table[idx];
+      const position = idx + 1;
+      const goalDifference = stats.goalsFor - stats.goalsAgainst;
+      const payload: CreateCompetitionStandingDTO = {
+        teamCompetitionSeasonId,
+        position,
+        played: stats.played,
+        won: stats.wins,
+        drawn: stats.draws,
+        lost: stats.losses,
+        goalsFor: stats.goalsFor,
+        goalsAgainst: stats.goalsAgainst,
+        goalDifference,
+        points: stats.points,
+        metadata: {
+          source: 'computed-from-fixtures',
+          lastComputedAt: new Date().toISOString(),
+          provider: PROVIDER_KEY,
+        } as any,
+      } as any;
+
+      const existing = await this.findExistingStanding(teamCompetitionSeasonId);
+      if (existing) {
+        await this.competitionStandingService.update(existing.id, {
+          ...payload,
+          id: existing.id,
+          metadata: deepMergeEntityMetadata(
+            (existing.metadata ?? {}) as Record<string, unknown>,
+            (payload.metadata ?? {}) as Record<string, unknown>,
+          ) as any,
+        } as any);
+      } else {
+        await this.competitionStandingService.create(payload);
+      }
+      processed += 1;
     }
-    const name = vname || 'Unknown venue';
-    const created = await this.stadiumService.create({
-      name,
-      country,
-      metadata: {
-        source: 'api-sports',
-        apisports: vid != null ? { venueId: vid } : {},
-        providers: vid != null ? { [PROVIDER_KEY]: { externalId: String(vid) } } : {},
-      } as any,
-    } as any);
-    return created.id;
+
+    return processed;
   }
 
   /** Prefer `goals`, then full-time `score`, when API returns numeric finals (nullable before kickoff). */
@@ -1100,9 +1555,11 @@ export class ApiSportsAdapterService {
 
   private async upsertFixtureFromApiSportsRow(
     row: any,
-    competitionId: number,
-    seasonId: number,
+    ctx: ApiSportsFixtureImportContext,
   ): Promise<'created' | 'updated' | 'skipped'> {
+    const competitionId = ctx.competitionId;
+    const seasonId = ctx.seasonId;
+
     const fx = row?.fixture;
     const league = row?.league;
     const teams = row?.teams;
@@ -1118,7 +1575,7 @@ export class ApiSportsAdapterService {
     if (!home?.id || !away?.id) return 'skipped';
 
     const leagueCountry = league?.country != null ? String(league.country) : 'Unknown';
-    const stadiumId = await this.ensureStadiumFromApiVenue(fx?.venue, leagueCountry);
+    const stadiumId = await this.ensureStadiumFromApiVenueForImport(ctx.stadiumCache, fx?.venue, leagueCountry);
 
     const date = fx?.date ? new Date(fx.date) : null;
     if (!date || Number.isNaN(date.getTime())) return 'skipped';
@@ -1159,23 +1616,71 @@ export class ApiSportsAdapterService {
       metadata: meta,
     };
 
-    const existing = await this.findFixtureByApiSportsId(apiId);
-    if (existing) {
-      await this.fixtureService.update(existing.id, { ...payload, id: existing.id } as any);
-      await this.ensureTeamCompetitionSeasonId(home.id, competitionId, seasonId);
-      await this.ensureTeamCompetitionSeasonId(away.id, competitionId, seasonId);
-      return 'updated';
-    }
+    let outcome!: 'created' | 'updated';
+    await this.enqueueFixtureImportExclusive(ctx, async () => {
+      const apiKey = String(apiId);
+      let existing = ctx.fixtureByApisportsExternalId.get(apiKey) ?? null;
+      if (!existing) {
+        existing = this.pickCorrelationCandidateFromPool(ctx.correlationPool, {
+          homeTeamId: home.id,
+          awayTeamId: away.id,
+          scheduledAtMs: date.getTime(),
+          incomingScores: scorePair,
+          apiFixtureId: apiId,
+        });
+        if (existing) {
+          this.logger.debug(
+            `Cross-provider correlate: API-Sports fixture ${apiId} → fixture ${existing.id} (±${FIXTURE_CORRELATION_MAX_MS / 3_600_000}h kickoff window)`,
+          );
+        }
+      }
 
-    await this.fixtureService.create(payload);
-    await this.ensureTeamCompetitionSeasonId(home.id, competitionId, seasonId);
-    await this.ensureTeamCompetitionSeasonId(away.id, competitionId, seasonId);
-    return 'created';
+      if (existing) {
+        const prevMeta =
+          existing.metadata && typeof existing.metadata === 'object'
+            ? { ...(existing.metadata as object) }
+            : {};
+        const mergedMeta = this.mergeApisportsFixtureMetadata(prevMeta as Record<string, any>, meta);
+        await this.fixtureService.update(existing.id, {
+          ...payload,
+          id: existing.id,
+          metadata: mergedMeta,
+        } as any);
+        ctx.fixtureByApisportsExternalId.set(apiKey, {
+          ...existing,
+          ...payload,
+          id: existing.id,
+          metadata: mergedMeta,
+        });
+        outcome = 'updated';
+        return;
+      }
+
+      const created = await this.fixtureService.create(payload);
+      ctx.fixtureByApisportsExternalId.set(apiKey, created);
+      outcome = 'created';
+    });
+
+    await Promise.all([
+      this.ensureTeamCompetitionSeasonId(home.id, competitionId, seasonId),
+      this.ensureTeamCompetitionSeasonId(away.id, competitionId, seasonId),
+    ]);
+
+    return outcome;
   }
 
   /**
    * Idempotent import of fixtures for `GET /fixtures?league=&season=&from=&to=` into `fixture` rows.
+   * **Pagination:** API-Football does not allow `page` with `from`+`to`; the provider returns the full window in **one request**
+   * (options `allPages` / `maxPages` are ignored — kept on the DTO for backward compatibility only).
+   * Primary key: `metadata.providers.apisports.externalId`. When missing locally, merges into another row that matches
+   * competition + season + home + away within a 6-hour kickoff window and (when known) agreeing full-time scores.
    * Requires local `competition` (API league id) and `season` (yearStart=seasonYear, yearEnd=seasonYear+1), and teams with provider ids.
+   *
+   * **Performance:** fixture upserts use bounded parallelism (`fixtureUpsertConcurrency`). One preload of season fixtures avoids N full-table scans;
+   * stadium rows are cached and venue creates are keyed. **Standings:** set `syncStandingsAfter` for `GET /standings` (+1 request), `recomputeStandingsFromFixturesAfter` for a pure local ladder (+0 request).
+   * If both flags are true, those two steps run concurrently; both write `competitionStanding` rows (ordering is not deterministic).
+   * **Primary venues:** set `syncPrimaryVenuesAfter` for `GET /teams` (club `venue` → `teamStadium`, not match venue).
    */
   async importFixturesFromLeagueWindow(
     options: ImportFixturesFromLeagueWindowOptions,
@@ -1184,6 +1689,12 @@ export class ApiSportsAdapterService {
     updated: number;
     skipped: number;
     apiRequests: number;
+    standingsApiRequests: number;
+    standingsProcessed: number;
+    standingsRecomputed: number;
+    primaryVenuesLinked: number;
+    primaryVenuesSkipped: number;
+    primaryVenuesApiRequests: number;
     errors: string[];
   }> {
     const errors: string[] = [];
@@ -1191,8 +1702,6 @@ export class ApiSportsAdapterService {
     let updated = 0;
     let skipped = 0;
     let apiRequests = 0;
-    const allPages = options.allPages !== false;
-    const maxPages = Math.min(50, Math.max(1, options.maxPages ?? 20));
     const maxReq = Math.max(1, options.maxRequests ?? 50);
 
     const competition = await this.findCompetitionByApiSportsLeagueId(options.leagueApiId);
@@ -1202,6 +1711,12 @@ export class ApiSportsAdapterService {
         updated: 0,
         skipped: 0,
         apiRequests: 0,
+        standingsApiRequests: 0,
+        standingsProcessed: 0,
+        standingsRecomputed: 0,
+        primaryVenuesLinked: 0,
+        primaryVenuesSkipped: 0,
+        primaryVenuesApiRequests: 0,
         errors: [`No local competition for API league ${options.leagueApiId}`],
       };
     }
@@ -1213,11 +1728,35 @@ export class ApiSportsAdapterService {
         updated: 0,
         skipped: 0,
         apiRequests: 0,
+        standingsApiRequests: 0,
+        standingsProcessed: 0,
+        standingsRecomputed: 0,
+        primaryVenuesLinked: 0,
+        primaryVenuesSkipped: 0,
+        primaryVenuesApiRequests: 0,
         errors: [
           `No local season for ${options.seasonYear}-${options.seasonYear + 1}; import leagues/seasons first`,
         ],
       };
     }
+
+    const fixturesForSeason = await this.fixtureService.getQuery({
+      where: { competitionId: competition.id, seasonId: seasonRow.id } as any,
+    });
+    const fixtureByApisportsExternalId = new Map<string, any>();
+    for (const f of fixturesForSeason ?? []) {
+      const ext = this.getProviderExternalId(f?.metadata);
+      if (!ext) continue;
+      fixtureByApisportsExternalId.set(ext, f);
+    }
+    const ctx: ApiSportsFixtureImportContext = {
+      competitionId: competition.id,
+      seasonId: seasonRow.id,
+      fixtureByApisportsExternalId,
+      correlationPool: [...(fixturesForSeason ?? [])],
+      stadiumCache: { rows: null },
+      exclusiveTail: Promise.resolve(),
+    };
 
     const baseQuery: Record<string, string | undefined> = {
       league: String(options.leagueApiId),
@@ -1226,52 +1765,163 @@ export class ApiSportsAdapterService {
       to: options.to,
     };
 
-    let page = 1;
     const rows: any[] = [];
+    let lastFixturesPayload: any = null;
 
-    while (page <= maxPages && apiRequests < maxReq) {
-      const params = this.cleanFixturesQuery({ ...baseQuery, page: String(page) });
+    /** API-Football rejects `page` with `from` + `to` (+ league/season): one unpaginated request only. */
+    if (apiRequests < maxReq) {
+      const params = this.cleanFixturesQuery({ ...baseQuery });
       let data: any;
       try {
         data = await this.http.get('/fixtures', params as any);
         apiRequests += 1;
+        lastFixturesPayload = data;
       } catch (e: any) {
         errors.push(`fixtures: ${e?.message ?? e}`);
-        break;
       }
-      if (data?.errors?.length) {
-        errors.push(JSON.stringify(data.errors));
-        break;
+
+      if (data !== undefined) {
+        const apiErr = data.errors;
+        if (
+          apiErr != null &&
+          (Array.isArray(apiErr)
+            ? apiErr.length > 0
+            : typeof apiErr === 'object' &&
+              Object.keys(apiErr).length > 0 &&
+              (!Array.isArray(data.response) || data.response.length === 0))
+        ) {
+          errors.push(`API-Sports fixtures: ${JSON.stringify(apiErr)}`);
+        } else {
+          const chunk = Array.isArray(data?.response) ? data.response : [];
+          rows.push(...chunk);
+        }
       }
-      const chunk = Array.isArray(data?.response) ? data.response : [];
-      rows.push(...chunk);
-      if (!allPages) break;
-      const paging = data?.paging;
-      if (paging?.current != null && paging?.total != null) {
-        if (Number(paging.current) >= Number(paging.total)) break;
-      } else {
-        break;
-      }
-      page += 1;
-      await this.sleep(API_SPORTS_CONFIG.requestDelayMs);
     }
 
-    for (const row of rows) {
+    if (rows.length === 0 && errors.length === 0) {
+      errors.push(
+        `API-Sports returned 0 fixtures for league=${options.leagueApiId} season=${options.seasonYear} ` +
+          `${options.from}–${options.to}. Typical causes: wrong season integer (must be campaign start year), ` +
+          `date range outside that season on your plan, or no schedule in the provider yet. ` +
+          `Compare GET /api-sports/discover/fixtures with the same league/season/from/to; ` +
+          `GET /api-sports/discover/league/${options.leagueApiId} to see which seasons have coverage.`,
+      );
       try {
-        const r = await this.upsertFixtureFromApiSportsRow(row, competition.id, seasonRow.id);
-        if (r === 'created') created += 1;
-        else if (r === 'updated') updated += 1;
-        else skipped += 1;
+        const up = lastFixturesPayload ?? {};
+        const echo = JSON.stringify({
+          upstreamResults: up.results,
+          upstreamParameters: up.parameters ?? up.get ?? null,
+          upstreamErrors: up.errors ?? null,
+          responseIsArray: Array.isArray(up.response),
+          responseLength: Array.isArray(up.response) ? up.response.length : null,
+          topLevelKeys:
+            up && typeof up === 'object' && !Array.isArray(up)
+              ? Object.keys(up as object).slice(0, 24).join(',')
+              : typeof up,
+        });
+        errors.push(`Upstream echo (first page): ${echo}`);
+      } catch {
+        errors.push(`Upstream echo: (could not stringify raw /fixtures payload)`);
+      }
+    }
+
+    const concurrency = Math.max(
+      1,
+      Math.min(64, Math.floor(Number(options.fixtureUpsertConcurrency ?? 16) || 16)),
+    );
+    const rowOutcomes = new Array<'created' | 'updated' | 'skipped'>(rows.length).fill('skipped');
+    await this.runPool(rows, concurrency, async (row, ix) => {
+      try {
+        rowOutcomes[ix] = await this.upsertFixtureFromApiSportsRow(row, ctx);
       } catch (e: any) {
         errors.push(`fixture row: ${e?.message ?? e}`);
-        skipped += 1;
+        rowOutcomes[ix] = 'skipped';
+      }
+    });
+    for (const r of rowOutcomes) {
+      if (r === 'created') created += 1;
+      else if (r === 'updated') updated += 1;
+      else skipped += 1;
+    }
+
+    let standingsApiRequests = 0;
+    let standingsProcessed = 0;
+    let standingsRecomputed = 0;
+    const wantApi = options.syncStandingsAfter === true && competition?.id && seasonRow?.id;
+    const wantLocal =
+      options.recomputeStandingsFromFixturesAfter === true && competition?.id && seasonRow?.id;
+
+    if (wantApi || wantLocal) {
+      await Promise.all([
+        (async () => {
+          if (!wantApi) return;
+          standingsApiRequests = 1;
+          const st = await this.syncStandings([
+            {
+              league: options.leagueApiId,
+              season: options.seasonYear,
+              competitionId: competition!.id,
+              seasonId: seasonRow!.id,
+            },
+          ]);
+          standingsProcessed = st.processed;
+          for (const e of st.errors) {
+            errors.push(`standings: ${e}`);
+          }
+        })(),
+        (async () => {
+          if (!wantLocal) return;
+          try {
+            standingsRecomputed = await this.recomputeCompetitionStandingFromFixtures(
+              competition!.id,
+              seasonRow!.id,
+            );
+          } catch (e: any) {
+            errors.push(`standingsLocal: ${e?.message ?? e}`);
+          }
+        })(),
+      ]);
+    }
+
+    let primaryVenuesLinked = 0;
+    let primaryVenuesSkipped = 0;
+    let primaryVenuesApiRequests = 0;
+    if (options.syncPrimaryVenuesAfter === true) {
+      const pv = await this.syncPrimaryVenuesFromTeamsLeagueSeason({
+        league: options.leagueApiId,
+        season: options.seasonYear,
+        maxPages: options.primaryVenuesMaxPages,
+        maxRequests: options.primaryVenuesMaxRequests,
+      });
+      primaryVenuesLinked = pv.linked;
+      primaryVenuesSkipped = pv.skipped;
+      primaryVenuesApiRequests = pv.requests;
+      for (const e of pv.errors) {
+        errors.push(`primaryVenues: ${e}`);
       }
     }
 
     this.logger.log(
-      `importFixturesFromLeagueWindow: league ${options.leagueApiId} ${options.from}–${options.to} — +${created} ~${updated} skipped ${skipped} (${apiRequests} req)`,
+      `importFixturesFromLeagueWindow: league ${options.leagueApiId} ${options.from}–${options.to} — +${created} ~${updated} skipped ${skipped} (${apiRequests} fixture req, concurrency ${concurrency})` +
+        (wantApi ? `, standings ${standingsProcessed} (${standingsApiRequests} req)` : '') +
+        (wantLocal ? `, standingsRecomputed=${standingsRecomputed}` : '') +
+        (options.syncPrimaryVenuesAfter === true
+          ? `, primaryVenues ${primaryVenuesLinked} linked (${primaryVenuesApiRequests} /teams req)`
+          : ''),
     );
-    return { created, updated, skipped, apiRequests, errors };
+    return {
+      created,
+      updated,
+      skipped,
+      apiRequests,
+      standingsApiRequests,
+      standingsProcessed,
+      standingsRecomputed,
+      primaryVenuesLinked,
+      primaryVenuesSkipped,
+      primaryVenuesApiRequests,
+      errors,
+    };
   }
 
   /** One league with `seasons[]` (year coverage for standings). */
@@ -1384,7 +2034,6 @@ export class ApiSportsAdapterService {
             lastImportedAt: new Date().toISOString(),
           },
           providers: {
-            ...(competition?.metadata?.providers ?? {}),
             [PROVIDER_KEY]: { externalId: String(apiLeagueId) },
           },
         };
@@ -1395,7 +2044,10 @@ export class ApiSportsAdapterService {
             name: leagueObj.name,
             type,
             country: countryName,
-            metadata: { ...(competition.metadata ?? {}), ...baseMeta },
+            metadata: deepMergeEntityMetadata(
+              (competition.metadata ?? {}) as Record<string, unknown>,
+              baseMeta as Record<string, unknown>,
+            ) as any,
           } as any);
           competitionsUpdated += 1;
         } else {
@@ -1431,7 +2083,10 @@ export class ApiSportsAdapterService {
           if (seasonRow) {
             await this.seasonService.update(seasonRow.id, {
               id: seasonRow.id,
-              metadata: { ...(seasonRow.metadata ?? {}), ...seasonMeta },
+              metadata: deepMergeEntityMetadata(
+                (seasonRow.metadata ?? {}) as Record<string, unknown>,
+                seasonMeta as Record<string, unknown>,
+              ) as any,
             } as any);
             seasonsExisting += 1;
           } else {

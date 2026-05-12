@@ -12040,6 +12040,387 @@
         ]
       }
     },
+    "/team-stadium": {
+      "post": {
+        "operationId": "createTeamStadium",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamStadiumDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamStadium"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create TeamStadium",
+        "tags": [
+          "team-stadium"
+        ]
+      },
+      "get": {
+        "operationId": "getAllTeamStadium",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamStadium"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all TeamStadiums",
+        "tags": [
+          "team-stadium"
+        ]
+      }
+    },
+    "/team-stadium/query": {
+      "get": {
+        "operationId": "getQueryTeamStadium",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamStadium"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all TeamStadiums",
+        "tags": [
+          "team-stadium"
+        ]
+      }
+    },
+    "/team-stadium/count": {
+      "get": {
+        "operationId": "getCountTeamStadium",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of TeamStadiums",
+        "tags": [
+          "team-stadium"
+        ]
+      }
+    },
+    "/team-stadium/{id}": {
+      "get": {
+        "operationId": "getOneTeamStadium",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamStadium"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one TeamStadium",
+        "tags": [
+          "team-stadium"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneTeamStadium",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamStadium"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one TeamStadium",
+        "tags": [
+          "team-stadium"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneTeamStadium",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one TeamStadium",
+        "tags": [
+          "team-stadium"
+        ]
+      }
+    },
+    "/team-stadium/upload": {
+      "post": {
+        "operationId": "uploadTeamStadium",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for TeamStadium",
+        "tags": [
+          "team-stadium"
+        ]
+      }
+    },
+    "/team-stadium/download/{filename}": {
+      "get": {
+        "operationId": "downloadTeamStadium",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to TeamStadium",
+        "tags": [
+          "team-stadium"
+        ]
+      }
+    },
     "/ticket": {
       "post": {
         "operationId": "createTicket",
@@ -15006,7 +15387,7 @@
     },
     "/api-sports/sync/import/fixtures": {
       "post": {
-        "description": "Upserts `fixture` rows by `metadata.providers.apisports.externalId`. Requires competition + season (yearStart/yearEnd) and teams already linked for that league.",
+        "description": "Upserts `fixture` rows by `metadata.providers.apisports.externalId`, or merges into an existing same-competition fixture when kickoff differs by ≤6h and teams match (and both sides agree on score when finalized). Requires competition + season (yearStart/yearEnd) and teams already linked for that league. **`syncStandingsAfter`: true** adds one **`/standings`** call; **`recomputeStandingsFromFixturesAfter`: true** rebuilds ladder from scored fixtures (+0 requests). **`syncPrimaryVenuesAfter`: true** runs paged **`GET /teams`** and links each club **`venue`** to **`teamStadium`** as primary home (not match venue). Fixture upserts use **`fixtureUpsertConcurrency`**. With `from`/`to`, API-Football returns all fixtures in one call and rejects `page`; `allPages`/`maxPages` here are ignored.",
         "operationId": "ApiSportsController_importFixtures",
         "parameters": [],
         "requestBody": {
@@ -15030,6 +15411,37 @@
           }
         ],
         "summary": "Import fixtures into DB (API-Football /fixtures)",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/sync/import/team-primary-venues": {
+      "post": {
+        "description": "Fetches `GET /teams?league=&season=` (paged). For each response row, resolves the local team by `metadata.providers.apisports.externalId`, upserts `stadium` from the club **`venue`** (not fixture venue), and upserts **`teamStadium`** with `metadata.relationship: primary_home` and `source: api-sports-teams`.",
+        "operationId": "ApiSportsController_importTeamPrimaryVenues",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSportsSyncPrimaryVenuesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Counts + errors"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Link primary stadiums from API-Football GET /teams",
         "tags": [
           "API-Sports"
         ]
@@ -15436,6 +15848,109 @@
           }
         ],
         "summary": "Live fixtures + events (one API call)",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/discover/teams": {
+      "get": {
+        "description": "Proxies **GET /teams** — each entry includes **`team`** and **`venue`** (registered home ground). See [API-Football documentation v3](https://www.api-football.com/documentation-v3). Typical: `league` + `season`, or `id` / `team` for one club.",
+        "operationId": "ApiSportsController_discoverTeams",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "venue",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "season",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "league",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "team",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": false,
+            "in": "query",
+            "description": "API-Sports team id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Teams (+ club venue) from API-Sports",
         "tags": [
           "API-Sports"
         ]
@@ -15888,11 +16403,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -15956,11 +16479,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16021,11 +16552,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16077,11 +16616,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16118,11 +16665,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16250,11 +16805,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16371,11 +16934,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16429,11 +17000,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16483,11 +17062,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16565,11 +17152,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16632,11 +17227,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16750,11 +17353,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16853,11 +17464,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16906,11 +17525,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -16944,11 +17571,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17002,11 +17637,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17045,11 +17688,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17108,11 +17759,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17156,11 +17815,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17213,11 +17880,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17255,11 +17930,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17306,11 +17989,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17342,11 +18033,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17396,11 +18095,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17435,11 +18142,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17489,11 +18204,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17536,11 +18259,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17592,11 +18323,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17641,11 +18380,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17723,11 +18470,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -17902,11 +18657,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18038,11 +18801,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18122,11 +18893,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18228,11 +19007,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18334,11 +19121,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18383,11 +19178,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18463,11 +19266,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18558,11 +19369,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18613,11 +19432,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18665,11 +19492,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18718,11 +19553,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18783,11 +19626,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18830,11 +19681,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18862,11 +19721,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18906,11 +19773,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18942,11 +19817,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -18986,11 +19869,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19022,11 +19913,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19042,12 +19941,6 @@
           "opened": {
             "format": "date-time",
             "type": "string"
-          },
-          "teamIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           },
           "capacity": {
             "type": "number"
@@ -19082,11 +19975,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19103,13 +20004,7 @@
             "format": "date-time",
             "type": "string"
           },
-          "teamIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "teams": {
+          "teamStadiumLinks": {
             "$ref": "#/components/schemas/Promise"
           },
           "capacity": {
@@ -19136,11 +20031,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19183,11 +20086,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19231,11 +20142,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19248,12 +20167,6 @@
           "founded": {
             "format": "date-time",
             "type": "string"
-          },
-          "stadiumIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           },
           "managerId": {
             "type": "number"
@@ -19307,11 +20220,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19325,18 +20246,13 @@
             "format": "date-time",
             "type": "string"
           },
-          "stadiumIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "stadiums": {
+          "teamStadiumLinks": {
             "nullable": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Promise"
+              }
+            ]
           },
           "teamCompetitionSeasons": {
             "type": "array",
@@ -19421,11 +20337,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19469,11 +20393,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19512,16 +20444,113 @@
           "fixtures"
         ]
       },
+      "CreateTeamStadiumDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "stadiumId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "teamId",
+          "stadiumId"
+        ]
+      },
+      "TeamStadium": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "stadiumId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "teamId",
+          "stadiumId"
+        ]
+      },
       "CreateTicketDTO": {
         "type": "object",
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19571,11 +20600,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19787,11 +20824,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19856,11 +20901,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -19918,11 +20971,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -20056,11 +21117,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -20115,11 +21184,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -20171,11 +21248,19 @@
         "properties": {
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -20227,11 +21312,19 @@
           },
           "metadata": {
             "type": "object",
-            "description": "Metadata stored as JSON",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
             "nullable": true,
             "example": {
-              "source": "StatsBomb",
-              "version": "1.0",
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
               "tags": [
                 "premier-league",
                 "2024"
@@ -20446,6 +21539,38 @@
             "type": "number",
             "default": 50,
             "description": "Max /fixtures HTTP calls"
+          },
+          "syncStandingsAfter": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, after fixtures, one GET /standings for this league+season and upsert `competitionStanding` (+1 API request)."
+          },
+          "recomputeStandingsFromFixturesAfter": {
+            "type": "boolean",
+            "default": false,
+            "description": "After fixtures (+0 HTTP), recomputes `competitionStanding` positions from persisted fixtures that have numeric scores (no form string). Runs in parallel with `syncStandingsAfter` when both are true."
+          },
+          "fixtureUpsertConcurrency": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 64,
+            "default": 16,
+            "description": "Max concurrent DB upserts for fixture rows."
+          },
+          "syncPrimaryVenuesAfter": {
+            "type": "boolean",
+            "default": false,
+            "description": "After fixtures, paged `GET /teams?league=&season=` links each club registered **`venue`** to `teamStadium` as primary home (`metadata.relationship: primary_home`). Not derived from match venue."
+          },
+          "primaryVenuesMaxPages": {
+            "type": "number",
+            "default": 5,
+            "description": "Max `/teams` pages when `syncPrimaryVenuesAfter`."
+          },
+          "primaryVenuesMaxRequests": {
+            "type": "number",
+            "default": 8,
+            "description": "Hard cap on `/teams` requests when `syncPrimaryVenuesAfter`."
           }
         },
         "required": [
@@ -20453,6 +21578,35 @@
           "seasonYear",
           "from",
           "to"
+        ]
+      },
+      "ApiSportsSyncPrimaryVenuesDto": {
+        "type": "object",
+        "properties": {
+          "league": {
+            "type": "number",
+            "description": "API-Sports league id",
+            "example": 39
+          },
+          "season": {
+            "type": "number",
+            "description": "API-Football season year (e.g. 2024)",
+            "example": 2024
+          },
+          "maxPages": {
+            "type": "number",
+            "default": 5,
+            "description": "Max GET /teams pages"
+          },
+          "maxRequests": {
+            "type": "number",
+            "default": 15,
+            "description": "Hard cap on /teams HTTP calls"
+          }
+        },
+        "required": [
+          "league",
+          "season"
         ]
       },
       "ApiSportsImportPlayersDto": {

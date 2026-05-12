@@ -26,6 +26,7 @@ import {ManagerService} from "../../modules/manager/manager.module";
 import {TeamType} from "../../enums/team.enum";
 import {PositionType} from "../../enums/position.enum";
 import {CardType} from "../../enums/card.enum";
+import {deepMergeEntityMetadata} from '@iWatchFootball/base-tools/entity/entityMetadata';
 
 // StatsBomb API Types
 interface StatsBombCompetition {
@@ -100,6 +101,9 @@ interface StatsBombMatch {
     country: string;
   };
 }
+
+/** Max |Δkickoff| when matching a StatsBomb/API-Sports fixture to an existing DB row cross-provider */
+const FIXTURE_CORRELATION_MAX_MS = 6 * 60 * 60 * 1000;
 
 interface StatsBombEvent {
   id: string;
@@ -623,6 +627,67 @@ export class StatsBombAdapterService {
         return;
     }
     this.logger.debug(`Upserted ${kind} ${row.id} teamId → ${team.id}`);
+  }
+
+  private scoresCorrelationCompatible(
+    fixtureRow: { homeScore?: number | null; awayScore?: number | null },
+    incoming: { homeScore?: number; awayScore?: number },
+  ): boolean {
+    const eh = fixtureRow.homeScore;
+    const ea = fixtureRow.awayScore;
+    const ih = incoming.homeScore;
+    const ia = incoming.awayScore;
+    const existingComplete =
+      eh != null && ea != null && Number.isFinite(Number(eh)) && Number.isFinite(Number(ea));
+    const incomingComplete =
+      ih !== undefined && ia !== undefined && Number.isFinite(Number(ih)) && Number.isFinite(Number(ia));
+    if (existingComplete && incomingComplete) {
+      return Number(eh) === Number(ih) && Number(ea) === Number(ia);
+    }
+    return true;
+  }
+
+  private conflictingOtherStatsBombId(metadata: any, matchId: number): boolean {
+    const prov = this.getProviderExternalIdFromMetadata(metadata);
+    const legacy = this.getLegacyStatsBombIdFromMetadata(metadata);
+    const tgt = String(matchId);
+    if (prov != null && prov !== '' && prov !== tgt) return true;
+    if (legacy != null && legacy !== '' && legacy !== tgt) return true;
+    return false;
+  }
+
+  private async findExistingFixtureCorrelationForStatsBomb(opts: {
+    competitionId: number;
+    seasonId: number;
+    homeTeamId: number;
+    awayTeamId: number;
+    scheduledAtMs: number;
+    scorePair: { homeScore?: number; awayScore?: number };
+    statsBombMatchId: number;
+  }): Promise<any | null> {
+    const rows = await this.fixtureService.getQuery({
+      where: {
+        competitionId: opts.competitionId,
+        seasonId: opts.seasonId,
+        homeTeamId: opts.homeTeamId,
+        awayTeamId: opts.awayTeamId,
+      } as any,
+    });
+    if (!rows?.length) return null;
+
+    const ranked: Array<{ f: any; dt: number }> = [];
+    for (const f of rows) {
+      if (!f?.id) continue;
+      if (this.conflictingOtherStatsBombId(f.metadata, opts.statsBombMatchId)) continue;
+      if (!this.scoresCorrelationCompatible(f, opts.scorePair)) continue;
+      const t = f.date instanceof Date ? f.date.getTime() : new Date(f.date as any).getTime();
+      if (Number.isNaN(t)) continue;
+      const delta = Math.abs(t - opts.scheduledAtMs);
+      if (delta <= FIXTURE_CORRELATION_MAX_MS) ranked.push({ f, dt: delta });
+    }
+    if (!ranked.length) return null;
+    ranked.sort((a, b) => a.dt - b.dt);
+    return ranked[0].f;
   }
 
   private async findFixtureByStatsBombMatchId(statsbombMatchId: number): Promise<any | null> {
@@ -1200,6 +1265,35 @@ export class StatsBombAdapterService {
           updateData.nationality = playerData.country.name;
         }
 
+        const playerMetaPatch: Record<string, unknown> = {
+          source: 'StatsBomb',
+          statsbombId: playerData.player_id,
+          providers: {
+            statsbomb: {
+              externalId: String(playerData.player_id),
+            },
+          },
+          country: playerData.country,
+          jerseyNumber: playerData.jersey_number,
+          lastSync: new Date().toISOString(),
+        };
+        if (playerData.positions && Array.isArray(playerData.positions)) {
+          playerMetaPatch.positions = playerData.positions.map((pos: any) => ({
+            position: pos.position,
+            from: pos.from,
+            to: pos.to,
+            fromPeriod: pos.from_period,
+            toPeriod: pos.to_period,
+            startReason: pos.start_reason,
+            endReason: pos.end_reason,
+          }));
+        }
+
+        updateData.metadata = deepMergeEntityMetadata(
+          (player.metadata ?? {}) as Record<string, unknown>,
+          playerMetaPatch,
+        ) as any;
+
         await this.playerService.update(player.id, updateData);
         this.logger.debug(`Updated player: ${playerData.player_name}`);
       }
@@ -1435,52 +1529,65 @@ export class StatsBombAdapterService {
     return { homeScore: h, awayScore: a };
   }
 
+  /** Persist StatsBomb-derived fields onto a fixture row (by StatsBomb id or cross-provider correlation). */
+  private async applyStatsBombToExistingFixtureRow(
+    matchData: StatsBombMatch,
+    existingFixture: any,
+    scorePair: { homeScore?: number; awayScore?: number },
+    options?: { skipLineups?: boolean },
+  ): Promise<void> {
+    const homeTeamId = existingFixture?.homeTeamId ?? null;
+    const awayTeamId = existingFixture?.awayTeamId ?? null;
+    const competitionId = existingFixture?.competitionId ?? null;
+    const seasonId = existingFixture?.seasonId ?? null;
+
+    if (homeTeamId && awayTeamId && competitionId && seasonId) {
+      await Promise.all([
+        this.ensureTeamCompetitionSeason(homeTeamId, competitionId, seasonId),
+        this.ensureTeamCompetitionSeason(awayTeamId, competitionId, seasonId),
+      ]);
+    }
+
+    const statsBombFixturePatch: Record<string, unknown> = {
+      providers: {
+        [this.providerKey]: { externalId: String(matchData.match_id) },
+      },
+      statsbombId: matchData.match_id,
+      competitionStage: matchData.competition_stage,
+      matchWeek: matchData.match_week,
+      referee: matchData.referee,
+      homeScore: matchData.home_score,
+      awayScore: matchData.away_score,
+      lastSync: new Date().toISOString(),
+    };
+
+    await this.fixtureService.update(existingFixture.id, {
+      id: existingFixture.id,
+      date: new Date(`${matchData.match_date} ${matchData.kick_off}`),
+      status: this.mapFixtureStatus(matchData.match_status),
+      stage: this.mapFixtureStage(matchData.competition_stage.name),
+      ...scorePair,
+      metadata: deepMergeEntityMetadata(
+        (existingFixture.metadata ?? {}) as Record<string, unknown>,
+        statsBombFixturePatch,
+      ) as any,
+    } as any);
+
+    await this.ensureTeamsManagersFromMatch(matchData, homeTeamId, awayTeamId);
+
+    if (!options?.skipLineups) {
+      await this.syncLineupsFromMatch(matchData, existingFixture.id);
+    }
+
+    await this.refreshLineUpManagersForFixture(matchData, existingFixture.id);
+  }
+
   async syncFixture(matchData: StatsBombMatch, options?: { skipLineups?: boolean; skipStadiums?: boolean }): Promise<void> {
-    // Check if fixture already exists by provider-scoped or legacy metadata key.
-    const existingFixture = await this.findFixtureByStatsBombMatchId(matchData.match_id);
     const scorePair = this.fixtureScoresFromStatsBomb(matchData);
-    if (existingFixture) {
+    const existingBySbId = await this.findFixtureByStatsBombMatchId(matchData.match_id);
+    if (existingBySbId) {
       this.logger.debug(`Fixture already exists for StatsBomb match ${matchData.match_id}`);
-      // Even if the fixture exists, we still want to backfill join rows and lineups.
-      const homeTeamId = existingFixture?.homeTeamId ?? null;
-      const awayTeamId = existingFixture?.awayTeamId ?? null;
-      const competitionId = existingFixture?.competitionId ?? null;
-      const seasonId = existingFixture?.seasonId ?? null;
-
-      if (homeTeamId && awayTeamId && competitionId && seasonId) {
-        await Promise.all([
-          this.ensureTeamCompetitionSeason(homeTeamId, competitionId, seasonId),
-          this.ensureTeamCompetitionSeason(awayTeamId, competitionId, seasonId),
-        ]);
-      }
-
-      const prevMeta =
-        existingFixture.metadata && typeof existingFixture.metadata === 'object'
-          ? { ...(existingFixture.metadata as object) }
-          : {};
-      await this.fixtureService.update(existingFixture.id, {
-        id: existingFixture.id,
-        status: this.mapFixtureStatus(matchData.match_status),
-        stage: this.mapFixtureStage(matchData.competition_stage.name),
-        ...scorePair,
-        metadata: {
-          ...prevMeta,
-          homeScore: matchData.home_score,
-          awayScore: matchData.away_score,
-          lastSync: new Date().toISOString(),
-        },
-      } as any);
-
-      await this.ensureTeamsManagersFromMatch(matchData, homeTeamId, awayTeamId);
-
-      if (!options?.skipLineups) {
-        // Always merge lineup JSON when available: Starting XI alone only creates 11 rows per side;
-        // bench/substitutes come from lineups/{match_id}.json with isStarting derived from start_reason.
-        await this.syncLineupsFromMatch(matchData, existingFixture.id);
-      }
-
-      await this.refreshLineUpManagersForFixture(matchData, existingFixture.id);
-
+      await this.applyStatsBombToExistingFixtureRow(matchData, existingBySbId, scorePair, options);
       return;
     }
 
@@ -1526,6 +1633,28 @@ export class StatsBombAdapterService {
       this.logger.warn(
         `Skipping fixture ${matchData.match_id} because stadium could not be resolved (statsbomb stadium missing/incomplete)`,
       );
+      return;
+    }
+
+    const kickMs = new Date(`${matchData.match_date} ${matchData.kick_off}`).getTime();
+    const correlated =
+      !Number.isNaN(kickMs) && homeTeamId && awayTeamId && competition?.id && season?.id
+        ? await this.findExistingFixtureCorrelationForStatsBomb({
+            competitionId: competition.id,
+            seasonId: season.id,
+            homeTeamId,
+            awayTeamId,
+            scheduledAtMs: kickMs,
+            scorePair,
+            statsBombMatchId: matchData.match_id,
+          })
+        : null;
+
+    if (correlated) {
+      this.logger.debug(
+        `Cross-provider correlate: StatsBomb match ${matchData.match_id} → fixture ${correlated.id} (±${FIXTURE_CORRELATION_MAX_MS / 3_600_000}h kickoff window)`,
+      );
+      await this.applyStatsBombToExistingFixtureRow(matchData, correlated, scorePair, options);
       return;
     }
 
@@ -2014,13 +2143,14 @@ export class StatsBombAdapterService {
                 baseMeta.statsbombPositionId = statsbombPositionId;
               }
 
-              const prev =
-                existingPLU?.metadata && typeof existingPLU.metadata === 'object'
-                  ? { ...(existingPLU.metadata as object) }
-                  : {};
-              const mergedMeta: Record<string, unknown> = { ...prev, ...baseMeta };
-              if (typeof (prev as { lineupSlotIndex?: number }).lineupSlotIndex === 'number') {
-                mergedMeta.lineupSlotIndex = (prev as { lineupSlotIndex: number }).lineupSlotIndex;
+              let mergedMeta = deepMergeEntityMetadata(
+                (existingPLU?.metadata ?? {}) as Record<string, unknown>,
+                baseMeta,
+              ) as Record<string, unknown>;
+              const prevSlot = (existingPLU?.metadata as { lineupSlotIndex?: number } | undefined)
+                ?.lineupSlotIndex;
+              if (typeof prevSlot === 'number') {
+                mergedMeta = { ...mergedMeta, lineupSlotIndex: prevSlot };
               }
 
               const resolvedPositionId = positionId ?? existingPLU?.positionId;
@@ -2395,32 +2525,31 @@ export class StatsBombAdapterService {
   ): Promise<void> {
     const [fx] = await this.fixtureService.getQuery({ where: { id: fixtureId } });
     if (!fx) return;
-    const prev =
-      fx.metadata && typeof fx.metadata === 'object' ? { ...(fx.metadata as Record<string, unknown>) } : {};
-    const sbRaw = prev.statsbomb;
-    const sb =
-      sbRaw && typeof sbRaw === 'object' && !Array.isArray(sbRaw)
-        ? { ...(sbRaw as Record<string, unknown>) }
-        : {};
-    const xiFallback =
-      sb.startingXiFallback && typeof sb.startingXiFallback === 'object' && !Array.isArray(sb.startingXiFallback)
-        ? { ...(sb.startingXiFallback as Record<string, unknown>) }
-        : {};
-    xiFallback[String(localTeamId)] = {
-      formation,
-      matchId,
-      statsbombTeamId,
-      updatedAt: new Date().toISOString(),
-      starters: rows.map((r) => ({
-        statsbombPlayerId: r.statsbombPlayerId,
-        name: r.name,
-        position: r.positionName,
-        jerseyNumber: r.jerseyNumber,
-      })),
+    const patch: Record<string, unknown> = {
+      statsbomb: {
+        startingXiFallback: {
+          [String(localTeamId)]: {
+            formation,
+            matchId,
+            statsbombTeamId,
+            updatedAt: new Date().toISOString(),
+            starters: rows.map((r) => ({
+              statsbombPlayerId: r.statsbombPlayerId,
+              name: r.name,
+              position: r.positionName,
+              jerseyNumber: r.jerseyNumber,
+            })),
+          },
+        },
+      },
     };
-    sb.startingXiFallback = xiFallback;
-    prev.statsbomb = sb;
-    await this.fixtureService.update(fixtureId, { id: fixtureId, metadata: prev } as any);
+    await this.fixtureService.update(fixtureId, {
+      id: fixtureId,
+      metadata: deepMergeEntityMetadata(
+        (fx.metadata ?? {}) as Record<string, unknown>,
+        patch,
+      ) as any,
+    } as any);
   }
 
   /**
@@ -2536,12 +2665,7 @@ export class StatsBombAdapterService {
           where: { lineupId: lineUp.id, playerId: player.id } as any,
         });
 
-        const prevMeta =
-          existingPLU?.metadata && typeof existingPLU.metadata === 'object'
-            ? { ...(existingPLU.metadata as object) }
-            : {};
-        const pluMeta: Record<string, unknown> = {
-          ...prevMeta,
+        const basePatch: Record<string, unknown> = {
           statsbombMatchId: matchId,
           statsbombPlayerId: row.statsbombPlayerId,
           statsbombTeamId: sbTeamId,
@@ -2550,8 +2674,15 @@ export class StatsBombAdapterService {
           lineupSlotIndex: slotIdx,
         };
         if (row.statsbombPositionId != null && Number.isFinite(row.statsbombPositionId)) {
-          pluMeta.statsbombPositionId = row.statsbombPositionId;
+          basePatch.statsbombPositionId = row.statsbombPositionId;
         }
+
+        const pluMeta = existingPLU
+          ? (deepMergeEntityMetadata(
+              (existingPLU.metadata ?? {}) as Record<string, unknown>,
+              basePatch,
+            ) as Record<string, unknown>)
+          : basePatch;
 
         if (existingPLU) {
           await this.playerLineUpService.update(existingPLU.id, {

@@ -25,6 +25,7 @@ import {RefereeModule} from "./api/modules/referee/referee.module";
 import {InjuryModule} from "./api/modules/injury/injury.module";
 import {TeamModule} from "./api/modules/team/team.module";
 import {TeamCompetitionSeasonModule} from "./api/modules/teamCompetitionSeason/teamCompetitionSeason.module";
+import {TeamStadiumModule} from "./api/modules/teamStadium/teamStadium.module";
 import {SeasonModule} from "./api/modules/season/season.module";
 import {ManagerModule} from "./api/modules/manager/manager.module";
 import {PlayerLineUpModule} from "./api/modules/playerLineUp/playerLineUp.module";
@@ -94,6 +95,7 @@ const Modules = [
     SubstitutionModule,
     TeamModule,
     TeamCompetitionSeasonModule,
+    TeamStadiumModule,
     TicketModule,
     TicketHoldModule,
     CheckoutModule,
