@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { DatePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
+import { useTranslation } from '../../i18n';
 import { UiButton } from './Button';
 import classes from './MatchDatePicker.module.css';
 
@@ -95,6 +96,7 @@ export function MatchDatePicker({
   onToday,
   showTodayAction = true,
 }: MatchDatePickerProps) {
+  const { t } = useTranslation();
   const [displayMonth, setDisplayMonth] = useState(value ?? new Date());
 
   useEffect(() => {
@@ -138,7 +140,7 @@ export function MatchDatePicker({
       {showTodayAction && (
         <div className={classes.footer}>
           <UiButton size="xs" variant="subtle" onClick={handleToday}>
-            Go to today
+            {t('matches.goToToday')}
           </UiButton>
         </div>
       )}

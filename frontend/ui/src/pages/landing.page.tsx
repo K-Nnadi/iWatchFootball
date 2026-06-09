@@ -1,45 +1,49 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Group, Image, rem, Stack } from '@mantine/core';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
+import { useTranslation } from '../i18n/useTranslation';
 import { UiBody, UiButton, UiCard, UiH1, UiH2, UiH3, UiPageContainer } from '../components/ui';
 
 export function LandingPage() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
 
-    const pillars = [
-        {
-            title: 'A verified match history',
-            body: "Build a record of the matches you've attended—grounded in real attendance—automatically enriched with context so it becomes more than a list of fixtures.",
-        },
-        {
-            title: 'Insights from your journey',
-            body: "Discover stats tied to your stands: which player you've seen score the most, the club you've watched most often, or which stadium has hosted the most goals in your history.",
-        },
-        ...(marketplaceEnabled
-            ? [{
-                title: 'Tickets that feed your story',
-                body: 'Our ticket marketplace connects getting in the door with your match history—turning one-off transactions into long-term engagement with your own data.',
-            }]
-            : [{
-                title: 'Your attendance, connected',
-                body: 'Log the matches you attend and build a personal record that grows richer over time—grounded in real attendance, not generic stats.',
-            }]),
-    ];
+    const pillars = useMemo(
+        () => [
+            {
+                title: t('landing.pillarHistoryTitle'),
+                body: t('landing.pillarHistoryBody'),
+            },
+            {
+                title: t('landing.pillarInsightsTitle'),
+                body: t('landing.pillarInsightsBody'),
+            },
+            marketplaceEnabled
+                ? {
+                      title: t('landing.pillarTicketsTitle'),
+                      body: t('landing.pillarTicketsBody'),
+                  }
+                : {
+                      title: t('landing.pillarAttendanceTitle'),
+                      body: t('landing.pillarAttendanceBody'),
+                  },
+        ],
+        [t, marketplaceEnabled],
+    );
 
     return (
         <UiPageContainer>
             <UiCard density="spacious" mb="xl">
                 <Group justify="space-between" align="center" wrap="wrap" gap="xl">
                     <Stack gap="md" style={{ flex: '1 1 280px', maxWidth: rem(520) }}>
-                        <UiH1>For fans who go to matches—not only from the sofa</UiH1>
-                        <UiBody>
-                            I Watch Football is for supporters who actually attend games. Ticketing sites help you buy a seat;
-                            stats apps show generic match data—none of them build your personal football history.
-                        </UiBody>
+                        <UiH1>{t('landing.heroTitle')}</UiH1>
+                        <UiBody>{t('landing.heroBody')}</UiBody>
                         <div>
-                            <UiButton onClick={() => navigateWithTransition('/home')}>Explore the app</UiButton>
+                            <UiButton onClick={() => navigateWithTransition('/home')}>
+                                {t('landing.exploreApp')}
+                            </UiButton>
                         </div>
                     </Stack>
                     <Image
@@ -64,35 +68,31 @@ export function LandingPage() {
             </Group>
 
             <UiCard density="spacious" mb="xl">
-                <UiH2 style={{ marginBottom: rem(12) }}>Why we built this</UiH2>
+                <UiH2 style={{ marginBottom: rem(12) }}>{t('landing.whyWeBuilt')}</UiH2>
                 <Stack gap="md">
-                    <UiBody>
-                        The idea came from travelling across Europe with family to watch football—loving the ritual of
-                        being there, but missing a product that answered one simple question: across every match
-                        I&apos;ve attended, what&apos;s my football story?
-                    </UiBody>
+                    <UiBody>{t('landing.whyWeBuiltBody')}</UiBody>
                     <UiCard density="compact" style={{ borderLeft: '3px solid var(--ui-accent)' }}>
-                        <UiBody style={{ fontStyle: 'italic' }}>
-                            &ldquo;I&apos;m naturally data-driven; nothing out there connected tickets, attendance, and personal
-                            narratives in one place. I Watch Football is our answer.&rdquo;
+                        <UiBody style={{ fontStyle: 'italic' }}>{t('landing.founderQuote')}</UiBody>
+                        <UiBody style={{ marginTop: rem(8), fontSize: rem(13) }}>
+                            {t('landing.founderAttribution')}
                         </UiBody>
-                        <UiBody style={{ marginTop: rem(8), fontSize: rem(13) }}>— founder</UiBody>
                     </UiCard>
                 </Stack>
             </UiCard>
 
             <UiCard density="spacious" style={{ textAlign: 'center' }}>
-                <UiH2 style={{ marginBottom: rem(12) }}>Start your history</UiH2>
+                <UiH2 style={{ marginBottom: rem(12) }}>{t('landing.startHistory')}</UiH2>
                 <UiBody style={{ marginBottom: rem(16) }}>
-                    Create an account to log matches and explore your stats
-                    {marketplaceEnabled ? ', and find tickets for your next game in the stands' : ''}.
+                    {marketplaceEnabled
+                        ? t('landing.startHistoryBodyMarketplace')
+                        : t('landing.startHistoryBody')}
                 </UiBody>
                 <Group justify="center" gap="sm">
                     <UiButton variant="primary" onClick={() => navigateWithTransition('/join')}>
-                        Join
+                        {t('nav.join')}
                     </UiButton>
                     <UiButton variant="outline" onClick={() => navigateWithTransition('/signIn')}>
-                        Sign In
+                        {t('nav.signIn')}
                     </UiButton>
                 </Group>
             </UiCard>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Paper, Title, Tabs, Text, SimpleGrid } from '@mantine/core';
+import { useTranslation } from '../../i18n/useTranslation';
 import { FormationView } from "./formation";
 import { Lineup, MatchDetails, Player } from "./match.page";  // Verify import paths
 
@@ -15,6 +16,7 @@ interface TeamLineupsProps {
 }
 
 export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }) => {
+    const { t } = useTranslation();
     const isFuture = status === 'future';
 
 
@@ -32,7 +34,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                 ta="center" 
                 style={{ color: 'var(--modern-text-primary)' }}
             >
-                Team Lineups
+                {t('match.teamLineups')}
             </Title>
             <Tabs 
                 defaultValue={matchDetails.homeTeam}
@@ -124,7 +126,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             !matchDetails.homeLineup &&
                             !matchDetails.homePredictedLineup && (
                                 <Text size="sm" ta="center" c="dimmed">
-                                    Starting lineup not available yet — sync StatsBomb lineups or ensure player lineup rows exist for this fixture.
+                                    {t('match.lineupUnavailable')}
                                 </Text>
                             )}
                         {matchDetails.homeLineup?.substitutes && !isFuture && (
@@ -151,7 +153,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             !matchDetails.awayLineup &&
                             !matchDetails.awayPredictedLineup && (
                                 <Text size="sm" ta="center" c="dimmed">
-                                    Starting lineup not available yet — sync StatsBomb lineups or ensure player lineup rows exist for this fixture.
+                                    {t('match.lineupUnavailable')}
                                 </Text>
                             )}
                         {matchDetails.awayLineup?.substitutes && !isFuture && (
@@ -169,9 +171,10 @@ interface SubstitutesListProps {
 }
 
 function SubstitutesList({ substitutes }: SubstitutesListProps) {
+    const { t } = useTranslation();
     return (
         <Box mt="xl" mx="auto" maw={{ base: '100%', sm: 920 }}>
-            <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-text-primary)' }}>Substitutes</Title>
+            <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-text-primary)' }}>{t('match.substitutes')}</Title>
             {substitutes?.length ? (
                 <SimpleGrid
                     cols={{ base: 1, xs: 2, sm: 3 }}
@@ -199,7 +202,7 @@ function SubstitutesList({ substitutes }: SubstitutesListProps) {
                     ))}
                 </SimpleGrid>
             ) : (
-                <Text size="sm" ta="center" style={{ color: 'var(--modern-text-secondary)' }}>No substitutes listed.</Text>
+                <Text size="sm" ta="center" style={{ color: 'var(--modern-text-secondary)' }}>{t('match.noSubstitutes')}</Text>
             )}
         </Box>
     );

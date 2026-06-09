@@ -33,6 +33,7 @@ import { getMyTicketLog, type TicketLogEntry } from '../shared/api/userTicketLog
 import { useAuthStore } from '../shared/stores/auth.store';
 import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useTranslation } from '../i18n/useTranslation';
 import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useGetQueryTeamCompetitionSeason } from '@iWatchFootball/clients/controllers/team-competition-season';
 import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
@@ -95,6 +96,7 @@ function LogEmptyState({ title, message }: { title: string; message: string }) {
 }
 
 export function LogsPage() {
+    const { t } = useTranslation();
     const { isLoggedIn, user } = useAuthStore();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
     const { navigateWithTransition } = usePageTransition();
@@ -208,7 +210,7 @@ export function LogsPage() {
             window.location.href = url;
         } catch (e) {
             showNotification({
-                title: 'Upgrade unavailable',
+                title: t('logs.upgradeUnavailable'),
                 message: extractApiErrorMessage(e),
                 color: 'red',
             });
@@ -224,8 +226,8 @@ export function LogsPage() {
             window.location.href = url;
         } catch {
             showNotification({
-                title: 'Billing portal unavailable',
-                message: 'No active subscription billing account found.',
+                title: t('logs.billingUnavailable'),
+                message: t('logs.billingUnavailableMessage'),
                 color: 'orange',
             });
         } finally {
@@ -306,8 +308,8 @@ export function LogsPage() {
                     : undefined;
             return {
                 fixtureId: String(log.fixtureId),
-                homeTeam: homeTeamDoc?.name ?? `Team ${fixture?.homeTeamId ?? '?'}`,
-                awayTeam: awayTeamDoc?.name ?? `Team ${fixture?.awayTeamId ?? '?'}`,
+                homeTeam: homeTeamDoc?.name ?? t('logs.teamFallback', { id: fixture?.homeTeamId ?? '?' }),
+                awayTeam: awayTeamDoc?.name ?? t('logs.teamFallback', { id: fixture?.awayTeamId ?? '?' }),
                 homeTeamLogo: homeTeamDoc?.logoUrl,
                 awayTeamLogo: awayTeamDoc?.logoUrl,
                 homeTeamId: fixture?.homeTeamId,
@@ -316,7 +318,7 @@ export function LogsPage() {
                 awayScore: resolved?.away ?? 0,
                 scoresAvailable: resolved != null,
                 date: fixture?.date ?? '',
-                competitionName: competition?.name ?? 'Unknown',
+                competitionName: competition?.name ?? t('logs.unknownCompetition'),
                 competitionId: fixture?.competitionId,
                 isVerified: log.isVerified,
                 stage: fixture?.stage ?? '',
@@ -333,6 +335,7 @@ export function LogsPage() {
         loggedStadiumRows,
         loggedFixtureIds,
         fixtureEventsQueries,
+        t,
     ]);
 
     const formLoading =
@@ -370,8 +373,11 @@ export function LogsPage() {
             queryClient.invalidateQueries({ queryKey: ['log', 'my-history'] });
 
             showNotification({
-                title: 'Match Added!',
-                message: `${homeTeam?.name ?? 'Home'} vs ${awayTeam?.name ?? 'Away'} has been added to your logs`,
+                title: t('logs.matchAddedTitle'),
+                message: t('logs.matchAddedMessage', {
+                    home: homeTeam?.name ?? t('common.home'),
+                    away: awayTeam?.name ?? t('common.away'),
+                }),
                 color: 'green',
                 autoClose: 3000,
             });
@@ -384,8 +390,8 @@ export function LogsPage() {
 
         } catch {
             showNotification({
-                title: 'Failed to save match',
-                message: 'Something went wrong. Please try again.',
+                title: t('logs.matchAddFailedTitle'),
+                message: t('logs.matchAddFailedMessage'),
                 color: 'red',
                 autoClose: 4000,
             });
@@ -457,16 +463,16 @@ export function LogsPage() {
         }
     }, [loggedFixtures, verificationFilter]);
 
-    const emptyLogTitle =
-        loggedFixtures.length === 0
-            ? 'No matches logged yet'
-            : verificationFilter === 'verified'
-              ? 'No verified matches found'
-              : 'No matches found';
-    const emptyLogMessage =
-        loggedFixtures.length === 0
-            ? 'Start by adding your first match using the form'
-            : 'Try changing the filter to see more matches';
+    const emptyLogTitle = useMemo(() => {
+        if (loggedFixtures.length === 0) return t('logs.emptyNoLogs');
+        if (verificationFilter === 'verified') return t('logs.emptyNoVerified');
+        return t('logs.emptyNoMatches');
+    }, [loggedFixtures.length, verificationFilter, t]);
+
+    const emptyLogMessage = useMemo(() => {
+        if (loggedFixtures.length === 0) return t('logs.emptyStartAdding');
+        return t('logs.emptyTryFilter');
+    }, [loggedFixtures.length, t]);
 
     // Lock Overlay component - rendered via portal to document body
     const lockOverlay = !isLoggedIn ? (
@@ -503,15 +509,12 @@ export function LogsPage() {
                 <UiCard density="spacious" accent style={{ maxWidth: 500, width: '90%', textAlign: 'center' }}>
                     <Stack gap="lg" align="center">
                         <IconLock size={64} color="var(--ui-accent)" />
-                        <UiH2>Authentication required</UiH2>
-                        <UiBody>
-                            You need to be logged in to access your match logs. Sign in to track and manage your match
-                            history.
-                        </UiBody>
+                        <UiH2>{t('logs.authRequired')}</UiH2>
+                        <UiBody>{t('logs.authRequiredMessage')}</UiBody>
                         <Group gap="md" mt="md">
-                            <UiButton onClick={() => navigateWithTransition('/signIn')}>Sign In</UiButton>
+                            <UiButton onClick={() => navigateWithTransition('/signIn')}>{t('nav.signIn')}</UiButton>
                             <UiButton variant="outline" onClick={() => navigateWithTransition('/join')}>
-                                Sign Up
+                                {t('logs.signUp')}
                             </UiButton>
                         </Group>
                     </Stack>
@@ -529,8 +532,8 @@ export function LogsPage() {
                 <Grid gutter="xl">
                     <Grid.Col span={columnSpan}>
                         <Stack gap="xs" mb="lg">
-                            <UiH2>My logged games</UiH2>
-                            <UiBody>Track and manage your match history across different competitions</UiBody>
+                            <UiH2>{t('logs.title')}</UiH2>
+                            <UiBody>{t('logs.subtitle')}</UiBody>
                         </Stack>
 
                         <Box pos="relative" mb="xl">
@@ -538,18 +541,18 @@ export function LogsPage() {
                             <UiCard hover={false} density="spacious">
                                 <Stack gap="lg">
                                     <Stack gap="xs" align="center">
-                                        <UiH3>Add new match</UiH3>
+                                        <UiH3>{t('logs.addNewMatch')}</UiH3>
                                         <UiBody style={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                            Search for a fixture by selecting competition, season, and filtering teams
+                                            {t('logs.addNewMatchHint')}
                                         </UiBody>
                                     </Stack>
 
                                     <Box>
                                         <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>
-                                            Competition
+                                            {t('logs.competition')}
                                         </UiCaption>
                                         <Select
-                                            placeholder="Select competition"
+                                            placeholder={t('logs.selectCompetition')}
                                             data={competitionsData.map((c) => ({
                                                 value: String(c.id),
                                                 label: c.name,
@@ -571,9 +574,9 @@ export function LogsPage() {
 
                                 {selectedCompetition && (
                                     <Box>
-                                        <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Season</UiCaption>
+                                        <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>{t('logs.season')}</UiCaption>
                                         <Select
-                                            placeholder={isLoadingSeasons ? 'Loading seasons…' : 'Select season'}
+                                            placeholder={isLoadingSeasons ? t('logs.loadingSeasons') : t('logs.selectSeason')}
                                             data={uniqueSeasonIds.map((seasonId) => {
                                                 const season = allSeasonsData.find(s => s.id === seasonId);
                                                 const label = season
@@ -599,9 +602,9 @@ export function LogsPage() {
                                     <>
                                         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                                             <Box>
-                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Home Team</UiCaption>
+                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>{t('logs.homeTeam')}</UiCaption>
                                                 <Select
-                                                    placeholder={isLoadingTeams ? 'Loading teams…' : 'Select home team'}
+                                                    placeholder={isLoadingTeams ? t('logs.loadingTeams') : t('logs.selectHomeTeam')}
                                                     data={teams
                                                         .filter(team => String(team.id) !== selectedAwayTeam)
                                                         .map((team) => ({
@@ -619,9 +622,9 @@ export function LogsPage() {
                                                 />
                                             </Box>
                                             <Box>
-                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Away Team</UiCaption>
+                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>{t('logs.awayTeam')}</UiCaption>
                                                 <Select
-                                                    placeholder={isLoadingTeams ? 'Loading teams…' : 'Select away team'}
+                                                    placeholder={isLoadingTeams ? t('logs.loadingTeams') : t('logs.selectAwayTeam')}
                                                     data={teams
                                                         .filter(team => String(team.id) !== selectedHomeTeam)
                                                         .map((team) => ({
@@ -642,9 +645,9 @@ export function LogsPage() {
 
                                         {selectedHomeTeam && selectedAwayTeam && fixturesData.length > 0 && (
                                             <Box>
-                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Select fixture</UiCaption>
+                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>{t('logs.selectFixture')}</UiCaption>
                                                 <Select
-                                                    placeholder={isLoadingFixtures ? 'Loading fixtures…' : 'Choose a fixture'}
+                                                    placeholder={isLoadingFixtures ? t('logs.loadingFixtures') : t('logs.chooseFixture')}
                                                     data={fixturesData.map((f) => {
                                                         const home = teamsData.find(t => t.id === f.homeTeamId)?.name || String(f.homeTeamId);
                                                         const away = teamsData.find(t => t.id === f.awayTeamId)?.name || String(f.awayTeamId);
@@ -660,7 +663,9 @@ export function LogsPage() {
                                                     size="md" styles={uiSelectStyles}
                                                 />
                                                 <UiCaption style={{ color: 'var(--modern-text-secondary)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
-                                                    {fixturesData.length} {fixturesData.length === 1 ? 'match' : 'matches'} found
+                                                    {fixturesData.length === 1
+                                                        ? t('logs.matchesFoundSingular', { count: fixturesData.length })
+                                                        : t('logs.matchesFoundPlural', { count: fixturesData.length })}
                                                 </UiCaption>
                                             </Box>
                                         )}
@@ -668,7 +673,7 @@ export function LogsPage() {
                                         {selectedHomeTeam && selectedAwayTeam && !isLoadingFixtures && fixturesData.length === 0 && (
                                             <Box style={{ textAlign: 'center', padding: '1rem' }}>
                                                 <UiBody style={{ color: 'var(--modern-text-secondary)' }}>
-                                                    No matches found between these teams
+                                                    {t('logs.noMatchesBetweenTeams')}
                                                 </UiBody>
                                             </Box>
                                         )}
@@ -682,7 +687,7 @@ export function LogsPage() {
                                                     size="md"
                                                     variant="primary"
                                                 >
-                                                    Add Match to Logs
+                                                    {t('logs.addMatchToLogs')}
                                                 </UiButton>
                                             </Box>
                                         )}
@@ -722,12 +727,12 @@ export function LogsPage() {
                             }}
                         >
                         <Tabs.List>
-                            <Tabs.Tab value={'matches'}>Matches</Tabs.Tab>
-                            <Tabs.Tab value={'stats'}>Stats</Tabs.Tab>
+                            <Tabs.Tab value={'matches'}>{t('logs.tabMatches')}</Tabs.Tab>
+                            <Tabs.Tab value={'stats'}>{t('logs.tabStats')}</Tabs.Tab>
                             <Tabs.Tab value={'tickets'}>
                                 <Group gap={6} wrap="nowrap" justify="center">
                                     <IconTicket size={16} style={{ flexShrink: 0 }} />
-                                    My Tickets
+                                    {t('logs.tabTickets')}
                                     {myTickets.length > 0 && (
                                         <Badge
                                             size="xs"
@@ -747,8 +752,8 @@ export function LogsPage() {
                                 value={verificationFilter}
                                 onChange={(value) => setVerificationFilter(value as 'all' | 'verified')}
                                 data={[
-                                    { label: 'All Games', value: 'all' },
-                                    { label: 'Verified', value: 'verified' },
+                                    { label: t('logs.filterAllGames'), value: 'all' },
+                                    { label: t('logs.filterVerified'), value: 'verified' },
                                 ]}
                                 size="sm"
                                 styles={uiSegmentedControlStyles}
@@ -758,19 +763,18 @@ export function LogsPage() {
                             <UiCard density="compact" accent style={{ marginBottom: '1rem' }}>
                                 <Stack gap="sm">
                                     <UiBody>
-                                        You&apos;ve attended{' '}
-                                        <strong>{trackerEntitlements.verifiedTotal}</strong> verified
-                                        matches. Your free plan shows the newest{' '}
-                                        {trackerEntitlements.freeVerifiedLimit} — upgrade to unlock
-                                        your full history and advanced stats.
+                                        {t('logs.upgradePrompt', {
+                                            total: trackerEntitlements.verifiedTotal,
+                                            limit: trackerEntitlements.freeVerifiedLimit,
+                                        })}
                                     </UiBody>
-                                    <UiButton loading={upgradeLoading} onClick={handleUpgradePremium}>Upgrade to Premium</UiButton>
+                                    <UiButton loading={upgradeLoading} onClick={handleUpgradePremium}>{t('logs.upgradePremium')}</UiButton>
                                 </Stack>
                             </UiCard>
                         )}
                         {trackerEntitlements?.isPremium && (
                             <Box mb="md">
-                                <UiButton variant="ghost" size="xs" loading={upgradeLoading} onClick={handleManageSubscription}>Manage subscription</UiButton>
+                                <UiButton variant="ghost" size="xs" loading={upgradeLoading} onClick={handleManageSubscription}>{t('logs.manageSubscription')}</UiButton>
                             </Box>
                         )}
                         <Tabs.Panel value={'matches'}>
@@ -841,16 +845,16 @@ export function LogsPage() {
                                 scrollHideDelay={0}
                             >
                                 {ticketsLoading ? (
-                                    <LogEmptyState title="Loading tickets" message="Fetching your ticket wallet…" />
+                                    <LogEmptyState title={t('logs.loadingTickets')} message={t('logs.loadingTicketsMessage')} />
                                 ) : myTickets.length === 0 ? (
                                     <UiCard density="spacious" style={{ textAlign: 'center' }}>
                                         <IconTicket size={40} color="var(--ui-text-muted)" style={{ margin: '0 auto 1rem' }} />
-                                        <UiH3 style={{ marginBottom: '0.5rem' }}>No tickets yet</UiH3>
+                                        <UiH3 style={{ marginBottom: '0.5rem' }}>{t('logs.noTickets')}</UiH3>
                                         <UiBody style={{ marginBottom: '1.5rem' }}>
-                                            Tickets you purchase will appear here automatically.
+                                            {t('logs.noTicketsMessage')}
                                         </UiBody>
                                         <UiButton onClick={() => navigateWithTransition('/tickets')}>
-                                            Browse tickets
+                                            {t('logs.browseTickets')}
                                         </UiButton>
                                     </UiCard>
                                 ) : (
@@ -860,28 +864,28 @@ export function LogsPage() {
                                                 <Group justify="space-between" mb="xs">
                                                     <Group gap="sm">
                                                         <IconTicket size={18} color="var(--ui-accent)" />
-                                                        <Text fw={600}>{entry.ticket?.category ?? 'Ticket'}</Text>
+                                                        <Text fw={600}>{entry.ticket?.category ?? t('logs.ticketLabel')}</Text>
                                                     </Group>
-                                                    <UiBadge size="sm">In wallet</UiBadge>
+                                                    <UiBadge size="sm">{t('logs.inWallet')}</UiBadge>
                                                 </Group>
 
                                                 <Stack gap={4} mb="md">
                                                     <Group justify="space-between">
-                                                        <Text size="sm" c="dimmed">Fixture</Text>
+                                                        <Text size="sm" c="dimmed">{t('logs.fixtureLabel')}</Text>
                                                         <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
                                                             {entry.ticket?.fixtureLabel ??
                                                                 `#${entry.ticket?.fixtureId ?? entry.ticketId}`}
                                                         </Text>
                                                     </Group>
                                                     <Group justify="space-between">
-                                                        <Text size="sm" c="dimmed">Ticket #</Text>
+                                                        <Text size="sm" c="dimmed">{t('logs.ticketNumber')}</Text>
                                                         <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
                                                             #{entry.ticketId}
                                                         </Text>
                                                     </Group>
                                                     {entry.ticket?.price != null && (
                                                         <Group justify="space-between">
-                                                            <Text size="sm" c="dimmed">Face Value</Text>
+                                                            <Text size="sm" c="dimmed">{t('logs.faceValue')}</Text>
                                                             <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
                                                                 {new Intl.NumberFormat('en-GB', {
                                                                     style: 'currency',
@@ -905,7 +909,7 @@ export function LogsPage() {
                                                         >
                                                             <Group gap={6}>
                                                                 <IconShoppingBag size={14} />
-                                                                Sell on Marketplace
+                                                                {t('logs.sellOnMarketplace')}
                                                             </Group>
                                                         </UiButton>
                                                     </Group>
@@ -929,7 +933,7 @@ export function LogsPage() {
                         }}
                         variant="primary"
                     >
-                        Go to Top
+                        {t('logs.goToTop')}
                     </UiButton>
                 </Grid.Col>
             </Grid>

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Avatar, Box, Paper, Text, Stack} from "@mantine/core";
+import { useTranslation } from '../../i18n/useTranslation';
 import { Lineup, Player } from "./match.page";
 
 /**
@@ -86,6 +87,7 @@ function arrangePlayersByFormation(players: Player[], formation: string) {
 }
 
 export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
+    const { t } = useTranslation();
     const { gk, df, mf, fw } = arrangePlayersByFormation(lineup.players, lineup.formation);
     const is4222 = isFourTwoTwoTwo(lineup.formation);
 
@@ -148,7 +150,7 @@ export const FormationView = ({ lineup, isPredicted }: FormationViewProps) => {
                             fontWeight: 600,
                         }}
                     >
-                        {isPredicted ? 'Predicted Formation' : 'Formation'}: {lineup.formation}
+                        {isPredicted ? t('match.predictedFormation') : t('match.formation')}: {lineup.formation}
                     </Text>
                 </Stack>
 

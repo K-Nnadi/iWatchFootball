@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons-react';
 import { notify } from '../../shared/notify';
 import { usePageTransition } from '../../hooks/usePageTransition';
+import { formatLocaleDateTime, useTranslation } from '../../i18n';
 import { ModernH1, ModernH3, ModernBody, ModernButton, ModernCard } from '../../components/modern';
 import {
     getActiveListings,
@@ -28,7 +29,21 @@ import {
     type ListingsResponse,
 } from '../../shared/api/marketplace.api';
 
+function listingStatusLabel(status: MarketplaceListing['status'], t: (key: string) => string): string {
+    switch (status) {
+        case 'ACTIVE':
+            return t('marketplace.statusActive');
+        case 'SOLD':
+            return t('marketplace.statusSold');
+        case 'EXPIRED':
+            return t('marketplace.statusExpired');
+        default:
+            return status;
+    }
+}
+
 export function MarketplacePage() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const [data, setData] = useState<ListingsResponse>({ listings: [], total: 0 });
     const [loading, setLoading] = useState(true);
@@ -50,11 +65,11 @@ export function MarketplacePage() {
                 total: typeof result?.total === 'number' ? result.total : 0,
             });
         } catch {
-            notify.error('Failed to load listings', 'Could not fetch marketplace listings. Please try again.');
+            notify.error(t('marketplace.loadFailedTitle'), t('marketplace.loadFailedMessage'));
         } finally {
             setLoading(false);
         }
-    }, [maxPrice, page, teamQuery]);
+    }, [maxPrice, page, teamQuery, t]);
 
     useEffect(() => {
         void fetchListings();
@@ -93,20 +108,20 @@ export function MarketplacePage() {
                 <Group justify="space-between" mb="lg" align="flex-start" wrap="wrap" gap="md">
                     <Group gap="md" align="center">
                         <IconShoppingBag size={32} color="var(--modern-lime)" />
-                        <ModernH1 style={{ margin: 0 }}>Ticket Marketplace</ModernH1>
+                        <ModernH1 style={{ margin: 0 }}>{t('marketplace.title')}</ModernH1>
                     </Group>
                     <Group gap="sm">
                         <ModernButton
                             variant="secondary"
                             onClick={() => navigateWithTransition('/marketplace/my-listings')}
                         >
-                            My Listings
+                            {t('marketplace.myListings')}
                         </ModernButton>
                         <ModernButton
                             variant="primary"
                             onClick={() => navigateWithTransition('/marketplace/sell')}
                         >
-                            + Sell a Ticket
+                            {t('marketplace.sellTicket')}
                         </ModernButton>
                     </Group>
                 </Group>
@@ -118,7 +133,7 @@ export function MarketplacePage() {
                         fontSize: '1.1rem',
                     }}
                 >
-                    Buy resale tickets from other fans. All prices include a platform service fee.
+                    {t('marketplace.description')}
                 </ModernBody>
 
                 {/* Filters */}
@@ -133,8 +148,8 @@ export function MarketplacePage() {
                 >
                     <Group align="flex-end" gap="md" wrap="wrap">
                         <TextInput
-                            label="Team"
-                            placeholder="e.g. Liverpool, Celtic…"
+                            label={t('marketplace.teamLabel')}
+                            placeholder={t('marketplace.teamPlaceholder')}
                             value={teamQuery}
                             onChange={(e) => setTeamQuery(e.currentTarget.value)}
                             leftSection={<IconSearch size={16} />}
@@ -149,8 +164,8 @@ export function MarketplacePage() {
                             }}
                         />
                         <NumberInput
-                            label="Max price (£)"
-                            placeholder="No limit"
+                            label={t('marketplace.maxPrice')}
+                            placeholder={t('marketplace.noLimit')}
                             value={maxPrice}
                             onChange={setMaxPrice}
                             min={0}
@@ -165,7 +180,7 @@ export function MarketplacePage() {
                             }}
                         />
                         <ModernButton variant="primary" onClick={handleFilter}>
-                            Filter
+                            {t('marketplace.filter')}
                         </ModernButton>
                         {(maxPrice !== '' || teamQuery.trim() !== '') && (
                             <ModernButton
@@ -176,7 +191,7 @@ export function MarketplacePage() {
                                     setPage(1);
                                 }}
                             >
-                                Clear
+                                {t('marketplace.clear')}
                             </ModernButton>
                         )}
                     </Group>
@@ -186,7 +201,9 @@ export function MarketplacePage() {
                 {!loading && (
                     <Group justify="space-between" mb="md">
                         <Text style={{ color: 'var(--modern-text-secondary)', fontSize: '0.9rem' }}>
-                            {data.total} listing{data.total !== 1 ? 's' : ''} available
+                            {data.total === 1
+                                ? t('marketplace.listingsAvailableSingular', { count: data.total })
+                                : t('marketplace.listingsAvailablePlural', { count: data.total })}
                         </Text>
                     </Group>
                 )}
@@ -213,10 +230,10 @@ export function MarketplacePage() {
                             style={{ margin: '0 auto 1rem' }}
                         />
                         <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
-                            No listings available
+                            {t('marketplace.emptyTitle')}
                         </ModernH3>
                         <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
-                            There are no tickets for sale right now. Check back later or list your own.
+                            {t('marketplace.emptyMessage')}
                         </ModernBody>
                     </ModernCard>
                 ) : (
@@ -258,7 +275,7 @@ export function MarketplacePage() {
                                                 textTransform: 'uppercase',
                                             }}
                                         >
-                                            {listing.status}
+                                            {listingStatusLabel(listing.status, t)}
                                         </Badge>
                                         <Text size="xs" c="dimmed">
                                             #{listing.id}
@@ -280,10 +297,12 @@ export function MarketplacePage() {
                                                     style={{ color: 'var(--modern-text-primary)' }}
                                                 >
                                                     {listing.ticket?.fixtureLabel ??
-                                                        `Fixture #${listing.ticket?.fixtureId ?? '—'}`}
+                                                        t('marketplace.fixtureFallback', {
+                                                            id: listing.ticket?.fixtureId ?? '—',
+                                                        })}
                                                 </Text>
                                                 <Text size="xs" c="dimmed">
-                                                    {listing.ticket?.category ?? 'General Admission'}
+                                                    {listing.ticket?.category ?? t('marketplace.generalAdmission')}
                                                 </Text>
                                                 {listing.ticket?.stadiumName ? (
                                                     <Group gap={4} wrap="nowrap" align="flex-start">
@@ -300,15 +319,8 @@ export function MarketplacePage() {
                                             </Stack>
                                         </Group>
                                         <Text size="xs" c="dimmed">
-                                            Expires{' '}
-                                            {new Date(listing.expiresAt).toLocaleString('en-GB', {
-                                                weekday: 'short',
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                            })}
+                                            {t('marketplace.expires')}{' '}
+                                            {formatLocaleDateTime(listing.expiresAt)}
                                         </Text>
                                     </Stack>
 
@@ -324,7 +336,7 @@ export function MarketplacePage() {
                                     >
                                         <Stack gap={2}>
                                             <Text size="xs" c="dimmed">
-                                                Seller asking
+                                                {t('marketplace.sellerAsking')}
                                             </Text>
                                             <Text
                                                 size="sm"
@@ -335,7 +347,7 @@ export function MarketplacePage() {
                                             </Text>
                                         </Stack>
                                         <Text size="xs" c="dimmed">
-                                            + platform fee
+                                            {t('marketplace.platformFee')}
                                         </Text>
                                     </Group>
 
@@ -349,7 +361,7 @@ export function MarketplacePage() {
                                             );
                                         }}
                                     >
-                                        View & Buy
+                                        {t('marketplace.viewAndBuy')}
                                     </ModernButton>
                                 </Paper>
                             </Grid.Col>
@@ -365,17 +377,17 @@ export function MarketplacePage() {
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
                         >
-                            Previous
+                            {t('marketplace.previous')}
                         </ModernButton>
                         <Text style={{ color: 'var(--modern-text-secondary)', alignSelf: 'center' }}>
-                            Page {page}
+                            {t('marketplace.page', { page })}
                         </Text>
                         <ModernButton
                             variant="secondary"
                             onClick={() => setPage((p) => p + 1)}
                             disabled={(data.listings ?? []).length < 20}
                         >
-                            Next
+                            {t('marketplace.next')}
                         </ModernButton>
                     </Group>
                 )}

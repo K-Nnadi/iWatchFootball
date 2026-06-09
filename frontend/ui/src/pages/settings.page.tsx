@@ -30,6 +30,7 @@ import {
 } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { UiButton } from '../components/ui';
+import { commsLanguageToLocale, useI18nStore, useTranslation } from '../i18n';
 import { useAuthStore } from '../shared/stores/auth.store';
 import { notify } from '../shared/notify';
 import { useGetQueryTeam, useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
@@ -64,10 +65,12 @@ import {
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
     const { isLoggedIn, logout, user } = useAuthStore();
+    const { t } = useTranslation();
+    const setLocale = useI18nStore((s) => s.setLocale);
 
     const handleLogout = () => {
         logout();
-        notify.info('Signed Out', 'You have been successfully signed out.');
+        notify.info(t('settings.signedOutTitle'), t('settings.signedOutMessage'));
         navigateWithTransition('/');
     };
 
@@ -111,9 +114,9 @@ export function SettingsPage() {
             });
             setTrackerVisibility(updated.trackerVisibility);
             setShareVerifiedOnly(updated.shareVerifiedOnly);
-            notify.success('Tracker privacy updated');
+            notify.success(t('settings.trackerUpdated'), '');
         } catch (e) {
-            notify.error('Could not save', e instanceof Error ? e.message : String(e));
+            notify.error(t('settings.couldNotSave'), e instanceof Error ? e.message : String(e));
         } finally {
             setSavingTrackerPrivacy(false);
         }
@@ -207,16 +210,17 @@ export function SettingsPage() {
             setNewsletterEmails(commsPreferenceData.newsletterEmails);
             setMatchReminders(commsPreferenceData.matchReminders);
             setLanguage(commsPreferenceData.language);
+            setLocale(commsLanguageToLocale(commsPreferenceData.language));
         }
-    }, [commsPreferenceData]);
+    }, [commsPreferenceData, setLocale]);
 
     const updateCommsPrefMutation = useUpdateOneCommsPreference({
         mutation: {
             onSuccess: () => {
-                notify.success('Preferences Saved', 'Your notification preferences have been updated.');
+                notify.success(t('settings.prefsSavedTitle'), t('settings.prefsSavedMessage'));
             },
             onError: (error: any) => {
-                notify.error('Error', error?.response?.data?.message || 'Failed to save notification preferences.');
+                notify.error(t('common.error'), error?.response?.data?.message || t('settings.couldNotSave'));
             },
         },
     });
@@ -261,13 +265,22 @@ export function SettingsPage() {
         }));
     }, [teamsData]);
 
-    const frequencyOptions = [
-        { value: CommsPreferenceEmailNotifications.IMMEDIATE, label: 'Immediately' },
-        { value: CommsPreferenceEmailNotifications.DAILY, label: 'Daily' },
-        { value: CommsPreferenceEmailNotifications.WEEKLY, label: 'Weekly' },
-        { value: CommsPreferenceEmailNotifications.MONTHLY, label: 'Monthly' },
-        { value: CommsPreferenceEmailNotifications.NEVER, label: 'Never' },
-    ];
+    const frequencyOptions = useMemo(() => [
+        { value: CommsPreferenceEmailNotifications.IMMEDIATE, label: t('frequency.immediate') },
+        { value: CommsPreferenceEmailNotifications.DAILY, label: t('frequency.daily') },
+        { value: CommsPreferenceEmailNotifications.WEEKLY, label: t('frequency.weekly') },
+        { value: CommsPreferenceEmailNotifications.MONTHLY, label: t('frequency.monthly') },
+        { value: CommsPreferenceEmailNotifications.NEVER, label: t('frequency.never') },
+    ], [t]);
+
+    const languageOptions = useMemo(() => [
+        { value: CommsPreferenceLanguage.EN, label: t('languages.EN') },
+        { value: CommsPreferenceLanguage.ES, label: t('languages.ES') },
+        { value: CommsPreferenceLanguage.FR, label: t('languages.FR') },
+        { value: CommsPreferenceLanguage.DE, label: t('languages.DE') },
+        { value: CommsPreferenceLanguage.IT, label: t('languages.IT') },
+        { value: CommsPreferenceLanguage.PT, label: t('languages.PT') },
+    ], [t]);
 
     const selectStyles = {
         input: {
@@ -303,9 +316,16 @@ export function SettingsPage() {
     }, [colorScheme]);
 
     function handleSave() {
-        console.log('Saved settings:', { isDarkMode, language, favoriteTeam: isLoggedIn ? favoriteTeamName : undefined });
-        // Save to store or backend
-        notify.success('Settings Saved', 'Your settings have been saved.');
+        if (isLoggedIn && user?.commsPreferenceId && commsPreferenceData) {
+            updateCommsPrefMutation.mutate({
+                id: user.commsPreferenceId,
+                data: {
+                    ...commsPreferenceData,
+                    language,
+                },
+            });
+        }
+        notify.success(t('settings.savedTitle'), t('settings.savedMessage'));
     }
 
     const toggleColourScheme = (dark: boolean) => {
@@ -369,7 +389,7 @@ export function SettingsPage() {
                     fontSize: 'clamp(1.5rem, 4vw, 2rem)',
                 }}
             >
-                Settings
+                {t('settings.title')}
             </Title>
 
             {/* Wallet — reachable from Settings (not main nav) */}
@@ -402,10 +422,10 @@ export function SettingsPage() {
                             </Box>
                             <Stack gap={2}>
                                 <Text fw={600} size="sm" c="var(--modern-text-primary)">
-                                    Wallet
+                                    {t('settings.wallet')}
                                 </Text>
                                 <Text size="xs" c="dimmed">
-                                    Platform credit balance and transaction history from marketplace sales
+                                    {t('settings.walletDescription')}
                                 </Text>
                             </Stack>
                         </Group>
@@ -485,7 +505,7 @@ export function SettingsPage() {
                                             fw={600}
                                             style={{ color: 'var(--modern-text-primary)' }}
                                         >
-                                            Full Name
+                                            {t('settings.fullName')}
                                         </Text>
                                     </Group>
                                     <Text 
@@ -510,7 +530,7 @@ export function SettingsPage() {
                                             fw={600}
                                             style={{ color: 'var(--modern-text-primary)' }}
                                         >
-                                            Email
+                                            {t('settings.emailLabel')}
                                         </Text>
                                     </Group>
                                     <Text 
@@ -679,14 +699,14 @@ export function SettingsPage() {
                                         <Group gap="sm" mb="md">
                                             <IconBell size={20} style={{ color: 'var(--modern-lime)' }} />
                                             <Text fw={600} style={{ color: 'var(--modern-text-primary)' }}>
-                                                Notification Preferences
+                                                {t('settings.notifications')}
                                             </Text>
                                         </Group>
 
                                         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                                             <Box>
                                                 <Text size="xs" mb={4} style={{ color: 'var(--modern-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    Email Notifications
+                                                    {t('settings.channelEmail')}
                                                 </Text>
                                                 <Select
                                                     data={frequencyOptions}
@@ -698,7 +718,7 @@ export function SettingsPage() {
 
                                             <Box>
                                                 <Text size="xs" mb={4} style={{ color: 'var(--modern-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    SMS Notifications
+                                                    {t('settings.sms')}
                                                 </Text>
                                                 <Select
                                                     data={frequencyOptions}
@@ -710,7 +730,7 @@ export function SettingsPage() {
 
                                             <Box>
                                                 <Text size="xs" mb={4} style={{ color: 'var(--modern-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    Push Notifications
+                                                    {t('settings.push')}
                                                 </Text>
                                                 <Select
                                                     data={frequencyOptions}
@@ -722,7 +742,7 @@ export function SettingsPage() {
 
                                             <Box>
                                                 <Text size="xs" mb={4} style={{ color: 'var(--modern-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    In-App Notifications
+                                                    {t('settings.inApp')}
                                                 </Text>
                                                 <Select
                                                     data={frequencyOptions}
@@ -746,7 +766,7 @@ export function SettingsPage() {
 
                                             <Box>
                                                 <Text size="xs" mb={4} style={{ color: 'var(--modern-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    Marketing Emails
+                                                    {t('settings.marketingEmails')}
                                                 </Text>
                                                 <Select
                                                     data={frequencyOptions}
@@ -758,7 +778,7 @@ export function SettingsPage() {
 
                                             <Box>
                                                 <Text size="xs" mb={4} style={{ color: 'var(--modern-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    Newsletter Emails
+                                                    {t('settings.newsletterEmails')}
                                                 </Text>
                                                 <Select
                                                     data={frequencyOptions}
@@ -774,7 +794,7 @@ export function SettingsPage() {
                                                 onClick={handleSaveCommsPrefs}
                                                 loading={updateCommsPrefMutation.isPending}
                                             >
-                                                Save preferences
+                                                {t('settings.savePreferences')}
                                             </UiButton>
                                         </Group>
                                     </Box>
@@ -788,7 +808,7 @@ export function SettingsPage() {
                     {/* General Settings */}
                     <Stack gap="md">
                         <Group justify="space-between">
-                            <Text style={{ color: 'var(--modern-text-primary)' }}>Dark Mode</Text>
+                            <Text style={{ color: 'var(--modern-text-primary)' }}>{t('settings.darkMode')}</Text>
                     <Switch
                         checked={isDarkMode}
                         onChange={(event) => handleDarkModeChange(event.currentTarget.checked)}
@@ -804,18 +824,17 @@ export function SettingsPage() {
                 </Group>
 
                         <Group justify="space-between">
-                            <Text style={{ color: 'var(--modern-text-primary)' }}>Language</Text>
+                            <Text style={{ color: 'var(--modern-text-primary)' }}>{t('settings.language')}</Text>
                             <Select
                                 value={language}
-                                onChange={(value) => value && setLanguage(value as LanguageType)}
-                                data={[
-                                    { value: CommsPreferenceLanguage.EN, label: 'English' },
-                                    { value: CommsPreferenceLanguage.ES, label: 'Español' },
-                                    { value: CommsPreferenceLanguage.FR, label: 'Français' },
-                                    { value: CommsPreferenceLanguage.DE, label: 'Deutsch' },
-                                    { value: CommsPreferenceLanguage.IT, label: 'Italiano' },
-                                    { value: CommsPreferenceLanguage.PT, label: 'Português' },
-                                ]}
+                                onChange={(value) => {
+                                    if (value) {
+                                        const next = value as LanguageType;
+                                        setLanguage(next);
+                                        setLocale(commsLanguageToLocale(next));
+                                    }
+                                }}
+                                data={languageOptions}
                                 style={{ width: 140 }}
                                 styles={selectStyles}
                             />
@@ -826,10 +845,10 @@ export function SettingsPage() {
                     {/* Action Buttons */}
                 <Group justify="flex-end" mt="lg">
                     <UiButton variant="outline" onClick={() => window.history.back()}>
-                        Cancel
+                        {t('settings.cancel')}
                     </UiButton>
                     <UiButton onClick={handleSave}>
-                        Save changes
+                        {t('settings.saveChanges')}
                     </UiButton>
                 </Group>
 
@@ -839,7 +858,7 @@ export function SettingsPage() {
                         <Divider my="xl" />
                         <Group justify="flex-end">
                             <UiButton variant="danger" onClick={handleLogout}>
-                                Sign out
+                                {t('settings.signOut')}
                             </UiButton>
                         </Group>
                     </>

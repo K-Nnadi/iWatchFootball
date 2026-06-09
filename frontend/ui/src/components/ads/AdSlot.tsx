@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n';
 import { useShowAds } from '../../hooks/useShowAds';
 import classes from './AdSlot.module.css';
 
@@ -11,35 +12,36 @@ interface AdSlotProps {
   className?: string;
 }
 
-const PLACEMENT_COPY: Record<AdPlacement, string> = {
-  'rail-left': 'Left rail',
-  'rail-right': 'Right rail',
-  banner: 'Banner',
-};
-
 export function AdSlot({ placement, unitId, className = '' }: AdSlotProps) {
   const showAds = useShowAds();
+  const { t } = useTranslation();
 
   if (!showAds) {
     return null;
   }
 
   const isRail = placement === 'rail-left' || placement === 'rail-right';
+  const placementCopy =
+    placement === 'rail-left'
+      ? t('ads.railLeft')
+      : placement === 'rail-right'
+        ? t('ads.railRight')
+        : t('ads.banner');
 
   return (
     <aside
       className={`${classes.adSlot} ${isRail ? classes.adSlotRail : classes.adSlotBanner} ${className}`}
       data-ad-placement={placement}
       data-ad-unit={unitId}
-      aria-label="Advertisement"
+      aria-label={t('ads.label')}
     >
-      <span className={classes.adLabel}>Ad</span>
+      <span className={classes.adLabel}>{t('ads.label')}</span>
       <span className={classes.adPlaceholder}>
-        {PLACEMENT_COPY[placement]} placement
+        {placementCopy}
         {unitId ? ` · ${unitId}` : ''}
       </span>
       <Link to="/logs" className={classes.adUpsell}>
-        Go ad-free with Premium
+        {t('ads.goAdFree')}
       </Link>
     </aside>
   );

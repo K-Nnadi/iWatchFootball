@@ -5,6 +5,7 @@ import { clientInstance } from '@iWatchFootball/clients/client-instance';
 import { useCreatePrediction } from '@iWatchFootball/clients/controllers/prediction';
 import { useAuthStore } from '../../shared/stores/auth.store';
 import { notify } from '../../shared/notify';
+import { useTranslation } from '../../i18n/useTranslation';
 
 export interface ScorePredictionCardProps {
     homeTeam: string;
@@ -51,6 +52,7 @@ export function ScorePredictionCard({
     date,
     fixtureId,
 }: ScorePredictionCardProps) {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { isLoggedIn, user } = useAuthStore();
 
@@ -99,7 +101,7 @@ export function ScorePredictionCard({
                 await queryClient.invalidateQueries({ queryKey: tallyQueryKey });
             },
             onError: () => {
-                notify.error('Could not save prediction', 'Please try again.');
+                notify.error(t('match.couldNotSavePrediction'), t('match.tryAgain'));
             },
         },
     });
@@ -118,7 +120,7 @@ export function ScorePredictionCard({
 
         if (useFixturePoll) {
             if (!isLoggedIn || !user?.id) {
-                notify.warning('Sign in required', 'Log in to submit your prediction.');
+                notify.warning(t('match.signInRequired'), t('match.signInToPredict'));
                 return;
             }
             createPredictionMut.mutate(
@@ -143,7 +145,7 @@ export function ScorePredictionCard({
         userScorePrediction && !useFixturePoll
             ? [
                   ...demoPredictions,
-                  { userId: 'current-user', username: 'You', prediction: userScorePrediction },
+                  { userId: 'current-user', username: t('match.you'), prediction: userScorePrediction },
               ]
             : demoPredictions;
 
@@ -193,7 +195,7 @@ export function ScorePredictionCard({
     const showPredictionTotalFooter =
         totalPredictions > 0 && (!showEqualSections || userScorePrediction);
 
-    const pollHeading = status === 'past' ? 'Pregame predictions' : 'Who will win?';
+    const pollHeading = status === 'past' ? t('match.pregamePredictions') : t('match.whoWillWin');
 
     const pastFixturePollAwaitingData =
         status === 'past' && useFixturePoll && tallyLoading;
@@ -342,7 +344,7 @@ export function ScorePredictionCard({
                                     padding: '0 8px',
                                 }}
                             >
-                                Draw
+                                {t('match.draw')}
                             </Text>
                         ) : (
                             <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
@@ -407,22 +409,18 @@ export function ScorePredictionCard({
 
                 {showPredictionTotalFooter && (
                     <Text size="sm" c="dimmed" ta="center" mt="md">
-                        Based on{' '}
-                        <Text span fw={700} style={{ color: 'var(--modern-text-primary)' }}>
-                            {totalPredictions}
-                        </Text>{' '}
-                        predictions
+                        {t('match.basedOnPredictions', { count: totalPredictions })}
                     </Text>
                 )}
 
                 {userScorePrediction && status !== 'past' && (
                     <Text size="sm" c="var(--modern-lime)" ta="center" mt="md" fw={600}>
-                        Your prediction:{' '}
+                        {t('match.yourPrediction')}{' '}
                         {userScorePrediction === 'home'
                             ? homeTeam
                             : userScorePrediction === 'away'
                               ? awayTeam
-                              : 'Draw'}
+                              : t('match.draw')}
                     </Text>
                 )}
             </Box>

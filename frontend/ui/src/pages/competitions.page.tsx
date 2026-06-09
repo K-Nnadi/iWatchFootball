@@ -2,12 +2,14 @@ import { useState, useMemo } from 'react';
 import { Container, SimpleGrid, Card, Text, Group, LoadingOverlay, Badge, Box, Stack, Center, TextInput, Divider } from '@mantine/core';
 import { IconWorld, IconFlag, IconTrophy, IconSearch, IconStar } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useTranslation } from '../i18n/useTranslation';
 import { ModernH1, ModernH2, ModernBody } from '../components/modern';
 import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
 import type { Competition } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import '../styles/modern.css';
 
 function CompetitionCard({ comp, index }: { comp: Competition; index: number }) {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const isInternational = !comp.country || comp.country.toLowerCase() === 'international';
 
@@ -72,7 +74,7 @@ function CompetitionCard({ comp, index }: { comp: Competition; index: number }) 
                     {isInternational ? (
                         <>
                             <IconWorld size={14} style={{ color: 'var(--modern-text-secondary)' }} />
-                            <Text size="xs" c="dimmed">International</Text>
+                            <Text size="xs" c="dimmed">{t('competitions.international')}</Text>
                         </>
                     ) : (
                         <>
@@ -87,6 +89,7 @@ function CompetitionCard({ comp, index }: { comp: Competition; index: number }) 
 }
 
 export function CompetitionsPage() {
+    const { t } = useTranslation();
     const { data: competitions = [], isLoading: loading } = useGetQueryCompetition({ take: 200 } as any);
     const [search, setSearch] = useState('');
 
@@ -107,14 +110,14 @@ export function CompetitionsPage() {
         <Container size="xl" my="xl" pos="relative">
             <LoadingOverlay visible={loading} />
             <Box mb="xl">
-                <ModernH1 style={{ marginBottom: '1.5rem' }}>Competitions</ModernH1>
+                <ModernH1 style={{ marginBottom: '1.5rem' }}>{t('competitions.title')}</ModernH1>
                 <ModernBody style={{ maxWidth: '600px' }}>
-                    Explore football competitions from around the world
+                    {t('competitions.subtitle')}
                 </ModernBody>
             </Box>
 
             <TextInput
-                placeholder="Search by name, country or type…"
+                placeholder={t('competitions.searchPlaceholder')}
                 leftSection={<IconSearch size={16} />}
                 value={search}
                 onChange={e => setSearch(e.currentTarget.value)}
@@ -131,14 +134,14 @@ export function CompetitionsPage() {
             />
 
             {filtered.length === 0 && !loading && (
-                <Text c="dimmed" ta="center" py="xl">No competitions match "{search}"</Text>
+                <Text c="dimmed" ta="center" py="xl">{t('competitions.noResults', { query: search })}</Text>
             )}
 
             {featured.length > 0 && (
                 <>
                     <Group gap="xs" mb="lg">
                         <IconStar size={20} style={{ color: 'var(--modern-lime)' }} />
-                        <ModernH2 style={{ margin: 0 }}>Featured</ModernH2>
+                        <ModernH2 style={{ margin: 0 }}>{t('competitions.featured')}</ModernH2>
                     </Group>
                     <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing="md" mb="xl">
                         {featured.map((comp, i) => <CompetitionCard key={comp.id} comp={comp} index={i} />)}
@@ -152,7 +155,7 @@ export function CompetitionsPage() {
                     {featured.length > 0 && (
                         <Group gap="xs" mb="lg">
                             <IconTrophy size={20} style={{ color: 'var(--modern-text-secondary)' }} />
-                            <ModernH2 style={{ margin: 0, color: 'var(--modern-text-secondary)' }}>All Competitions</ModernH2>
+                            <ModernH2 style={{ margin: 0, color: 'var(--modern-text-secondary)' }}>{t('competitions.allCompetitions')}</ModernH2>
                         </Group>
                     )}
                     <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing="md">

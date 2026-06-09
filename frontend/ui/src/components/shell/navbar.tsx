@@ -4,12 +4,14 @@ import {useLocation} from "react-router-dom";
 import {useHeaderNavbarStore} from "../../shared/stores/headerNavbar.store";
 import {useAuthStore} from "../../shared/stores/auth.store";
 import {usePlatformFeaturesStore} from "../../shared/stores/platformFeatures.store";
+import {useTranslation} from "../../i18n";
 import {useEffect, useState, useRef} from "react";
 
 export function Navbar() {
     const { navigateWithTransition } = usePageTransition();
     const { isLoggedIn } = useAuthStore();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
+    const { t } = useTranslation();
     const location = useLocation();
     const homePath = isLoggedIn ? "/home" : "/";
     const { toggleNavbar, navbarOpen } = useHeaderNavbarStore();
@@ -44,13 +46,13 @@ export function Navbar() {
     }, [navbarOpen]);
     
     const navItems = [
-        { label: "Home", path: homePath },
-        { label: "Logs", path: "/logs" },
-        { label: "Friends", path: "/friends" },
-        { label: "Matches", path: "/matches" },
-        { label: "Competitions", path: "/competitions" },
-        ...(marketplaceEnabled ? [{ label: "Marketplace", path: "/marketplace" }] : []),
-        { label: "Settings", path: "/settings" }
+        { label: t('nav.home'), path: homePath },
+        { label: t('nav.logs'), path: "/logs" },
+        { label: t('nav.friends'), path: "/friends" },
+        { label: t('nav.matches'), path: "/matches" },
+        { label: t('nav.competitions'), path: "/competitions" },
+        ...(marketplaceEnabled ? [{ label: t('nav.marketplace'), path: "/marketplace" }] : []),
+        { label: t('nav.settings'), path: "/settings" }
     ];
     
     const isCurrentPage = (path: string) => {

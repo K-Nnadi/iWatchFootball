@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Box, LoadingOverlay, Stack } from '@mantine/core';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { MatchToolbar } from '../components/filters/MatchToolbar';
+import { formatMatchShortDate, useTranslation } from '../i18n';
 import {
     UiBody,
     UiCard,
@@ -90,6 +91,7 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
 
 export function MatchesPage() {
     const { navigateWithTransition } = usePageTransition();
+    const { t } = useTranslation();
     const [matches, setMatches] = useState<TodayMatch[]>([]);
     const [loading, setLoading] = useState(true);
     const [showLive, setShowLive] = useState(false);
@@ -167,10 +169,10 @@ export function MatchesPage() {
         const dayToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const diff = (dayDate.getTime() - dayToday.getTime()) / (24 * 3600 * 1000);
 
-        if (diff === 0) return 'Today';
-        if (diff === -1) return 'Yesterday';
-        if (diff === 1) return 'Tomorrow';
-        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        if (diff === 0) return t('matches.today');
+        if (diff === -1) return t('matches.yesterday');
+        if (diff === 1) return t('matches.tomorrow');
+        return formatMatchShortDate(d);
     }
 
     useEffect(() => {
@@ -298,7 +300,7 @@ export function MatchesPage() {
         <Box style={{ backgroundColor: 'var(--ui-bg-base)', minHeight: '100vh' }}>
             <UiPageContainer size="lg">
                 <Stack gap="lg">
-                    <UiH1>Matches</UiH1>
+                    <UiH1>{t('matches.title')}</UiH1>
 
                     <MatchToolbar
                         dates={dates}
@@ -324,13 +326,13 @@ export function MatchesPage() {
                             <UiCard density="spacious" style={{ textAlign: 'center' }}>
                                 <UiH3 style={{ marginBottom: '0.5rem' }}>
                                     {showLive || showAvailableTickets || teamSearch.trim()
-                                        ? 'No matches match your filters'
-                                        : 'No matches on this date'}
+                                        ? t('matches.noMatchesFilters')
+                                        : t('matches.noMatchesDate')}
                                 </UiH3>
                                 <UiBody>
                                     {showLive || showAvailableTickets || teamSearch.trim()
-                                        ? 'Try adjusting your filters'
-                                        : 'Check back later for upcoming fixtures'}
+                                        ? t('matches.tryAdjustingFilters')
+                                        : t('matches.checkBackLater')}
                                 </UiBody>
                             </UiCard>
                         ) : (

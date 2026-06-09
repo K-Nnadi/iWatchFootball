@@ -22,6 +22,7 @@ import {
 } from '@tabler/icons-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useTranslation } from '../i18n/useTranslation';
 import { notify } from '../shared/notify';
 import { ModernButton, ModernCard, ModernH2, ModernBody, ModernCaption } from '../components/modern';
 import {
@@ -53,6 +54,7 @@ function PendingRequestRow({
     onAccept: (id: number) => void;
     onDecline: (id: number) => void;
 }) {
+    const { t } = useTranslation();
     const isIncoming = request.direction === 'incoming';
 
     return (
@@ -86,7 +88,7 @@ function PendingRequestRow({
                             {request.user.firstName} {request.user.lastName}
                         </Text>
                         <Text size="xs" c={isIncoming ? 'var(--modern-lime)' : 'dimmed'}>
-                            {isIncoming ? 'Wants to be friends' : 'Waiting for response'}
+                            {isIncoming ? t('friends.wantsToBeFriends') : t('friends.waitingForResponse')}
                         </Text>
                     </Stack>
                 </Group>
@@ -106,7 +108,7 @@ function PendingRequestRow({
                                 },
                             }}
                         >
-                            Accept
+                            {t('friends.accept')}
                         </ModernButton>
                         <ModernButton
                             size="sm"
@@ -131,7 +133,7 @@ function PendingRequestRow({
                                 },
                             }}
                         >
-                            Decline
+                            {t('friends.decline')}
                         </ModernButton>
                     </Group>
                 ) : (
@@ -151,7 +153,7 @@ function PendingRequestRow({
                             },
                         }}
                     >
-                        Pending
+                        {t('friends.pending')}
                     </Badge>
                 )}
             </Group>
@@ -160,6 +162,7 @@ function PendingRequestRow({
 }
 
 export function FriendsPage() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const queryClient = useQueryClient();
     const [searchValue, setSearchValue] = useState('');
@@ -195,22 +198,22 @@ export function FriendsPage() {
     const handleAddFriend = async (user: PublicUserSummary) => {
         try {
             await sendFriendRequest({ userId: user.id });
-            notify.success('Request sent', `Friend request sent to @${user.userName}`);
+            notify.success(t('friends.requestSentTitle'), t('friends.requestSentMessage', { userName: user.userName }));
             setSearchValue('');
             setSearchResults([]);
             await invalidate();
         } catch (e) {
-            notify.error('Could not send request', e instanceof Error ? e.message : String(e));
+            notify.error(t('friends.couldNotSend'), e instanceof Error ? e.message : String(e));
         }
     };
 
     const handleAccept = async (connectionId: number) => {
         try {
             await acceptFriendRequest(connectionId);
-            notify.success('Friend added');
+            notify.success(t('friends.friendAdded'), '');
             await invalidate();
         } catch (e) {
-            notify.error('Could not accept', e instanceof Error ? e.message : String(e));
+            notify.error(t('friends.couldNotAccept'), e instanceof Error ? e.message : String(e));
         }
     };
 
@@ -219,17 +222,17 @@ export function FriendsPage() {
             await declineFriendRequest(connectionId);
             await invalidate();
         } catch (e) {
-            notify.error('Could not decline', e instanceof Error ? e.message : String(e));
+            notify.error(t('friends.couldNotDecline'), e instanceof Error ? e.message : String(e));
         }
     };
 
     const handleRemove = async (connectionId: number) => {
         try {
             await removeFriend(connectionId);
-            notify.info('Friend removed');
+            notify.info(t('friends.friendRemoved'), '');
             await invalidate();
         } catch (e) {
-            notify.error('Could not remove', e instanceof Error ? e.message : String(e));
+            notify.error(t('friends.couldNotRemove'), e instanceof Error ? e.message : String(e));
         }
     };
 
@@ -245,11 +248,10 @@ export function FriendsPage() {
             <Stack gap="lg">
                 <Group gap="sm">
                     <IconUsers size={28} color="var(--modern-lime)" />
-                    <ModernH2>Friends</ModernH2>
+                    <ModernH2>{t('friends.title')}</ModernH2>
                 </Group>
                 <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                    Add friends to compare match-going stats. Friends must share their tracker (Settings →
-                    Tracker privacy) for compare to work.
+                    {t('friends.description')}
                 </ModernBody>
 
                 <ModernCard padding="md">
@@ -257,11 +259,11 @@ export function FriendsPage() {
                         <Group gap="xs">
                             <IconUserPlus size={18} color="var(--modern-lime)" />
                             <Text fw={600} c="var(--modern-text-primary)">
-                                Find people
+                                {t('friends.findPeople')}
                             </Text>
                         </Group>
                         <Autocomplete
-                            placeholder="Search by username or name"
+                            placeholder={t('friends.searchPlaceholder')}
                             value={searchValue}
                             onChange={setSearchValue}
                             data={autocompleteData}
@@ -294,7 +296,7 @@ export function FriendsPage() {
                             <ModernCard padding="md">
                                 <Group justify="space-between" mb="md">
                                     <Text fw={600} c="var(--modern-text-primary)">
-                                        Pending requests
+                                        {t('friends.pendingRequests')}
                                     </Text>
                                     {incomingCount > 0 && (
                                         <Badge
@@ -304,7 +306,7 @@ export function FriendsPage() {
                                                 color: 'var(--modern-black)',
                                             }}
                                         >
-                                            {incomingCount} new
+                                            {t('friends.newCount', { count: incomingCount })}
                                         </Badge>
                                     )}
                                 </Group>
@@ -331,11 +333,11 @@ export function FriendsPage() {
 
                         <ModernCard padding="md">
                             <Text fw={600} mb="md" c="var(--modern-text-primary)">
-                                Your friends ({data?.friends.length ?? 0})
+                                {t('friends.yourFriends', { count: data?.friends.length ?? 0 })}
                             </Text>
                             {(data?.friends.length ?? 0) === 0 ? (
                                 <ModernCaption style={{ color: 'var(--modern-text-secondary)' }}>
-                                    No friends yet. Search above to send a request.
+                                    {t('friends.emptyFriends')}
                                 </ModernCaption>
                             ) : (
                                 <Stack gap={0}>
@@ -389,13 +391,13 @@ export function FriendsPage() {
                                                             navigateWithTransition(`/friends/compare/${f.id}`)
                                                         }
                                                     >
-                                                        Compare
+                                                        {t('friends.compare')}
                                                     </ModernButton>
                                                     <ActionIcon
                                                         variant="subtle"
                                                         color="red"
                                                         size="lg"
-                                                        aria-label="Remove friend"
+                                                        aria-label={t('friends.removeFriend')}
                                                         onClick={() => void handleRemove(f.connectionId)}
                                                         style={{
                                                             border: '1px solid var(--modern-border-color)',

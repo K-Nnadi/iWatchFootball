@@ -18,6 +18,7 @@ import { useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetOneStadium } from '@iWatchFootball/clients/controllers/stadium';
 import { useGetOneCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { clientInstance } from '@iWatchFootball/clients/client-instance';
+import { useTranslation } from '../../i18n/useTranslation';
 import {
     attachLineupsToFixtureSides,
     collectPositionIds,
@@ -65,6 +66,7 @@ function routeUsesHardcodedMatchPreview(routeFixtureId: string | undefined): boo
 }
 
 export function MatchPage() {
+    const { t } = useTranslation();
     const { id: routeFixtureId } = useParams<{ id: string }>();
     const fixtureNumericId = routeFixtureId ? parseInt(routeFixtureId, 10) : NaN;
     const useHardcodedPreview = routeUsesHardcodedMatchPreview(routeFixtureId);
@@ -287,7 +289,7 @@ export function MatchPage() {
         return (
             <Container size="xl" py="xl">
                 <Center>
-                    <Text c="dimmed">Missing match id.</Text>
+                    <Text c="dimmed">{t('match.missingMatchId')}</Text>
                 </Center>
             </Container>
         );
@@ -297,7 +299,7 @@ export function MatchPage() {
         return (
             <Container size="xl" py="xl">
                 <Center>
-                    <Text c="dimmed">Invalid match id.</Text>
+                    <Text c="dimmed">{t('match.invalidMatchId')}</Text>
                 </Center>
             </Container>
         );
@@ -307,7 +309,7 @@ export function MatchPage() {
         return (
             <Container size="xl" py="xl">
                 <Center>
-                    <Text c="dimmed">Could not load fixture #{routeFixtureId}.</Text>
+                    <Text c="dimmed">{t('match.couldNotLoadFixture', { id: routeFixtureId })}</Text>
                 </Center>
             </Container>
         );
@@ -317,7 +319,7 @@ export function MatchPage() {
         return (
             <Container size="xl" py="xl">
                 <Center>
-                    <Text c="dimmed">Fixture data is incomplete.</Text>
+                    <Text c="dimmed">{t('match.fixtureIncomplete')}</Text>
                 </Center>
             </Container>
         );

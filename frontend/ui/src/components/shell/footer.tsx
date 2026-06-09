@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react';
 import React from "react";
 import { usePageTransition } from "../../hooks/usePageTransition";
+import { useTranslation } from "../../i18n";
 import classes from './styles/footer.module.css';
 
 
@@ -15,25 +16,26 @@ import classes from './styles/footer.module.css';
 export function Footer() {
     const { navigateWithTransition } = usePageTransition();
     const { colorScheme } = useMantineColorScheme();
+    const { t } = useTranslation();
     const isDark = colorScheme === 'dark';
 
     const quickLinks = [
-        { label: 'All matches', path: '/matches' },
-        { label: 'All teams', path: '/teams' },
-        { label: 'All competitions', path: '/competitions' },
-        { label: 'Tickets', path: '/tickets' }
+        { label: t('footer.allMatches'), path: '/matches' },
+        { label: t('footer.allTeams'), path: '/teams' },
+        { label: t('footer.allCompetitions'), path: '/competitions' },
+        { label: t('footer.tickets'), path: '/tickets' }
     ];
 
     const aboutLinks = [
-        { label: 'Contact Us', path: '/contact' },
-        { label: 'Help', path: '/help' }
+        { label: t('footer.contactUs'), path: '/contact' },
+        { label: t('footer.help'), path: '/help' }
     ];
 
     const legalLinks = [
-        { label: 'Privacy Policy', path: '/privacy', external: false },
-        { label: 'Terms and Conditions', path: '/terms', external: false },
-        { label: 'Cookie Policy', path: '/cookies', external: false },
-        { label: 'Licenses', path: '/licenses', external: false }
+        { label: t('footer.privacyPolicy'), path: '/privacy', external: false },
+        { label: t('footer.terms'), path: '/terms', external: false },
+        { label: t('footer.cookiePolicy'), path: '/cookies', external: false },
+        { label: t('footer.licenses'), path: '/licenses', external: false }
     ];
 
     const moreLinks = [
@@ -73,7 +75,7 @@ export function Footer() {
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
                         <Stack gap="md">
                             <Title order={5} fw={600} size="sm" className={classes.sectionTitle}>
-                                Quick Links
+                                {t('footer.quickLinks')}
                             </Title>
                             <Stack gap="xs">
                                 {quickLinks.map((link) => (
@@ -95,7 +97,7 @@ export function Footer() {
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
                         <Stack gap="md">
                             <Title order={5} fw={600} size="sm" className={classes.sectionTitle}>
-                                About Us
+                                {t('footer.about')}
                             </Title>
                             <Stack gap="xs">
                                 {aboutLinks.map((link) => (
@@ -117,7 +119,7 @@ export function Footer() {
                     <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
                         <Stack gap="md">
                             <Title order={5} fw={600} size="sm" className={classes.sectionTitle}>
-                                Legal
+                                {t('footer.legal')}
                             </Title>
                             <Stack gap="xs">
                                 {legalLinks.map((link) => (
@@ -162,7 +164,7 @@ export function Footer() {
                 <Grid align="center">
                     <Grid.Col span={{ base: 12, md: 6 }}>
                         <Text className={classes.copyright} size="sm">
-                            2025 I Watch Football
+                            {t('footer.copyright', { year: new Date().getFullYear() })}
                         </Text>
                     </Grid.Col>
                 </Grid>

@@ -26,8 +26,10 @@ import {usePageTransition} from "../hooks/usePageTransition";
 import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
 import { UiAccent, UiCaption, UiMatchList, UiSectionHeader } from '../components/ui';
+import { useTranslation } from '../i18n/useTranslation';
 
 function HeroSection() {
+    const { t } = useTranslation();
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
     
@@ -68,13 +70,14 @@ function HeroSection() {
                 <Grid align="center" gutter="xl">
                     <Grid.Col span={{base: 12, md: 6}}>
                         <Stack gap="xl" className="hero-content">
-                            <UiCaption>Football Tracking Platform</UiCaption>
+                            <UiCaption>{t('home.heroTagline')}</UiCaption>
                             <ModernH1>
-                                Your Ultimate <UiAccent>Football</UiAccent> Companion
+                                {t('home.heroTitlePrefix')}{' '}
+                                <UiAccent>{t('home.heroTitleAccent')}</UiAccent>{' '}
+                                {t('home.heroTitleSuffix')}
                             </ModernH1>
                             <ModernBody>
-                                Live scores, personalised statistics, and ticket bookings all in one place.
-                                Experience football like never before with our cutting-edge platform.
+                                {t('home.heroDescription')}
                             </ModernBody>
                         </Stack>
                     </Grid.Col>
@@ -103,6 +106,7 @@ function HeroSection() {
 
 // Live Matches Section — Fotmob-style compact match list
 function LiveMatchesSection() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 0, threshold: 0.2 });
 
@@ -172,10 +176,11 @@ function LiveMatchesSection() {
                 <UiSectionHeader
                     title={
                         <>
-                            Live <UiAccent>Matches</UiAccent>
+                            {t('home.liveTitlePrefix')}{' '}
+                            <UiAccent>{t('home.liveTitleAccent')}</UiAccent>
                         </>
                     }
-                    action={{ label: 'View all', onClick: () => navigateWithTransition('/matches') }}
+                    action={{ label: t('home.viewAll'), onClick: () => navigateWithTransition('/matches') }}
                 />
                 <UiMatchList
                     groups={matchGroups}
@@ -188,6 +193,7 @@ function LiveMatchesSection() {
 
 // Top News Section Component
 function TopNewsSection() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 150, threshold: 0.2 });
     const theme = useMantineTheme();
@@ -297,14 +303,15 @@ function TopNewsSection() {
             <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
                 <Group justify="space-between" mb="3rem" wrap="wrap" gap="md">
                     <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 2rem)' }}>
-                        Top <span style={{color: 'var(--modern-lime)'}}>News</span>
+                        {t('home.topNewsPrefix')}{' '}
+                        <span style={{color: 'var(--modern-lime)'}}>{t('home.topNewsAccent')}</span>
                     </ModernH2>
                     <ModernButton 
                         variant="secondary"
                         size="sm"
                         onClick={() => navigateWithTransition('/news')}
                     >
-                        View All
+                        {t('home.viewAll')}
                     </ModernButton>
                 </Group>
 
@@ -455,25 +462,26 @@ function TopNewsSection() {
 
 // Features Section Component
 function FeaturesSection() {
+    const { t } = useTranslation();
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 200, threshold: 0.2 });
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
     const features = [
         {
             icon: IconBell,
-            title: 'Personalised Stats',
-            description: 'Measure your football journey-track games attended, goals you’ve witnessed, and total stadiums visited.'
+            title: t('home.featurePersonalisedStats'),
+            description: t('home.featurePersonalisedStatsDesc'),
         },
         {
             icon: IconTicket,
-            title: 'Easy Ticketing',
-            description: 'Secure tickets for matches across all major leagues with our verified partners.'
+            title: t('home.featureEasyTicketing'),
+            description: t('home.featureEasyTicketingDesc'),
         },
         {
             icon: IconVideo,
-            title: 'Match Highlights',
-            description: 'Watch extended highlights and key moments from all the top matches.'
-        }
+            title: t('home.featureHighlights'),
+            description: t('home.featureHighlightsDesc'),
+        },
     ];
 
     return (
@@ -510,7 +518,9 @@ function FeaturesSection() {
                     marginBottom: isMobile ? '2rem' : '4rem',
                     fontSize: 'clamp(1.25rem, 4vw, 2rem)'
                 }}>
-                    Why Choose <span style={{color: 'var(--modern-lime)'}}>I Watch Football</span>?
+                    {t('home.whyChoosePrefix')}{' '}
+                    <span style={{color: 'var(--modern-lime)'}}>{t('home.whyChooseAccent')}</span>
+                    {t('home.whyChooseSuffix')}
                 </ModernH2>
 
                 <Grid gutter="xl">

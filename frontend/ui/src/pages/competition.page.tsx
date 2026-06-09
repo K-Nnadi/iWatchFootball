@@ -15,6 +15,7 @@ import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture'
 import { clientInstance } from '@iWatchFootball/clients/client-instance';
 import { useQuery } from '@tanstack/react-query';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { formatMatchHeadingDate, useTranslation } from '../i18n';
 import '../styles/modern.css';
 import { resolveFixtureScores, type FixtureScoresInput } from '../shared/fixtureScores';
 
@@ -34,15 +35,6 @@ type TeamRecord = {
     name?: string;
     logoUrl?: string;
 };
-
-function formatFixtureDateLabel(dateKey: string): string {
-    return new Date(`${dateKey}T12:00:00`).toLocaleDateString('en-GB', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
-}
 
 function fixtureToMatchRowData(fix: FixtureRecord, teams: TeamRecord[]): MatchRowData {
     const homeTeam = teams.find((t) => t.id === fix.homeTeamId);
@@ -135,6 +127,7 @@ function useCompetitionSeasonStandings(competitionId: number, seasonId: number |
 }
 
 export function CompetitionPage() {
+    const { t, locale } = useTranslation();
     const { id: competitionIdStr } = useParams<{ id: string }>();
     const competitionId = Number(competitionIdStr);
     const { navigateWithTransition } = usePageTransition();
@@ -200,16 +193,16 @@ export function CompetitionPage() {
             (groups[key] ??= []).push(f);
         });
         return Object.entries(groups).map(([date, dayFixtures]) => ({
-            league: formatFixtureDateLabel(date),
+            league: formatMatchHeadingDate(new Date(`${date}T12:00:00`)),
             matches: dayFixtures.map((f) => fixtureToMatchRowData(f, teamsData as TeamRecord[])),
         }));
-    }, [fixtures, teamsData]);
+    }, [fixtures, teamsData, locale]);
 
     const isInternational = !competition?.country || competition.country.toLowerCase() === 'international';
     const loading = isLoadingComp || isLoadingTcs;
 
     if (loading) return <Container size="xl" my="xl" pos="relative"><LoadingOverlay visible /></Container>;
-    if (!competition) return <Container size="xl" my="xl"><Text c="dimmed">Competition not found.</Text></Container>;
+    if (!competition) return <Container size="xl" my="xl"><Text c="dimmed">{t('competitions.notFound')}</Text></Container>;
 
     return (
         <Container size="xl" my="xl" pos="relative">
@@ -224,7 +217,7 @@ export function CompetitionPage() {
                         <ModernH2 style={{ margin: 0 }}>{competition.name}</ModernH2>
                         <Group gap="xs">
                             {isInternational ? (
-                                <><IconWorld size={14} style={{ color: 'var(--modern-text-secondary)' }} /><Text size="sm" c="dimmed">International Competition</Text></>
+                                <><IconWorld size={14} style={{ color: 'var(--modern-text-secondary)' }} /><Text size="sm" c="dimmed">{t('competitions.internationalCompetition')}</Text></>
                             ) : (
                                 <><IconFlag size={14} style={{ color: 'var(--modern-text-secondary)' }} /><Text size="sm" c="dimmed">{competition.country}</Text></>
                             )}
@@ -240,7 +233,7 @@ export function CompetitionPage() {
                     {seasonOptions.length > 0 && (
                         <Select
                             size="sm"
-                            placeholder="Season"
+                            placeholder={t('competitions.season')}
                             value={selectedSeasonId ?? String(seasonOptions[0]?.id ?? '')}
                             onChange={setSelectedSeasonId}
                             data={seasonOptions.map(s => ({ value: String(s.id), label: `${s.yearStart}/${s.yearEnd}` }))}
@@ -259,8 +252,8 @@ export function CompetitionPage() {
                 },
             }}>
                 <Tabs.List>
-                    <Tabs.Tab value="table" leftSection={<IconTable size={16} />}>Table</Tabs.Tab>
-                    <Tabs.Tab value="fixtures" leftSection={<IconCalendar size={16} />}>Fixtures</Tabs.Tab>
+                    <Tabs.Tab value="table" leftSection={<IconTable size={16} />}>{t('competitions.tabTable')}</Tabs.Tab>
+                    <Tabs.Tab value="fixtures" leftSection={<IconCalendar size={16} />}>{t('competitions.tabFixtures')}</Tabs.Tab>
                 </Tabs.List>
 
                 {/* ── Standings tab ── */}
@@ -271,7 +264,7 @@ export function CompetitionPage() {
                         <Center py="xl">
                             <Stack align="center" gap="md">
                                 <IconTable size={48} style={{ color: 'var(--modern-text-secondary)', opacity: 0.4 }} />
-                                <Text c="dimmed">No standings data for this season yet</Text>
+                                <Text c="dimmed">{t('competitions.noStandings')}</Text>
                             </Stack>
                         </Center>
                     ) : (
@@ -283,7 +276,7 @@ export function CompetitionPage() {
                                 <Table.Thead>
                                     <Table.Tr>
                                         <Table.Th w={40}>#</Table.Th>
-                                        <Table.Th>Team</Table.Th>
+                                        <Table.Th>{t('competitions.team')}</Table.Th>
                                         <Table.Th ta="center">P</Table.Th>
                                         <Table.Th ta="center">W</Table.Th>
                                         <Table.Th ta="center">D</Table.Th>
@@ -292,7 +285,7 @@ export function CompetitionPage() {
                                         <Table.Th ta="center">GA</Table.Th>
                                         <Table.Th ta="center">GD</Table.Th>
                                         <Table.Th ta="center" fw={700}>Pts</Table.Th>
-                                        <Table.Th ta="center">Form</Table.Th>
+                                        <Table.Th ta="center">{t('competitions.form')}</Table.Th>
                                     </Table.Tr>
                                 </Table.Thead>
                                 <Table.Tbody>
@@ -347,7 +340,7 @@ export function CompetitionPage() {
                         <Center py="xl">
                             <Stack align="center" gap="md">
                                 <IconCalendar size={48} style={{ color: 'var(--modern-text-secondary)', opacity: 0.4 }} />
-                                <Text c="dimmed">No fixtures for this season</Text>
+                                <Text c="dimmed">{t('competitions.noFixtures')}</Text>
                             </Stack>
                         </Center>
                     ) : (

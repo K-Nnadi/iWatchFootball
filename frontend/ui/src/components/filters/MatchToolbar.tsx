@@ -9,16 +9,8 @@ import {
     IconSearch,
 } from '@tabler/icons-react';
 import { UiButton, MatchDatePicker, matchDatePickerClasses } from '../ui';
+import { formatMatchHeadingDate, useTranslation } from '../../i18n';
 import classes from './MatchToolbar.module.css';
-
-function formatHeadingDate(date: Date): string {
-    return date.toLocaleDateString(undefined, {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
-}
 
 interface MatchToolbarProps {
     dates: Date[];
@@ -56,6 +48,7 @@ export function MatchToolbar({
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isCompact = useMediaQuery('(max-width: 640px)');
     const [datePickerOpened, setDatePickerOpened] = useState(false);
+    const { t } = useTranslation();
 
     const selectedDate = dates[selectedDateIndex];
     const hasActiveFilters = showLive || showAvailableTickets || teamSearch.trim().length > 0;
@@ -93,11 +86,11 @@ export function MatchToolbar({
             <div className={classes.dateSection}>
                 <div className={classes.dateHeadingRow}>
                     <Text className={classes.dateHeading}>
-                        {selectedDate ? formatHeadingDate(selectedDate) : 'Select a date'}
+                        {selectedDate ? formatMatchHeadingDate(selectedDate) : t('matches.selectDate')}
                     </Text>
                     {showTodayLink && (
                         <UnstyledButton className={classes.todayLink} onClick={onReturnToToday}>
-                            Jump to today
+                            {t('matches.jumpToToday')}
                         </UnstyledButton>
                     )}
                 </div>
@@ -108,7 +101,7 @@ export function MatchToolbar({
                         variant="default"
                         size="lg"
                         className={classes.navIcon}
-                        aria-label="Previous days"
+                        aria-label={t('matches.prevDays')}
                     >
                         <IconChevronLeft size={18} />
                     </ActionIcon>
@@ -145,7 +138,7 @@ export function MatchToolbar({
                         variant="default"
                         size="lg"
                         className={classes.navIcon}
-                        aria-label="Next days"
+                        aria-label={t('matches.nextDays')}
                     >
                         <IconChevronRight size={18} />
                     </ActionIcon>
@@ -164,7 +157,7 @@ export function MatchToolbar({
                             onClick={() => setDatePickerOpened((open) => !open)}
                         >
                             <IconCalendar size={15} />
-                            Pick a date
+                            {t('matches.pickDate')}
                         </UnstyledButton>
                     </Popover.Target>
                     <Popover.Dropdown className={matchDatePickerClasses.popoverDropdown}>
@@ -192,7 +185,7 @@ export function MatchToolbar({
                         color="green"
                         styles={chipStyles}
                     >
-                        Live now
+                        {t('matches.liveNow')}
                     </Chip>
                     <Chip
                         checked={showAvailableTickets}
@@ -201,22 +194,22 @@ export function MatchToolbar({
                         color="green"
                         styles={chipStyles}
                     >
-                        Has tickets
+                        {t('matches.hasTickets')}
                     </Chip>
                 </Group>
 
                 <TextInput
                     className={classes.searchInput}
-                    placeholder="Search by team…"
+                    placeholder={t('matches.searchTeams')}
                     value={teamSearch}
                     onChange={(e) => onTeamSearchChange(e.currentTarget.value)}
                     leftSection={<IconSearch size={16} stroke={1.75} />}
-                    aria-label="Search by team name"
+                    aria-label={t('matches.searchAriaLabel')}
                 />
 
                 {hasActiveFilters && (
                     <UnstyledButton className={classes.clearLink} onClick={handleClear}>
-                        Clear filters
+                        {t('matches.clearFilters')}
                     </UnstyledButton>
                 )}
             </div>

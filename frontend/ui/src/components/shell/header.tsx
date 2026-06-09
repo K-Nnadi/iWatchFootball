@@ -8,6 +8,7 @@ import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
 import { useCartStore } from '../../shared/stores/cart.store';
 import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
 import { UiButton } from '../ui';
+import { useTranslation } from '../../i18n';
 import classes from './styles/header.module.css';
 
 /** Navbar cart + Sign In / Join are redundant on public auth screens (already on login / register / recover). */
@@ -50,14 +51,15 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
     const { items } = useCartStore();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
+    const { t } = useTranslation();
     const hasCartItems = items.length > 0;
     const goHome = () => navigateWithTransition(isLoggedIn ? '/home' : '/');
 
     const pages = [
-        { page: 'competitions', label: 'Competitions' },
-        { page: 'matches', label: 'Matches' },
-        ...(marketplaceEnabled ? [{ page: 'marketplace', label: 'Marketplace' }] : []),
-        { page: 'logs', label: 'Logs' },
+        { page: 'competitions', label: t('nav.competitions') },
+        { page: 'matches', label: t('nav.matches') },
+        ...(marketplaceEnabled ? [{ page: 'marketplace', label: t('nav.marketplace') }] : []),
+        { page: 'logs', label: t('nav.logs') },
     ];
 
     return (
@@ -140,10 +142,10 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                 {!isLoggedIn && !hideCartAndNavbarAuth && (
                                     <>
                                         <UiButton variant="outline" size="sm" onClick={() => navigateWithTransition('/signIn')}>
-                                            Sign In
+                                            {t('nav.signIn')}
                                         </UiButton>
                                         <UiButton variant="primary" size="sm" onClick={() => navigateWithTransition('/join')}>
-                                            Join
+                                            {t('nav.join')}
                                         </UiButton>
                                     </>
                                 )}
