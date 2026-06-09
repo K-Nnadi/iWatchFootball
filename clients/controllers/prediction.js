@@ -8,6 +8,32 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { clientInstance } from '../client-instance';
 /**
+ * @summary Aggregate prediction counts for a fixture (public poll totals)
+ */
+export const predictionControllerGetFixtureTally = (fixtureId, signal) => {
+    return clientInstance({ url: `/prediction/fixture/${fixtureId}/tally`, method: 'GET', signal
+    });
+};
+export const getPredictionControllerGetFixtureTallyQueryKey = (fixtureId) => {
+    return [`/prediction/fixture/${fixtureId}/tally`];
+};
+export const getPredictionControllerGetFixtureTallyQueryOptions = (fixtureId, options) => {
+    var _a;
+    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
+    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getPredictionControllerGetFixtureTallyQueryKey(fixtureId);
+    const queryFn = ({ signal }) => predictionControllerGetFixtureTally(fixtureId, signal);
+    return Object.assign({ queryKey, queryFn, enabled: !!(fixtureId) }, queryOptions);
+};
+/**
+ * @summary Aggregate prediction counts for a fixture (public poll totals)
+ */
+export const usePredictionControllerGetFixtureTally = (fixtureId, options) => {
+    const queryOptions = getPredictionControllerGetFixtureTallyQueryOptions(fixtureId, options);
+    const query = useQuery(queryOptions);
+    query.queryKey = queryOptions.queryKey;
+    return query;
+};
+/**
  * @summary Create Prediction
  */
 export const createPrediction = (createPredictionDTO) => {

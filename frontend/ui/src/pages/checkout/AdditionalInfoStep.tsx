@@ -1,5 +1,5 @@
-import { Paper, Title, Stack, Checkbox, Group, Button, Box, Text } from '@mantine/core';
-import { ModernButton } from '../../components/modern';
+import { Paper, Title, Stack, Checkbox, Group, Box, Text } from '@mantine/core';
+import { UiButton } from '../../components/ui';
 import { AdditionalInfo, CheckoutErrors } from './types';
 
 interface AdditionalInfoStepProps {
@@ -45,12 +45,12 @@ export function AdditionalInfoStep({
             </Stack>
 
             <Group mt="xl">
-                <Button variant="outline" onClick={onBack} style={{ flex: 1 }}>
+                <UiButton variant="outline" onClick={onBack} style={{ flex: 1 }}>
                     Back
-                </Button>
-                <ModernButton variant="primary" onClick={onNext} style={{ flex: 1 }}>
+                </UiButton>
+                <UiButton onClick={onNext} style={{ flex: 1 }}>
                     Continue
-                </ModernButton>
+                </UiButton>
             </Group>
         </Paper>
     );

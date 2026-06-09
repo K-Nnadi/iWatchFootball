@@ -1,5 +1,5 @@
 import type { QueryKey, UseMutationOptions, UseMutationResult, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-import type { CreateFixtureDTO, Fixture, GetCountFixtureParams, GetQueryFixtureParams } from './iWatchFootballAPI.schemas';
+import type { CreateFixtureDTO, Fixture, FixtureTimelineControllerGetFixtureEvents200, GetCountFixtureParams, GetQueryFixtureParams } from './iWatchFootballAPI.schemas';
 /**
  * @summary Create Fixture
  */
@@ -187,6 +187,26 @@ export type DownloadFixtureQueryError = void;
  */
 export declare const useDownloadFixture: <TData = void, TError = void>(filename: string, options?: {
     query?: UseQueryOptions<void, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+};
+/**
+ * @summary Goals, cards and substitutions for a fixture (public)
+ */
+export declare const fixtureTimelineControllerGetFixtureEvents: (fixtureId: number, signal?: AbortSignal) => Promise<FixtureTimelineControllerGetFixtureEvents200>;
+export declare const getFixtureTimelineControllerGetFixtureEventsQueryKey: (fixtureId: number) => readonly [`/fixture/${number}/events`];
+export declare const getFixtureTimelineControllerGetFixtureEventsQueryOptions: <TData = FixtureTimelineControllerGetFixtureEvents200, TError = unknown>(fixtureId: number, options?: {
+    query?: UseQueryOptions<FixtureTimelineControllerGetFixtureEvents200, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryOptions<FixtureTimelineControllerGetFixtureEvents200, TError, TData, QueryKey> & {
+    queryKey: QueryKey;
+};
+export type FixtureTimelineControllerGetFixtureEventsQueryResult = NonNullable<Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>>;
+export type FixtureTimelineControllerGetFixtureEventsQueryError = unknown;
+/**
+ * @summary Goals, cards and substitutions for a fixture (public)
+ */
+export declare const useFixtureTimelineControllerGetFixtureEvents: <TData = FixtureTimelineControllerGetFixtureEvents200, TError = unknown>(fixtureId: number, options?: {
+    query?: UseQueryOptions<FixtureTimelineControllerGetFixtureEvents200, TError, TData, QueryKey> | undefined;
 } | undefined) => UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
 };

@@ -33,25 +33,31 @@ import {PredictionModule} from "./api/modules/prediction/prediction.module";
 import {AuthModule} from "./api/complexControllers/auth.controller";
 import {AuthModule as CoreAuthModule} from "./auth/auth.module";
 import {PaymentModule} from "./api/modules/payment/payment.module";
-import {PaymentProviderModule} from "./api/modules/paymentProvider/paymentProvider.module";
+import {PaymentProcessorModule} from "./api/modules/paymentProcessor/paymentProcessor.module";
 import {TicketModule} from "./api/modules/ticket/ticket.module";
 import {TicketHoldModule} from "./api/modules/ticketHold/ticketHold.module";
-import {CheckoutModule} from "./api/modules/checkout/checkout.module";
+import {CheckoutModule} from "./api/complexModules/checkout/checkout.module";
 import {TransactionModule} from "./api/modules/transaction/transaction.module";
 import {CreditModule} from "./api/modules/credit/credit.module";
-import {MarketplaceModule} from "./api/modules/marketplace/marketplace.module";
+import {MarketplaceModule} from "./api/complexModules/marketplace/marketplace.module";
 import {DiscountCodeModule} from "./api/modules/discountCode/discountCode.module";
 import {LoyaltySchemeModule} from "./api/modules/loyaltyScheme/loyaltyScheme.module";
 import {LoyaltyEventModule} from "./api/modules/loyaltyEvent/loyaltyEvent.module";
-import {LoyaltyModule} from "./api/services/loyalty/loyalty.module";
+import {LoyaltyModule} from "./api/complexModules/loyalty/loyalty.module";
 import {NewsArticleModule} from "./api/modules/newsArticle/newsArticle.module";
 import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {ApiSportsAdapterModule} from "./api/adapters/api-sports/api-sports-adapter.module";
 import {HealthController} from "./health/health.controller";
 import {DataSeedingModule} from "./api/complexControllers/dataSeeding.controller";
-import {InsightsModule} from "./api/modules/insights/insights.module";
-import {DataSyncModule} from "./api/modules/dataSync/data-sync.module";
+import {InsightsModule} from "./api/complexModules/insights/insights.module";
+import {DataSyncModule} from "./api/complexModules/dataSync/data-sync.module";
+import {UserSubscriptionModule} from "./api/modules/userSubscription/userSubscription.module";
+import {TrackerModule} from "./api/complexModules/tracker/tracker.module";
+import {PaymentsIntegrationModule} from "./api/integrations/payments/payments-integration.module";
+import {IntegrationModule} from "./api/modules/integration/integration.module";
+import {NotificationModule} from "./api/modules/notification/notification.module";
+import {PlatformConfigModule} from "./api/modules/platformConfig/platformConfig.module";
 
 // Only configure BullMQ if Redis is available
 const BULL_MODULE = process.env.REDIS_HOST ? BullModule.forRoot({
@@ -79,12 +85,11 @@ const Modules = [
     NewsArticleModule,
     NewsAggregatorModule,
     PaymentModule,
-    PaymentProviderModule,
+    PaymentProcessorModule,
     CreditModule,
     TransactionModule,
     LoyaltySchemeModule,
     LoyaltyEventModule,
-    LoyaltyModule,
     PlayerModule,
     PlayerLineUpModule,
     PositionModule,
@@ -98,22 +103,29 @@ const Modules = [
     TeamStadiumModule,
     TicketModule,
     TicketHoldModule,
-    CheckoutModule,
-    MarketplaceModule,
     DiscountCodeModule,
     TransferModule,
     TrophyModule,
     UserModule,
     StatsBombAdapterModule,
     ApiSportsAdapterModule,
-    InsightsModule,
-    DataSyncModule
+    UserSubscriptionModule,
+    PaymentsIntegrationModule,
+    IntegrationModule,
+    NotificationModule,
+    PlatformConfigModule,
 ];
 
 const ComplexModules = [
     AuthModule,
     DataSeedingModule,
-    CoreAuthModule
+    CoreAuthModule,
+    LoyaltyModule,
+    CheckoutModule,
+    MarketplaceModule,
+    InsightsModule,
+    DataSyncModule,
+    TrackerModule,
 ];
 
 

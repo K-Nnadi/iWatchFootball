@@ -41,7 +41,7 @@ async function streamFixtureInsight(
     fixtureId: number,
     opts: {
         integrationSlug?: string;
-        externalIntegrationId?: number;
+        integrationId?: number;
         question?: string;
         locale?: string;
     },
@@ -201,7 +201,7 @@ export function MatchInsightPanel({ fixtureId }: MatchInsightPanelProps) {
                         {selectData.length > 0 && (
                             <Select
                                 label="LLM integration"
-                                description="From externalIntegration rows (or env default if list is empty)"
+                                description="From integration rows (or env default if list is empty)"
                                 data={selectData}
                                 value={selectedSlug}
                                 onChange={setSelectedSlug}

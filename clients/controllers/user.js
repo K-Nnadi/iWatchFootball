@@ -8,6 +8,32 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { clientInstance } from '../client-instance';
 /**
+ * @summary Get all Users
+ */
+export const getAllUsers = (signal) => {
+    return clientInstance({ url: `/user`, method: 'GET', signal
+    });
+};
+export const getGetAllUsersQueryKey = () => {
+    return [`/user`];
+};
+export const getGetAllUsersQueryOptions = (options) => {
+    var _a;
+    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
+    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getGetAllUsersQueryKey();
+    const queryFn = ({ signal }) => getAllUsers(signal);
+    return Object.assign({ queryKey, queryFn }, queryOptions);
+};
+/**
+ * @summary Get all Users
+ */
+export const useGetAllUsers = (options) => {
+    const queryOptions = getGetAllUsersQueryOptions(options);
+    const query = useQuery(queryOptions);
+    query.queryKey = queryOptions.queryKey;
+    return query;
+};
+/**
  * @summary Create User
  */
 export const createUser = (createUserDTO) => {
@@ -34,32 +60,6 @@ export const useCreateUser = (options) => {
 /**
 * @summary Get all Users
 */
-export const getAllUser = (signal) => {
-    return clientInstance({ url: `/user`, method: 'GET', signal
-    });
-};
-export const getGetAllUserQueryKey = () => {
-    return [`/user`];
-};
-export const getGetAllUserQueryOptions = (options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getGetAllUserQueryKey();
-    const queryFn = ({ signal }) => getAllUser(signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Get all Users
- */
-export const useGetAllUser = (options) => {
-    const queryOptions = getGetAllUserQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Get all Users
- */
 export const getQueryUser = (params, signal) => {
     return clientInstance({ url: `/user/query`, method: 'GET',
         params, signal
@@ -80,33 +80,6 @@ export const getGetQueryUserQueryOptions = (params, options) => {
  */
 export const useGetQueryUser = (params, options) => {
     const queryOptions = getGetQueryUserQueryOptions(params, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Get count of Users
- */
-export const getCountUser = (params, signal) => {
-    return clientInstance({ url: `/user/count`, method: 'GET',
-        params, signal
-    });
-};
-export const getGetCountUserQueryKey = (params) => {
-    return [`/user/count`, ...(params ? [params] : [])];
-};
-export const getGetCountUserQueryOptions = (params, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getGetCountUserQueryKey(params);
-    const queryFn = ({ signal }) => getCountUser(params, signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Get count of Users
- */
-export const useGetCountUser = (params, options) => {
-    const queryOptions = getGetCountUserQueryOptions(params, options);
     const query = useQuery(queryOptions);
     query.queryKey = queryOptions.queryKey;
     return query;
@@ -184,8 +157,35 @@ export const useDeleteOneUser = (options) => {
     return useMutation(mutationOptions);
 };
 /**
-* @summary Upload a file for User
+* @summary Get count of Users
 */
+export const getCountUser = (params, signal) => {
+    return clientInstance({ url: `/user/count`, method: 'GET',
+        params, signal
+    });
+};
+export const getGetCountUserQueryKey = (params) => {
+    return [`/user/count`, ...(params ? [params] : [])];
+};
+export const getGetCountUserQueryOptions = (params, options) => {
+    var _a;
+    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
+    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getGetCountUserQueryKey(params);
+    const queryFn = ({ signal }) => getCountUser(params, signal);
+    return Object.assign({ queryKey, queryFn }, queryOptions);
+};
+/**
+ * @summary Get count of Users
+ */
+export const useGetCountUser = (params, options) => {
+    const queryOptions = getGetCountUserQueryOptions(params, options);
+    const query = useQuery(queryOptions);
+    query.queryKey = queryOptions.queryKey;
+    return query;
+};
+/**
+ * @summary Upload a file for User
+ */
 export const uploadUser = () => {
     return clientInstance({ url: `/user/upload`, method: 'POST'
     });

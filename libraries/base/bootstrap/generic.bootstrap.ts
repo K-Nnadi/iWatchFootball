@@ -42,6 +42,26 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         const initTime = Date.now() - startTime;
         console.log(`✅ NestJS application created successfully (took ${initTime}ms)`);
 
+        // Stripe webhooks require the raw request body for signature verification
+        try {
+            const fastifyInstance = app.getHttpAdapter().getInstance();
+            fastifyInstance.addHook('preParsing', async (request, _reply, payload) => {
+                if (!request.url?.startsWith('/webhooks/stripe')) {
+                    return payload;
+                }
+                const chunks: Buffer[] = [];
+                for await (const chunk of payload as AsyncIterable<Buffer>) {
+                    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+                }
+                const rawBody = Buffer.concat(chunks);
+                (request as { rawBody?: Buffer }).rawBody = rawBody;
+                return rawBody;
+            });
+            console.log('✅ Fastify preParsing hook registered for /webhooks/stripe raw body');
+        } catch (rawBodyError) {
+            console.warn('⚠️  Could not register Stripe raw-body hook:', rawBodyError);
+        }
+
         // Add global authentication guard and security interceptor if enabled
         if (options?.enableAuth && options.GlobalAuthGuard && options.SecurityInterceptor) {
             console.log('📦 Step 4/7: Setting up authentication guards and interceptors...');

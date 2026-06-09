@@ -4,6 +4,8 @@
 		"run:frontend": "pnpm --filter ./frontend/ui dev",
 		"run:backend": "pnpm --filter ./backend start:dev",
 		"run:clients": "pnpm --filter ./backend generate:client-gen",
+		"run:stripe-webhook": "powershell -ExecutionPolicy Bypass -File scripts/stripe-webhook.ps1",
+		"run:stripe-webhook-secret": "powershell -ExecutionPolicy Bypass -File scripts/stripe-webhook-secret.ps1",
 		"db:proxy": "ts-node resources/.proxy/run-cloud-sql-proxy.ts"
 	},
 	"dependencies": {

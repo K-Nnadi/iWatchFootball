@@ -79,15 +79,22 @@ export interface CheckoutTicketDetails {
     marketplacePlatformFee?: number;
 }
 
-export interface PaymentProvider {
+export interface PaymentProcessor {
     id: number;
     name: string;
     slug: string;
     type: 'CARD' | 'WALLET' | 'BANK_TRANSFER' | 'CRYPTO' | 'CREDIT';
     logoUrl?: string;
+    publishableKey?: string;
     /** Only set for the platform credit option */
     creditBalance?: number;
     disabled?: boolean;
+}
+
+export interface StripeCheckoutSession {
+    paymentSessionId: number;
+    clientSecret: string;
+    publishableKey: string;
 }
 
 export interface UserDetails {

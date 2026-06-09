@@ -25,6 +25,7 @@ import carouselClasses from '../components/carousel/news.carousel.module.css';
 import {usePageTransition} from "../hooks/usePageTransition";
 import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
+import { UiAccent, UiCaption, UiMatchList, UiSectionHeader } from '../components/ui';
 
 function HeroSection() {
     const theme = useMantineTheme();
@@ -67,9 +68,9 @@ function HeroSection() {
                 <Grid align="center" gutter="xl">
                     <Grid.Col span={{base: 12, md: 6}}>
                         <Stack gap="xl" className="hero-content">
-                            <ModernCaption>Football Tracking Platform</ModernCaption>
+                            <UiCaption>Football Tracking Platform</UiCaption>
                             <ModernH1>
-                                Your Ultimate <span style={{color: 'var(--modern-lime)'}}>Football</span> Companion
+                                Your Ultimate <UiAccent>Football</UiAccent> Companion
                             </ModernH1>
                             <ModernBody>
                                 Live scores, personalised statistics, and ticket bookings all in one place.
@@ -100,159 +101,86 @@ function HeroSection() {
     );
 }
 
-// Live Matches Section Component
+// Live Matches Section — Fotmob-style compact match list
 function LiveMatchesSection() {
     const { navigateWithTransition } = usePageTransition();
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 0, threshold: 0.2 });
 
-    const matches = [
+    const matchGroups = [
         {
-            id: 1,
-            homeTeam: 'Arsenal',
-            awayTeam: 'Chelsea',
-            homeScore: 2,
-            awayScore: 1,
-            statusColor: 'red',
             league: 'Premier League',
-            time: '65\'',
-            homeLogo: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=120&q=80',
-            awayLogo: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=120&q=80',
+            matches: [
+                {
+                    id: 1,
+                    homeTeam: 'Arsenal',
+                    awayTeam: 'Chelsea',
+                    homeScore: 2,
+                    awayScore: 1,
+                    time: "65'",
+                    isLive: true,
+                    homeLogo: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=120&q=80',
+                    awayLogo: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=120&q=80',
+                },
+            ],
         },
         {
-            id: 2,
-            homeTeam: 'Barcelona',
-            awayTeam: 'Real Madrid',
-            homeScore: 2,
-            awayScore: 2,
-            statusColor: 'green',
             league: 'La Liga',
-            time: '86\'',
-            homeLogo: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=120&q=80',
-            awayLogo: 'https://images.unsplash.com/photo-1599245895529-3c0992ab3c91?auto=format&w=120&q=80',
+            matches: [
+                {
+                    id: 2,
+                    homeTeam: 'Barcelona',
+                    awayTeam: 'Real Madrid',
+                    homeScore: 2,
+                    awayScore: 2,
+                    time: "86'",
+                    isLive: true,
+                    homeLogo: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=120&q=80',
+                    awayLogo: 'https://images.unsplash.com/photo-1599245895529-3c0992ab3c91?auto=format&w=120&q=80',
+                },
+            ],
         },
         {
-            id: 3,
-            homeTeam: 'Juventus',
-            awayTeam: 'Inter',
-            homeScore: 1,
-            awayScore: 3,
-            statusColor: 'gray',
             league: 'Serie A',
-            time: 'FT',
-            homeLogo: 'https://images.unsplash.com/photo-1605973174423-47046f81ec9b?auto=format&w=120&q=80',
-            awayLogo: 'https://images.unsplash.com/photo-1616941360635-7d51b6607429?auto=format&w=120&q=80',
-        }
+            matches: [
+                {
+                    id: 3,
+                    homeTeam: 'Juventus',
+                    awayTeam: 'Inter',
+                    homeScore: 1,
+                    awayScore: 3,
+                    time: 'FT',
+                    isLive: false,
+                    homeLogo: 'https://images.unsplash.com/photo-1605973174423-47046f81ec9b?auto=format&w=120&q=80',
+                    awayLogo: 'https://images.unsplash.com/photo-1616941360635-7d51b6607429?auto=format&w=120&q=80',
+                },
+            ],
+        },
     ];
 
     return (
         <Box
             ref={scrollAnimation.ref}
             className={scrollAnimation.className}
-            py={{ base: '3rem', md: '6rem' }}
-            px={{ base: 'md', md: 0 }}
+            py={{ base: '2rem', md: '4rem' }}
             style={{
-                backgroundColor: 'var(--modern-bg-secondary)',
-                color: 'var(--modern-text-primary)',
-                borderTop: '1px solid var(--modern-section-divider)',
-                borderBottom: '1px solid var(--modern-section-divider)',
-                position: 'relative',
-                overflowX: 'hidden',
+                backgroundColor: 'var(--ui-bg-surface)',
+                borderTop: '1px solid var(--ui-divider)',
+                borderBottom: '1px solid var(--ui-divider)',
             }}
         >
-            {/* Subtle Background Pattern */}
-            <Box
-                className="section-background-pattern"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    opacity: 0.03,
-                    pointerEvents: 'none',
-                    zIndex: 0,
-                }}
-            />
-            <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
-                <Group justify="space-between" mb="3rem" wrap="wrap" gap="md">
-                    <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 2rem)' }}>
-                        Live <span style={{color: 'var(--modern-lime)'}}>Matches</span>
-                    </ModernH2>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        style={{ 
-                            cursor: 'pointer',
-                            borderColor: 'var(--modern-lime)',
-                            color: 'var(--modern-lime)',
-                            backgroundColor: 'transparent'
-                        }}
-                        onClick={() => navigateWithTransition('/matches')}
-                    >
-                        View All
-                    </Button>
-                </Group>
-
-                <Grid gutter="xl">
-                    {matches.map((match) => (
-                        <Grid.Col key={match.id} span={{base: 12, md: 4}}>
-                            <Box
-                                onClick={() => navigateWithTransition(`/match/${match.id}`)}
-                                style={{
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                <ModernCard hover accent>
-                                    <Stack gap="md">
-                                        <Group justify="space-between">
-                                            <ModernCaption>{match.league}</ModernCaption>
-                                            <Group gap="xs">
-                                                <IconPlayerPlay size={16} color="var(--modern-lime)"/>
-                                                <Text size="sm" color="var(--modern-lime)" fw={600}>
-                                                    LIVE
-                                                </Text>
-                                            </Group>
-                                        </Group>
-
-                                        <Group justify="space-between" align="center">
-                                            <Stack align="center" gap="xs">
-                                                <Avatar
-                                                    src={match.homeLogo}
-                                                    size="xl"
-                                                    radius="md"
-                                                />
-                                                <Text fw={600} size="sm">{match.homeTeam}</Text>
-                                            </Stack>
-
-                                            <Stack align="center" gap="xs">
-                                                <Text
-                                                    size="2.5rem"
-                                                    fw={900}
-                                                    style={{color: 'var(--modern-lime)'}}
-                                                >
-                                                    {match.homeScore !== null ? `${match.homeScore} - ${match.awayScore}` : '- -'}
-                                                </Text>
-                                                <Group gap="xs">
-                                                    <IconClock size={14}/>
-                                                    <Text size="sm" c="dimmed">{match.time}</Text>
-                                                </Group>
-                                            </Stack>
-
-                                            <Stack align="center" gap="xs">
-                                                <Avatar
-                                                    src={match.awayLogo}
-                                                    size="xl"
-                                                    radius="md"
-                                                />
-                                                <Text fw={600} size="sm">{match.awayTeam}</Text>
-                                            </Stack>
-                                        </Group>
-                                    </Stack>
-                                </ModernCard>
-                            </Box>
-                        </Grid.Col>
-                    ))}
-                </Grid>
+            <Container size="xl" px={{ base: 'md', md: 'xl' }}>
+                <UiSectionHeader
+                    title={
+                        <>
+                            Live <UiAccent>Matches</UiAccent>
+                        </>
+                    }
+                    action={{ label: 'View all', onClick: () => navigateWithTransition('/matches') }}
+                />
+                <UiMatchList
+                    groups={matchGroups}
+                    onMatchClick={(id) => navigateWithTransition(`/match/${id}`)}
+                />
             </Container>
         </Box>
     );

@@ -2,7 +2,7 @@ import { Card, Image, Text, Title, Stack, Group, Divider, ScrollArea, Modal, Bad
 import { IconBallFootball, IconBolt, IconCalendar, IconMapPin, IconExternalLink } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
 import { UserGame, MatchEvent } from '../pages/logs.page';
-import { ModernCard, ModernH3, ModernBody, ModernButton } from '../components/modern';
+import { UiCard, UiH3, UiBody, UiButton } from '../components/ui';
 import { usePageTransition } from '../hooks/usePageTransition';
 
 interface PlayerStats {
@@ -784,7 +784,7 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                           'color-mix(in srgb, var(--modern-border-color) 6%, transparent)',
                                                   }}
                                               >
-                                                  <ModernButton
+                                                  <UiButton
                                                       type="button"
                                                       variant="ghost"
                                                       size="sm"
@@ -802,7 +802,7 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                       }
                                                   >
                                                       Load more
-                                                  </ModernButton>
+                                                  </UiButton>
                                               </Box>
                                           ) : null}
                                       </Stack>
@@ -824,9 +824,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                     setSelectedPlayer(null);
                 }}
                 title={
-                    <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
+                    <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
                         {selectedPlayer?.name} - {selectedPlayer?.category}
-                    </ModernH3>
+                    </UiH3>
                 }
                 size="xl"
                 centered
@@ -861,9 +861,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                     <Stack gap="lg">
                         {/* Total Stats Summary */}
                         <Box>
-                            <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
+                            <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
                                 Total Statistics
-                            </ModernH3>
+                            </UiH3>
                             <Group gap="md">
                                 {totalStats.goals > 0 && (
                                     <Badge size="lg" style={{ 
@@ -928,18 +928,18 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
 
                         {/* Games List */}
                         <Box>
-                            <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
+                            <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
                                 Games ({playerGameStats.length})
-                            </ModernH3>
+                            </UiH3>
                             <ScrollArea h={400} type="never">
                                 <Stack gap="md">
                                     {playerGameStats.length === 0 ? (
-                                        <ModernBody style={{ color: 'var(--modern-text-secondary)', textAlign: 'center', padding: '2rem' }}>
+                                        <UiBody style={{ color: 'var(--modern-text-secondary)', textAlign: 'center', padding: '2rem' }}>
                                             No games found for this player
-                                        </ModernBody>
+                                        </UiBody>
                                     ) : (
                                         playerGameStats.map((gameStats, index) => (
-                                            <ModernCard 
+                                            <UiCard 
                                                 key={index}
                                                 style={{ 
                                                     padding: '1.5rem', 
@@ -951,9 +951,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                     {/* Match Header */}
                                                     <Box>
                                                         <Group justify="space-between" mb="xs">
-                                                            <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '0.95rem', fontWeight: 600 }}>
+                                                            <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '0.95rem', fontWeight: 600 }}>
                                                                 {gameStats.fixture.homeTeam} vs {gameStats.fixture.awayTeam}
-                                                            </ModernH3>
+                                                            </UiH3>
                                                             <Badge size="sm" style={{ 
                                                                 backgroundColor: 'var(--modern-lime)', 
                                                                 color: 'var(--modern-bg-primary)',
@@ -967,20 +967,20 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                             {gameStats.fixture.venue && (
                                                                 <Group gap={4}>
                                                                     <IconMapPin size={14} style={{ color: 'var(--modern-text-secondary)' }} />
-                                                                    <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                                                                    <UiBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
                                                                         {gameStats.fixture.venue}
-                                                                    </ModernBody>
+                                                                    </UiBody>
                                                                 </Group>
                                                             )}
                                                             <Group gap={4}>
                                                                 <IconCalendar size={14} style={{ color: 'var(--modern-text-secondary)' }} />
-                                                                <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                                                                <UiBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
                                                                     {new Date(gameStats.fixture.date).toLocaleDateString('en-US', { 
                                                                         year: 'numeric', 
                                                                         month: 'short', 
                                                                         day: 'numeric'
                                                                     })}
-                                                                </ModernBody>
+                                                                </UiBody>
                                                             </Group>
                                                         </Group>
                                                     </Box>
@@ -989,9 +989,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
 
                                                     {/* Player Stats in this Game */}
                                                     <Box>
-                                                        <ModernBody style={{ color: 'var(--modern-text-primary)', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                                        <UiBody style={{ color: 'var(--modern-text-primary)', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                                                             Performance in this match:
-                                                        </ModernBody>
+                                                        </UiBody>
                                                         <Group gap="sm">
                                                             {gameStats.goals > 0 && (
                                                                 <Badge size="sm" leftSection={<IconBallFootball size={12} />} style={{ 
@@ -1039,9 +1039,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                                 gameStats.yellowCards === 0 &&
                                                                 gameStats.redCards === 0 &&
                                                                 gameStats.penalties === 0 && (
-                                                                <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                                                                <UiBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
                                                                     No recorded stats
-                                                                </ModernBody>
+                                                                </UiBody>
                                                             )}
                                                         </Group>
                                                     </Box>
@@ -1049,30 +1049,30 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                     {/* Events in this Game */}
                                                     {gameStats.events.length > 0 && (
                                                         <Box>
-                                                            <ModernBody style={{ color: 'var(--modern-text-primary)', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                                            <UiBody style={{ color: 'var(--modern-text-primary)', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                                                                 Events:
-                                                            </ModernBody>
+                                                            </UiBody>
                                                             <Stack gap="xs">
                                                                 {gameStats.events.map((event, eventIndex) => (
                                                                     <Group key={eventIndex} gap="xs" wrap="nowrap">
-                                                                        <ModernBody style={{ 
+                                                                        <UiBody style={{ 
                                                                             fontWeight: 500, 
                                                                             fontSize: '0.875rem', 
                                                                             minWidth: 40,
                                                                             color: 'var(--modern-text-primary)' 
                                                                         }}>
                                                                             {event.time}'
-                                                                        </ModernBody>
-                                                                        <ModernBody style={{ fontSize: '0.875rem', color: 'var(--modern-text-primary)' }}>
+                                                                        </UiBody>
+                                                                        <UiBody style={{ fontSize: '0.875rem', color: 'var(--modern-text-primary)' }}>
                                                                             {event.description}
-                                                                        </ModernBody>
+                                                                        </UiBody>
                                                                     </Group>
                                                                 ))}
                                                             </Stack>
                                                         </Box>
                                                     )}
                                                 </Stack>
-                                            </ModernCard>
+                                            </UiCard>
                                         ))
                                     )}
                                 </Stack>
@@ -1082,13 +1082,13 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                         {/* Action Buttons */}
                         <Divider color="var(--modern-border-color)" />
                         <Group justify="flex-end" gap="md">
-                            <ModernButton
+                            <UiButton
                                 variant="primary"
                                 onClick={() => handleViewPlayerPage(selectedPlayer.id)}
                                 leftSection={<IconExternalLink size={16} />}
                             >
                                 View Player Page
-                            </ModernButton>
+                            </UiButton>
                         </Group>
                     </Stack>
                 )}
@@ -1102,9 +1102,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                     setSelectedTeam(null);
                 }}
                 title={
-                    <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
+                    <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
                         {selectedTeam?.name}
-                    </ModernH3>
+                    </UiH3>
                 }
                 size="lg"
                 centered
@@ -1138,7 +1138,7 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                 {selectedTeam && (
                     <Stack gap="lg">
                         <Box>
-                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                            <UiBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
                                 You've logged{' '}
                                 {stats.find((s) => s.title === 'Most-logged teams')?.topPlayers.find((p) => p.name === selectedTeam.name)
                                     ?.value || 0}{' '}
@@ -1147,17 +1147,17 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                     ? 'match'
                                     : 'matches'}{' '}
                                 involving {selectedTeam.name}.
-                            </ModernBody>
+                            </UiBody>
                         </Box>
                         <Divider color="var(--modern-border-color)" />
                         <Group justify="flex-end" gap="md">
-                            <ModernButton
+                            <UiButton
                                 variant="primary"
                                 onClick={() => handleViewTeamPage(selectedTeam.id)}
                                 leftSection={<IconExternalLink size={16} />}
                             >
                                 View Team Page
-                            </ModernButton>
+                            </UiButton>
                         </Group>
                     </Stack>
                 )}
@@ -1171,9 +1171,9 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                     setSelectedVenue(null);
                 }}
                 title={
-                    <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
+                    <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
                         {selectedVenue?.name}
-                    </ModernH3>
+                    </UiH3>
                 }
                 size="lg"
                 centered
@@ -1209,11 +1209,11 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                         <Box>
                             <Group gap="xs" mb="md">
                                 <IconMapPin size={20} style={{ color: 'var(--modern-text-secondary)' }} />
-                                <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600 }}>
+                                <UiH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1rem', fontWeight: 600 }}>
                                     Stadium Information
-                                </ModernH3>
+                                </UiH3>
                             </Group>
-                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                            <UiBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
                                 You&apos;ve visited {selectedVenue.name}{' '}
                                 {stats.find((s) => s.title === CAT_VENUES)?.topPlayers.find((p) => p.name === selectedVenue.name)
                                     ?.value || 0}{' '}
@@ -1222,17 +1222,17 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                     ? 'time'
                                     : 'times'}
                                 .
-                            </ModernBody>
+                            </UiBody>
                         </Box>
                         <Divider color="var(--modern-border-color)" />
                         <Group justify="flex-end" gap="md">
-                            <ModernButton
+                            <UiButton
                                 variant="primary"
                                 onClick={() => handleViewStadium(selectedVenue.id)}
                                 leftSection={<IconExternalLink size={16} />}
                             >
                                 View Stadium
-                            </ModernButton>
+                            </UiButton>
                         </Group>
                     </Stack>
                 )}

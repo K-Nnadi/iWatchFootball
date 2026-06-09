@@ -1,21 +1,30 @@
 import type { QueryKey, UseMutationOptions, UseMutationResult, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-import type { StatsBombControllerGetAvailableMatches200, StatsBombControllerGetSyncStatus200, StatsBombControllerSyncData200, StatsBombControllerTestSyncEventsOnly200, StatsBombControllerTestSyncPlayersOnly200, StatsBombControllerTestSyncSingleMatch200, StatsBombControllerTestSyncTeamsOnly200, StatsBombControllerTestTeamCreation200, StatsBombControllerTestTeamTypeDetection200Item } from './iWatchFootballAPI.schemas';
+import type { StatsBombControllerGetAvailableMatches200, StatsBombControllerGetSyncStatus200, StatsBombControllerSyncData200, StatsBombControllerTestSyncEventsOnly200, StatsBombControllerTestSyncPlayersOnly200, StatsBombControllerTestSyncSingleMatch200, StatsBombControllerTestSyncTeamsOnly200, StatsBombControllerTestTeamCreation200, StatsBombControllerTestTeamTypeDetection200Item, StatsBombSyncOptionsDTO } from './iWatchFootballAPI.schemas';
 /**
  * Fetches data from StatsBomb Open Data repository and syncs it with the local database
  * @summary Sync StatsBomb data to database
  */
-export declare const statsBombControllerSyncData: () => Promise<StatsBombControllerSyncData200>;
+export declare const statsBombControllerSyncData: (statsBombSyncOptionsDTO: StatsBombSyncOptionsDTO) => Promise<StatsBombControllerSyncData200>;
 export declare const getStatsBombControllerSyncDataMutationOptions: <TError = void, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<StatsBombControllerSyncData200, TError, void, TContext> | undefined;
-} | undefined) => UseMutationOptions<StatsBombControllerSyncData200, TError, void, TContext>;
+    mutation?: UseMutationOptions<StatsBombControllerSyncData200, TError, {
+        data: StatsBombSyncOptionsDTO;
+    }, TContext> | undefined;
+} | undefined) => UseMutationOptions<StatsBombControllerSyncData200, TError, {
+    data: StatsBombSyncOptionsDTO;
+}, TContext>;
 export type StatsBombControllerSyncDataMutationResult = NonNullable<Awaited<ReturnType<typeof statsBombControllerSyncData>>>;
+export type StatsBombControllerSyncDataMutationBody = StatsBombSyncOptionsDTO;
 export type StatsBombControllerSyncDataMutationError = void;
 /**
 * @summary Sync StatsBomb data to database
 */
 export declare const useStatsBombControllerSyncData: <TError = void, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<StatsBombControllerSyncData200, TError, void, TContext> | undefined;
-} | undefined) => UseMutationResult<StatsBombControllerSyncData200, TError, void, TContext>;
+    mutation?: UseMutationOptions<StatsBombControllerSyncData200, TError, {
+        data: StatsBombSyncOptionsDTO;
+    }, TContext> | undefined;
+} | undefined) => UseMutationResult<StatsBombControllerSyncData200, TError, {
+    data: StatsBombSyncOptionsDTO;
+}, TContext>;
 /**
 * Returns current database statistics and sync status
 * @summary Get sync status and statistics

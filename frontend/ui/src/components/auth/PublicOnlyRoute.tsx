@@ -7,7 +7,7 @@ export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
     const { isLoggedIn } = useAuthStore();
 
     if (isLoggedIn) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/home" replace />;
     }
 
     return <>{children}</>;

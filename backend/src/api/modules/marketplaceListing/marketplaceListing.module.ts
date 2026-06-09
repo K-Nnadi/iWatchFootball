@@ -3,12 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Ticket } from '../ticket/ticket.entity';
 import { TicketOwnershipHistoryModule } from '../ticketOwnershipHistory/ticketOwnershipHistory.module';
 import { UserTicketLogModule } from '../userTicketLog/userTicketLog.module';
+import { MarketplaceFeatureModule } from '../../complexModules/marketplace/marketplace-feature.module';
 import { MarketplaceListing } from './marketplaceListing.entity';
 import { MarketplaceListingController } from './marketplaceListing.controller';
 import { MarketplaceListingService } from './marketplaceListing.service';
 
 @Module({
     imports: [
+        MarketplaceFeatureModule,
         TicketOwnershipHistoryModule,
         UserTicketLogModule,
         TypeOrmModule.forFeature([MarketplaceListing, Ticket]),

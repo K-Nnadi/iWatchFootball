@@ -116,19 +116,19 @@ export class ApiSportsImportFixturesDto {
   @ApiPropertyOptional({
     default: false,
     description:
-      'After fixtures, paged `GET /teams?league=&season=` links each club registered **`venue`** to `teamStadium` as primary home (`metadata.relationship: primary_home`). Not derived from match venue.',
+      'After fixtures, one **`GET /teams?league=&season=`** (no `page`; API-Football returns all teams in one response) links each club **`venue`** to `teamStadium` as primary home. Not derived from match venue.',
   })
   syncPrimaryVenuesAfter?: boolean;
 
   @ApiPropertyOptional({
     default: 5,
-    description: 'Max `/teams` pages when `syncPrimaryVenuesAfter`.',
+    description: 'Ignored for primary-venue sync (reserved). API-Football does not accept `page` with league+season on /teams.',
   })
   primaryVenuesMaxPages?: number;
 
   @ApiPropertyOptional({
     default: 8,
-    description: 'Hard cap on `/teams` requests when `syncPrimaryVenuesAfter`.',
+    description: 'Ignored for primary-venue sync (single /teams call). Reserved for future use.',
   })
   primaryVenuesMaxRequests?: number;
 }
@@ -140,10 +140,13 @@ export class ApiSportsSyncPrimaryVenuesDto {
   @ApiProperty({ description: 'API-Football season year (e.g. 2024)', example: 2024 })
   season!: number;
 
-  @ApiPropertyOptional({ default: 5, description: 'Max GET /teams pages' })
+  @ApiPropertyOptional({
+    description:
+      'Ignored: with `league`+`season`, API-Football returns all teams in one response and rejects the `page` parameter.',
+  })
   maxPages?: number;
 
-  @ApiPropertyOptional({ default: 15, description: 'Hard cap on /teams HTTP calls' })
+  @ApiPropertyOptional({ description: 'Ignored: single GET /teams request.' })
   maxRequests?: number;
 }
 
@@ -342,7 +345,7 @@ export class ApiSportsController {
   @ApiOperation({
     summary: 'Link primary stadiums from API-Football GET /teams',
     description:
-      'Fetches `GET /teams?league=&season=` (paged). For each response row, resolves the local team by `metadata.providers.apisports.externalId`, upserts `stadium` from the club **`venue`** (not fixture venue), and upserts **`teamStadium`** with `metadata.relationship: primary_home` and `source: api-sports-teams`.',
+      'One **`GET /teams?league=&season=`** (no `page` — API-Football rejects `page` with this filter and returns all teams in one response). For each row, resolves the local team by `metadata.providers.apisports.externalId`, upserts `stadium` from the club **`venue`**, and upserts **`teamStadium`** with `metadata.relationship: primary_home` and `source: api-sports-teams`.',
   })
   @ApiBody({ type: ApiSportsSyncPrimaryVenuesDto })
   @ApiResponse({ status: 200, description: 'Counts + errors' })

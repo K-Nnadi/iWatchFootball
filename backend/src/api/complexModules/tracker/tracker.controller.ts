@@ -1,0 +1,83 @@
+import {
+    Body,
+    Get,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Req,
+    UnauthorizedException,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthedController } from '@iWatchFootball/base-tools/decorators/controller.decorator';
+import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { SocialService } from '../../modules/social/social.service';
+import { TrackerCompareService } from './tracker-compare.service';
+import { TrackerVisibility } from '../../enums/social.enum';
+import type { Request } from 'express';
+
+type AuthedRequest = Request & { user?: { id: number } };
+
+export class UpdateTrackerPrivacyDto {
+    @ApiPropertyOptional({ enum: TrackerVisibility })
+    @IsOptional()
+    @IsEnum(TrackerVisibility)
+    trackerVisibility?: TrackerVisibility;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsBoolean()
+    shareVerifiedOnly?: boolean;
+}
+
+@AuthedController('tracker')
+@ApiTags('tracker')
+export class TrackerController {
+    constructor(
+        private readonly socialService: SocialService,
+        private readonly compareService: TrackerCompareService,
+    ) {}
+
+    @Get('privacy')
+    @ApiOperation({ summary: 'Get tracker privacy settings for the current user' })
+    async getPrivacy(@Req() req: AuthedRequest) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException('Not authenticated');
+        const user = await this.socialService.assertCanViewTrackerStats(userId, userId);
+        return {
+            trackerVisibility: user.trackerVisibility ?? TrackerVisibility.PRIVATE,
+            shareVerifiedOnly: user.shareVerifiedOnly ?? true,
+        };
+    }
+
+    @Patch('privacy')
+    @ApiOperation({ summary: 'Update tracker privacy settings' })
+    @ApiBody({ type: UpdateTrackerPrivacyDto })
+    async updatePrivacy(@Req() req: AuthedRequest, @Body() body: UpdateTrackerPrivacyDto) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException('Not authenticated');
+        return this.socialService.updateTrackerPrivacy(userId, body);
+    }
+
+    @Get('stats/:userId')
+    @ApiOperation({ summary: 'Get aggregate tracker stats for a user (privacy-gated)' })
+    async getStats(
+        @Req() req: AuthedRequest,
+        @Param('userId', ParseIntPipe) targetUserId: number,
+    ) {
+        const viewerId = req.user?.id;
+        if (!viewerId) throw new UnauthorizedException('Not authenticated');
+        return this.compareService.getStatsForUser(viewerId, targetUserId);
+    }
+
+    @Get('compare/:friendUserId')
+    @ApiOperation({ summary: 'Compare tracker stats with a friend (premium)' })
+    async compare(
+        @Req() req: AuthedRequest,
+        @Param('friendUserId', ParseIntPipe) friendUserId: number,
+    ) {
+        const viewerId = req.user?.id;
+        if (!viewerId) throw new UnauthorizedException('Not authenticated');
+        return this.compareService.compare(viewerId, friendUserId);
+    }
+}

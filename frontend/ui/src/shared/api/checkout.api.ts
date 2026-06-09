@@ -10,7 +10,7 @@ export async function confirmCheckout(body: {
     unitPrice: number;
     category: string;
     paymentMethod: CheckoutPaymentMethod;
-    paymentProviderId?: number;
+    paymentProcessorId?: number;
     providerPaymentRef?: string;
     idempotencyKey?: string;
     discountCodeId?: number;

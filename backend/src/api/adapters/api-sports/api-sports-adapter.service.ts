@@ -101,9 +101,12 @@ export type ImportFixturesFromLeagueWindowOptions = {
 export type SyncPrimaryVenuesFromTeamsOptions = {
   league: number;
   season: number;
-  /** Max GET /teams pages (default 5). */
+  /**
+   * Ignored for `league`+`season` sync: API-Football returns **all** teams in one response and rejects `page`
+   * (`"The Page field do not exist."`). Kept for API compatibility / discover use.
+   */
   maxPages?: number;
-  /** Hard cap on /teams requests (default 8). */
+  /** Reserved (single `/teams` request today). */
   maxRequests?: number;
 };
 
@@ -1100,6 +1103,24 @@ export class ApiSportsAdapterService {
     return out;
   }
 
+  private hasApiSportsErrorsPayload(data: any): boolean {
+    const e = data?.errors;
+    if (e == null) return false;
+    if (Array.isArray(e)) return e.length > 0;
+    if (typeof e === 'object') return Object.keys(e).length > 0;
+    if (typeof e === 'string') return String(e).trim().length > 0;
+    return false;
+  }
+
+  /** `/teams` returns `response: [{ team, venue }, ...]`; single-id calls may return one `{ team, venue }` object. */
+  private normalizeTeamsResponseArray(responseField: unknown): any[] {
+    if (Array.isArray(responseField)) return responseField;
+    if (responseField && typeof responseField === 'object' && (responseField as any).team != null) {
+      return [responseField as any];
+    }
+    return [];
+  }
+
   /** Proxies GET /teams — club `venue` is the registered home ground (see `syncPrimaryVenuesFromTeamsLeagueSeason`). */
   async discoverTeams(query: Record<string, string | undefined>): Promise<any> {
     return this.http.get('/teams', this.cleanTeamsDiscoverQuery(query) as any);
@@ -1107,7 +1128,8 @@ export class ApiSportsAdapterService {
 
   /**
    * Links each local team (matched by `metadata.providers.apisports.externalId`) to its **primary** stadium
-   * using API-Football **`GET /teams?league=&season=`** `venue` object — not fixture match venue.
+   * using API-Football **`GET /teams?league=&season=`** (no `page` — upstream rejects `page` with this filter).
+   * Each row’s **`venue`** is the registered home ground, not match venue.
    */
   async syncPrimaryVenuesFromTeamsLeagueSeason(options: SyncPrimaryVenuesFromTeamsOptions): Promise<{
     requests: number;
@@ -1121,82 +1143,89 @@ export class ApiSportsAdapterService {
     let pagesFetched = 0;
     let linked = 0;
     let skipped = 0;
-    const maxPages = Math.max(1, options.maxPages ?? 5);
-    const maxRequests = Math.max(1, options.maxRequests ?? 8);
     const stadiumCache: StadiumImportCache = { rows: null };
 
-    for (let page = 1; page <= maxPages; page += 1) {
-      if (requests >= maxRequests) break;
-      let data: any;
+    let data: any;
+    try {
+      // API-Football: `page` is not allowed with `league` + `season` on /teams — returns errors.page "do not exist".
+      data = await this.http.get('/teams', {
+        league: options.league,
+        season: options.season,
+      });
+      requests = 1;
+      pagesFetched = 1;
+    } catch (e: any) {
+      errors.push(`/teams: ${e?.message ?? e}`);
+      this.logger.log(
+        `syncPrimaryVenuesFromTeamsLeagueSeason: league ${options.league} season ${options.season} — ${linked} linked, ${skipped} skipped, ${requests} /teams req` +
+          (errors.length ? `; see errors (${errors.length}) in response body` : ''),
+      );
+      return { requests, pagesFetched, linked, skipped, errors };
+    }
+
+    if (this.hasApiSportsErrorsPayload(data)) {
+      errors.push(`/teams: ${JSON.stringify(data.errors)}`);
+      this.logger.log(
+        `syncPrimaryVenuesFromTeamsLeagueSeason: league ${options.league} season ${options.season} — ${linked} linked, ${skipped} skipped, ${requests} /teams req` +
+          (errors.length ? `; see errors (${errors.length}) in response body` : ''),
+      );
+      return { requests, pagesFetched, linked, skipped, errors };
+    }
+
+    const response = this.normalizeTeamsResponseArray(data?.response);
+    if (!response.length) {
+      errors.push(
+        `/teams: empty response for league=${options.league} season=${options.season} ` +
+          `(upstream results=${data?.results ?? 'n/a'}, parameters=${JSON.stringify(data?.parameters ?? data?.get ?? null)}). ` +
+          `Confirm this league+season exists on your API-Football plan. To link venues, local teams need ` +
+          `metadata.providers.apisports.externalId (run league import with standings sync, or POST /sync/standings first).`,
+      );
+      this.logger.log(
+        `syncPrimaryVenuesFromTeamsLeagueSeason: league ${options.league} season ${options.season} — ${linked} linked, ${skipped} skipped, ${requests} /teams req` +
+          (errors.length ? `; see errors (${errors.length}) in response body` : ''),
+      );
+      return { requests, pagesFetched, linked, skipped, errors };
+    }
+
+    for (const entry of response) {
+      const apiTeam = entry?.team;
+      const venue = entry?.venue;
+      const apiTeamId = apiTeam?.id != null ? Number(apiTeam.id) : null;
+      if (!apiTeamId) {
+        skipped += 1;
+        continue;
+      }
+      const venueId = venue?.id != null ? Number(venue.id) : null;
+      if (!venueId || !Number.isFinite(venueId)) {
+        skipped += 1;
+        continue;
+      }
+
+      const localTeam = await this.findLocalTeamByApiSportsId(apiTeamId);
+      if (!localTeam?.id) {
+        skipped += 1;
+        continue;
+      }
+
+      const country =
+        apiTeam?.country != null && String(apiTeam.country).trim() !== ''
+          ? String(apiTeam.country).trim()
+          : venue?.city != null && String(venue.city).trim() !== ''
+            ? String(venue.city).trim()
+            : 'Unknown';
+
       try {
-        data = await this.http.get('/teams', {
-          league: options.league,
-          season: options.season,
-          page,
-        });
-        requests += 1;
-        pagesFetched += 1;
+        const stadiumId = await this.ensureStadiumFromApiVenueForImport(stadiumCache, venue, country);
+        await this.teamStadiumService.ensurePrimaryHomeFromApiSportsTeams(localTeam.id, stadiumId);
+        linked += 1;
       } catch (e: any) {
-        errors.push(`/teams page ${page}: ${e?.message ?? e}`);
-        break;
+        errors.push(`team api id ${apiTeamId} venue ${venueId}: ${e?.message ?? e}`);
       }
-
-      if (data?.errors?.length) {
-        errors.push(`/teams page ${page}: ${JSON.stringify(data.errors)}`);
-        break;
-      }
-
-      const response = Array.isArray(data?.response) ? data.response : [];
-      if (!response.length) break;
-
-      for (const entry of response) {
-        const apiTeam = entry?.team;
-        const venue = entry?.venue;
-        const apiTeamId = apiTeam?.id != null ? Number(apiTeam.id) : null;
-        if (!apiTeamId) {
-          skipped += 1;
-          continue;
-        }
-        const venueId = venue?.id != null ? Number(venue.id) : null;
-        if (!venueId || !Number.isFinite(venueId)) {
-          skipped += 1;
-          continue;
-        }
-
-        const localTeam = await this.findLocalTeamByApiSportsId(apiTeamId);
-        if (!localTeam?.id) {
-          skipped += 1;
-          continue;
-        }
-
-        const country =
-          apiTeam?.country != null && String(apiTeam.country).trim() !== ''
-            ? String(apiTeam.country).trim()
-            : venue?.city != null && String(venue.city).trim() !== ''
-              ? String(venue.city).trim()
-              : 'Unknown';
-
-        try {
-          const stadiumId = await this.ensureStadiumFromApiVenueForImport(stadiumCache, venue, country);
-          await this.teamStadiumService.ensurePrimaryHomeFromApiSportsTeams(localTeam.id, stadiumId);
-          linked += 1;
-        } catch (e: any) {
-          errors.push(`team api id ${apiTeamId} venue ${venueId}: ${e?.message ?? e}`);
-        }
-      }
-
-      const paging = data?.paging;
-      if (paging?.current != null && paging?.total != null) {
-        if (Number(paging.current) >= Number(paging.total)) break;
-      } else {
-        break;
-      }
-
-      await this.sleep(API_SPORTS_CONFIG.requestDelayMs);
     }
 
     this.logger.log(
-      `syncPrimaryVenuesFromTeamsLeagueSeason: league ${options.league} season ${options.season} — ${linked} linked, ${skipped} skipped, ${requests} /teams req`,
+      `syncPrimaryVenuesFromTeamsLeagueSeason: league ${options.league} season ${options.season} — ${linked} linked, ${skipped} skipped, ${requests} /teams req` +
+        (errors.length ? `; see errors (${errors.length}) in response body` : ''),
     );
     return { requests, pagesFetched, linked, skipped, errors };
   }

@@ -5,6 +5,169 @@
  * The API Docs for I Watch Football
  * OpenAPI spec version: 1.0
  */
+export type SubscriptionControllerCreatePortalBody = {
+  returnUrl?: string;
+};
+
+export type SubscriptionControllerCreateCheckout200 = {
+  url?: string;
+};
+
+export type SubscriptionControllerCreateCheckoutBody = {
+  cancelUrl?: string;
+  successUrl?: string;
+};
+
+export type GetCountIntegrationParams = {
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetQueryIntegrationParams = {
+/**
+ * Number of records to skip
+ */
+skip?: number;
+/**
+ * Number of records to take
+ */
+take?: number;
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Load eager relations
+ */
+loadEagerRelations?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type ApiSportsControllerDiscoverCountries200 = { [key: string]: unknown };
+
+export type ApiSportsControllerDiscoverCountriesParams = {
+/**
+ * ISO country code
+ */
+code?: string;
+search?: string;
+};
+
+export type ApiSportsControllerDiscoverTeams200 = { [key: string]: unknown };
+
+export type ApiSportsControllerDiscoverTeamsParams = {
+page?: number;
+search?: string;
+venue?: number;
+code?: string;
+country?: string;
+season?: number;
+league?: number;
+team?: number;
+/**
+ * API-Sports team id
+ */
+id?: number;
+};
+
+export type ApiSportsControllerDiscoverLiveFixtures200 = { [key: string]: unknown };
+
+export type ApiSportsControllerDiscoverFixtures200 = { [key: string]: unknown };
+
+export type ApiSportsControllerDiscoverFixturesParams = {
+/**
+ * Next N fixtures for a team (requires team)
+ */
+next?: number;
+/**
+ * Last N fixtures for a team (requires team)
+ */
+last?: number;
+/**
+ * e.g. all
+ */
+live?: string;
+status?: string;
+timezone?: string;
+/**
+ * Cap when allPages=true (default 20, max 50)
+ */
+maxPages?: number;
+/**
+ * If true, fetch all pages until API paging ends (max `maxPages` requests)
+ */
+allPages?: string;
+/**
+ * Pagination (starts at 1)
+ */
+page?: number;
+round?: string;
+venue?: number;
+team?: number;
+season?: number;
+league?: number;
+/**
+ * Hyphen-separated fixture ids (one call for many)
+ */
+ids?: string;
+/**
+ * YYYY-MM-DD
+ */
+to?: string;
+/**
+ * YYYY-MM-DD
+ */
+from?: string;
+date?: string;
+};
+
+export type ApiSportsControllerDiscoverLeagueById200 = { [key: string]: unknown };
+
+export type ApiSportsControllerDiscoverLeagues200 = { [key: string]: unknown };
+
+export type ApiSportsControllerDiscoverLeaguesParams = {
+/**
+ * true / false
+ */
+current?: string;
+team?: number;
+/**
+ * League code (e.g. GB)
+ */
+code?: string;
+/**
+ * League name search
+ */
+search?: string;
+/**
+ * e.g. league, cup
+ */
+type?: string;
+season?: number;
+country?: string;
+/**
+ * API-Sports league id
+ */
+id?: number;
+};
+
 export type StatsBombControllerGetAvailableMatches200MatchesItem = {
   awayTeam?: string;
   competition?: string;
@@ -60,59 +223,20 @@ export type StatsBombControllerTestTeamTypeDetection200Item = {
 };
 
 export type StatsBombControllerGetSyncStatus200 = {
+  cards?: number;
   competitions?: number;
+  events?: number;
   fixtures?: number;
   goals?: number;
   lastSync?: string;
   players?: number;
+  substitutions?: number;
   teams?: number;
 };
 
 export type StatsBombControllerSyncData200 = {
   message?: string;
   timestamp?: string;
-};
-
-export type GetCountUserParams = {
-/**
- * Include soft deleted records
- */
-withDeleted?: boolean;
-/**
- * Use transaction
- */
-transaction?: boolean;
-/**
- * Query comment
- */
-comment?: string;
-};
-
-export type GetQueryUserParams = {
-/**
- * Number of records to skip
- */
-skip?: number;
-/**
- * Number of records to take
- */
-take?: number;
-/**
- * Include soft deleted records
- */
-withDeleted?: boolean;
-/**
- * Load eager relations
- */
-loadEagerRelations?: boolean;
-/**
- * Use transaction
- */
-transaction?: boolean;
-/**
- * Query comment
- */
-comment?: string;
 };
 
 export type GetCountTrophyParams = {
@@ -199,6 +323,125 @@ transaction?: boolean;
 comment?: string;
 };
 
+export type MarketplaceCheckoutControllerConfirmPurchase200 = {
+  marketplaceTransactionId?: number;
+  ticketId?: number;
+};
+
+export type MarketplaceCheckoutControllerGetFeePreview200 = {
+  adminFee?: number;
+  adminFeeRate?: number;
+  askPrice?: number;
+  totalBuyerPays?: number;
+};
+
+export type MarketplaceCheckoutControllerHoldListing200 = {
+  expiresAt?: string;
+  /** Pass this back in confirm to prove your hold */
+  holderId?: string;
+};
+
+export type MarketplaceListingControllerCancelListing200 = {
+  ok?: boolean;
+};
+
+export type MarketplaceListingControllerGetListings200 = {
+  total?: number;
+};
+
+export type MarketplaceListingControllerGetListingsParams = {
+fixtureId?: number;
+maxPrice?: number;
+/**
+ * Filter listings whose fixture involves a team matching this substring (home or away, case-insensitive)
+ */
+team?: string;
+page?: number;
+};
+
+export type DiscountCodeControllerCreateBodyType = typeof DiscountCodeControllerCreateBodyType[keyof typeof DiscountCodeControllerCreateBodyType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DiscountCodeControllerCreateBodyType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED: 'FIXED',
+} as const;
+
+export type DiscountCodeControllerCreateBody = {
+  code: string;
+  expiresAt?: string;
+  maxUsesPerUser?: number;
+  type: DiscountCodeControllerCreateBodyType;
+  value: number;
+};
+
+export type DiscountCodeControllerValidateParams = {
+orderTotal: number;
+};
+
+export type GetCountUserParams = {
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetQueryUserParams = {
+/**
+ * Number of records to skip
+ */
+skip?: number;
+/**
+ * Number of records to take
+ */
+take?: number;
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Load eager relations
+ */
+loadEagerRelations?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type CheckoutControllerRefundPrimary200 = {
+  ok?: boolean;
+};
+
+export type CheckoutControllerConfirm200 = {
+  idempotent?: boolean;
+  paymentId?: number;
+  ticketIds?: number[];
+};
+
+export type TicketHoldControllerVerifyParams = {
+fixtureId: number;
+offerKey: string;
+holderId: string;
+};
+
+export type TicketHoldControllerAcquire200 = {
+  expiresAt?: string;
+};
+
 export type GetCountTicketParams = {
 /**
  * Include soft deleted records
@@ -215,6 +458,48 @@ comment?: string;
 };
 
 export type GetQueryTicketParams = {
+/**
+ * Number of records to skip
+ */
+skip?: number;
+/**
+ * Number of records to take
+ */
+take?: number;
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Load eager relations
+ */
+loadEagerRelations?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetCountTeamStadiumParams = {
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetQueryTeamStadiumParams = {
 /**
  * Number of records to skip
  */
@@ -829,7 +1114,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetCountPaymentProviderParams = {
+export type GetCountPaymentProcessorParams = {
 /**
  * Include soft deleted records
  */
@@ -844,7 +1129,7 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type GetQueryPaymentProviderParams = {
+export type GetQueryPaymentProcessorParams = {
 /**
  * Number of records to skip
  */
@@ -1039,6 +1324,10 @@ transaction?: boolean;
 comment?: string;
 };
 
+export type SocialControllerSearchUsersParams = {
+q: string;
+};
+
 export type GetCountLogParams = {
 /**
  * Include soft deleted records
@@ -1079,6 +1368,15 @@ transaction?: boolean;
  * Query comment
  */
 comment?: string;
+};
+
+export type LogControllerGetMyHistory200LogsItem = { [key: string]: unknown };
+
+export type LogControllerGetMyHistory200Entitlements = { [key: string]: unknown };
+
+export type LogControllerGetMyHistory200 = {
+  entitlements?: LogControllerGetMyHistory200Entitlements;
+  logs?: LogControllerGetMyHistory200LogsItem[];
 };
 
 export type GetCountLineUpParams = {
@@ -1291,6 +1589,24 @@ transaction?: boolean;
 comment?: string;
 };
 
+export type FixtureTimelineControllerGetFixtureEvents200SubstitutionsItem = { [key: string]: unknown };
+
+export type FixtureTimelineControllerGetFixtureEvents200PlayersItem = {
+  id?: number;
+  name?: string;
+};
+
+export type FixtureTimelineControllerGetFixtureEvents200GoalsItem = { [key: string]: unknown };
+
+export type FixtureTimelineControllerGetFixtureEvents200CardsItem = { [key: string]: unknown };
+
+export type FixtureTimelineControllerGetFixtureEvents200 = {
+  cards?: FixtureTimelineControllerGetFixtureEvents200CardsItem[];
+  goals?: FixtureTimelineControllerGetFixtureEvents200GoalsItem[];
+  players?: FixtureTimelineControllerGetFixtureEvents200PlayersItem[];
+  substitutions?: FixtureTimelineControllerGetFixtureEvents200SubstitutionsItem[];
+};
+
 export type GetCountFixtureParams = {
 /**
  * Include soft deleted records
@@ -1307,6 +1623,48 @@ comment?: string;
 };
 
 export type GetQueryFixtureParams = {
+/**
+ * Number of records to skip
+ */
+skip?: number;
+/**
+ * Number of records to take
+ */
+take?: number;
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Load eager relations
+ */
+loadEagerRelations?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetCountCompetitionStandingParams = {
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetQueryCompetitionStandingParams = {
 /**
  * Number of records to skip
  */
@@ -1524,36 +1882,514 @@ export interface LoginBody {
   userName: string;
 }
 
-export type UserType = typeof UserType[keyof typeof UserType];
+export interface DataSyncRunDto {
+  apiSports?: ApiSportsPipelineDto;
+  /** When Redis is configured, defaults true so Swagger returns immediately with bullJobId. Set false to run synchronously. */
+  async?: boolean;
+  /** Continue a previous job (uses stored preset + step cursors) */
+  resumeJobId?: number;
+  /** Run StatsBomb open-data sync first (does not count toward maxApiRequests) */
+  statsbomb?: boolean;
+  statsbombOptions?: StatsBombPipelineOptionsDto;
+}
+
+export interface ApiSportsEnrichPipelineDto {
+  /** Max players to try (also limited by budget via maxRequests) */
+  limit?: number;
+  /** Hard stop on API calls for this enrich step */
+  maxRequests?: number;
+  /** Season fallback for /players?id= */
+  season?: number;
+}
+
+export interface ApiSportsFixturesPipelineDto {
+  allPages?: boolean;
+  /** YYYY-MM-DD */
+  from: string;
+  maxPages?: number;
+  /** Per league */
+  maxRequestsPerLeague?: number;
+  /** YYYY-MM-DD */
+  to: string;
+}
+
+export interface ApiSportsPlayersPipelineDto {
+  maxPages?: number;
+  /** Per league; also bounded by remaining budget */
+  maxRequestsPerLeague?: number;
+  skipOnAmbiguousName?: boolean;
+}
+
+export interface ApiSportsLeaguesPipelineDto {
+  /** Cap on /standings calls (plus one /leagues) */
+  maxStandingsRequests?: number;
+  onlyLeagueType?: boolean;
+  onlyStandingsCoverage?: boolean;
+  syncTeamsAndStandings?: boolean;
+}
+
+export interface ApiSportsPipelineDto {
+  /** With season, runs GET /leagues then import + optional standings */
+  country?: string;
+  /** When false, the API-Sports block is skipped (useful with preset objects) */
+  enabled?: boolean;
+  enrich?: ApiSportsEnrichPipelineDto;
+  fixtures?: ApiSportsFixturesPipelineDto;
+  /** API league ids for players + fixtures passes */
+  leagueApiIds?: number[];
+  leagues?: ApiSportsLeaguesPipelineDto;
+  /** Global cap on API-Sports HTTP requests for this run (leagues + players + fixtures + enrich) */
+  maxApiRequests: number;
+  players?: ApiSportsPlayersPipelineDto;
+  /** API-Football season year (e.g. 2024 for 2024/25) */
+  season: number;
+}
+
+export interface StatsBombPipelineOptionsDto {
+  skipCards?: boolean;
+  skipFixtures?: boolean;
+  skipGoals?: boolean;
+  skipLineups?: boolean;
+  skipPlayers?: boolean;
+  skipStadiums?: boolean;
+}
+
+/**
+ * Provider implementation key
+ */
+export type IntegrationProvider = typeof IntegrationProvider[keyof typeof IntegrationProvider];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UserType = {
-  ADMIN: 'ADMIN',
-  MODERATOR: 'MODERATOR',
-  USER: 'USER',
+export const IntegrationProvider = {
+  stripe: 'stripe',
+  paypal: 'paypal',
+  openai: 'openai',
+  anthropic: 'anthropic',
+  azure_openai: 'azure_openai',
+  api_sports: 'api_sports',
+  statsbomb: 'statsbomb',
+  custom: 'custom',
 } as const;
 
-export interface User {
-  commsPreference?: Promise;
-  commsPreferenceId?: number;
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type IntegrationMetadata = { [key: string]: unknown } | null;
+
+export type IntegrationKind = typeof IntegrationKind[keyof typeof IntegrationKind];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const IntegrationKind = {
+  PAYMENT: 'PAYMENT',
+  LLM: 'LLM',
+  HTTP_API: 'HTTP_API',
+  DATA_SYNC: 'DATA_SYNC',
+} as const;
+
+/**
+ * Provider credentials and settings (encrypted at rest in production)
+ */
+export type IntegrationConfig = { [key: string]: unknown };
+
+export interface Integration {
+  /** Provider credentials and settings (encrypted at rest in production) */
+  config?: IntegrationConfig;
   createdAt?: string;
-  deletedAt?: string;
-  email: string;
-  favouriteTeamId?: number;
-  firstName: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  description?: string;
+  enabled: boolean;
   id: number;
-  lastName: string;
-  logs: Promise;
+  /** Default integration for this kind when slug omitted */
+  isDefault: boolean;
+  kind: IntegrationKind;
   /**
-   * @minLength 8
-   * @maxLength 32
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
    */
-  password: string;
-  predictions?: Promise;
-  type: UserType;
+  metadata?: IntegrationMetadata;
+  name: string;
+  /** Provider implementation key */
+  provider: IntegrationProvider;
+  /** Unique slug for code lookups */
+  slug: string;
   updatedAt?: string;
-  userName: string;
+}
+
+/**
+ * Provider implementation key
+ */
+export type CreateIntegrationDTOProvider = typeof CreateIntegrationDTOProvider[keyof typeof CreateIntegrationDTOProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateIntegrationDTOProvider = {
+  stripe: 'stripe',
+  paypal: 'paypal',
+  openai: 'openai',
+  anthropic: 'anthropic',
+  azure_openai: 'azure_openai',
+  api_sports: 'api_sports',
+  statsbomb: 'statsbomb',
+  custom: 'custom',
+} as const;
+
+export type CreateIntegrationDTOKind = typeof CreateIntegrationDTOKind[keyof typeof CreateIntegrationDTOKind];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateIntegrationDTOKind = {
+  PAYMENT: 'PAYMENT',
+  LLM: 'LLM',
+  HTTP_API: 'HTTP_API',
+  DATA_SYNC: 'DATA_SYNC',
+} as const;
+
+/**
+ * Provider credentials and settings (encrypted at rest in production)
+ */
+export type CreateIntegrationDTOConfig = { [key: string]: unknown };
+
+export interface CreateIntegrationDTO {
+  /** Provider credentials and settings (encrypted at rest in production) */
+  config?: CreateIntegrationDTOConfig;
+  description?: string;
+  enabled: boolean;
+  /** Default integration for this kind when slug omitted */
+  isDefault: boolean;
+  kind: CreateIntegrationDTOKind;
+  name: string;
+  /** Provider implementation key */
+  provider: CreateIntegrationDTOProvider;
+  /** Unique slug for code lookups */
+  slug: string;
+}
+
+export interface StreamFixtureInsightDto {
+  integrationId?: number;
+  integrationSlug?: string;
+  locale?: string;
+  question?: string;
+}
+
+export interface ApiSportsSyncTransfersDto {
+  /** Optional season filter */
+  season?: number;
+  /** API-Sports team id */
+  teamApiId: number;
+}
+
+export interface ApiSportsImportPlayersDto {
+  /** API-Sports league id */
+  league: number;
+  /** Max pages to fetch from GET /players. Each page is one API request. Increase slowly to protect the 100/day quota. */
+  maxPages?: number;
+  /** Hard cap on /players requests in this run (safety guard; each page is one request). */
+  maxRequests?: number;
+  /** API-Sports season year */
+  season: number;
+  /** If true (default), when multiple local players share the same name with placeholder DOB (1900-01-01), we skip linking/creating to avoid wrong matches and duplicates. */
+  skipOnAmbiguousName?: boolean;
+}
+
+export interface ApiSportsSyncPrimaryVenuesDto {
+  /** API-Sports league id */
+  league: number;
+  /** Ignored: with `league`+`season`, API-Football returns all teams in one response and rejects the `page` parameter. */
+  maxPages?: number;
+  /** Ignored: single GET /teams request. */
+  maxRequests?: number;
+  /** API-Football season year (e.g. 2024) */
+  season: number;
+}
+
+export interface ApiSportsImportFixturesDto {
+  /** Follow paging until complete (within maxPages/maxRequests) */
+  allPages?: boolean;
+  /**
+   * Max concurrent DB upserts for fixture rows.
+   * @minimum 1
+   * @maximum 64
+   */
+  fixtureUpsertConcurrency?: number;
+  /** from date YYYY-MM-DD */
+  from: string;
+  /** API-Sports league id */
+  leagueApiId: number;
+  /** Max fixture list pages */
+  maxPages?: number;
+  /** Max /fixtures HTTP calls */
+  maxRequests?: number;
+  /** Ignored for primary-venue sync (reserved). API-Football does not accept `page` with league+season on /teams. */
+  primaryVenuesMaxPages?: number;
+  /** Ignored for primary-venue sync (single /teams call). Reserved for future use. */
+  primaryVenuesMaxRequests?: number;
+  /** After fixtures (+0 HTTP), recomputes `competitionStanding` positions from persisted fixtures that have numeric scores (no form string). Runs in parallel with `syncStandingsAfter` when both are true. */
+  recomputeStandingsFromFixturesAfter?: boolean;
+  /** API-Football season year (e.g. 2024 for 2024/25) */
+  seasonYear: number;
+  /** After fixtures, one **`GET /teams?league=&season=`** (no `page`; API-Football returns all teams in one response) links each club **`venue`** to `teamStadium` as primary home. Not derived from match venue. */
+  syncPrimaryVenuesAfter?: boolean;
+  /** When true, after fixtures, one GET /standings for this league+season and upsert `competitionStanding` (+1 API request). */
+  syncStandingsAfter?: boolean;
+  /** to date YYYY-MM-DD */
+  to: string;
+}
+
+export interface ApiSportsEnrichPlayersDto {
+  /** Max players to process */
+  limit?: number;
+  /** Hard cap on API calls in this run (each player may use 1–2 requests) */
+  maxRequests?: number;
+  /** Season year for /players fallback */
+  season?: number;
+}
+
+export interface ApiSportsStandingsItemDto {
+  /** Local competition id */
+  competitionId: number;
+  /** API-Sports league id */
+  league: number;
+  /** API-Sports season year */
+  season: number;
+  /** Local season id */
+  seasonId: number;
+}
+
+export interface ApiSportsSyncStandingsDto {
+  items: ApiSportsStandingsItemDto[];
+}
+
+export type ApiSportsImportLeaguesDtoResponseItem = { [key: string]: unknown };
+
+export interface ApiSportsImportLeaguesDto {
+  /** With `season`, calls GET /leagues on API-Sports */
+  country?: string;
+  /** Cap on extra /standings calls in this request (1 league = 1 call). */
+  maxStandingsRequests?: number;
+  /** Only sync standings for competition type League, not Cup. */
+  onlyLeagueType?: boolean;
+  /** Skip leagues where seasons[].coverage.standings is false (saves daily quota). */
+  onlyStandingsCoverage?: boolean;
+  /** Paste the `response` array from a /leagues call (or send full JSON — we read `.response`). */
+  response?: ApiSportsImportLeaguesDtoResponseItem[];
+  /** API-Sports season year (with `country`) */
+  season?: number;
+  /** API season for `/standings` when pasting `response` (e.g. 2023). With `country`+`season`, this is set automatically. */
+  standingsSeasonYear?: number;
+  /** If true (default), one GET /standings per eligible league after import (teams + standings in one call; no /teams). Respects onlyStandingsCoverage, onlyLeagueType, maxStandingsRequests. */
+  syncTeamsAndStandings?: boolean;
+}
+
+export interface StatsBombSyncOptionsDTO {
+  /** Skip syncing cards */
+  skipCards?: boolean;
+  /** Skip syncing fixtures */
+  skipFixtures?: boolean;
+  /** Skip syncing goals */
+  skipGoals?: boolean;
+  /** Skip StatsBomb lineups/{match}.json merge (no PlayerLineUp rows from squad file; substitutes missing unless filled elsewhere). When false, starters + bench are synced with isStarting from start_reason. */
+  skipLineups?: boolean;
+  /** Skip team + player ingest from match lineups (Step 2). Managers still attach from match payloads when fixtures run. */
+  skipPlayers?: boolean;
+  /** Skip creating stadiums during fixture sync */
+  skipStadiums?: boolean;
+  /** Skip Starting XI events when syncing match events (formation / eleven from tactics block only). Independent of skipLineups. */
+  skipStartingXi?: boolean;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TrophyMetadata = { [key: string]: unknown } | null;
+
+export interface Trophy {
+  competitionId?: number;
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  description?: string;
+  id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TrophyMetadata;
+  name: string;
+  playerId?: number;
+  teamId?: number;
+  updatedAt?: string;
+  yearIntroduced?: string;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateTrophyDTOMetadata = { [key: string]: unknown } | null;
+
+export interface CreateTrophyDTO {
+  competitionId?: number;
+  description?: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateTrophyDTOMetadata;
+  name: string;
+  playerId?: number;
+  teamId?: number;
+  yearIntroduced?: string;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TransferMetadata = { [key: string]: unknown } | null;
+
+export interface Transfer {
+  createdAt?: string;
+  date?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  destinationTeam: Promise;
+  destinationTeamId: number;
+  id: number;
+  isLoan?: boolean;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TransferMetadata;
+  player: Promise;
+  playerId: number;
+  sourceTeam: Promise;
+  sourceTeamId: number;
+  transferFee: number;
+  updatedAt?: string;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateTransferDTOMetadata = { [key: string]: unknown } | null;
+
+export interface CreateTransferDTO {
+  date?: string;
+  destinationTeamId: number;
+  isLoan?: boolean;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateTransferDTOMetadata;
+  playerId: number;
+  sourceTeamId: number;
+  transferFee: number;
+}
+
+/**
+ * Discriminator — indicates which value field holds the data
+ */
+export type UpdatePlatformConfigDtoValueType = typeof UpdatePlatformConfigDtoValueType[keyof typeof UpdatePlatformConfigDtoValueType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdatePlatformConfigDtoValueType = {
+  number: 'number',
+  string: 'string',
+  boolean: 'boolean',
+  array: 'array',
+  json: 'json',
+} as const;
+
+/**
+ * Populated when valueType is json
+ */
+export type UpdatePlatformConfigDtoJsonValue = { [key: string]: unknown };
+
+export type UpdatePlatformConfigDtoArrayValueItem = { [key: string]: unknown };
+
+export interface UpdatePlatformConfigDto {
+  /** Populated when valueType is array */
+  arrayValue?: UpdatePlatformConfigDtoArrayValueItem[];
+  /** Populated when valueType is boolean */
+  booleanValue?: boolean;
+  /** Human-readable description (optional update) */
+  description?: string;
+  /** Populated when valueType is json */
+  jsonValue?: UpdatePlatformConfigDtoJsonValue;
+  /** Populated when valueType is number */
+  numberValue?: number;
+  /** Populated when valueType is string */
+  stringValue?: string;
+  /** Discriminator — indicates which value field holds the data */
+  valueType: UpdatePlatformConfigDtoValueType;
+}
+
+export type ConfirmMarketplacePurchaseDtoPaymentMethod = typeof ConfirmMarketplacePurchaseDtoPaymentMethod[keyof typeof ConfirmMarketplacePurchaseDtoPaymentMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmMarketplacePurchaseDtoPaymentMethod = {
+  CreditCard: 'CreditCard',
+  PayPal: 'PayPal',
+  PlatformCredit: 'PlatformCredit',
+} as const;
+
+export interface ConfirmMarketplacePurchaseDto {
+  /** holderId returned by POST /marketplace/hold/:listingId */
+  holderId: string;
+  /** Client-generated idempotency key for safe retries */
+  idempotencyKey?: string;
+  /** ID of the marketplace listing to purchase */
+  listingId: number;
+  paymentMethod: ConfirmMarketplacePurchaseDtoPaymentMethod;
+  /** ID of the payment processor used */
+  paymentProcessorId?: number;
+  /** Provider transaction reference (e.g. Stripe payment_intent) */
+  providerPaymentRef?: string;
+}
+
+export interface CreateListingDto {
+  /**
+   * Asking price set by the seller
+   * @minimum 0.01
+   */
+  askPrice: number;
+  /** ID of the ticket to list for resale */
+  ticketId: number;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type UserTicketLogMetadata = { [key: string]: unknown } | null;
+
+export interface UserTicketLog {
+  /** Whether the ticket is currently in the user's wallet. False when listed for sale. */
+  active: boolean;
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: UserTicketLogMetadata;
+  /** Ticket id */
+  ticketId: number;
+  updatedAt?: string;
+  /** Owner user id */
+  userId: number;
 }
 
 export type CreateUserDTOType = typeof CreateUserDTOType[keyof typeof CreateUserDTOType];
@@ -1566,90 +2402,229 @@ export const CreateUserDTOType = {
   USER: 'USER',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateUserDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateUserDTO {
   email: string;
   firstName: string;
   lastName: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateUserDTOMetadata;
   type: CreateUserDTOType;
   userName: string;
 }
 
-export interface Trophy {
-  competitionId?: number;
-  createdAt?: string;
-  deletedAt?: string;
-  description?: string;
-  id: number;
-  name: string;
-  playerId?: number;
-  teamId?: number;
-  updatedAt?: string;
-  yearIntroduced?: string;
+export type UserType = typeof UserType[keyof typeof UserType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserType = {
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',
+  USER: 'USER',
+} as const;
+
+export type UserTrackerVisibility = typeof UserTrackerVisibility[keyof typeof UserTrackerVisibility];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserTrackerVisibility = {
+  PRIVATE: 'PRIVATE',
+  FRIENDS: 'FRIENDS',
+  PUBLIC: 'PUBLIC',
+} as const;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type UserMetadata = { [key: string]: unknown } | null;
+
+export type WebhookConfirmCheckoutDtoPaymentMethod = typeof WebhookConfirmCheckoutDtoPaymentMethod[keyof typeof WebhookConfirmCheckoutDtoPaymentMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WebhookConfirmCheckoutDtoPaymentMethod = {
+  CreditCard: 'CreditCard',
+  PayPal: 'PayPal',
+  PlatformCredit: 'PlatformCredit',
+} as const;
+
+export interface WebhookConfirmCheckoutDto {
+  /** Ticket category label stored on Ticket rows */
+  category: string;
+  /** Discount code id to apply (primary market only) */
+  discountCodeId?: number;
+  fixtureId: number;
+  holderId: string;
+  /** Client-generated idempotency key for safe retries */
+  idempotencyKey?: string;
+  offerKey: string;
+  paymentMethod: WebhookConfirmCheckoutDtoPaymentMethod;
+  paymentProcessorId?: number;
+  /** Provider transaction id (e.g. Stripe payment_intent) */
+  providerPaymentRef?: string;
+  /** @minimum 1 */
+  quantity: number;
+  unitPrice: number;
+  /** Purchasing user id (must match Stripe session metadata) */
+  userId: number;
 }
 
-export interface CreateTrophyDTO {
-  competitionId?: number;
-  description?: string;
-  name: string;
-  playerId?: number;
-  teamId?: number;
-  yearIntroduced?: string;
+export type ConfirmCheckoutDtoPaymentMethod = typeof ConfirmCheckoutDtoPaymentMethod[keyof typeof ConfirmCheckoutDtoPaymentMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmCheckoutDtoPaymentMethod = {
+  CreditCard: 'CreditCard',
+  PayPal: 'PayPal',
+  PlatformCredit: 'PlatformCredit',
+} as const;
+
+export interface ConfirmCheckoutDto {
+  /** Ticket category label stored on Ticket rows */
+  category: string;
+  /** Discount code id to apply (primary market only) */
+  discountCodeId?: number;
+  fixtureId: number;
+  holderId: string;
+  /** Client-generated idempotency key for safe retries */
+  idempotencyKey?: string;
+  offerKey: string;
+  paymentMethod: ConfirmCheckoutDtoPaymentMethod;
+  paymentProcessorId?: number;
+  /** Provider transaction id (e.g. Stripe payment_intent) */
+  providerPaymentRef?: string;
+  /** @minimum 1 */
+  quantity: number;
+  unitPrice: number;
 }
 
-export interface Transfer {
-  createdAt?: string;
-  date?: string;
-  deletedAt?: string;
-  destinationTeam: Promise;
-  destinationTeamId: number;
-  id: number;
-  isLoan?: boolean;
-  player: Promise;
-  playerId: number;
-  sourceTeam: Promise;
-  sourceTeamId: number;
-  transferFee: number;
-  updatedAt?: string;
+export interface ReleaseTicketHoldDto {
+  holderId: string;
 }
 
-export interface CreateTransferDTO {
-  date?: string;
-  destinationTeamId: number;
-  isLoan?: boolean;
-  playerId: number;
-  sourceTeamId: number;
-  transferFee: number;
+export interface AcquireTicketHoldDto {
+  fixtureId: number;
+  /** Client-generated UUID for this browser session */
+  holderId: string;
+  /**
+   * @minimum 1
+   * @maximum 60
+   */
+  holdMinutes?: number;
+  /** @maxLength 512 */
+  offerKey: string;
+  /** @minimum 1 */
+  quantity: number;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TicketMetadata = { [key: string]: unknown } | null;
 
 export interface Ticket {
   category: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TicketMetadata;
   paymentId?: number;
   price: number;
   updatedAt?: string;
   userId?: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateTicketDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateTicketDTO {
   category: string;
   fixtureId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateTicketDTOMetadata;
   paymentId?: number;
   price: number;
   userId?: number;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TeamStadiumMetadata = { [key: string]: unknown } | null;
+
+export interface TeamStadium {
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TeamStadiumMetadata;
+  stadiumId: number;
+  teamId: number;
+  updatedAt?: string;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateTeamStadiumDTOMetadata = { [key: string]: unknown } | null;
+
+export interface CreateTeamStadiumDTO {
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateTeamStadiumDTOMetadata;
+  stadiumId: number;
+  teamId: number;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TeamCompetitionSeasonMetadata = { [key: string]: unknown } | null;
 
 export interface TeamCompetitionSeason {
   competition: Promise;
   competitionId: number;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtures: Promise;
   id: number;
-  points?: number;
-  position?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TeamCompetitionSeasonMetadata;
   season: Promise;
   seasonId: number;
   team?: Promise;
@@ -1657,10 +2632,19 @@ export interface TeamCompetitionSeason {
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateTeamCompetitionSeasonDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateTeamCompetitionSeasonDTO {
   competitionId: number;
-  points?: number;
-  position?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateTeamCompetitionSeasonDTOMetadata;
   seasonId: number;
   teamId: number;
 }
@@ -1673,6 +2657,17 @@ export const TeamType = {
   Club: 'Club',
   Country: 'Country',
 } as const;
+
+/**
+ * @nullable
+ */
+export type TeamTeamStadiumLinks = Promise | null;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TeamMetadata = { [key: string]: unknown } | null;
 
 /**
  * @nullable
@@ -1691,7 +2686,8 @@ export interface Team {
   city?: string;
   country?: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   founded?: string;
   /** @nullable */
   gender: TeamGender;
@@ -1700,14 +2696,18 @@ export interface Team {
   logoUrl?: string;
   manager: Promise;
   managerId?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TeamMetadata;
   name: string;
   parentId?: number;
   playerIds?: string[];
   players: Promise;
-  stadiumIds?: string[];
-  /** @nullable */
-  stadiums?: string[] | null;
   teamCompetitionSeasons: string[];
+  /** @nullable */
+  teamStadiumLinks?: TeamTeamStadiumLinks;
   /** @nullable */
   trophies: string[] | null;
   type: TeamType;
@@ -1724,24 +2724,47 @@ export const CreateTeamDTOType = {
   Country: 'Country',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateTeamDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateTeamDTO {
   city?: string;
   country?: string;
   founded?: string;
   logoUrl?: string;
   managerId?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateTeamDTOMetadata;
   name: string;
   parentId?: number;
-  stadiumIds?: string[];
   type: CreateTeamDTOType;
   website?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type SubstitutionMetadata = { [key: string]: unknown } | null;
+
 export interface Substitution {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  fixture: Promise;
   fixtureId: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: SubstitutionMetadata;
   minute?: number;
   playerLineup: Promise;
   playerOut: Promise;
@@ -1750,11 +2773,28 @@ export interface Substitution {
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateSubstitutionDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateSubstitutionDTO {
   fixtureId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateSubstitutionDTOMetadata;
   minute?: number;
   teamId: number;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type StadiumMetadata = { [key: string]: unknown } | null;
 
 export interface Stadium {
   address?: Address;
@@ -1762,69 +2802,164 @@ export interface Stadium {
   capacity?: number;
   country: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtures?: Promise;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: StadiumMetadata;
   name: string;
   opened?: string;
-  teamIds?: string[];
-  teams?: Promise;
+  teamStadiumLinks?: Promise;
   updatedAt?: string;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateStadiumDTOMetadata = { [key: string]: unknown } | null;
 
 export interface CreateStadiumDTO {
   addressId?: number;
   capacity?: number;
   country: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateStadiumDTOMetadata;
   name: string;
   opened?: string;
-  teamIds?: string[];
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type SeasonMetadata = { [key: string]: unknown } | null;
 
 export interface Season {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: SeasonMetadata;
   teamCompetitionSeasons: string[];
   updatedAt?: string;
   yearEnd: number;
   yearStart: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateSeasonDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateSeasonDTO {
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateSeasonDTOMetadata;
   yearEnd: number;
   yearStart: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type RefereeMetadata = { [key: string]: unknown } | null;
+
 export interface Referee {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtures: string[];
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: RefereeMetadata;
   name: string;
   nationality: string;
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateRefereeDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateRefereeDTO {
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateRefereeDTOMetadata;
   name: string;
   nationality: string;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type PredictionMetadata = { [key: string]: unknown } | null;
 
 export interface Prediction {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: PredictionMetadata;
   predicted?: string;
   updatedAt?: string;
   userId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreatePredictionDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreatePredictionDTO {
   fixtureId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreatePredictionDTOMetadata;
   predicted?: string;
   userId: number;
+}
+
+export interface FixturePredictionTallyDto {
+  /** Votes for away win */
+  away: number;
+  /** Votes for draw */
+  draw: number;
+  /** Votes for home win */
+  home: number;
+  /** Total predictions with a result set */
+  total: number;
 }
 
 export type PositionType = typeof PositionType[keyof typeof PositionType];
@@ -1838,11 +2973,23 @@ export const PositionType = {
   Forward: 'Forward',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type PositionMetadata = { [key: string]: unknown } | null;
+
 export interface Position {
   abbreviation?: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: PositionMetadata;
   name: string;
   type: PositionType;
   updatedAt?: string;
@@ -1859,20 +3006,43 @@ export const CreatePositionDTOType = {
   Forward: 'Forward',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreatePositionDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreatePositionDTO {
   abbreviation?: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreatePositionDTOMetadata;
   name: string;
   type: CreatePositionDTOType;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type PlayerLineUpMetadata = { [key: string]: unknown } | null;
+
 export interface PlayerLineUp {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
   isCaptain: boolean;
   isStarting: boolean;
   lineup: Promise;
   lineupId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: PlayerLineUpMetadata;
   player: Promise;
   playerId: number;
   positionId?: number;
@@ -1880,24 +3050,47 @@ export interface PlayerLineUp {
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreatePlayerLineUpDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreatePlayerLineUpDTO {
   isCaptain: boolean;
   isStarting: boolean;
   lineupId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreatePlayerLineUpDTOMetadata;
   playerId: number;
   positionId?: number;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type PlayerMetadata = { [key: string]: unknown } | null;
 
 export interface Player {
   assists: Promise;
   bio?: string;
   createdAt?: string;
   dateOfBirth: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   goals: Promise;
   height?: number;
   id: number;
   kitNumber?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: PlayerMetadata;
   name: string;
   nationality: string;
   nickname?: string;
@@ -1913,11 +3106,22 @@ export interface Player {
   weight?: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreatePlayerDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreatePlayerDTO {
   bio?: string;
   dateOfBirth: string;
   height?: number;
   kitNumber?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreatePlayerDTOMetadata;
   name: string;
   nationality: string;
   nickname?: string;
@@ -1927,9 +3131,16 @@ export interface CreatePlayerDTO {
   weight?: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type LoyaltyEventMetadata = { [key: string]: unknown } | null;
+
 export interface LoyaltyEvent {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   /** Description of the loyalty event */
   description?: string;
   /** Type of loyalty event */
@@ -1937,6 +3148,11 @@ export interface LoyaltyEvent {
   id: number;
   /** ID of the loyalty scheme that triggered this event */
   loyaltySchemeId?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: LoyaltyEventMetadata;
   /** Credit amount awarded */
   rewardAmount: number;
   updatedAt?: string;
@@ -1957,9 +3173,16 @@ export interface CreateLoyaltyEventDTO {
   userId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type LoyaltySchemeMetadata = { [key: string]: unknown } | null;
+
 export interface LoyaltyScheme {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   /** Description of the loyalty scheme */
   description?: string;
   /** Whether this scheme is enabled */
@@ -1967,6 +3190,11 @@ export interface LoyaltyScheme {
   /** Type of loyalty event this scheme applies to */
   eventType: string;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: LoyaltySchemeMetadata;
   /** Name of the loyalty scheme */
   name: string;
   /** Credit amount to award when scheme is triggered */
@@ -1991,14 +3219,26 @@ export interface CreateLoyaltySchemeDTO {
   threshold?: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type TransactionMetadata = { [key: string]: unknown } | null;
+
 export interface Transaction {
   /** Transaction amount (positive for credits, negative for debits) */
   amount: number;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   /** Description of the transaction */
   description?: string;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: TransactionMetadata;
   /** ID of the payment this transaction belongs to */
   paymentId?: number;
   /** Type of transaction */
@@ -2021,12 +3261,24 @@ export interface CreateTransactionDTO {
   userId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreditMetadata = { [key: string]: unknown } | null;
+
 export interface Credit {
   /** Current credit balance for the user */
   balance: number;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreditMetadata;
   updatedAt?: string;
   /** ID of the user who owns this credit account */
   userId: number;
@@ -2040,13 +3292,13 @@ export interface CreateCreditDTO {
 }
 
 /**
- * Type of payment provider
+ * Type of payment processor
  */
-export type CreatePaymentProviderDTOType = typeof CreatePaymentProviderDTOType[keyof typeof CreatePaymentProviderDTOType];
+export type CreatePaymentProcessorDTOType = typeof CreatePaymentProcessorDTOType[keyof typeof CreatePaymentProcessorDTOType];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreatePaymentProviderDTOType = {
+export const CreatePaymentProcessorDTOType = {
   CARD: 'CARD',
   WALLET: 'WALLET',
   BANK_TRANSFER: 'BANK_TRANSFER',
@@ -2055,54 +3307,70 @@ export const CreatePaymentProviderDTOType = {
 
 /**
  * Additional configuration/metadata as JSON
+ * @nullable
  */
-export type CreatePaymentProviderDTOMetadata = { [key: string]: unknown };
+export type CreatePaymentProcessorDTOMetadata = { [key: string]: unknown } | null;
 
-export interface CreatePaymentProviderDTO {
+export interface CreatePaymentProcessorDTO {
   /** API key or secret (encrypted in production) */
   apiKey: string;
-  /** Whether this provider is enabled and available */
+  /** Whether this processor is enabled and available */
   enabled: boolean;
-  /** URL to the provider logo */
+  /** URL to the processor logo */
   logoUrl?: string;
-  /** Additional configuration/metadata as JSON */
-  metadata?: CreatePaymentProviderDTOMetadata;
-  /** Display name of the payment provider */
+  /**
+   * Additional configuration/metadata as JSON
+   * @nullable
+   */
+  metadata?: CreatePaymentProcessorDTOMetadata;
+  /** Display name of the payment processor */
   name: string;
   /** Unique slug identifier */
   slug: string;
-  /** Type of payment provider */
-  type: CreatePaymentProviderDTOType;
+  /** Type of payment processor */
+  type: CreatePaymentProcessorDTOType;
 }
 
 /**
  * @nullable
  */
-export type PaymentPaymentProvider = PaymentProvider | null;
+export type PaymentPaymentProcessor = PaymentProcessor | null;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type PaymentMetadata = { [key: string]: unknown } | null;
 
 export interface Payment {
   /** Total amount paid */
   amount?: number;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: PaymentMetadata;
   method: string;
   /** @nullable */
-  paymentProvider?: PaymentPaymentProvider;
+  paymentProcessor?: PaymentPaymentProcessor;
   /** ID of the payment provider used */
-  paymentProviderId?: number;
+  paymentProcessorId?: number;
   status: string;
   updatedAt?: string;
 }
 
 /**
- * Type of payment provider
+ * Type of payment processor
  */
-export type PaymentProviderType = typeof PaymentProviderType[keyof typeof PaymentProviderType];
+export type PaymentProcessorType = typeof PaymentProcessorType[keyof typeof PaymentProcessorType];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const PaymentProviderType = {
+export const PaymentProcessorType = {
   CARD: 'CARD',
   WALLET: 'WALLET',
   BANK_TRANSFER: 'BANK_TRANSFER',
@@ -2111,27 +3379,32 @@ export const PaymentProviderType = {
 
 /**
  * Additional configuration/metadata as JSON
+ * @nullable
  */
-export type PaymentProviderMetadata = { [key: string]: unknown };
+export type PaymentProcessorMetadata = { [key: string]: unknown } | null;
 
-export interface PaymentProvider {
+export interface PaymentProcessor {
   /** API key or secret (encrypted in production) */
   apiKey: string;
   createdAt?: string;
-  deletedAt?: string;
-  /** Whether this provider is enabled and available */
+  /** @nullable */
+  deletedAt?: string | null;
+  /** Whether this processor is enabled and available */
   enabled: boolean;
   id: number;
-  /** URL to the provider logo */
+  /** URL to the processor logo */
   logoUrl?: string;
-  /** Additional configuration/metadata as JSON */
-  metadata?: PaymentProviderMetadata;
-  /** Display name of the payment provider */
+  /**
+   * Additional configuration/metadata as JSON
+   * @nullable
+   */
+  metadata?: PaymentProcessorMetadata;
+  /** Display name of the payment processor */
   name: string;
   /** Unique slug identifier */
   slug: string;
-  /** Type of payment provider */
-  type: PaymentProviderType;
+  /** Type of payment processor */
+  type: PaymentProcessorType;
   updatedAt?: string;
 }
 
@@ -2140,9 +3413,15 @@ export interface CreatePaymentDTO {
   amount?: number;
   method: string;
   /** ID of the payment provider used */
-  paymentProviderId?: number;
+  paymentProcessorId?: number;
   status: string;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type NewsArticleMetadata = { [key: string]: unknown } | null;
 
 export interface NewsArticle {
   /** Author name */
@@ -2150,10 +3429,16 @@ export interface NewsArticle {
   /** Article category/topic */
   category?: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
   /** URL to the article image */
   imageUrl?: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: NewsArticleMetadata;
   /** Original publication date */
   publishedAt: string;
   /** Source/publication name */
@@ -2166,6 +3451,12 @@ export interface NewsArticle {
   /** URL to the original source article */
   url: string;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateNewsArticleDTOMetadata = { [key: string]: unknown } | null;
 
 export interface CreateNewsArticleDTO {
   /** Author name */
@@ -2174,6 +3465,11 @@ export interface CreateNewsArticleDTO {
   category?: string;
   /** URL to the article image */
   imageUrl?: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateNewsArticleDTOMetadata;
   /** Original publication date */
   publishedAt: string;
   /** Source/publication name */
@@ -2186,33 +3482,68 @@ export interface CreateNewsArticleDTO {
   url: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type ManagerEmploymentMetadata = { [key: string]: unknown } | null;
+
 export interface ManagerEmployment {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   endDate?: string;
   id: number;
   isCurrent: boolean;
   manager: Promise;
   managerId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: ManagerEmploymentMetadata;
   startDate?: string;
   team: Promise;
   teamId: number;
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateManagerEmploymentDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateManagerEmploymentDTO {
   endDate?: string;
   isCurrent: boolean;
   managerId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateManagerEmploymentDTOMetadata;
   startDate?: string;
   teamId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type ManagerMetadata = { [key: string]: unknown } | null;
+
 export interface Manager {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   employments: Promise;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: ManagerMetadata;
   name: string;
   nationality: string;
   nickname: string;
@@ -2221,91 +3552,218 @@ export interface Manager {
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateManagerDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateManagerDTO {
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateManagerDTOMetadata;
   name: string;
   nationality: string;
   nickname: string;
   teamIds?: string[];
 }
 
+export interface SendFriendRequestDto {
+  userId?: number;
+  userName?: string;
+}
+
+export type UpdateTrackerPrivacyDtoTrackerVisibility = typeof UpdateTrackerPrivacyDtoTrackerVisibility[keyof typeof UpdateTrackerPrivacyDtoTrackerVisibility];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateTrackerPrivacyDtoTrackerVisibility = {
+  PRIVATE: 'PRIVATE',
+  FRIENDS: 'FRIENDS',
+  PUBLIC: 'PUBLIC',
+} as const;
+
+export interface UpdateTrackerPrivacyDto {
+  shareVerifiedOnly?: boolean;
+  trackerVisibility?: UpdateTrackerPrivacyDtoTrackerVisibility;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type LogMetadata = { [key: string]: unknown } | null;
+
 export interface Log {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   id: number;
   isVerified: boolean;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: LogMetadata;
   notes?: string;
   ticketNumber?: string;
   updatedAt?: string;
   userId: number;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateLogDTOMetadata = { [key: string]: unknown } | null;
 
 export interface CreateLogDTO {
   fixtureId: number;
   isVerified: boolean;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateLogDTOMetadata;
   notes?: string;
   ticketNumber?: string;
   userId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type LineUpMetadata = { [key: string]: unknown } | null;
+
 export interface LineUp {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   formation?: string;
   id: number;
   managerId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: LineUpMetadata;
   teamId: number;
   updatedAt?: string;
 }
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateLineUpDTOMetadata = { [key: string]: unknown } | null;
 
 export interface CreateLineUpDTO {
   fixtureId: number;
   formation?: string;
   managerId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateLineUpDTOMetadata;
   teamId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type InjuryMetadata = { [key: string]: unknown } | null;
+
 export interface Injury {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   endDate?: string;
   id: number;
   injuryType: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: InjuryMetadata;
   playerId: number;
   startDate: string;
   status: string;
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateInjuryDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateInjuryDTO {
   endDate?: string;
   injuryType: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateInjuryDTOMetadata;
   playerId: number;
   startDate: string;
   status: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type GoalMetadata = { [key: string]: unknown } | null;
+
 export interface Goal {
   assistantId?: number;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: GoalMetadata;
   minute: number;
-  ownGoal?: boolean;
-  penalty?: boolean;
+  /** @nullable */
+  ownGoal?: boolean | null;
+  /** @nullable */
+  penalty?: boolean | null;
   scorerId: number;
   teamId: number;
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateGoalDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateGoalDTO {
   assistantId?: number;
   fixtureId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateGoalDTOMetadata;
   minute: number;
-  ownGoal?: boolean;
-  penalty?: boolean;
+  /** @nullable */
+  ownGoal?: boolean | null;
+  /** @nullable */
+  penalty?: boolean | null;
   scorerId: number;
   teamId: number;
 }
@@ -2318,11 +3776,23 @@ export const GenericTokenType = {
   FORGOT_PASSWORD: 'FORGOT_PASSWORD',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type GenericTokenMetadata = { [key: string]: unknown } | null;
+
 export interface GenericToken {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   expiry: string;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: GenericTokenMetadata;
   token: string;
   type: GenericTokenType;
   updatedAt?: string;
@@ -2338,8 +3808,19 @@ export const CreateGenericTokenDTOType = {
   FORGOT_PASSWORD: 'FORGOT_PASSWORD',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateGenericTokenDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateGenericTokenDTO {
   expiry: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateGenericTokenDTOMetadata;
   token: string;
   type: CreateGenericTokenDTOType;
   userEmail?: string;
@@ -2356,11 +3837,23 @@ export const FixtureRefereeRole = {
   Var: 'Var',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type FixtureRefereeMetadata = { [key: string]: unknown } | null;
+
 export interface FixtureReferee {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: FixtureRefereeMetadata;
   refereeId: number;
   role: FixtureRefereeRole;
   updatedAt?: string;
@@ -2376,8 +3869,19 @@ export const CreateFixtureRefereeDTORole = {
   Var: 'Var',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateFixtureRefereeDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateFixtureRefereeDTO {
   fixtureId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateFixtureRefereeDTOMetadata;
   refereeId: number;
   role: CreateFixtureRefereeDTORole;
 }
@@ -2418,10 +3922,16 @@ export const FixtureStage = {
   League: 'League',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type FixtureMetadata = { [key: string]: unknown } | null;
+
 export interface Fixture {
   /** Attendance for the fixture */
   attendance?: number;
-  /** Final away goals when detailed goal rows are incomplete */
+  /** Final goals for away team when detailed goal rows are missing or incomplete. */
   awayScore?: number;
   /** ID of the away team */
   awayTeamId?: number;
@@ -2430,12 +3940,18 @@ export interface Fixture {
   createdAt?: string;
   /** Date and time of the fixture */
   date: string;
-  deletedAt?: string;
-  /** Final home goals when detailed goal rows are incomplete */
+  /** @nullable */
+  deletedAt?: string | null;
+  /** Final goals for home team when detailed goal rows are missing or incomplete. */
   homeScore?: number;
   /** ID of the home team */
   homeTeamId?: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: FixtureMetadata;
   /** Season ID associated with the fixture */
   seasonId: number;
   /** Stadium ID where the fixture takes place */
@@ -2483,17 +3999,32 @@ export const CreateFixtureDTOStage = {
   League: 'League',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateFixtureDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateFixtureDTO {
   /** Attendance for the fixture */
   attendance?: number;
+  /** Final goals for away team when detailed goal rows are missing or incomplete. */
+  awayScore?: number;
   /** ID of the away team */
   awayTeamId?: number;
   /** Competition ID associated with the fixture */
   competitionId: number;
   /** Date and time of the fixture */
   date: string;
+  /** Final goals for home team when detailed goal rows are missing or incomplete. */
+  homeScore?: number;
   /** ID of the home team */
   homeTeamId?: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateFixtureDTOMetadata;
   /** Season ID associated with the fixture */
   seasonId: number;
   /** Stadium ID where the fixture takes place */
@@ -2502,6 +4033,63 @@ export interface CreateFixtureDTO {
   stage: CreateFixtureDTOStage;
   /** Status of the fixture */
   status: CreateFixtureDTOStatus;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CompetitionStandingMetadata = { [key: string]: unknown } | null;
+
+export interface CompetitionStanding {
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  drawn: number;
+  form?: string;
+  goalDifference: number;
+  goalsAgainst: number;
+  goalsFor: number;
+  id: number;
+  lost: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CompetitionStandingMetadata;
+  played: number;
+  points: number;
+  position: number;
+  positionChange?: number;
+  teamCompetitionSeasonId: number;
+  updatedAt?: string;
+  won: number;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateCompetitionStandingDTOMetadata = { [key: string]: unknown } | null;
+
+export interface CreateCompetitionStandingDTO {
+  drawn: number;
+  form?: string;
+  goalDifference: number;
+  goalsAgainst: number;
+  goalsFor: number;
+  lost: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateCompetitionStandingDTOMetadata;
+  played: number;
+  points: number;
+  position: number;
+  positionChange?: number;
+  teamCompetitionSeasonId: number;
+  won: number;
 }
 
 export type CompetitionType = typeof CompetitionType[keyof typeof CompetitionType];
@@ -2515,12 +4103,25 @@ export const CompetitionType = {
   Friendly: 'Friendly',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CompetitionMetadata = { [key: string]: unknown } | null;
+
 export interface Competition {
   code?: string;
   country: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  featured: boolean;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CompetitionMetadata;
   name: string;
   teamCompetitionSeasons: Promise;
   trophies: Promise;
@@ -2539,8 +4140,20 @@ export const CreateCompetitionDTOType = {
   Friendly: 'Friendly',
 } as const;
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateCompetitionDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateCompetitionDTO {
   country: string;
+  featured: boolean;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateCompetitionDTOMetadata;
   name: string;
   type: CreateCompetitionDTOType;
 }
@@ -2580,6 +4193,12 @@ export const CommsPreferenceNewsletterEmails = {
   MONTHLY: 'MONTHLY',
   NEVER: 'NEVER',
 } as const;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CommsPreferenceMetadata = { [key: string]: unknown } | null;
 
 export type CommsPreferenceMatchReminders = typeof CommsPreferenceMatchReminders[keyof typeof CommsPreferenceMatchReminders];
 
@@ -2644,13 +4263,19 @@ export const CommsPreferenceEmailNotifications = {
 
 export interface CommsPreference {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   emailNotifications: CommsPreferenceEmailNotifications;
   id: number;
   inAppNotifications: CommsPreferenceInAppNotifications;
   language: CommsPreferenceLanguage;
   marketingEmails: CommsPreferenceMarketingEmails;
   matchReminders: CommsPreferenceMatchReminders;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CommsPreferenceMetadata;
   newsletterEmails: CommsPreferenceNewsletterEmails;
   pushNotifications: CommsPreferencePushNotifications;
   smsNotifications: CommsPreferenceSmsNotifications;
@@ -2695,6 +4320,12 @@ export const CommsPreferenceDTONewsletterEmails = {
   MONTHLY: 'MONTHLY',
   NEVER: 'NEVER',
 } as const;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CommsPreferenceDTOMetadata = { [key: string]: unknown } | null;
 
 export type CommsPreferenceDTOMatchReminders = typeof CommsPreferenceDTOMatchReminders[keyof typeof CommsPreferenceDTOMatchReminders];
 
@@ -2763,6 +4394,11 @@ export interface CommsPreferenceDTO {
   language: CommsPreferenceDTOLanguage;
   marketingEmails: CommsPreferenceDTOMarketingEmails;
   matchReminders: CommsPreferenceDTOMatchReminders;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CommsPreferenceDTOMetadata;
   newsletterEmails: CommsPreferenceDTONewsletterEmails;
   pushNotifications: CommsPreferenceDTOPushNotifications;
   smsNotifications: CommsPreferenceDTOSmsNotifications;
@@ -2770,11 +4406,23 @@ export interface CommsPreferenceDTO {
   userId: number;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CardMetadata = { [key: string]: unknown } | null;
+
 export interface Card {
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   fixtureId: number;
   id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CardMetadata;
   minute: number;
   playerId: number;
   /** Team whose player received the card */
@@ -2783,15 +4431,63 @@ export interface Card {
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateCardDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateCardDTO {
   fixtureId: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateCardDTOMetadata;
   minute: number;
   playerId: number;
+  /** Team whose player received the card */
   teamId?: number;
   type: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type AddressMetadata = { [key: string]: unknown } | null;
+
 export interface Promise { [key: string]: unknown }
+
+export interface User {
+  commsPreference?: Promise;
+  commsPreferenceId?: number;
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  email: string;
+  favouriteTeamId?: number;
+  firstName: string;
+  id: number;
+  lastName: string;
+  logs: Promise;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: UserMetadata;
+  /**
+   * @minLength 8
+   * @maxLength 32
+   */
+  password: string;
+  predictions?: Promise;
+  shareVerifiedOnly: boolean;
+  trackerVisibility: UserTrackerVisibility;
+  type: UserType;
+  updatedAt?: string;
+  userName: string;
+}
 
 /**
  * Associated stadium entity
@@ -2807,10 +4503,16 @@ export interface Address {
   /** Country name */
   country?: string;
   createdAt?: string;
-  deletedAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
   id: number;
   /** Location description or coordinates */
   location?: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: AddressMetadata;
   /** Postcode or ZIP code */
   postcode?: string;
   /**
@@ -2825,6 +4527,12 @@ export interface Address {
   updatedAt?: string;
 }
 
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateAddressDTOMetadata = { [key: string]: unknown } | null;
+
 export interface CreateAddressDTO {
   /** Primary address line */
   address1?: string;
@@ -2832,6 +4540,11 @@ export interface CreateAddressDTO {
   address2?: string;
   /** Location description or coordinates */
   location?: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateAddressDTOMetadata;
   /** Postcode or ZIP code */
   postcode?: string;
   /** Associated stadium ID */

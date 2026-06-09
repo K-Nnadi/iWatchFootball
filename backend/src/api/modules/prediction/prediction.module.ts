@@ -4,7 +4,7 @@ import { CrudController } from '@iWatchFootball/base-tools/crud/crud.controller'
 import { AuthedController } from '@iWatchFootball/base-tools/decorators/controller.decorator';
 import { CrudRepoAdapter } from '@iWatchFootball/base-tools/crud/crud.repo.adapter';
 import { Repository } from 'typeorm';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { Public } from '../../../auth/decorators/public.decorator';
 import { PredictedResult } from '../../enums/prediction.enum';
 import { CreatePredictionDTO, Prediction } from './prediction.entity';
@@ -50,7 +50,6 @@ export class PredictionService extends CrudRepoAdapter<Prediction, CreatePredict
     }
 }
 
-@ApiTags('prediction')
 @AuthedController('prediction')
 export class PredictionController extends CrudController<Prediction, CreatePredictionDTO>(Prediction, CreatePredictionDTO) {
     constructor(private service: PredictionService) {

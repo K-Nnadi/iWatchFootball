@@ -230,4 +230,30 @@ export const useDownloadFixture = (filename, options) => {
     query.queryKey = queryOptions.queryKey;
     return query;
 };
+/**
+ * @summary Goals, cards and substitutions for a fixture (public)
+ */
+export const fixtureTimelineControllerGetFixtureEvents = (fixtureId, signal) => {
+    return clientInstance({ url: `/fixture/${fixtureId}/events`, method: 'GET', signal
+    });
+};
+export const getFixtureTimelineControllerGetFixtureEventsQueryKey = (fixtureId) => {
+    return [`/fixture/${fixtureId}/events`];
+};
+export const getFixtureTimelineControllerGetFixtureEventsQueryOptions = (fixtureId, options) => {
+    var _a;
+    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
+    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getFixtureTimelineControllerGetFixtureEventsQueryKey(fixtureId);
+    const queryFn = ({ signal }) => fixtureTimelineControllerGetFixtureEvents(fixtureId, signal);
+    return Object.assign({ queryKey, queryFn, enabled: !!(fixtureId) }, queryOptions);
+};
+/**
+ * @summary Goals, cards and substitutions for a fixture (public)
+ */
+export const useFixtureTimelineControllerGetFixtureEvents = (fixtureId, options) => {
+    const queryOptions = getFixtureTimelineControllerGetFixtureEventsQueryOptions(fixtureId, options);
+    const query = useQuery(queryOptions);
+    query.queryKey = queryOptions.queryKey;
+    return query;
+};
 //# sourceMappingURL=fixture.js.map

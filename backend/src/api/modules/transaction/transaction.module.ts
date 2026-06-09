@@ -6,8 +6,8 @@ import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";
 import {Repository} from "typeorm";
 import {TransactionType} from "../../enums/transaction.enum";
-import {LoyaltyModule} from "../../services/loyalty/loyalty.module";
-import {LoyaltyService} from "../../services/loyalty/loyalty.service";
+import {LoyaltyModule} from "../../complexModules/loyalty/loyalty.module";
+import {LoyaltyService} from "../../complexModules/loyalty/loyalty.service";
 
 
 @Injectable()

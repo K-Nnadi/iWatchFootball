@@ -1,0 +1,25 @@
+.matchDatePicker {
+  padding: var(--ui-space-1);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--ui-space-3);
+  margin-top: var(--ui-space-2);
+  border-top: 1px solid var(--ui-divider);
+}
+
+.todayDay:not([data-selected]) {
+  border: 1px solid var(--ui-accent) !important;
+  color: var(--ui-accent) !important;
+  background-color: transparent !important;
+}
+
+.popoverDropdown {
+  background-color: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  padding: var(--ui-space-3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}

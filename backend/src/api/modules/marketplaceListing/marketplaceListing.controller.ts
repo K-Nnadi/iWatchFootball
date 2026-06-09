@@ -8,17 +8,20 @@ import {
     Query,
     Req,
     UnauthorizedException,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthedController } from '@iWatchFootball/base-tools/decorators/controller.decorator';
 import { MarketplaceListingService } from './marketplaceListing.service';
 import { CreateListingDto } from './marketplaceListing.dto';
+import { MarketplaceEnabledGuard } from '../../complexModules/marketplace/marketplace-enabled.guard';
 import type { Request } from 'express';
 
 type AuthedRequest = Request & { user?: { id: number } };
 
 @AuthedController('marketplace')
 @ApiTags('marketplace')
+@UseGuards(MarketplaceEnabledGuard)
 export class MarketplaceListingController {
     constructor(private readonly service: MarketplaceListingService) {}
 

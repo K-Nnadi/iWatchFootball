@@ -1,5 +1,6 @@
-import { Box, Button, Container, Group, Paper, Text, Title } from '@mantine/core';
+import { Box, Container, Group, Paper, Text, Title } from '@mantine/core';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { UiButton } from '../components/ui';
 import { notify } from '../shared/notify';
 
 const SUPPORT_EMAIL = 'iwatchfootball@gmail.com';
@@ -33,17 +34,17 @@ export function ForgotPasswordPage() {
 					</Text>
 				</Box>
 				<Group justify="center" mt="xl" gap="md">
-					<Button fullWidth variant="filled" size="md" onClick={openPasswordResetMailto}>
+					<UiButton fullWidth size="md" onClick={openPasswordResetMailto}>
 						Email support
-					</Button>
-					<Button
+					</UiButton>
+					<UiButton
 						fullWidth
 						variant="outline"
 						size="md"
 						onClick={() => navigateWithTransition('/signIn')}
 					>
 						Back to sign in
-					</Button>
+					</UiButton>
 				</Group>
 			</Paper>
 		</Container>

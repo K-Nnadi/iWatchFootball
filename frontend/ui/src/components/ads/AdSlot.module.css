@@ -1,0 +1,78 @@
+.adSlot {
+  position: relative;
+  overflow: hidden;
+  border: 1px dashed var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background-color: var(--ui-bg-surface);
+  color: var(--ui-text-muted);
+}
+
+.adSlotRail {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  min-height: 600px;
+  width: 160px;
+  padding: var(--ui-space-3);
+}
+
+.adSlotBanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 90px;
+  padding: var(--ui-space-3);
+  margin-bottom: var(--ui-space-3);
+}
+
+.adLabel {
+  position: absolute;
+  top: var(--ui-space-2);
+  left: var(--ui-space-2);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+
+.adPlaceholder {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.adUpsell {
+  margin-top: var(--ui-space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ui-accent);
+  text-decoration: none;
+}
+
+.adUpsell:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 1200px) {
+  .adSlotRail {
+    display: flex;
+  }
+
+  .adSlotBanner {
+    display: none;
+  }
+}
+
+@media (max-width: 1199px) {
+  .adSlotRail {
+    display: none !important;
+  }
+
+  .adSlotBanner {
+    display: flex;
+  }
+}

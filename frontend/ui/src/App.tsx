@@ -1,20 +1,12 @@
 import React from 'react';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
+import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
+import './theme/tokens.css';
 import './styles/modern.css';
-import {createTheme, MantineProvider, Modal} from '@mantine/core';
-
-/** Mantine Modal default ~200 sits under the app shell sticky header (z-index: 1000), which clipped modal titles */
-const mantineTheme = createTheme({
-    components: {
-        Modal: Modal.extend({
-            defaultProps: {
-                zIndex: 1200,
-            },
-        }),
-    },
-});
+import { MantineProvider } from '@mantine/core';
+import { appTheme } from './theme/mantine-theme';
 import { Notifications } from '@mantine/notifications';
 
 import {Router} from "./router";
@@ -32,7 +24,7 @@ const queryClient = new QueryClient({
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <MantineProvider theme={mantineTheme} defaultColorScheme={'dark'}>
+            <MantineProvider theme={appTheme} defaultColorScheme={'dark'}>
                 <Notifications />
                 <Router/>
             </MantineProvider>

@@ -1,5 +1,25 @@
 import type { QueryKey, UseMutationOptions, UseMutationResult, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-import type { CreateLogDTO, GetCountLogParams, GetQueryLogParams, Log } from './iWatchFootballAPI.schemas';
+import type { CreateLogDTO, GetCountLogParams, GetQueryLogParams, Log, LogControllerGetMyHistory200 } from './iWatchFootballAPI.schemas';
+/**
+ * @summary Get match log history with freemium gating (verified limit for free users)
+ */
+export declare const logControllerGetMyHistory: (signal?: AbortSignal) => Promise<LogControllerGetMyHistory200>;
+export declare const getLogControllerGetMyHistoryQueryKey: () => readonly ["/log/my-history"];
+export declare const getLogControllerGetMyHistoryQueryOptions: <TData = LogControllerGetMyHistory200, TError = void>(options?: {
+    query?: UseQueryOptions<LogControllerGetMyHistory200, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryOptions<LogControllerGetMyHistory200, TError, TData, QueryKey> & {
+    queryKey: QueryKey;
+};
+export type LogControllerGetMyHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof logControllerGetMyHistory>>>;
+export type LogControllerGetMyHistoryQueryError = void;
+/**
+ * @summary Get match log history with freemium gating (verified limit for free users)
+ */
+export declare const useLogControllerGetMyHistory: <TData = LogControllerGetMyHistory200, TError = void>(options?: {
+    query?: UseQueryOptions<LogControllerGetMyHistory200, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+};
 /**
  * @summary Create Log
  */

@@ -1,6 +1,5 @@
 import {
 	Box,
-	Button,
 	Container,
 	Paper,
 	Text,
@@ -11,6 +10,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { usePageTransition } from "../hooks/usePageTransition";
+import { UiButton } from "../components/ui";
 import { useRegister, type RegisterMutationResult } from "@iWatchFootball/clients/controllers/auth";
 import { useAuthStore } from "../shared/stores/auth.store";
 import { notify } from "../shared/notify";
@@ -34,7 +34,7 @@ export function SignUpPage() {
 					
 					notify.success('Success', 'Account created successfully!');
 
-					navigateWithTransition('/');
+					navigateWithTransition('/home');
 				}
 			},
 			onError: (error: any) => {
@@ -141,18 +141,17 @@ export function SignUpPage() {
 						</Alert>
 					)}
 
-					<Button 
-						my="xl" 
-						variant="filled" 
-						size="md" 
-						fullWidth 
+					<UiButton
+						my="xl"
+						size="md"
+						fullWidth
 						type="submit"
 						loading={registerMutation.isPending}
 						disabled={registerMutation.isPending}
 					>
 						Sign up
-					</Button>
-					<Button
+					</UiButton>
+					<UiButton
 						my="xl"
 						variant="outline"
 						size="md"
@@ -160,7 +159,7 @@ export function SignUpPage() {
 						onClick={() => navigateWithTransition('/signIn')}
 					>
 						Login
-					</Button>
+					</UiButton>
 				</form>
 			</Paper>
 		</Container>

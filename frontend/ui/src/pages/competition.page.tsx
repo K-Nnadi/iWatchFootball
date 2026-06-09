@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     Container, LoadingOverlay, Tabs, Text, Box, Group, Badge,
-    Stack, Center, Table, Select, ThemeIcon, UnstyledButton,
+    Stack, Center, Table, Select, ThemeIcon,
 } from '@mantine/core';
 import { IconTable, IconCalendar, IconWorld, IconFlag, IconTrophy, IconArrowUp, IconArrowDown, IconMinus } from '@tabler/icons-react';
 import { ModernCard, ModernH2 } from '../components/modern';
+import { UiMatchList, type MatchRowData } from '../components/ui';
 import { useGetOneCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useGetQueryTeamCompetitionSeason } from '@iWatchFootball/clients/controllers/team-competition-season';
 import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
@@ -15,7 +16,84 @@ import { clientInstance } from '@iWatchFootball/clients/client-instance';
 import { useQuery } from '@tanstack/react-query';
 import { usePageTransition } from '../hooks/usePageTransition';
 import '../styles/modern.css';
-import { resolveFixtureScores } from '../shared/fixtureScores';
+import { resolveFixtureScores, type FixtureScoresInput } from '../shared/fixtureScores';
+
+type FixtureRecord = {
+    id: number;
+    date: string;
+    status?: string;
+    homeTeamId: number;
+    awayTeamId: number;
+    homeScore?: number;
+    awayScore?: number;
+    metadata?: { homeScore?: number; awayScore?: number };
+};
+
+type TeamRecord = {
+    id: number;
+    name?: string;
+    logoUrl?: string;
+};
+
+function formatFixtureDateLabel(dateKey: string): string {
+    return new Date(`${dateKey}T12:00:00`).toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+}
+
+function fixtureToMatchRowData(fix: FixtureRecord, teams: TeamRecord[]): MatchRowData {
+    const homeTeam = teams.find((t) => t.id === fix.homeTeamId);
+    const awayTeam = teams.find((t) => t.id === fix.awayTeamId);
+    const home = homeTeam?.name ?? `Team ${fix.homeTeamId}`;
+    const away = awayTeam?.name ?? `Team ${fix.awayTeamId}`;
+    const scores = resolveFixtureScores(fix as FixtureScoresInput);
+    const isLive = fix.status === 'Live';
+    const kickoff = new Date(fix.date).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    if (isLive && scores) {
+        return {
+            id: fix.id,
+            homeTeam: home,
+            awayTeam: away,
+            homeScore: scores.home,
+            awayScore: scores.away,
+            homeLogo: homeTeam?.logoUrl,
+            awayLogo: awayTeam?.logoUrl,
+            time: 'LIVE',
+            isLive: true,
+        };
+    }
+
+    if (scores) {
+        return {
+            id: fix.id,
+            homeTeam: home,
+            awayTeam: away,
+            homeScore: scores.home,
+            awayScore: scores.away,
+            homeLogo: homeTeam?.logoUrl,
+            awayLogo: awayTeam?.logoUrl,
+            time: fix.status === 'Completed' ? 'FT' : kickoff,
+            isLive: false,
+        };
+    }
+
+    return {
+        id: fix.id,
+        homeTeam: home,
+        awayTeam: away,
+        homeLogo: homeTeam?.logoUrl,
+        awayLogo: awayTeam?.logoUrl,
+        time: kickoff,
+        isLive: false,
+    };
+}
 
 interface CompetitionStanding {
     id: number;
@@ -115,14 +193,17 @@ export function CompetitionPage() {
         [standings]
     );
 
-    const groupedFixtures = useMemo(() => {
-        const groups: Record<string, typeof fixtures> = {};
-        fixtures.forEach(f => {
+    const fixtureGroups = useMemo(() => {
+        const groups: Record<string, FixtureRecord[]> = {};
+        (fixtures as FixtureRecord[]).forEach((f) => {
             const key = f.date.slice(0, 10);
             (groups[key] ??= []).push(f);
         });
-        return groups;
-    }, [fixtures]);
+        return Object.entries(groups).map(([date, dayFixtures]) => ({
+            league: formatFixtureDateLabel(date),
+            matches: dayFixtures.map((f) => fixtureToMatchRowData(f, teamsData as TeamRecord[])),
+        }));
+    }, [fixtures, teamsData]);
 
     const isInternational = !competition?.country || competition.country.toLowerCase() === 'international';
     const loading = isLoadingComp || isLoadingTcs;
@@ -262,7 +343,7 @@ export function CompetitionPage() {
                 <Tabs.Panel value="fixtures">
                     {isLoadingFixtures ? (
                         <Box pos="relative" h={200}><LoadingOverlay visible /></Box>
-                    ) : Object.keys(groupedFixtures).length === 0 ? (
+                    ) : fixtureGroups.length === 0 ? (
                         <Center py="xl">
                             <Stack align="center" gap="md">
                                 <IconCalendar size={48} style={{ color: 'var(--modern-text-secondary)', opacity: 0.4 }} />
@@ -270,104 +351,15 @@ export function CompetitionPage() {
                             </Stack>
                         </Center>
                     ) : (
-                        <Stack gap="xl">
-                            {Object.entries(groupedFixtures).map(([date, dayFixtures]) => (
-                                <Box key={date}>
-                                    <Group gap="sm" mb="sm">
-                                        <IconCalendar size={16} style={{ color: 'var(--modern-lime)' }} />
-                                        <Text fw={600} size="sm">
-                                            {new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                                        </Text>
-                                        <Badge size="xs" style={{ backgroundColor: 'rgba(0,255,136,0.1)', color: 'var(--modern-lime)', border: '1px solid rgba(0,255,136,0.2)' }}>
-                                            {dayFixtures.length}
-                                        </Badge>
-                                    </Group>
-                                    <Stack gap="xs">
-                                        {dayFixtures.map(fix => {
-                                            const home = teamsData.find(t => t.id === fix.homeTeamId)?.name ?? `Team ${fix.homeTeamId}`;
-                                            const away = teamsData.find(t => t.id === fix.awayTeamId)?.name ?? `Team ${fix.awayTeamId}`;
-                                            const isCompleted = fix.status === 'Completed';
-                                            const scores = resolveFixtureScores(fix);
-                                            const isLive = fix.status === 'Live';
-                                            return (
-                                                <ModernCard key={fix.id} hover={false} style={{ padding: 0, overflow: 'hidden' }}>
-                                                    <UnstyledButton
-                                                        type="button"
-                                                        w="100%"
-                                                        onClick={() =>
-                                                            navigateWithTransition(`/match/${fix.id}`, {
-                                                                transitionType: 'loading',
-                                                                duration: 1200,
-                                                            })
-                                                        }
-                                                        styles={{
-                                                            root: {
-                                                                display: 'block',
-                                                                padding: '0.75rem 1rem',
-                                                                cursor: 'pointer',
-                                                                width: '100%',
-                                                                borderRadius: 0,
-                                                                transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                                                                '&:hover': {
-                                                                    backgroundColor: 'rgba(0, 255, 136, 0.06)',
-                                                                },
-                                                            },
-                                                        }}
-                                                        aria-label={`Open match ${home} versus ${away}`}
-                                                    >
-                                                        <Group justify="space-between" wrap="nowrap">
-                                                            <Text size="sm" fw={500} style={{ flex: 1, textAlign: 'right' }}>{home}</Text>
-                                                            <Box style={{ minWidth: 64, textAlign: 'center' }}>
-                                                                {scores ? (
-                                                                    <Text
-                                                                        size="sm"
-                                                                        fw={800}
-                                                                        style={{
-                                                                            fontVariantNumeric: 'tabular-nums',
-                                                                        }}
-                                                                    >
-                                                                        {scores.home} : {scores.away}
-                                                                    </Text>
-                                                                ) : isCompleted ? (
-                                                                    <Text size="sm" fw={600} c="dimmed">
-                                                                        — : —
-                                                                    </Text>
-                                                                ) : (
-                                                                    <Text size="xs" c="dimmed">
-                                                                        {new Date(fix.date).toLocaleTimeString('en-GB', {
-                                                                            hour: '2-digit',
-                                                                            minute: '2-digit',
-                                                                        })}
-                                                                    </Text>
-                                                                )}
-                                                                <Badge
-                                                                    size="xs"
-                                                                    variant="dot"
-                                                                    color={
-                                                                        isLive
-                                                                            ? 'red'
-                                                                            : isCompleted
-                                                                              ? 'gray'
-                                                                              : 'blue'
-                                                                    }
-                                                                    style={{
-                                                                        fontSize: 9,
-                                                                        textTransform: 'capitalize',
-                                                                    }}
-                                                                >
-                                                                    {fix.status}
-                                                                </Badge>
-                                                            </Box>
-                                                            <Text size="sm" fw={500} style={{ flex: 1 }}>{away}</Text>
-                                                        </Group>
-                                                    </UnstyledButton>
-                                                </ModernCard>
-                                            );
-                                        })}
-                                    </Stack>
-                                </Box>
-                            ))}
-                        </Stack>
+                        <UiMatchList
+                            groups={fixtureGroups}
+                            onMatchClick={(id) =>
+                                navigateWithTransition(`/match/${id}`, {
+                                    transitionType: 'loading',
+                                    duration: 1200,
+                                })
+                            }
+                        />
                     )}
                 </Tabs.Panel>
             </Tabs>

@@ -1,6 +1,26 @@
 import type { QueryKey, UseMutationOptions, UseMutationResult, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import type { CreateUserDTO, GetCountUserParams, GetQueryUserParams, User } from './iWatchFootballAPI.schemas';
 /**
+ * @summary Get all Users
+ */
+export declare const getAllUsers: (signal?: AbortSignal) => Promise<User[]>;
+export declare const getGetAllUsersQueryKey: () => readonly ["/user"];
+export declare const getGetAllUsersQueryOptions: <TData = User[], TError = void>(options?: {
+    query?: UseQueryOptions<User[], TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryOptions<User[], TError, TData, QueryKey> & {
+    queryKey: QueryKey;
+};
+export type GetAllUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getAllUsers>>>;
+export type GetAllUsersQueryError = void;
+/**
+ * @summary Get all Users
+ */
+export declare const useGetAllUsers: <TData = User[], TError = void>(options?: {
+    query?: UseQueryOptions<User[], TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+};
+/**
  * @summary Create User
  */
 export declare const createUser: (createUserDTO: CreateUserDTO) => Promise<User>;
@@ -27,26 +47,6 @@ export declare const useCreateUser: <TError = void, TContext = unknown>(options?
 /**
 * @summary Get all Users
 */
-export declare const getAllUser: (signal?: AbortSignal) => Promise<User[]>;
-export declare const getGetAllUserQueryKey: () => readonly ["/user"];
-export declare const getGetAllUserQueryOptions: <TData = User[], TError = void>(options?: {
-    query?: UseQueryOptions<User[], TError, TData, QueryKey> | undefined;
-} | undefined) => UseQueryOptions<User[], TError, TData, QueryKey> & {
-    queryKey: QueryKey;
-};
-export type GetAllUserQueryResult = NonNullable<Awaited<ReturnType<typeof getAllUser>>>;
-export type GetAllUserQueryError = void;
-/**
- * @summary Get all Users
- */
-export declare const useGetAllUser: <TData = User[], TError = void>(options?: {
-    query?: UseQueryOptions<User[], TError, TData, QueryKey> | undefined;
-} | undefined) => UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-};
-/**
- * @summary Get all Users
- */
 export declare const getQueryUser: (params?: GetQueryUserParams, signal?: AbortSignal) => Promise<User[]>;
 export declare const getGetQueryUserQueryKey: (params?: GetQueryUserParams) => readonly ["/user/query", ...GetQueryUserParams[]];
 export declare const getGetQueryUserQueryOptions: <TData = User[], TError = void>(params?: GetQueryUserParams, options?: {
@@ -61,26 +61,6 @@ export type GetQueryUserQueryError = void;
  */
 export declare const useGetQueryUser: <TData = User[], TError = void>(params?: GetQueryUserParams, options?: {
     query?: UseQueryOptions<User[], TError, TData, QueryKey> | undefined;
-} | undefined) => UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-};
-/**
- * @summary Get count of Users
- */
-export declare const getCountUser: (params?: GetCountUserParams, signal?: AbortSignal) => Promise<number>;
-export declare const getGetCountUserQueryKey: (params?: GetCountUserParams) => readonly ["/user/count", ...GetCountUserParams[]];
-export declare const getGetCountUserQueryOptions: <TData = number, TError = void>(params?: GetCountUserParams, options?: {
-    query?: UseQueryOptions<number, TError, TData, QueryKey> | undefined;
-} | undefined) => UseQueryOptions<number, TError, TData, QueryKey> & {
-    queryKey: QueryKey;
-};
-export type GetCountUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCountUser>>>;
-export type GetCountUserQueryError = void;
-/**
- * @summary Get count of Users
- */
-export declare const useGetCountUser: <TData = number, TError = void>(params?: GetCountUserParams, options?: {
-    query?: UseQueryOptions<number, TError, TData, QueryKey> | undefined;
 } | undefined) => UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
 };
@@ -107,13 +87,13 @@ export declare const useGetOneUser: <TData = User, TError = void>(id: number, op
 /**
  * @summary Update one User
  */
-export declare const updateOneUser: (id: number, user: User) => Promise<void>;
+export declare const updateOneUser: (id: number, user: User) => Promise<User>;
 export declare const getUpdateOneUserMutationOptions: <TError = void, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<void, TError, {
+    mutation?: UseMutationOptions<User, TError, {
         id: number;
         data: User;
     }, TContext> | undefined;
-} | undefined) => UseMutationOptions<void, TError, {
+} | undefined) => UseMutationOptions<User, TError, {
     id: number;
     data: User;
 }, TContext>;
@@ -124,11 +104,11 @@ export type UpdateOneUserMutationError = void;
 * @summary Update one User
 */
 export declare const useUpdateOneUser: <TError = void, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<void, TError, {
+    mutation?: UseMutationOptions<User, TError, {
         id: number;
         data: User;
     }, TContext> | undefined;
-} | undefined) => UseMutationResult<void, TError, {
+} | undefined) => UseMutationResult<User, TError, {
     id: number;
     data: User;
 }, TContext>;
@@ -156,8 +136,28 @@ export declare const useDeleteOneUser: <TError = void, TContext = unknown>(optio
     id: number;
 }, TContext>;
 /**
-* @summary Upload a file for User
+* @summary Get count of Users
 */
+export declare const getCountUser: (params?: GetCountUserParams, signal?: AbortSignal) => Promise<number>;
+export declare const getGetCountUserQueryKey: (params?: GetCountUserParams) => readonly ["/user/count", ...GetCountUserParams[]];
+export declare const getGetCountUserQueryOptions: <TData = number, TError = void>(params?: GetCountUserParams, options?: {
+    query?: UseQueryOptions<number, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryOptions<number, TError, TData, QueryKey> & {
+    queryKey: QueryKey;
+};
+export type GetCountUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCountUser>>>;
+export type GetCountUserQueryError = void;
+/**
+ * @summary Get count of Users
+ */
+export declare const useGetCountUser: <TData = number, TError = void>(params?: GetCountUserParams, options?: {
+    query?: UseQueryOptions<number, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+};
+/**
+ * @summary Upload a file for User
+ */
 export declare const uploadUser: () => Promise<void>;
 export declare const getUploadUserMutationOptions: <TError = void, TContext = unknown>(options?: {
     mutation?: UseMutationOptions<void, TError, void, TContext> | undefined;

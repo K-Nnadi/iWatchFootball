@@ -8,6 +8,7 @@ import { useHeaderNavbarStore } from "../../shared/stores/headerNavbar.store";
 // Assume we have an auth store or context that provides isLoggedIn
 import { useAuthStore } from '../../shared/stores/auth.store'; // Example import
 import { useCartStore } from '../../shared/stores/cart.store';
+import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
 
 export function AppWrapper() {
     const { navbarOpen } = useHeaderNavbarStore();
@@ -18,12 +19,14 @@ export function AppWrapper() {
     // Retrieve login state from a store or context
     const { isLoggedIn, initializeAuth } = useAuthStore();
     const { initializeCart } = useCartStore();
+    const { initializeFeatures } = usePlatformFeaturesStore();
 
-    // Initialize auth and cart state on mount
+    // Initialize auth, cart, and platform features on mount
     useEffect(() => {
         initializeAuth();
         initializeCart();
-    }, [initializeAuth, initializeCart]);
+        void initializeFeatures();
+    }, [initializeAuth, initializeCart, initializeFeatures]);
 
     const collapsed = {
         desktop: true,

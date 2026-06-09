@@ -17,12 +17,18 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useAuthStore } from '../shared/stores/auth.store';
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 import { useCartStore } from '../shared/stores/cart.store';
 import { releaseTicketHold, verifyTicketHold } from '../shared/api/ticketHold.api';
 import { confirmCheckout } from '../shared/api/checkout.api';
 import { confirmMarketplacePurchase, getListing } from '../shared/api/marketplace.api';
 import { getMyCredit } from '../shared/api/wallet.api';
 import { validateDiscountCode } from '../shared/api/discountCode.api';
+import {
+    createPaymentSession,
+    getPaymentProviders,
+    pollPaymentSessionUntilComplete,
+} from '../shared/api/payments.api';
 import { AuthenticationStep } from './checkout/AuthenticationStep';
 import { DetailsStep } from './checkout/DetailsStep';
 import { AdditionalInfoStep } from './checkout/AdditionalInfoStep';
@@ -33,7 +39,8 @@ import { CheckoutStepper } from './checkout/CheckoutStepper';
 import {
     buildThankYouPageState,
     CheckoutTicketDetails,
-    PaymentProvider,
+    PaymentProcessor,
+    StripeCheckoutSession,
     UserDetails,
     AdditionalInfo,
     PaymentInfo,
@@ -43,6 +50,7 @@ import {
 export function CheckoutPage() {
     const location = useLocation();
     const { navigateWithTransition } = usePageTransition();
+    const { marketplaceEnabled, loaded: featuresLoaded } = usePlatformFeaturesStore();
     const { isLoggedIn } = useAuthStore();
     const {
         items,
@@ -95,9 +103,12 @@ export function CheckoutPage() {
         }
     };
 
-    const [paymentProviders, setPaymentProviders] = useState<PaymentProvider[]>([]);
-    const [selectedProvider, setSelectedProvider] = useState<PaymentProvider | null>(null);
+    const [paymentProcessors, setPaymentProcessors] = useState<PaymentProcessor[]>([]);
+    const [selectedProcessor, setSelectedProcessor] = useState<PaymentProcessor | null>(null);
     const [loading, setLoading] = useState(true);
+    const [stripeCheckout, setStripeCheckout] = useState<StripeCheckoutSession | null>(null);
+    const [stripeSessionLoading, setStripeSessionLoading] = useState(false);
+    const [stripeSessionError, setStripeSessionError] = useState<string | null>(null);
 
     // Discount code state
     const [discountCodeInput, setDiscountCodeInput] = useState('');
@@ -112,6 +123,13 @@ export function CheckoutPage() {
     /** Fresh stadium / fixture label for resale carts (cart may omit venue if created before enrichment). */
     const [listingHydrate, setListingHydrate] = useState<{ venue?: string; fixtureLabel?: string }>();
     const marketplaceListingIdHydrate = ticketDetailsFromState?.listingId ?? undefined;
+
+    useEffect(() => {
+        if (!featuresLoaded || marketplaceListingIdHydrate == null) return;
+        if (!marketplaceEnabled) {
+            navigateWithTransition('/home');
+        }
+    }, [featuresLoaded, marketplaceEnabled, marketplaceListingIdHydrate, navigateWithTransition]);
 
     useEffect(() => {
         if (marketplaceListingIdHydrate == null) {
@@ -142,7 +160,7 @@ export function CheckoutPage() {
         void (async () => {
             const credit = await getMyCredit();
             const creditBalance = Number(credit?.balance ?? 0);
-            setPaymentProviders((prev) =>
+            setPaymentProcessors((prev) =>
                 prev.length === 0
                     ? prev
                     : prev.map((p) =>
@@ -160,32 +178,35 @@ export function CheckoutPage() {
 
     useEffect(() => {
         void (async () => {
-            const credit = await getMyCredit();
-            const creditBalance = Number(credit?.balance ?? 0);
-            setPaymentProviders([
-                {
-                    id: 1,
-                    name: 'Stripe',
-                    slug: 'stripe',
-                    type: 'CARD',
-                    logoUrl: '/logos/stripe.png',
-                },
-                {
-                    id: 2,
-                    name: 'PayPal',
-                    slug: 'paypal',
-                    type: 'WALLET',
-                    logoUrl: '/logos/paypal.png',
-                },
-                {
-                    id: 999,
-                    name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
-                    slug: 'platform-credit',
-                    type: 'CREDIT',
-                    creditBalance,
-                },
-            ]);
-            setLoading(false);
+            try {
+                const credit = await getMyCredit();
+                const creditBalance = Number(credit?.balance ?? 0);
+                const providers = await getPaymentProviders();
+                setPaymentProcessors([
+                    ...providers,
+                    {
+                        id: 999,
+                        name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
+                        slug: 'platform-credit',
+                        type: 'CREDIT',
+                        creditBalance,
+                    },
+                ]);
+            } catch {
+                const credit = await getMyCredit().catch(() => null);
+                const creditBalance = Number(credit?.balance ?? 0);
+                setPaymentProcessors([
+                    {
+                        id: 999,
+                        name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
+                        slug: 'platform-credit',
+                        type: 'CREDIT',
+                        creditBalance,
+                    },
+                ]);
+            } finally {
+                setLoading(false);
+            }
         })();
     }, []);
 
@@ -246,6 +267,86 @@ export function CheckoutPage() {
 
     const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+    /** Create Stripe checkout session when card payment is selected (primary market only). */
+    useEffect(() => {
+        const isMarketplace = ticketDetailsFromState?.listingId != null;
+        const isStripe =
+            selectedProcessor?.type === 'CARD' && selectedProcessor.slug === 'stripe';
+        if (
+            !isStripe ||
+            isMarketplace ||
+            ticketDetailsFromState?.fixtureId == null ||
+            !ticketDetailsFromState?.offerKey ||
+            !ticketDetailsFromState?.holderId
+        ) {
+            setStripeCheckout(null);
+            setStripeSessionError(null);
+            return;
+        }
+
+        let cancelled = false;
+        setStripeSessionLoading(true);
+        setStripeSessionError(null);
+
+        void (async () => {
+            try {
+                let idem = sessionStorage.getItem('iwf_checkout_idem');
+                if (!idem) {
+                    idem = crypto.randomUUID();
+                    sessionStorage.setItem('iwf_checkout_idem', idem);
+                }
+                const session = await createPaymentSession({
+                    fixtureId: ticketDetailsFromState.fixtureId!,
+                    offerKey: ticketDetailsFromState.offerKey!,
+                    holderId: ticketDetailsFromState.holderId!,
+                    quantity:
+                        ticketDetailsFromState.quantity ??
+                        ticketDetailsFromState.seatsTogether ??
+                        1,
+                    unitPrice: ticketDetailsFromState.price,
+                    category: ticketDetailsFromState.category ?? 'general',
+                    discountCodeId: appliedDiscount?.discountCodeId,
+                    providerSlug: 'stripe',
+                    idempotencyKey: idem,
+                });
+                if (cancelled) return;
+                setStripeCheckout({
+                    paymentSessionId: session.paymentSessionId,
+                    clientSecret: session.clientSecret,
+                    publishableKey: session.publishableKey,
+                });
+            } catch (e: unknown) {
+                if (cancelled) return;
+                const msg =
+                    (e as { response?: { data?: { message?: string } } })?.response?.data
+                        ?.message ||
+                    (e as Error)?.message ||
+                    'Could not start card payment';
+                setStripeSessionError(msg);
+                setStripeCheckout(null);
+            } finally {
+                if (!cancelled) setStripeSessionLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [
+        selectedProcessor?.id,
+        selectedProcessor?.type,
+        selectedProcessor?.slug,
+        ticketDetailsFromState?.fixtureId,
+        ticketDetailsFromState?.offerKey,
+        ticketDetailsFromState?.holderId,
+        ticketDetailsFromState?.listingId,
+        ticketDetailsFromState?.price,
+        ticketDetailsFromState?.quantity,
+        ticketDetailsFromState?.seatsTogether,
+        ticketDetailsFromState?.category,
+        appliedDiscount?.discountCodeId,
+    ]);
 
     const [cartReady, setCartReady] = useState(false);
 
@@ -462,13 +563,20 @@ export function CheckoutPage() {
             email: '',
         };
 
-        if (!selectedProvider) {
+        if (!selectedProcessor) {
             return false;
         }
 
-        if (selectedProvider.type === 'CREDIT') {
+        if (selectedProcessor.type === 'CREDIT') {
             // No extra fields needed; balance check is done server-side
-        } else if (selectedProvider.type === 'CARD') {
+        } else if (
+            selectedProcessor.type === 'CARD' &&
+            selectedProcessor.slug === 'stripe'
+        ) {
+            if (!stripeCheckout) {
+                valid = false;
+            }
+        } else if (selectedProcessor.type === 'CARD') {
             if (!paymentInfo.name.trim()) {
                 newErrors.name = 'Name is required';
                 valid = false;
@@ -491,7 +599,7 @@ export function CheckoutPage() {
                 newErrors.cvv = 'CVV must be 3 or 4 digits';
                 valid = false;
             }
-        } else if (selectedProvider.type === 'WALLET') {
+        } else if (selectedProcessor.type === 'WALLET') {
             const emailRegex = /^\S+@\S+$/;
             if (!emailRegex.test(paymentInfo.email)) {
                 newErrors.email = 'Valid email is required';
@@ -548,8 +656,25 @@ export function CheckoutPage() {
         setActiveStep((prev) => Math.max(minStep, prev - 1));
     };
 
-    const handlePaymentSubmit = () => {
-        if (!validateStep3() || !selectedProvider) return;
+    const finishCheckoutSuccess = () => {
+        setPaymentStatus('success');
+        sessionStorage.removeItem('iwf_checkout_idem');
+        const thankYouState = buildThankYouPageState(getTicketDetails(), listingHydrate);
+        clearCart();
+        clearCheckoutState();
+        setTimeout(
+            () =>
+                navigateWithTransition('/thank-you', {
+                    transitionType: 'loading',
+                    duration: 1200,
+                    state: thankYouState,
+                }),
+            1500,
+        );
+    };
+
+    const handleCreditPaymentSubmit = () => {
+        if (!validateStep3() || !selectedProcessor) return;
 
         const isMarketplace = ticketDetails.listingId != null;
 
@@ -571,102 +696,94 @@ export function CheckoutPage() {
             return;
         }
 
+        if (selectedProcessor.type !== 'CREDIT') {
+            return;
+        }
+
         setPaymentProcessing(true);
         setPaymentStatus('idle');
-        setTimeout(() => {
-            void (async () => {
-                try {
-                    let idem = sessionStorage.getItem('iwf_checkout_idem');
-                    if (!idem) {
-                        idem = crypto.randomUUID();
-                        sessionStorage.setItem('iwf_checkout_idem', idem);
-                    }
-                    const paymentMethod =
-                        selectedProvider.type === 'CARD'
-                            ? 'CreditCard'
-                            : selectedProvider.type === 'CREDIT'
-                            ? 'PlatformCredit'
-                            : 'PayPal';
-
-                    if (selectedProvider.type === 'CREDIT') {
-                        const credit = await getMyCredit();
-                        const creditBalance = Number(credit?.balance ?? 0);
-                        setPaymentProviders((prev) =>
-                            prev.map((p) =>
-                                p.slug === 'platform-credit'
-                                    ? {
-                                          ...p,
-                                          name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
-                                          creditBalance,
-                                      }
-                                    : p,
-                            ),
-                        );
-                        if (creditBalance + 1e-6 < payAmountDue) {
-                            notify.error(
-                                'Insufficient credit',
-                                `Available £${creditBalance.toFixed(2)} — required £${payAmountDue.toFixed(2)}.`,
-                            );
-                            return;
-                        }
-                    }
-
-                    if (isMarketplace) {
-                        await confirmMarketplacePurchase({
-                            listingId: ticketDetails.listingId!,
-                            holderId: ticketDetails.marketplaceHolderId!,
-                            paymentMethod,
-                            paymentProviderId: selectedProvider.type !== 'CREDIT' ? selectedProvider.id : undefined,
-                            providerPaymentRef: `client_${Date.now()}`,
-                            idempotencyKey: idem,
-                        });
-                    } else {
-                        await confirmCheckout({
-                            fixtureId: ticketDetails.fixtureId!,
-                            offerKey: ticketDetails.offerKey!,
-                            holderId: ticketDetails.holderId!,
-                            quantity: ticketDetails.quantity ?? ticketDetails.seatsTogether ?? 1,
-                            unitPrice: ticketDetails.price,
-                            category: ticketDetails.category ?? 'general',
-                            paymentMethod,
-                            paymentProviderId: selectedProvider.type !== 'CREDIT' ? selectedProvider.id : undefined,
-                            providerPaymentRef: `client_${Date.now()}`,
-                            idempotencyKey: idem,
-                            discountCodeId: appliedDiscount?.discountCodeId,
-                        });
-                    }
-
-                    setPaymentStatus('success');
-                    sessionStorage.removeItem('iwf_checkout_idem');
-                    const thankYouState = buildThankYouPageState(getTicketDetails(), listingHydrate);
-                    clearCart();
-                    clearCheckoutState();
-                    setTimeout(
-                        () =>
-                            navigateWithTransition('/thank-you', {
-                                transitionType: 'loading',
-                                duration: 1200,
-                                state: thankYouState,
-                            }),
-                        1500,
-                    );
-                } catch (e: unknown) {
-                    setPaymentStatus('error');
-                    const msg =
-                        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-                        (e as Error)?.message ||
-                        'Payment could not be completed.';
-                    notify.error('Checkout failed', msg);
-                } finally {
-                    setPaymentProcessing(false);
+        void (async () => {
+            try {
+                let idem = sessionStorage.getItem('iwf_checkout_idem');
+                if (!idem) {
+                    idem = crypto.randomUUID();
+                    sessionStorage.setItem('iwf_checkout_idem', idem);
                 }
-            })();
-        }, 400);
+
+                const credit = await getMyCredit();
+                const creditBalance = Number(credit?.balance ?? 0);
+                setPaymentProcessors((prev) =>
+                    prev.map((p) =>
+                        p.slug === 'platform-credit'
+                            ? {
+                                  ...p,
+                                  name: `Platform Credit (£${creditBalance.toFixed(2)} available)`,
+                                  creditBalance,
+                              }
+                            : p,
+                    ),
+                );
+                if (creditBalance + 1e-6 < payAmountDue) {
+                    notify.error(
+                        'Insufficient credit',
+                        `Available £${creditBalance.toFixed(2)} — required £${payAmountDue.toFixed(2)}.`,
+                    );
+                    return;
+                }
+
+                if (isMarketplace) {
+                    await confirmMarketplacePurchase({
+                        listingId: ticketDetails.listingId!,
+                        holderId: ticketDetails.marketplaceHolderId!,
+                        paymentMethod: 'PlatformCredit',
+                        idempotencyKey: idem,
+                    });
+                } else {
+                    await confirmCheckout({
+                        fixtureId: ticketDetails.fixtureId!,
+                        offerKey: ticketDetails.offerKey!,
+                        holderId: ticketDetails.holderId!,
+                        quantity: ticketDetails.quantity ?? ticketDetails.seatsTogether ?? 1,
+                        unitPrice: ticketDetails.price,
+                        category: ticketDetails.category ?? 'general',
+                        paymentMethod: 'PlatformCredit',
+                        idempotencyKey: idem,
+                        discountCodeId: appliedDiscount?.discountCodeId,
+                    });
+                }
+
+                finishCheckoutSuccess();
+            } catch (e: unknown) {
+                setPaymentStatus('error');
+                const msg =
+                    (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                    (e as Error)?.message ||
+                    'Payment could not be completed.';
+                notify.error('Checkout failed', msg);
+            } finally {
+                setPaymentProcessing(false);
+            }
+        })();
     };
 
-    const handleInputChange = (field: string, value: string) => {
-        setPaymentInfo((prev) => ({ ...prev, [field]: value }));
-        setErrors((prev) => ({ ...prev, [field]: '' }));
+    const handleStripePaymentComplete = async () => {
+        if (!stripeCheckout) return;
+        setPaymentProcessing(true);
+        setPaymentStatus('idle');
+        try {
+            await pollPaymentSessionUntilComplete(stripeCheckout.paymentSessionId);
+            finishCheckoutSuccess();
+        } catch (e: unknown) {
+            setPaymentStatus('error');
+            const msg =
+                (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                (e as Error)?.message ||
+                'Payment could not be completed.';
+            notify.error('Checkout failed', msg);
+            throw e;
+        } finally {
+            setPaymentProcessing(false);
+        }
     };
 
     const handleUserDetailsChange = (field: string, value: string) => {
@@ -813,19 +930,25 @@ export function CheckoutPage() {
                             )}
 
                             <PaymentStep
-                                paymentProviders={paymentProviders}
-                                selectedProvider={selectedProvider}
-                                paymentInfo={paymentInfo}
+                                paymentProcessors={paymentProcessors}
+                                selectedProcessor={selectedProcessor}
                                 errors={errors}
                                 loading={loading}
                                 paymentProcessing={paymentProcessing}
                                 paymentStatus={paymentStatus}
                                 payAmountDue={payAmountDue}
-                                onProviderSelect={setSelectedProvider}
-                                onPaymentInfoChange={handleInputChange}
+                                stripeCheckout={stripeCheckout}
+                                stripeSessionLoading={stripeSessionLoading}
+                                stripeSessionError={stripeSessionError}
+                                onProcessorSelect={setSelectedProcessor}
                                 onBack={handleBack}
-                                onPaymentSubmit={handlePaymentSubmit}
+                                onCreditPaymentSubmit={handleCreditPaymentSubmit}
+                                onStripePaymentComplete={handleStripePaymentComplete}
                                 onPaymentStatusChange={setPaymentStatus}
+                                onStripeError={(msg) => {
+                                    setPaymentStatus('error');
+                                    notify.error('Checkout failed', msg);
+                                }}
                             />
                         </>
                     )}

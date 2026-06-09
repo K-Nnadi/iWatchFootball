@@ -21,6 +21,7 @@ import type {
 import type {
   CreateFixtureDTO,
   Fixture,
+  FixtureTimelineControllerGetFixtureEvents200,
   GetCountFixtureParams,
   GetQueryFixtureParams
 } from './iWatchFootballAPI.schemas'
@@ -551,6 +552,67 @@ export const useDownloadFixture = <TData = Awaited<ReturnType<typeof downloadFix
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
 
   const queryOptions = getDownloadFixtureQueryOptions(filename,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Goals, cards and substitutions for a fixture (public)
+ */
+export const fixtureTimelineControllerGetFixtureEvents = (
+    fixtureId: number,
+ signal?: AbortSignal
+) => {
+      
+      
+      return clientInstance<FixtureTimelineControllerGetFixtureEvents200>(
+      {url: `/fixture/${fixtureId}/events`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+export const getFixtureTimelineControllerGetFixtureEventsQueryKey = (fixtureId: number,) => {
+    return [`/fixture/${fixtureId}/events`] as const;
+    }
+
+    
+export const getFixtureTimelineControllerGetFixtureEventsQueryOptions = <TData = Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>, TError = unknown>(fixtureId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>, TError, TData>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getFixtureTimelineControllerGetFixtureEventsQueryKey(fixtureId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>> = ({ signal }) => fixtureTimelineControllerGetFixtureEvents(fixtureId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(fixtureId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type FixtureTimelineControllerGetFixtureEventsQueryResult = NonNullable<Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>>
+export type FixtureTimelineControllerGetFixtureEventsQueryError = unknown
+
+/**
+ * @summary Goals, cards and substitutions for a fixture (public)
+ */
+export const useFixtureTimelineControllerGetFixtureEvents = <TData = Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>, TError = unknown>(
+ fixtureId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof fixtureTimelineControllerGetFixtureEvents>>, TError, TData>, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getFixtureTimelineControllerGetFixtureEventsQueryOptions(fixtureId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

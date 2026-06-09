@@ -4,33 +4,49 @@ import {
     ActionIcon,
     Badge,
     Box,
-    Container,
     Grid,
     Group,
     LoadingOverlay,
-    Paper,
     ScrollArea,
     Select,
     SegmentedControl,
     SimpleGrid,
     Stack,
     Text,
-    Tabs
+    Tabs,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconLock, IconArrowLeft, IconTicket, IconShoppingBag } from '@tabler/icons-react';
-import { ModernButton, ModernCard, ModernH2, ModernH3, ModernBody, ModernCaption } from '../components/modern';
+import {
+    UiBadge,
+    UiBody,
+    UiButton,
+    UiCaption,
+    UiCard,
+    UiH2,
+    UiH3,
+    UiPageContainer,
+    uiSelectStyles,
+    uiSegmentedControlStyles,
+} from '../components/ui';
 import { getMyTicketLog, type TicketLogEntry } from '../shared/api/userTicketLog.api';
 import { useAuthStore } from '../shared/stores/auth.store';
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useGetQueryTeamCompetitionSeason } from '@iWatchFootball/clients/controllers/team-competition-season';
 import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
 import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
-import { useCreateLog, useGetQueryLog } from '@iWatchFootball/clients/controllers/log';
+import { useCreateLog } from '@iWatchFootball/clients/controllers/log';
 import { useQueryClient, useQuery, useQueries } from '@tanstack/react-query';
-import { getGetQueryLogQueryKey } from '@iWatchFootball/clients/controllers/log';
+import {
+    createPremiumCheckout,
+    extractApiErrorMessage,
+    getMyLogHistory,
+    openSubscriptionPortal,
+    type TrackerEntitlements,
+} from '../shared/api/tracker.api';
 import { clientInstance } from '@iWatchFootball/clients/client-instance';
 import { resolveFixtureScores, type FixtureScoresInput } from '../shared/fixtureScores';
 import {
@@ -69,8 +85,18 @@ export interface UserGame {
     events?: MatchEvent[];
 }
 
+function LogEmptyState({ title, message }: { title: string; message: string }) {
+    return (
+        <UiCard density="spacious" style={{ textAlign: 'center' }}>
+            <UiH3 style={{ marginBottom: '0.5rem' }}>{title}</UiH3>
+            <UiBody>{message}</UiBody>
+        </UiCard>
+    );
+}
+
 export function LogsPage() {
     const { isLoggedIn, user } = useAuthStore();
+    const { marketplaceEnabled } = usePlatformFeaturesStore();
     const { navigateWithTransition } = usePageTransition();
     const queryClient = useQueryClient();
 
@@ -161,11 +187,51 @@ export function LogsPage() {
         { query: { enabled: canFetchFixtures } as any }
     );
 
-    // Fetch this user's saved logs from the DB
-    const { data: userLogsData = [], isLoading: isLoadingLogs } = useGetQueryLog(
-        { where: { userId: user?.id }, take: 200 } as any,
-        { query: { enabled: isLoggedIn && !!user?.id } as any }
-    );
+    const [upgradeLoading, setUpgradeLoading] = useState(false);
+
+    const { data: logHistory, isLoading: isLoadingLogs } = useQuery({
+        queryKey: ['log', 'my-history'],
+        queryFn: getMyLogHistory,
+        enabled: isLoggedIn && !!user?.id,
+    });
+    const userLogsData = logHistory?.logs ?? [];
+    const trackerEntitlements: TrackerEntitlements | undefined = logHistory?.entitlements;
+
+    const handleUpgradePremium = async () => {
+        setUpgradeLoading(true);
+        try {
+            const origin = window.location.origin;
+            const { url } = await createPremiumCheckout(
+                `${origin}/logs?subscribed=1`,
+                `${origin}/logs`,
+            );
+            window.location.href = url;
+        } catch (e) {
+            showNotification({
+                title: 'Upgrade unavailable',
+                message: extractApiErrorMessage(e),
+                color: 'red',
+            });
+        } finally {
+            setUpgradeLoading(false);
+        }
+    };
+
+    const handleManageSubscription = async () => {
+        setUpgradeLoading(true);
+        try {
+            const { url } = await openSubscriptionPortal(`${window.location.origin}/logs`);
+            window.location.href = url;
+        } catch {
+            showNotification({
+                title: 'Billing portal unavailable',
+                message: 'No active subscription billing account found.',
+                color: 'orange',
+            });
+        } finally {
+            setUpgradeLoading(false);
+        }
+    };
 
     // Fetch fixtures for the user's logged games so we can display team names / dates
     const loggedFixtureIds = useMemo(
@@ -269,8 +335,14 @@ export function LogsPage() {
         fixtureEventsQueries,
     ]);
 
-    const loading = isLoadingCompetitions || isLoadingSeasons || isLoadingTeamsTcs || isLoadingTeams
-        || isLoadingFixtures || isLoadingLogs || isLoadingLoggedFixtures || isCreatingLog;
+    const formLoading =
+        isLoadingCompetitions ||
+        isLoadingSeasons ||
+        isLoadingTeamsTcs ||
+        isLoadingTeams ||
+        isLoadingFixtures ||
+        isCreatingLog;
+    const logsLoading = isLoadingLogs || isLoadingLoggedFixtures;
 
     const handleAddToLog = async (e: FormEvent) => {
         e.preventDefault();
@@ -295,7 +367,7 @@ export function LogsPage() {
             });
 
             // Invalidate the log query so the right-hand list refreshes
-            queryClient.invalidateQueries({ queryKey: getGetQueryLogQueryKey() });
+            queryClient.invalidateQueries({ queryKey: ['log', 'my-history'] });
 
             showNotification({
                 title: 'Match Added!',
@@ -384,30 +456,33 @@ export function LogsPage() {
             return loggedFixtures.filter(fixture => fixture.isVerified);
         }
     }, [loggedFixtures, verificationFilter]);
+
+    const emptyLogTitle =
+        loggedFixtures.length === 0
+            ? 'No matches logged yet'
+            : verificationFilter === 'verified'
+              ? 'No verified matches found'
+              : 'No matches found';
+    const emptyLogMessage =
+        loggedFixtures.length === 0
+            ? 'Start by adding your first match using the form'
+            : 'Try changing the filter to see more matches';
+
     // Lock Overlay component - rendered via portal to document body
     const lockOverlay = !isLoggedIn ? (
         createPortal(
             <Box
                 style={{
                     position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    inset: 0,
+                    backgroundColor: 'var(--ui-backdrop-color, rgba(0, 0, 0, 0.7))',
                     backdropFilter: 'blur(4px)',
                     zIndex: 9999,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    pointerEvents: 'auto',
-                    margin: 0,
-                    padding: 0,
                 }}
             >
-                {/* Back Button */}
                 <ActionIcon
                     onClick={() => window.history.back()}
                     variant="filled"
@@ -417,156 +492,86 @@ export function LogsPage() {
                         position: 'absolute',
                         top: '1.5rem',
                         left: '1.5rem',
-                        backgroundColor: 'var(--modern-lime)',
-                        color: 'var(--modern-bg-primary)',
+                        backgroundColor: 'var(--ui-accent)',
+                        color: 'var(--ui-accent-text)',
                         zIndex: 10001,
-                        border: '2px solid var(--modern-lime)',
                     }}
                 >
                     <IconArrowLeft size={24} />
                 </ActionIcon>
 
-                <ModernCard
-                    style={{
-                        padding: '3rem',
-                        backgroundColor: 'var(--modern-card-bg)',
-                        border: '2px solid var(--modern-lime)',
-                        maxWidth: '500px',
-                        width: '90%',
-                        textAlign: 'center',
-                        position: 'relative',
-                        zIndex: 10000,
-                    }}
-                >
+                <UiCard density="spacious" accent style={{ maxWidth: 500, width: '90%', textAlign: 'center' }}>
                     <Stack gap="lg" align="center">
-                        <IconLock 
-                            size={64} 
-                            style={{ 
-                                color: 'var(--modern-lime)',
-                                marginBottom: '1rem'
-                            }} 
-                        />
-                        <ModernH2 style={{ color: 'var(--modern-text-primary)' }}>
-                            Authentication Required
-                        </ModernH2>
-                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                            You need to be logged in to access your match logs. Sign in to track and manage your match history.
-                        </ModernBody>
+                        <IconLock size={64} color="var(--ui-accent)" />
+                        <UiH2>Authentication required</UiH2>
+                        <UiBody>
+                            You need to be logged in to access your match logs. Sign in to track and manage your match
+                            history.
+                        </UiBody>
                         <Group gap="md" mt="md">
-                            <ModernButton
-                                onClick={() => navigateWithTransition('/signIn')}
-                                variant="primary"
-                                size="md"
-                            >
-                                Sign In
-                            </ModernButton>
-                            <ModernButton
-                                onClick={() => navigateWithTransition('/join')}
-                                variant="outline"
-                                size="md"
-                                style={{
-                                    borderColor: 'var(--modern-lime)',
-                                    color: 'var(--modern-lime)',
-                                }}
-                            >
+                            <UiButton onClick={() => navigateWithTransition('/signIn')}>Sign In</UiButton>
+                            <UiButton variant="outline" onClick={() => navigateWithTransition('/join')}>
                                 Sign Up
-                            </ModernButton>
+                            </UiButton>
                         </Group>
                     </Stack>
-                </ModernCard>
+                </UiCard>
             </Box>,
-            document.body
+            document.body,
         )
     ) : null;
 
     return (
-        <Box className="dark-theme" style={{ 
-            minHeight: '100vh', 
-            backgroundColor: 'var(--modern-bg-primary)',
-            width: '100vw',
-            marginLeft: 'calc(-50vw + 50%)',
-            marginRight: 'calc(-50vw + 50%)',
-            marginTop: '-1rem',
-            position: 'relative'
-        }}>
+        <Box style={{ minHeight: '100vh', backgroundColor: 'var(--ui-bg-base)' }}>
             {lockOverlay}
-            
-            <Container>
-                <Grid my={10}>
-                    <LoadingOverlay visible={loading} />
+
+            <UiPageContainer>
+                <Grid gutter="xl">
                     <Grid.Col span={columnSpan}>
+                        <Stack gap="xs" mb="lg">
+                            <UiH2>My logged games</UiH2>
+                            <UiBody>Track and manage your match history across different competitions</UiBody>
+                        </Stack>
 
-                        <Box mb={10}>
-                            <ModernH2 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
-                                My Logged Games
-                            </ModernH2>
-                            <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                                Track and manage your match history across different competitions
-                            </ModernBody>
-                        </Box>
+                        <Box pos="relative" mb="xl">
+                            <LoadingOverlay visible={formLoading} zIndex={10} overlayProps={{ blur: 1 }} />
+                            <UiCard hover={false} density="spacious">
+                                <Stack gap="lg">
+                                    <Stack gap="xs" align="center">
+                                        <UiH3>Add new match</UiH3>
+                                        <UiBody style={{ textAlign: 'center', fontSize: '0.9rem' }}>
+                                            Search for a fixture by selecting competition, season, and filtering teams
+                                        </UiBody>
+                                    </Stack>
 
-                    <Box mb="xl" style={{ maxHeight: 'none' }}>
-                        <ModernCard 
-                            hover={false}
-                            style={{ 
-                                padding: '2rem', 
-                                backgroundColor: 'var(--modern-card-bg)',
-                                maxHeight: 'none'
-                            }}
-                            styles={{
-                                root: {
-                                    maxHeight: 'none',
-                                    position: 'static',
-                                    transform: 'none !important',
-                                    '&:hover': {
-                                        transform: 'none !important',
-                                        position: 'static'
-                                    }
-                                }
-                            }}
-                        >
-                            <Stack gap="lg">
-                                <Box style={{ textAlign: 'center' }}>
-                                    <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
-                                        Add New Match
-                                    </ModernH3>
-                                    <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.9rem' }}>
-                                        Search for a fixture by selecting competition, season, and filtering teams
-                                    </ModernBody>
-                                </Box>
-
-                                <Box>
-                                    <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Competition</ModernCaption>
-                                    <Select
-                                        placeholder="Select competition"
-                                        data={competitionsData.map((c) => ({value: String(c.id), label: c.name}))}
-                                        value={selectedCompetition}
-                                        onChange={(val) => {
-                                            setSelectedCompetition(val);
-                                            setSelectedSeason(null);
-                                            setSelectedHomeTeam(null);
-                                            setSelectedAwayTeam(null);
-                                            setSelectedFixture(null);
-                                        }}
-                                        searchable
-                                        clearable
-                                        size="md"
-                                        styles={{
-                                            input: {
-                                                backgroundColor: 'var(--modern-bg-secondary)',
-                                                borderColor: 'var(--modern-border-color)',
-                                                color: 'var(--modern-text-primary)',
-                                                '&:focus': {
-                                                    borderColor: 'var(--modern-lime)',
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </Box>
+                                    <Box>
+                                        <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>
+                                            Competition
+                                        </UiCaption>
+                                        <Select
+                                            placeholder="Select competition"
+                                            data={competitionsData.map((c) => ({
+                                                value: String(c.id),
+                                                label: c.name,
+                                            }))}
+                                            value={selectedCompetition}
+                                            onChange={(val) => {
+                                                setSelectedCompetition(val);
+                                                setSelectedSeason(null);
+                                                setSelectedHomeTeam(null);
+                                                setSelectedAwayTeam(null);
+                                                setSelectedFixture(null);
+                                            }}
+                                            searchable
+                                            clearable
+                                            size="md"
+                                            styles={uiSelectStyles}
+                                        />
+                                    </Box>
 
                                 {selectedCompetition && (
                                     <Box>
-                                        <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Season</ModernCaption>
+                                        <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Season</UiCaption>
                                         <Select
                                             placeholder={isLoadingSeasons ? 'Loading seasons…' : 'Select season'}
                                             data={uniqueSeasonIds.map((seasonId) => {
@@ -585,17 +590,7 @@ export function LogsPage() {
                                             }}
                                             searchable
                                             clearable
-                                            size="md"
-                                            styles={{
-                                                input: {
-                                                    backgroundColor: 'var(--modern-bg-secondary)',
-                                                    borderColor: 'var(--modern-border-color)',
-                                                    color: 'var(--modern-text-primary)',
-                                                    '&:focus': {
-                                                        borderColor: 'var(--modern-lime)',
-                                                    }
-                                                }
-                                            }}
+                                            size="md" styles={uiSelectStyles}
                                         />
                                     </Box>
                                 )}
@@ -604,7 +599,7 @@ export function LogsPage() {
                                     <>
                                         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                                             <Box>
-                                                <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Home Team</ModernCaption>
+                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Home Team</UiCaption>
                                                 <Select
                                                     placeholder={isLoadingTeams ? 'Loading teams…' : 'Select home team'}
                                                     data={teams
@@ -620,21 +615,11 @@ export function LogsPage() {
                                                     }}
                                                     searchable
                                                     clearable
-                                                    size="md"
-                                                    styles={{
-                                                        input: {
-                                                            backgroundColor: 'var(--modern-bg-secondary)',
-                                                            borderColor: 'var(--modern-border-color)',
-                                                            color: 'var(--modern-text-primary)',
-                                                            '&:focus': {
-                                                                borderColor: 'var(--modern-lime)',
-                                                            }
-                                                        }
-                                                    }}
+                                                    size="md" styles={uiSelectStyles}
                                                 />
                                             </Box>
                                             <Box>
-                                                <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Away Team</ModernCaption>
+                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Away Team</UiCaption>
                                                 <Select
                                                     placeholder={isLoadingTeams ? 'Loading teams…' : 'Select away team'}
                                                     data={teams
@@ -650,24 +635,14 @@ export function LogsPage() {
                                                     }}
                                                     searchable
                                                     clearable
-                                                    size="md"
-                                                    styles={{
-                                                        input: {
-                                                            backgroundColor: 'var(--modern-bg-secondary)',
-                                                            borderColor: 'var(--modern-border-color)',
-                                                            color: 'var(--modern-text-primary)',
-                                                            '&:focus': {
-                                                                borderColor: 'var(--modern-lime)',
-                                                            }
-                                                        }
-                                                    }}
+                                                    size="md" styles={uiSelectStyles}
                                                 />
                                             </Box>
                                         </SimpleGrid>
 
                                         {selectedHomeTeam && selectedAwayTeam && fixturesData.length > 0 && (
                                             <Box>
-                                                <ModernCaption style={{ color: 'var(--modern-text-primary)', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Select Fixture</ModernCaption>
+                                                <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>Select fixture</UiCaption>
                                                 <Select
                                                     placeholder={isLoadingFixtures ? 'Loading fixtures…' : 'Choose a fixture'}
                                                     data={fixturesData.map((f) => {
@@ -682,35 +657,25 @@ export function LogsPage() {
                                                     onChange={setSelectedFixture}
                                                     searchable
                                                     clearable
-                                                    size="md"
-                                                    styles={{
-                                                        input: {
-                                                            backgroundColor: 'var(--modern-bg-secondary)',
-                                                            borderColor: 'var(--modern-border-color)',
-                                                            color: 'var(--modern-text-primary)',
-                                                            '&:focus': {
-                                                                borderColor: 'var(--modern-lime)',
-                                                            }
-                                                        }
-                                                    }}
+                                                    size="md" styles={uiSelectStyles}
                                                 />
-                                                <ModernCaption style={{ color: 'var(--modern-text-secondary)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                                                <UiCaption style={{ color: 'var(--modern-text-secondary)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
                                                     {fixturesData.length} {fixturesData.length === 1 ? 'match' : 'matches'} found
-                                                </ModernCaption>
+                                                </UiCaption>
                                             </Box>
                                         )}
 
                                         {selectedHomeTeam && selectedAwayTeam && !isLoadingFixtures && fixturesData.length === 0 && (
                                             <Box style={{ textAlign: 'center', padding: '1rem' }}>
-                                                <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
+                                                <UiBody style={{ color: 'var(--modern-text-secondary)' }}>
                                                     No matches found between these teams
-                                                </ModernBody>
+                                                </UiBody>
                                             </Box>
                                         )}
 
                                         {selectedHomeTeam && selectedAwayTeam && (
                                             <Box mt="md">
-                                                <ModernButton
+                                                <UiButton
                                                     onClick={handleAddToLog}
                                                     disabled={!selectedFixture}
                                                     fullWidth
@@ -718,14 +683,14 @@ export function LogsPage() {
                                                     variant="primary"
                                                 >
                                                     Add Match to Logs
-                                                </ModernButton>
+                                                </UiButton>
                                             </Box>
                                         )}
                                     </>
                                 )}
                             </Stack>
-                        </ModernCard>
-                    </Box>
+                            </UiCard>
+                        </Box>
 
                 </Grid.Col>
                 <Grid.Col span={columnSpan}>
@@ -767,8 +732,8 @@ export function LogsPage() {
                                         <Badge
                                             size="xs"
                                             style={{
-                                                backgroundColor: 'var(--modern-lime)',
-                                                color: 'var(--modern-bg-primary)',
+                                                backgroundColor: 'var(--ui-accent)',
+                                                color: 'var(--ui-accent-text)',
                                             }}
                                         >
                                             {myTickets.length}
@@ -786,44 +751,39 @@ export function LogsPage() {
                                     { label: 'Verified', value: 'verified' },
                                 ]}
                                 size="sm"
-                                styles={{
-                                    root: {
-                                        backgroundColor: 'var(--modern-bg-secondary)',
-                                    },
-                                    label: {
-                                        color: 'var(--modern-text-primary)',
-                                        '&[data-active]': {
-                                            color: 'var(--modern-bg-primary)',
-                                        },
-                                    },
-                                    control: {
-                                        '&[data-active]': {
-                                            backgroundColor: 'var(--modern-lime)',
-                                        },
-                                    },
-                                }}
+                                styles={uiSegmentedControlStyles}
                             />
                         </Box>
+                        {trackerEntitlements?.upgradeRequired && (
+                            <UiCard density="compact" accent style={{ marginBottom: '1rem' }}>
+                                <Stack gap="sm">
+                                    <UiBody>
+                                        You&apos;ve attended{' '}
+                                        <strong>{trackerEntitlements.verifiedTotal}</strong> verified
+                                        matches. Your free plan shows the newest{' '}
+                                        {trackerEntitlements.freeVerifiedLimit} — upgrade to unlock
+                                        your full history and advanced stats.
+                                    </UiBody>
+                                    <UiButton loading={upgradeLoading} onClick={handleUpgradePremium}>Upgrade to Premium</UiButton>
+                                </Stack>
+                            </UiCard>
+                        )}
+                        {trackerEntitlements?.isPremium && (
+                            <Box mb="md">
+                                <UiButton variant="ghost" size="xs" loading={upgradeLoading} onClick={handleManageSubscription}>Manage subscription</UiButton>
+                            </Box>
+                        )}
                         <Tabs.Panel value={'matches'}>
+                            <Box pos="relative">
+                                <LoadingOverlay visible={logsLoading} zIndex={10} overlayProps={{ blur: 1 }} />
                             <ScrollArea
                                 style={{ height: `${scrollAreaHeight}px`, minHeight: '400px' }}
                                 type="never"
                                 scrollbarSize={2}
                                 scrollHideDelay={0}
                             >
-                                {filteredLoggedFixtures.length === 0 && !loading ? (
-                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
-                                        <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '1rem' }}>
-                                            {loggedFixtures.length === 0 
-                                                ? 'No Matches Logged Yet' 
-                                                : verificationFilter === 'verified' ? 'No Verified Matches Found' : 'No Matches Found'}
-                                        </ModernH3>
-                                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                                            {loggedFixtures.length === 0 
-                                                ? 'Start by adding your first match using the form'
-                                                : 'Try changing the filter to see more matches'}
-                                        </ModernBody>
-                                    </ModernCard>
+                                {filteredLoggedFixtures.length === 0 && !logsLoading ? (
+                                    <LogEmptyState title={emptyLogTitle} message={emptyLogMessage} />
                                 ) : (
                                     <SimpleGrid
                                         cols={1}
@@ -855,26 +815,17 @@ export function LogsPage() {
                                     </SimpleGrid>
                                 )}
                             </ScrollArea>
-                        </Tabs.Panel>                        <Tabs.Panel value={'stats'}>
+                            </Box>
+                        </Tabs.Panel>
+                        <Tabs.Panel value={'stats'}>
                             <ScrollArea
                                 style={{ height: `${scrollAreaHeight}px` }}
                                 type="never"
                                 scrollbarSize={2}
                                 scrollHideDelay={0}
                             >
-                                {filteredLoggedFixtures.length === 0 && !loading ? (
-                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
-                                        <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '1rem' }}>
-                                            {loggedFixtures.length === 0 
-                                                ? 'No Matches Logged Yet' 
-                                                : verificationFilter === 'verified' ? 'No Verified Matches Found' : 'No Matches Found'}
-                                        </ModernH3>
-                                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                                            {loggedFixtures.length === 0 
-                                                ? 'Start by adding your first match using the form'
-                                                : 'Try changing the filter to see more matches'}
-                                        </ModernBody>
-                                    </ModernCard>
+                                {filteredLoggedFixtures.length === 0 && !logsLoading ? (
+                                    <LogEmptyState title={emptyLogTitle} message={emptyLogMessage} />
                                 ) : (
                                     // <StatsTab loggedFixtures={filteredLoggedFixtures}/>
                                     <NewStatsTab loggedFixtures={filteredLoggedFixtures} />
@@ -890,56 +841,28 @@ export function LogsPage() {
                                 scrollHideDelay={0}
                             >
                                 {ticketsLoading ? (
-                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
-                                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                                            Loading your tickets…
-                                        </ModernBody>
-                                    </ModernCard>
+                                    <LogEmptyState title="Loading tickets" message="Fetching your ticket wallet…" />
                                 ) : myTickets.length === 0 ? (
-                                    <ModernCard style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--modern-card-bg)' }}>
-                                        <IconTicket size={40} color="var(--modern-text-secondary)" style={{ margin: '0 auto 1rem' }} />
-                                        <ModernH3 style={{ color: 'var(--modern-text-primary)', marginBottom: '0.5rem' }}>
-                                            No Tickets Yet
-                                        </ModernH3>
-                                        <ModernBody style={{ color: 'var(--modern-text-secondary)', marginBottom: '1.5rem' }}>
+                                    <UiCard density="spacious" style={{ textAlign: 'center' }}>
+                                        <IconTicket size={40} color="var(--ui-text-muted)" style={{ margin: '0 auto 1rem' }} />
+                                        <UiH3 style={{ marginBottom: '0.5rem' }}>No tickets yet</UiH3>
+                                        <UiBody style={{ marginBottom: '1.5rem' }}>
                                             Tickets you purchase will appear here automatically.
-                                        </ModernBody>
-                                        <ModernButton
-                                            variant="primary"
-                                            onClick={() => navigateWithTransition('/tickets')}
-                                        >
-                                            Browse Tickets
-                                        </ModernButton>
-                                    </ModernCard>
+                                        </UiBody>
+                                        <UiButton onClick={() => navigateWithTransition('/tickets')}>
+                                            Browse tickets
+                                        </UiButton>
+                                    </UiCard>
                                 ) : (
                                     <SimpleGrid cols={1} style={{ gap: 'var(--mantine-spacing-md)', padding: '0 8px' }}>
                                         {myTickets.map((entry) => (
-                                            <Paper
-                                                key={entry.id}
-                                                p="md"
-                                                radius="md"
-                                                style={{
-                                                    backgroundColor: 'var(--modern-card-bg)',
-                                                    border: '1px solid var(--modern-border-color)',
-                                                }}
-                                            >
+                                            <UiCard key={entry.id} density="default">
                                                 <Group justify="space-between" mb="xs">
                                                     <Group gap="sm">
-                                                        <IconTicket size={18} color="var(--modern-lime)" />
-                                                        <Text fw={600} style={{ color: 'var(--modern-text-primary)' }}>
-                                                            {entry.ticket?.category ?? 'Ticket'}
-                                                        </Text>
+                                                        <IconTicket size={18} color="var(--ui-accent)" />
+                                                        <Text fw={600}>{entry.ticket?.category ?? 'Ticket'}</Text>
                                                     </Group>
-                                                    <Badge
-                                                        size="sm"
-                                                        style={{
-                                                            backgroundColor: 'rgba(0, 255, 136, 0.15)',
-                                                            color: 'var(--modern-lime)',
-                                                            border: '1px solid rgba(0, 255, 136, 0.3)',
-                                                        }}
-                                                    >
-                                                        In Wallet
-                                                    </Badge>
+                                                    <UiBadge size="sm">In wallet</UiBadge>
                                                 </Group>
 
                                                 <Stack gap={4} mb="md">
@@ -969,23 +892,25 @@ export function LogsPage() {
                                                     )}
                                                 </Stack>
 
-                                                <Group gap="sm">
-                                                    <ModernButton
-                                                        variant="primary"
-                                                        style={{ flex: 1 }}
-                                                        onClick={() =>
-                                                            navigateWithTransition('/marketplace/sell', {
-                                                                state: { ticketId: entry.ticketId },
-                                                            })
-                                                        }
-                                                    >
-                                                        <Group gap={6}>
-                                                            <IconShoppingBag size={14} />
-                                                            Sell on Marketplace
-                                                        </Group>
-                                                    </ModernButton>
-                                                </Group>
-                                            </Paper>
+                                                {marketplaceEnabled && (
+                                                    <Group gap="sm">
+                                                        <UiButton
+                                                            variant="primary"
+                                                            style={{ flex: 1 }}
+                                                            onClick={() =>
+                                                                navigateWithTransition('/marketplace/sell', {
+                                                                    state: { ticketId: entry.ticketId },
+                                                                })
+                                                            }
+                                                        >
+                                                            <Group gap={6}>
+                                                                <IconShoppingBag size={14} />
+                                                                Sell on Marketplace
+                                                            </Group>
+                                                        </UiButton>
+                                                    </Group>
+                                                )}
+                                            </UiCard>
                                         ))}
                                     </SimpleGrid>
                                 )}
@@ -993,7 +918,7 @@ export function LogsPage() {
                         </Tabs.Panel>
 
                     </Tabs>
-                    <ModernButton
+                    <UiButton
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         style={{
                             display: showTopButton ? 'block' : 'none',
@@ -1005,11 +930,11 @@ export function LogsPage() {
                         variant="primary"
                     >
                         Go to Top
-                    </ModernButton>
+                    </UiButton>
                 </Grid.Col>
             </Grid>
 
-            </Container>
+            </UiPageContainer>
         </Box>
     );
 }

@@ -27,7 +27,8 @@ import type {
   StatsBombControllerTestSyncSingleMatch200,
   StatsBombControllerTestSyncTeamsOnly200,
   StatsBombControllerTestTeamCreation200,
-  StatsBombControllerTestTeamTypeDetection200Item
+  StatsBombControllerTestTeamTypeDetection200Item,
+  StatsBombSyncOptionsDTO
 } from './iWatchFootballAPI.schemas'
 import { clientInstance } from '../client-instance';
 
@@ -39,12 +40,14 @@ import { clientInstance } from '../client-instance';
  * @summary Sync StatsBomb data to database
  */
 export const statsBombControllerSyncData = (
-    
+    statsBombSyncOptionsDTO: StatsBombSyncOptionsDTO,
  ) => {
       
       
       return clientInstance<StatsBombControllerSyncData200>(
-      {url: `/statsbomb/sync`, method: 'POST'
+      {url: `/statsbomb/sync`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: statsBombSyncOptionsDTO
     },
       );
     }
@@ -52,17 +55,17 @@ export const statsBombControllerSyncData = (
 
 
 export const getStatsBombControllerSyncDataMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof statsBombControllerSyncData>>, TError,void, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof statsBombControllerSyncData>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof statsBombControllerSyncData>>, TError,{data: StatsBombSyncOptionsDTO}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof statsBombControllerSyncData>>, TError,{data: StatsBombSyncOptionsDTO}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof statsBombControllerSyncData>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof statsBombControllerSyncData>>, {data: StatsBombSyncOptionsDTO}> = (props) => {
+          const {data} = props ?? {};
 
-          return  statsBombControllerSyncData()
+          return  statsBombControllerSyncData(data,)
         }
 
         
@@ -71,18 +74,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type StatsBombControllerSyncDataMutationResult = NonNullable<Awaited<ReturnType<typeof statsBombControllerSyncData>>>
-    
+    export type StatsBombControllerSyncDataMutationBody = StatsBombSyncOptionsDTO
     export type StatsBombControllerSyncDataMutationError = void
 
     /**
  * @summary Sync StatsBomb data to database
  */
 export const useStatsBombControllerSyncData = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof statsBombControllerSyncData>>, TError,void, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof statsBombControllerSyncData>>, TError,{data: StatsBombSyncOptionsDTO}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof statsBombControllerSyncData>>,
         TError,
-        void,
+        {data: StatsBombSyncOptionsDTO},
         TContext
       > => {
 

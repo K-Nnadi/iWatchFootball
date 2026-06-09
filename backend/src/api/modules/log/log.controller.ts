@@ -1,0 +1,35 @@
+import { Get, Req, UnauthorizedException } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { AuthedController } from '@iWatchFootball/base-tools/decorators/controller.decorator';
+import { CrudController } from '@iWatchFootball/base-tools/crud/crud.controller';
+import { CreateLogDTO, Log } from './log.entity';
+import { LogService, LogHistoryResponse } from './log.service';
+import type { Request } from 'express';
+
+type AuthedRequest = Request & { user?: { id: number } };
+
+@AuthedController('log')
+export class LogController extends CrudController<Log, CreateLogDTO>(Log, CreateLogDTO) {
+    constructor(private readonly logService: LogService) {
+        super(logService);
+    }
+
+    @Get('my-history')
+    @ApiOperation({
+        summary: 'Get match log history with freemium gating (verified limit for free users)',
+    })
+    @ApiOkResponse({
+        schema: {
+            type: 'object',
+            properties: {
+                logs: { type: 'array', items: { type: 'object' } },
+                entitlements: { type: 'object' },
+            },
+        },
+    })
+    async getMyHistory(@Req() req: AuthedRequest): Promise<LogHistoryResponse> {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException('Not authenticated');
+        return this.logService.getMyHistory(userId);
+    }
+}

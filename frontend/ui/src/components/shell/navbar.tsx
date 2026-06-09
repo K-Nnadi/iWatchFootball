@@ -2,11 +2,16 @@ import {AppShell, NavLink, Stack} from "@mantine/core";
 import {usePageTransition} from "../../hooks/usePageTransition";
 import {useLocation} from "react-router-dom";
 import {useHeaderNavbarStore} from "../../shared/stores/headerNavbar.store";
+import {useAuthStore} from "../../shared/stores/auth.store";
+import {usePlatformFeaturesStore} from "../../shared/stores/platformFeatures.store";
 import {useEffect, useState, useRef} from "react";
 
 export function Navbar() {
     const { navigateWithTransition } = usePageTransition();
+    const { isLoggedIn } = useAuthStore();
+    const { marketplaceEnabled } = usePlatformFeaturesStore();
     const location = useLocation();
+    const homePath = isLoggedIn ? "/home" : "/";
     const { toggleNavbar, navbarOpen } = useHeaderNavbarStore();
     const [isClosing, setIsClosing] = useState(false);
     const prevNavbarOpenRef = useRef(navbarOpen);
@@ -39,17 +44,18 @@ export function Navbar() {
     }, [navbarOpen]);
     
     const navItems = [
-        { label: "Home", path: "/" },
+        { label: "Home", path: homePath },
         { label: "Logs", path: "/logs" },
+        { label: "Friends", path: "/friends" },
         { label: "Matches", path: "/matches" },
         { label: "Competitions", path: "/competitions" },
-        { label: "Marketplace", path: "/marketplace" },
+        ...(marketplaceEnabled ? [{ label: "Marketplace", path: "/marketplace" }] : []),
         { label: "Settings", path: "/settings" }
     ];
     
     const isCurrentPage = (path: string) => {
-        if (path === "/") {
-            return location.pathname === "/";
+        if (path === homePath) {
+            return location.pathname === "/" || location.pathname === "/home";
         }
         return location.pathname.startsWith(path);
     };

@@ -1,7 +1,7 @@
 import {Entity, ManyToOne} from 'typeorm';
 import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Ticket} from "../ticket/ticket.entity";
-import {PaymentProvider} from "../paymentProvider/paymentProvider.entity";
+import {PaymentProcessor} from "../paymentProcessor/paymentProcessor.entity";
 import {Transaction} from "../transaction/transaction.entity";
 import {
     EntityColumn,
@@ -27,7 +27,7 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'paymentProviderId', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'paymentProcessorId', 'metadata'
       ],
     },
     [UserRole.USER]: {
@@ -37,7 +37,7 @@ import { FindOptionsWhere } from 'typeorm';
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'paymentProviderId', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'method', 'status', 'amount', 'paymentProcessorId', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }), fields: ['id'] },
@@ -45,14 +45,14 @@ import { FindOptionsWhere } from 'typeorm';
     [OperationType.CREATE]: {
       [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
         // All authenticated users can create payments
-        fields: ['method', 'status', 'amount', 'paymentProviderId', 'metadata'],
+        fields: ['method', 'status', 'amount', 'paymentProcessorId', 'metadata'],
       },
       default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }) },
     },
     [OperationType.UPDATE]: {
       [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
         // Only admin and moderator can update payments
-        fields: ['method', 'status', 'amount', 'paymentProviderId', 'metadata'],
+        fields: ['method', 'status', 'amount', 'paymentProcessorId', 'metadata'],
       },
       default: { filter: (): FindOptionsWhere<Payment> => ({ id: -1 }) },
     },
@@ -86,11 +86,11 @@ export class Payment extends BaseDbEntity {
         db: {type: 'int'},
         api: {description: 'ID of the payment provider used', example: 1},
     })
-    paymentProviderId?: number;
+    paymentProcessorId?: number;
 
     @ApiPropertyOptional({nullable: true})
-    @ManyToOne(() => PaymentProvider, {nullable: true})
-    paymentProvider?: PaymentProvider;
+    @ManyToOne(() => PaymentProcessor, {nullable: true})
+    paymentProcessor?: PaymentProcessor;
 
     @EntityRelation({
         type: RelationshipType.ONE_TO_MANY,
@@ -114,5 +114,5 @@ export class CreatePaymentDTO extends PickType(Payment, [
     'method',
     'status',
     'amount',
-    'paymentProviderId',
+    'paymentProcessorId',
 ] as const) {}

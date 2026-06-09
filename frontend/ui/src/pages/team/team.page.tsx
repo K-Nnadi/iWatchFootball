@@ -26,7 +26,8 @@ import { usePageTransition } from '../../hooks/usePageTransition';
 import '../../styles/modern.css';
 import { useGetOneTeam, useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetOneManager } from '@iWatchFootball/clients/controllers/manager';
-import { useGetOneStadium, useGetQueryStadium } from '@iWatchFootball/clients/controllers/stadium';
+import { useGetQueryStadium } from '@iWatchFootball/clients/controllers/stadium';
+import { useGetQueryTeamStadium } from '@iWatchFootball/clients/controllers/team-stadium';
 import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
 import { useGetQueryPlayer } from '@iWatchFootball/clients/controllers/player';
 import { useGetQueryPosition } from '@iWatchFootball/clients/controllers/position';
@@ -295,18 +296,51 @@ export function TeamPage() {
         } as any,
     });
 
-    const stadiumSid = asFiniteNumberId(apiTeam?.stadiumIds?.[0]);
-    const { data: stadium } = useGetOneStadium(stadiumSid ?? 0, {
-        query: {
-            enabled: fetchFromApi && !!apiTeam && stadiumSid !== undefined,
-        } as any,
-    });
-
-    /** Stadium rows often link clubs via `stadium.teamIds` while `team.stadiumIds` is unset — reverse lookup fills the header. */
-    const { data: stadiumsListingTeamId = [] } = useGetQueryStadium(
-        { where: { teamIds: { $contains: [teamIdNum] } }, take: 10, order: { name: 'ASC' as const } } as any,
+    /** Home grounds are now sourced from the `teamStadium` link table (replaces legacy `team.stadiumIds` / `stadium.teamIds`). */
+    const { data: teamStadiumLinks = [] } = useGetQueryTeamStadium(
+        { where: { teamId: teamIdNum }, take: 10 } as any,
         { query: { enabled: fetchFromApi && !!apiTeam } as any }
     );
+
+    /** Prefer the link tagged `relationship: 'primary_home'` (set by `TeamStadiumService.ensurePrimaryHomeFromApiSportsTeams`); fall back to the first link. */
+    const primaryStadiumLink = useMemo(() => {
+        const primary = teamStadiumLinks.find((l) => {
+            const m = (l as { metadata?: unknown }).metadata;
+            return (
+                m != null &&
+                typeof m === 'object' &&
+                (m as Record<string, unknown>)['relationship'] === 'primary_home'
+            );
+        });
+        return primary ?? teamStadiumLinks[0];
+    }, [teamStadiumLinks]);
+
+    const linkedStadiumIds = useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    teamStadiumLinks
+                        .map((l) => asFiniteNumberId((l as { stadiumId?: unknown }).stadiumId))
+                        .filter((n): n is number => n !== undefined)
+                )
+            ),
+        [teamStadiumLinks]
+    );
+
+    const { data: linkedStadiums = [] } = useGetQueryStadium(
+        {
+            where: { id: { $in: linkedStadiumIds.length ? linkedStadiumIds : [-1] } },
+            take: 10,
+            order: { name: 'ASC' as const },
+        } as any,
+        { query: { enabled: fetchFromApi && !!apiTeam && linkedStadiumIds.length > 0 } as any }
+    );
+
+    const primaryStadium = useMemo(() => {
+        const pid = asFiniteNumberId((primaryStadiumLink as { stadiumId?: unknown } | undefined)?.stadiumId);
+        if (pid === undefined) return undefined;
+        return linkedStadiums.find((s) => s.id === pid);
+    }, [primaryStadiumLink, linkedStadiums]);
 
     const pidList: number[] =
         fetchFromApi && apiTeam?.playerIds?.length
@@ -447,15 +481,10 @@ export function TeamPage() {
                 if (Number.isFinite(fy) && fy > 1600 && fy < 2100) foundedDisp = String(fy);
             }
 
-            const stadiumIdFallbackCount =
-                Array.isArray(apiTeam.stadiumIds) && apiTeam.stadiumIds.length > 0
-                    ? apiTeam.stadiumIds.length
-                    : stadiumsListingTeamId.length;
-
             const stadiumLabel = stadiumNameFromLinkedRows(
-                stadium ?? undefined,
-                stadiumsListingTeamId,
-                stadiumIdFallbackCount
+                primaryStadium,
+                linkedStadiums,
+                linkedStadiumIds.length
             );
 
             return {
@@ -493,8 +522,9 @@ export function TeamPage() {
         mergedApiFixtures,
         teamNameLookup,
         competitionNameLookup,
-        stadium?.name,
-        stadiumsListingTeamId,
+        primaryStadium,
+        linkedStadiums,
+        linkedStadiumIds.length,
         manager?.name,
         manager?.nationality,
     ]);

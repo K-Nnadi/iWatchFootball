@@ -1,5 +1,25 @@
 import type { QueryKey, UseMutationOptions, UseMutationResult, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-import type { CreatePredictionDTO, GetCountPredictionParams, GetQueryPredictionParams, Prediction } from './iWatchFootballAPI.schemas';
+import type { CreatePredictionDTO, FixturePredictionTallyDto, GetCountPredictionParams, GetQueryPredictionParams, Prediction } from './iWatchFootballAPI.schemas';
+/**
+ * @summary Aggregate prediction counts for a fixture (public poll totals)
+ */
+export declare const predictionControllerGetFixtureTally: (fixtureId: number, signal?: AbortSignal) => Promise<FixturePredictionTallyDto>;
+export declare const getPredictionControllerGetFixtureTallyQueryKey: (fixtureId: number) => readonly [`/prediction/fixture/${number}/tally`];
+export declare const getPredictionControllerGetFixtureTallyQueryOptions: <TData = FixturePredictionTallyDto, TError = void>(fixtureId: number, options?: {
+    query?: UseQueryOptions<FixturePredictionTallyDto, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryOptions<FixturePredictionTallyDto, TError, TData, QueryKey> & {
+    queryKey: QueryKey;
+};
+export type PredictionControllerGetFixtureTallyQueryResult = NonNullable<Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>>;
+export type PredictionControllerGetFixtureTallyQueryError = void;
+/**
+ * @summary Aggregate prediction counts for a fixture (public poll totals)
+ */
+export declare const usePredictionControllerGetFixtureTally: <TData = FixturePredictionTallyDto, TError = void>(fixtureId: number, options?: {
+    query?: UseQueryOptions<FixturePredictionTallyDto, TError, TData, QueryKey> | undefined;
+} | undefined) => UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+};
 /**
  * @summary Create Prediction
  */

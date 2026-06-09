@@ -20,12 +20,74 @@ import type {
 } from '@tanstack/react-query'
 import type {
   CreatePredictionDTO,
+  FixturePredictionTallyDto,
   GetCountPredictionParams,
   GetQueryPredictionParams,
   Prediction
 } from './iWatchFootballAPI.schemas'
 import { clientInstance } from '../client-instance';
 
+
+
+
+/**
+ * @summary Aggregate prediction counts for a fixture (public poll totals)
+ */
+export const predictionControllerGetFixtureTally = (
+    fixtureId: number,
+ signal?: AbortSignal
+) => {
+      
+      
+      return clientInstance<FixturePredictionTallyDto>(
+      {url: `/prediction/fixture/${fixtureId}/tally`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+export const getPredictionControllerGetFixtureTallyQueryKey = (fixtureId: number,) => {
+    return [`/prediction/fixture/${fixtureId}/tally`] as const;
+    }
+
+    
+export const getPredictionControllerGetFixtureTallyQueryOptions = <TData = Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>, TError = void>(fixtureId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>, TError, TData>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPredictionControllerGetFixtureTallyQueryKey(fixtureId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>> = ({ signal }) => predictionControllerGetFixtureTally(fixtureId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(fixtureId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type PredictionControllerGetFixtureTallyQueryResult = NonNullable<Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>>
+export type PredictionControllerGetFixtureTallyQueryError = void
+
+/**
+ * @summary Aggregate prediction counts for a fixture (public poll totals)
+ */
+export const usePredictionControllerGetFixtureTally = <TData = Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>, TError = void>(
+ fixtureId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof predictionControllerGetFixtureTally>>, TError, TData>, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getPredictionControllerGetFixtureTallyQueryOptions(fixtureId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
 
 
 

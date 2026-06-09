@@ -1,0 +1,112 @@
+/*
+ * IWF Design Tokens — football-focused dark UI
+ * Import once in App.tsx. Legacy --modern-* aliases keep existing pages working.
+ */
+
+:root {
+  /* Brand & accent */
+  --ui-accent: #00c853;
+  --ui-accent-hover: #00e676;
+  --ui-accent-muted: rgba(0, 200, 83, 0.12);
+  --ui-accent-text: #000000;
+
+  /* Surfaces — dark-first layered charcoal */
+  --ui-bg-base: #0b0e11;
+  --ui-bg-surface: #14181f;
+  --ui-bg-elevated: #1a2029;
+  --ui-bg-hover: #222933;
+
+  /* Text */
+  --ui-text-primary: #f0f2f5;
+  --ui-text-secondary: #8b949e;
+  --ui-text-muted: #6e7681;
+
+  /* Borders & dividers */
+  --ui-border: rgba(255, 255, 255, 0.08);
+  --ui-border-strong: rgba(255, 255, 255, 0.14);
+  --ui-divider: rgba(255, 255, 255, 0.06);
+
+  /* Status */
+  --ui-live: #ff4444;
+  --ui-live-muted: rgba(255, 68, 68, 0.15);
+
+  /* Radius */
+  --ui-radius-xs: 4px;
+  --ui-radius-sm: 6px;
+  --ui-radius-md: 10px;
+  --ui-radius-lg: 14px;
+  --ui-radius-xl: 20px;
+  --ui-radius-full: 9999px;
+
+  /* Spacing scale */
+  --ui-space-1: 0.25rem;
+  --ui-space-2: 0.5rem;
+  --ui-space-3: 0.75rem;
+  --ui-space-4: 1rem;
+  --ui-space-5: 1.25rem;
+  --ui-space-6: 1.5rem;
+  --ui-space-8: 2rem;
+  --ui-space-10: 2.5rem;
+  --ui-space-12: 3rem;
+
+  /* Typography */
+  --ui-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ui-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shadows */
+  --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --ui-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.32);
+  --ui-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Layout */
+  --ui-header-height: 56px;
+  --ui-max-width: 1200px;
+
+  /* Legacy aliases — keeps existing --modern-* usage working */
+  --modern-black: var(--ui-bg-base);
+  --modern-lime: var(--ui-accent);
+  --modern-white: var(--ui-text-primary);
+  --modern-gray: var(--ui-text-secondary);
+  --modern-dark-gray: var(--ui-bg-elevated);
+
+  --modern-bg-primary: var(--ui-bg-base);
+  --modern-bg-secondary: var(--ui-bg-surface);
+  --modern-bg-tertiary: var(--ui-bg-elevated);
+  --modern-text-primary: var(--ui-text-primary);
+  --modern-text-secondary: var(--ui-text-secondary);
+  --modern-border-color: var(--ui-border);
+  --modern-card-bg: var(--ui-bg-elevated);
+  --modern-card-border: var(--ui-border);
+  --modern-navbar-bg: var(--ui-bg-base);
+  --modern-header-bg: var(--ui-bg-base);
+  --modern-shadow-color: rgba(0, 0, 0, 0.4);
+  --modern-backdrop-color: rgba(0, 0, 0, 0.6);
+  --modern-section-divider: var(--ui-divider);
+  --modern-font-primary: var(--ui-font);
+  --modern-font-mono: var(--ui-font-mono);
+  --modern-space-xs: var(--ui-space-2);
+  --modern-space-sm: var(--ui-space-4);
+  --modern-space-md: var(--ui-space-8);
+  --modern-space-lg: var(--ui-space-12);
+  --modern-space-xl: 8rem;
+  --modern-shadow-sm: var(--ui-shadow-sm);
+  --modern-shadow-md: var(--ui-shadow-md);
+  --modern-shadow-lg: var(--ui-shadow-lg);
+}
+
+[data-mantine-color-scheme='light'] {
+  --ui-bg-base: #f5f6f8;
+  --ui-bg-surface: #ffffff;
+  --ui-bg-elevated: #ffffff;
+  --ui-bg-hover: #eef0f3;
+  --ui-text-primary: #0b0e11;
+  --ui-text-secondary: #57606a;
+  --ui-text-muted: #8b949e;
+  --ui-border: rgba(0, 0, 0, 0.08);
+  --ui-border-strong: rgba(0, 0, 0, 0.14);
+  --ui-divider: rgba(0, 0, 0, 0.06);
+  --ui-accent-text: #ffffff;
+  --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --ui-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --ui-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}

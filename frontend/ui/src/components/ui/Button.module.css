@@ -1,0 +1,89 @@
+.uiButton {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none !important;
+  border-radius: var(--ui-radius-md) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    transform 0.15s ease;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.uiButton:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.uiButton:active {
+  transform: scale(0.98) !important;
+}
+
+.primary {
+  background-color: var(--ui-accent) !important;
+  border: 1px solid var(--ui-accent) !important;
+  color: var(--ui-accent-text) !important;
+}
+
+.primary:hover {
+  background-color: var(--ui-accent-hover) !important;
+  border-color: var(--ui-accent-hover) !important;
+  color: var(--ui-accent-text) !important;
+}
+
+.secondary {
+  background-color: var(--ui-bg-hover) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--ui-text-primary) !important;
+}
+
+.secondary:hover {
+  background-color: var(--ui-bg-elevated) !important;
+  border-color: var(--ui-border-strong) !important;
+  color: var(--ui-text-primary) !important;
+}
+
+.outline {
+  background-color: transparent !important;
+  border: 1px solid var(--ui-accent) !important;
+  color: var(--ui-accent) !important;
+}
+
+.outline:hover {
+  background-color: var(--ui-accent-muted) !important;
+  border-color: var(--ui-accent) !important;
+  color: var(--ui-accent) !important;
+}
+
+.ghost {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--ui-text-secondary) !important;
+}
+
+.ghost:hover {
+  background-color: var(--ui-bg-hover) !important;
+  color: var(--ui-text-primary) !important;
+}
+
+.subtle {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--ui-text-secondary) !important;
+}
+
+.subtle:hover {
+  background-color: var(--ui-bg-hover) !important;
+  color: var(--ui-accent) !important;
+}
+
+.danger {
+  background-color: transparent !important;
+  border: 1px solid #e53935 !important;
+  color: #ef5350 !important;
+}
+
+.danger:hover {
+  background-color: rgba(229, 57, 53, 0.12) !important;
+  border-color: #ef5350 !important;
+  color: #ef5350 !important;
+}

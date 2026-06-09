@@ -22,10 +22,72 @@ import type {
   CreateLogDTO,
   GetCountLogParams,
   GetQueryLogParams,
-  Log
+  Log,
+  LogControllerGetMyHistory200
 } from './iWatchFootballAPI.schemas'
 import { clientInstance } from '../client-instance';
 
+
+
+
+/**
+ * @summary Get match log history with freemium gating (verified limit for free users)
+ */
+export const logControllerGetMyHistory = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return clientInstance<LogControllerGetMyHistory200>(
+      {url: `/log/my-history`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+export const getLogControllerGetMyHistoryQueryKey = () => {
+    return [`/log/my-history`] as const;
+    }
+
+    
+export const getLogControllerGetMyHistoryQueryOptions = <TData = Awaited<ReturnType<typeof logControllerGetMyHistory>>, TError = void>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof logControllerGetMyHistory>>, TError, TData>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLogControllerGetMyHistoryQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof logControllerGetMyHistory>>> = ({ signal }) => logControllerGetMyHistory(signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof logControllerGetMyHistory>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type LogControllerGetMyHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof logControllerGetMyHistory>>>
+export type LogControllerGetMyHistoryQueryError = void
+
+/**
+ * @summary Get match log history with freemium gating (verified limit for free users)
+ */
+export const useLogControllerGetMyHistory = <TData = Awaited<ReturnType<typeof logControllerGetMyHistory>>, TError = void>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof logControllerGetMyHistory>>, TError, TData>, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getLogControllerGetMyHistoryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
 
 
 

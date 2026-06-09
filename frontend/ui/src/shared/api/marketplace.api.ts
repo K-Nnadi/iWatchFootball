@@ -96,7 +96,7 @@ export async function confirmMarketplacePurchase(body: {
     listingId: number;
     holderId: string;
     paymentMethod: MarketplacePaymentMethod;
-    paymentProviderId?: number;
+    paymentProcessorId?: number;
     providerPaymentRef?: string;
     idempotencyKey?: string;
 }): Promise<{ marketplaceTransactionId: number; ticketId: number }> {

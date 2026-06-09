@@ -1,0 +1,144 @@
+.toolbar {
+  background-color: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  overflow: hidden;
+}
+
+.dateSection {
+  padding: var(--ui-space-4);
+  border-bottom: 1px solid var(--ui-divider);
+}
+
+.dateHeadingRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  margin-bottom: var(--ui-space-3);
+  flex-wrap: wrap;
+}
+
+.dateHeading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ui-text-primary);
+  line-height: 1.3;
+}
+
+.todayLink {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ui-accent);
+  white-space: nowrap;
+}
+
+.todayLink:hover {
+  text-decoration: underline;
+}
+
+.carouselRow {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+}
+
+.carousel {
+  flex: 1;
+  min-width: 0;
+}
+
+.navIcon {
+  flex-shrink: 0;
+  background-color: var(--ui-bg-surface) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--ui-text-primary) !important;
+  border-radius: var(--ui-radius-sm) !important;
+}
+
+.navIcon:hover {
+  background-color: var(--ui-bg-hover) !important;
+  border-color: var(--ui-accent) !important;
+  color: var(--ui-accent) !important;
+}
+
+.dateChip {
+  font-size: 0.75rem !important;
+  min-height: 2rem !important;
+  padding-left: 0.35rem !important;
+  padding-right: 0.35rem !important;
+}
+
+.calendarLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-1);
+  margin-top: var(--ui-space-3);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ui-text-secondary);
+}
+
+.calendarLink:hover {
+  color: var(--ui-accent);
+}
+
+.filterSection {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  flex-wrap: wrap;
+}
+
+.filterChips {
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 11rem;
+}
+
+.searchInput input {
+  background-color: var(--ui-bg-surface) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: var(--ui-radius-sm) !important;
+  color: var(--ui-text-primary) !important;
+  font-size: 0.875rem !important;
+  min-height: 2.25rem !important;
+}
+
+.searchInput input::placeholder {
+  color: var(--ui-text-muted) !important;
+}
+
+.searchInput input:focus {
+  border-color: var(--ui-accent) !important;
+}
+
+.clearLink {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ui-text-secondary);
+  white-space: nowrap;
+}
+
+.clearLink:hover {
+  color: var(--ui-accent);
+}
+
+@media (max-width: 640px) {
+  .filterSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchInput {
+    min-width: 0;
+  }
+
+  .clearLink {
+    align-self: flex-end;
+  }
+}

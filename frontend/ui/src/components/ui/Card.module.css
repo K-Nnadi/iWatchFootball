@@ -1,0 +1,43 @@
+.uiCard {
+  background-color: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.hoverable:hover {
+  border-color: var(--ui-border-strong);
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  border-color: var(--ui-accent);
+  transform: translateY(-1px);
+}
+
+.compact {
+  padding: var(--ui-space-3) var(--ui-space-4);
+}
+
+.default {
+  padding: var(--ui-space-4) var(--ui-space-5);
+}
+
+.spacious {
+  padding: var(--ui-space-6);
+}
+
+.accentTop::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ui-accent);
+  border-radius: var(--ui-radius-md) var(--ui-radius-md) 0 0;
+}

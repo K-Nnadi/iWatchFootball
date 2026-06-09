@@ -1,7 +1,6 @@
 import {
 	Anchor,
 	Box,
-	Button,
 	Checkbox,
 	Container,
 	Flex,
@@ -16,6 +15,7 @@ import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { UiButton } from '../components/ui';
 import { useLogin, type LoginMutationResult } from '@iWatchFootball/clients/controllers/auth';
 import type { LoginBody } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { useAuthStore } from '../shared/stores/auth.store';
@@ -55,7 +55,7 @@ export function LoginPage() {
 
 					const from =
 						(location.state as { from?: { pathname: string } } | null)?.from?.pathname ??
-						'/';
+						'/home';
 					navigateWithTransition(from);
 				}
 			},
@@ -169,24 +169,23 @@ export function LoginPage() {
 					</Flex>
 
 					<Group justify="center" mt="xl" gap="md">
-						<Button 
-							type="submit" 
-							fullWidth 
-							variant="filled" 
+						<UiButton
+							type="submit"
+							fullWidth
 							size="md"
 							loading={loginMutation.isPending}
 							disabled={loginMutation.isPending}
 						>
 							Login
-						</Button>
-						<Button
+						</UiButton>
+						<UiButton
 							fullWidth
 							variant="outline"
 							size="md"
 							onClick={() => navigateWithTransition('/join')}
 						>
 							Sign up
-						</Button>
+						</UiButton>
 					</Group>
 				</form>
 			</Paper>

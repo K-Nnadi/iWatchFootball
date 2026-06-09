@@ -8,6 +8,32 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { clientInstance } from '../client-instance';
 /**
+ * @summary Get match log history with freemium gating (verified limit for free users)
+ */
+export const logControllerGetMyHistory = (signal) => {
+    return clientInstance({ url: `/log/my-history`, method: 'GET', signal
+    });
+};
+export const getLogControllerGetMyHistoryQueryKey = () => {
+    return [`/log/my-history`];
+};
+export const getLogControllerGetMyHistoryQueryOptions = (options) => {
+    var _a;
+    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
+    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getLogControllerGetMyHistoryQueryKey();
+    const queryFn = ({ signal }) => logControllerGetMyHistory(signal);
+    return Object.assign({ queryKey, queryFn }, queryOptions);
+};
+/**
+ * @summary Get match log history with freemium gating (verified limit for free users)
+ */
+export const useLogControllerGetMyHistory = (options) => {
+    const queryOptions = getLogControllerGetMyHistoryQueryOptions(options);
+    const query = useQuery(queryOptions);
+    query.queryKey = queryOptions.queryKey;
+    return query;
+};
+/**
  * @summary Create Log
  */
 export const createLog = (createLogDTO) => {

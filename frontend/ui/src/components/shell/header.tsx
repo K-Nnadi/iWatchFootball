@@ -1,10 +1,13 @@
 import React from 'react';
-import { AppShell, Avatar, Badge, Box, Burger, Button, Container, Flex, Group, Menu, Title } from '@mantine/core';
+import { AppShell, Avatar, Badge, Box, Burger, Container, Flex, Group, Menu } from '@mantine/core';
 import { IoSettingsOutline, IoPersonOutline, IoCartOutline } from 'react-icons/io5';
+import { NotificationBell } from './NotificationBell';
 import { useLocation } from 'react-router-dom';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
 import { useCartStore } from '../../shared/stores/cart.store';
+import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
+import { UiButton } from '../ui';
 import classes from './styles/header.module.css';
 
 /** Navbar cart + Sign In / Join are redundant on public auth screens (already on login / register / recover). */
@@ -16,9 +19,28 @@ function isAuthLandingPath(pathname: string): boolean {
     return AUTH_LANDING_SEGMENTS.has(last);
 }
 
+function Logo({ onClick, className }: { onClick: () => void; className?: string }) {
+    return (
+        <span className={`${classes.logoText} ${className ?? ''}`} onClick={onClick} role="button" tabIndex={0}>
+            I Watch <span className={classes.logoAccent}>Football</span>
+        </span>
+    );
+}
+
+function CartBadge({ count, onClick }: { count: number; onClick: () => void }) {
+    return (
+        <Box onClick={onClick} className={classes.cartIcon} style={{ position: 'relative' }}>
+            <IoCartOutline size={22} />
+            <Badge size="xs" circle variant="filled" className={classes.cartBadge}>
+                {count}
+            </Badge>
+        </Box>
+    );
+}
+
 interface HeaderProps {
     showHeader: boolean;
-    isLoggedIn: boolean; // Add this prop to control login state
+    isLoggedIn: boolean;
 }
 
 export function Header({ showHeader, isLoggedIn }: HeaderProps) {
@@ -27,120 +49,56 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const { navigateWithTransition } = usePageTransition();
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
     const { items } = useCartStore();
+    const { marketplaceEnabled } = usePlatformFeaturesStore();
     const hasCartItems = items.length > 0;
+    const goHome = () => navigateWithTransition(isLoggedIn ? '/home' : '/');
 
     const pages = [
         { page: 'competitions', label: 'Competitions' },
         { page: 'matches', label: 'Matches' },
-        { page: 'marketplace', label: 'Marketplace' },
+        ...(marketplaceEnabled ? [{ page: 'marketplace', label: 'Marketplace' }] : []),
         { page: 'logs', label: 'Logs' },
     ];
 
     return (
         <AppShell.Header className={classes.header}>
-            <Container px="md" h={'100%'}>
-                <Flex justify={'space-between'} align="center" h="100%" className={classes.inner}>
-                    {/* Logo Section - Desktop: Left, Mobile: Hidden (title is centered) */}
+            <Container px="md" h="100%">
+                <Flex justify="space-between" align="center" h="100%" className={classes.inner}>
                     <Group gap="xs" visibleFrom="md" className={classes.logoSection}>
-                        <Title 
-                            order={2} 
-                            size="2rem"
-                            fw={700} 
-                            c="var(--modern-text-primary)" 
-                            onClick={() => navigateWithTransition('/')}
-                            style={{ cursor: 'pointer', fontSize: 'clamp(1.5rem, 2vw, 2rem)' }}
-                        >
-                            I Watch Football
-                        </Title>
+                        <Logo onClick={goHome} />
                     </Group>
 
-                    {/* Burger Menu - Mobile only */}
-                    <Burger 
-                        opened={navbarOpen} 
-                        onClick={toggleNavbar} 
-                        hiddenFrom="md" 
-                        size="md" 
-                        color="var(--modern-text-primary)"
+                    <Burger
+                        opened={navbarOpen}
+                        onClick={toggleNavbar}
+                        hiddenFrom="md"
+                        size="sm"
+                        color="var(--ui-text-primary)"
                         className={classes.burgerMenu}
                     />
 
-                    {/* Mobile Right Section - Cart (only when non-empty) and Avatar */}
-                    <Group gap="md" hiddenFrom="md" className={classes.mobileRightSection}>
+                    <Group gap="sm" hiddenFrom="md" className={classes.mobileRightSection}>
+                        {isLoggedIn && <NotificationBell />}
                         {hasCartItems && !hideCartAndNavbarAuth && (
-                            <Box
-                                onClick={() => navigateWithTransition('/checkout')}
-                                className={classes.cartIcon}
-                                style={{ position: 'relative', cursor: 'pointer' }}
-                            >
-                                <IoCartOutline
-                                    size={24}
-                                    style={{ color: 'var(--modern-text-primary)' }}
-                                />
-                                <Badge
-                                    size="xs"
-                                    circle
-                                    variant="filled"
-                                    style={{
-                                        position: 'absolute',
-                                        top: -8,
-                                        right: -8,
-                                        minWidth: 18,
-                                        height: 18,
-                                        padding: 0,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '10px',
-                                        fontWeight: 700,
-                                        backgroundColor: 'var(--modern-lime)',
-                                        color: 'var(--modern-bg-primary)',
-                                    }}
-                                >
-                                    {items.length}
-                                </Badge>
-                            </Box>
+                            <CartBadge count={items.length} onClick={() => navigateWithTransition('/checkout')} />
                         )}
-                        
-                        {/* Mobile Avatar */}
                         <Box>
                             {isLoggedIn ? (
-                                // Logged in: Click to go to settings
-                                <Avatar
-                                    size="md"
-                                    radius="xl"
-                                    onClick={() => navigateWithTransition('/settings')}
-                                    className={classes.avatar}
-                                >
-                                    <IoPersonOutline size={20} />
+                                <Avatar size="sm" radius="xl" onClick={() => navigateWithTransition('/settings')} className={classes.avatar}>
+                                    <IoPersonOutline size={16} />
                                 </Avatar>
                             ) : !hideCartAndNavbarAuth ? (
-                                // Not logged in: Menu with Sign In/Sign Up
-                                <Menu
-                                    shadow="md"
-                                    width={200}
-                                    position="bottom-end"
-                                    withArrow
-                                >
+                                <Menu shadow="md" width={180} position="bottom-end">
                                     <Menu.Target>
-                                        <Avatar
-                                            size="md"
-                                            radius="xl"
-                                            className={classes.avatar}
-                                        >
-                                            <IoPersonOutline size={20} />
+                                        <Avatar size="sm" radius="xl" className={classes.avatar}>
+                                            <IoPersonOutline size={16} />
                                         </Avatar>
                                     </Menu.Target>
                                     <Menu.Dropdown className={classes.menuDropdown}>
-                                        <Menu.Item
-                                            onClick={() => navigateWithTransition('/signIn')}
-                                            className={classes.menuItem}
-                                        >
+                                        <Menu.Item onClick={() => navigateWithTransition('/signIn')} className={classes.menuItem}>
                                             Sign In
                                         </Menu.Item>
-                                        <Menu.Item
-                                            onClick={() => navigateWithTransition('/join')}
-                                            className={classes.menuItemLime}
-                                        >
+                                        <Menu.Item onClick={() => navigateWithTransition('/join')} className={classes.menuItemLime}>
                                             Join
                                         </Menu.Item>
                                     </Menu.Dropdown>
@@ -149,95 +107,44 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                         </Box>
                     </Group>
 
-                    {/* Title - Mobile: Centered */}
                     <Box hiddenFrom="md" className={classes.mobileTitle}>
-                        <Title 
-                            order={2} 
-                            size="1.75rem"
-                            fw={700} 
-                            c="var(--modern-text-primary)" 
-                            onClick={() => navigateWithTransition('/')}
-                            className={classes.mobileTitleText}
-                        >
-                            I Watch Football
-                        </Title>
+                        <Logo onClick={goHome} className={classes.mobileTitleText} />
                     </Box>
 
-                    {/* Navigation Links */}
                     {showHeader && (
-                        <Group gap="xl" visibleFrom="md">
+                        <Group gap="xs" visibleFrom="md">
                             {pages.map(({ page, label }) => (
-                                <Button
+                                <UiButton
                                     key={label}
                                     variant="subtle"
+                                    size="sm"
                                     onClick={() => navigateWithTransition(`/${page}`)}
                                     className={classes.navButton}
                                 >
                                     {label}
-                                </Button>
+                                </UiButton>
                             ))}
                         </Group>
                     )}
 
-                    {/* Right Section */}
-                    <Group gap="lg">
+                    <Group gap="sm">
                         {showHeader && (
                             <>
+                                {isLoggedIn && <NotificationBell />}
                                 {hasCartItems && !hideCartAndNavbarAuth && (
-                                    <Box
-                                        onClick={() => navigateWithTransition('/checkout')}
-                                        className={classes.cartIcon}
-                                        style={{ position: 'relative', cursor: 'pointer' }}
-                                    >
-                                        <IoCartOutline
-                                            size={24}
-                                            style={{ color: 'var(--modern-text-primary)' }}
-                                        />
-                                        <Badge
-                                            size="xs"
-                                            circle
-                                            variant="filled"
-                                            style={{
-                                                position: 'absolute',
-                                                top: -8,
-                                                right: -8,
-                                                minWidth: 18,
-                                                height: 18,
-                                                padding: 0,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '10px',
-                                                fontWeight: 700,
-                                                backgroundColor: 'var(--modern-lime)',
-                                                color: 'var(--modern-bg-primary)',
-                                            }}
-                                        >
-                                            {items.length}
-                                        </Badge>
+                                    <Box visibleFrom="md">
+                                        <CartBadge count={items.length} onClick={() => navigateWithTransition('/checkout')} />
                                     </Box>
                                 )}
-                                <IoSettingsOutline
-                                    size={24}
-                                    onClick={() => navigateWithTransition('/settings')}
-                                    className={classes.settingsIcon}
-                                />
+                                <IoSettingsOutline size={20} onClick={() => navigateWithTransition('/settings')} className={classes.settingsIcon} />
                                 {!isLoggedIn && !hideCartAndNavbarAuth && (
                                     <>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => navigateWithTransition('/signIn')}
-                                            className={classes.signInButton}
-                                        >
+                                        <UiButton variant="outline" size="sm" onClick={() => navigateWithTransition('/signIn')}>
                                             Sign In
-                                        </Button>
-                                        <Button
-                                            variant="filled"
-                                            onClick={() => navigateWithTransition('/join')}
-                                            className={classes.joinButton}
-                                        >
+                                        </UiButton>
+                                        <UiButton variant="primary" size="sm" onClick={() => navigateWithTransition('/join')}>
                                             Join
-                                        </Button>
+                                        </UiButton>
                                     </>
                                 )}
                             </>

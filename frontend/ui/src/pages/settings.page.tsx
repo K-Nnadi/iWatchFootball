@@ -8,7 +8,6 @@ import {
     Switch,
     Select,
     Autocomplete,
-    Button,
     Text,
     Avatar,
     Divider,
@@ -30,6 +29,7 @@ import {
     IconChevronRight,
 } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { UiButton } from '../components/ui';
 import { useAuthStore } from '../shared/stores/auth.store';
 import { notify } from '../shared/notify';
 import { useGetQueryTeam, useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
@@ -55,7 +55,11 @@ import type {
     CommsPreferenceMatchReminders as MatchRemindersType,
     CommsPreferenceLanguage as LanguageType,
 } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
-import '../styles/modern.css';
+import {
+    getTrackerPrivacy,
+    updateTrackerPrivacy,
+    type TrackerVisibility,
+} from '../shared/api/tracker.api';
 
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
@@ -83,9 +87,44 @@ export function SettingsPage() {
     const [isEditingTeam, setIsEditingTeam] = useState(false);
     const [selectedTeamId, setSelectedTeamId] = useState<number | null>(user?.favouriteTeamId || null);
     const [favoriteTeamName, setFavoriteTeamName] = useState<string | null>(null);
+    const [trackerVisibility, setTrackerVisibility] = useState<TrackerVisibility>('PRIVATE');
+    const [shareVerifiedOnly, setShareVerifiedOnly] = useState(true);
+    const [savingTrackerPrivacy, setSavingTrackerPrivacy] = useState(false);
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Debounce the team search input
+    useEffect(() => {
+        if (!isLoggedIn) return;
+        void getTrackerPrivacy()
+            .then((p) => {
+                setTrackerVisibility(p.trackerVisibility);
+                setShareVerifiedOnly(p.shareVerifiedOnly);
+            })
+            .catch(() => {});
+    }, [isLoggedIn]);
+
+    const handleSaveTrackerPrivacy = async () => {
+        setSavingTrackerPrivacy(true);
+        try {
+            const updated = await updateTrackerPrivacy({
+                trackerVisibility,
+                shareVerifiedOnly,
+            });
+            setTrackerVisibility(updated.trackerVisibility);
+            setShareVerifiedOnly(updated.shareVerifiedOnly);
+            notify.success('Tracker privacy updated');
+        } catch (e) {
+            notify.error('Could not save', e instanceof Error ? e.message : String(e));
+        } finally {
+            setSavingTrackerPrivacy(false);
+        }
+    };
+
+    const trackerVisibilityOptions = [
+        { value: 'PRIVATE', label: 'Private — only you' },
+        { value: 'FRIENDS', label: 'Friends — accepted friends only' },
+        { value: 'PUBLIC', label: 'Public — any signed-in user' },
+    ];
+
     const handleTeamSearchChange = (value: string) => {
         setTeamSearchValue(value);
         if (debounceTimer.current) clearTimeout(debounceTimer.current);
@@ -594,6 +633,41 @@ export function SettingsPage() {
                                         </Text>
                                     )}
                                 </Box>
+
+                                <Box>
+                                    <Text fw={600} mb="xs" style={{ color: 'var(--modern-text-primary)' }}>
+                                        Tracker privacy
+                                    </Text>
+                                    <Text size="xs" c="dimmed" mb="sm" style={{ paddingLeft: 0 }}>
+                                        Controls who can see your match stats and compare with you.
+                                    </Text>
+                                    <Stack gap="sm" style={{ paddingLeft: '28px' }}>
+                                        <Select
+                                            label="Who can see your stats"
+                                            data={trackerVisibilityOptions}
+                                            value={trackerVisibility}
+                                            onChange={(v) =>
+                                                v && setTrackerVisibility(v as TrackerVisibility)
+                                            }
+                                            styles={selectStyles}
+                                        />
+                                        <Switch
+                                            label="Share verified matches only"
+                                            description="When on, friends compare using ticket-verified logs only"
+                                            checked={shareVerifiedOnly}
+                                            onChange={(e) =>
+                                                setShareVerifiedOnly(e.currentTarget.checked)
+                                            }
+                                        />
+                                        <UiButton
+                                            size="xs"
+                                            loading={savingTrackerPrivacy}
+                                            onClick={() => void handleSaveTrackerPrivacy()}
+                                        >
+                                            Save tracker privacy
+                                        </UiButton>
+                                    </Stack>
+                                </Box>
                             </Stack>
 
                             <Divider style={{ borderColor: 'var(--modern-border-color)' }} />
@@ -696,21 +770,12 @@ export function SettingsPage() {
                                         </SimpleGrid>
 
                                         <Group justify="flex-end" mt="md">
-                                            <Button
+                                            <UiButton
                                                 onClick={handleSaveCommsPrefs}
                                                 loading={updateCommsPrefMutation.isPending}
-                                                style={{
-                                                    backgroundColor: 'var(--modern-lime)',
-                                                    color: 'var(--modern-bg-primary)',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '0.05em',
-                                                    fontWeight: 600,
-                                                    borderRadius: '0',
-                                                    border: '2px solid var(--modern-lime)',
-                                                }}
                                             >
-                                                Save Preferences
-                                            </Button>
+                                                Save preferences
+                                            </UiButton>
                                         </Group>
                                     </Box>
 
@@ -760,34 +825,12 @@ export function SettingsPage() {
 
                     {/* Action Buttons */}
                 <Group justify="flex-end" mt="lg">
-                    <Button 
-                        variant="outline" 
-                        onClick={() => window.history.back()}
-                        style={{
-                            borderColor: 'var(--modern-lime)',
-                            color: 'var(--modern-lime)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            fontWeight: 600,
-                            borderRadius: '0',
-                        }}
-                    >
+                    <UiButton variant="outline" onClick={() => window.history.back()}>
                         Cancel
-                    </Button>
-                    <Button 
-                        onClick={handleSave}
-                        style={{
-                            backgroundColor: 'var(--modern-lime)',
-                            color: 'var(--modern-bg-primary)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            fontWeight: 600,
-                            borderRadius: '0',
-                            border: '2px solid var(--modern-lime)',
-                        }}
-                    >
-                        Save Changes
-                    </Button>
+                    </UiButton>
+                    <UiButton onClick={handleSave}>
+                        Save changes
+                    </UiButton>
                 </Group>
 
                 {/* Sign Out Section - Only shown when logged in */}
@@ -795,20 +838,9 @@ export function SettingsPage() {
                     <>
                         <Divider my="xl" />
                         <Group justify="flex-end">
-                            <Button 
-                                variant="outline" 
-                                onClick={handleLogout}
-                                style={{
-                                    borderColor: 'var(--mantine-color-red-6)',
-                                    color: 'var(--mantine-color-red-6)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em',
-                                    fontWeight: 600,
-                                    borderRadius: '0',
-                                }}
-                            >
-                                Sign Out
-                            </Button>
+                            <UiButton variant="danger" onClick={handleLogout}>
+                                Sign out
+                            </UiButton>
                         </Group>
                     </>
                 )}

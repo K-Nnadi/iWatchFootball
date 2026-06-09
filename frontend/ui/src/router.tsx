@@ -32,6 +32,10 @@ import { WalletPage } from "./pages/wallet.page";
 import { DiscountCodesAdminPage } from "./pages/admin/discountCodes.page";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
+import { RootEntry } from "./components/auth/RootEntry";
+import { MarketplaceFeatureRoute } from "./components/auth/MarketplaceFeatureRoute";
+import { FriendsPage } from "./pages/friends.page";
+import { CompareFriendPage } from "./pages/friendsCompare.page";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -39,6 +43,7 @@ export type ElementMap = {
 
 const IWatchFootballElements: ElementMap = {
     logs: <LogsPage/>,
+    friends: <FriendsPage/>,
     matches: <MatchesPage/>,
     settings: <SettingsPage/>,
     competitions: <CompetitionsPage />,
@@ -46,9 +51,21 @@ const IWatchFootballElements: ElementMap = {
     thankYou: <ThankYouPage/>,
     news: <NewsPage/>,
     tickets: <TicketsPage/>,
-    marketplace: <MarketplacePage/>,
-    'marketplace/my-listings': <MyListingsPage/>,
-    'marketplace/sell': <CreateListingPage/>,
+    marketplace: (
+        <MarketplaceFeatureRoute>
+            <MarketplacePage/>
+        </MarketplaceFeatureRoute>
+    ),
+    'marketplace/my-listings': (
+        <MarketplaceFeatureRoute>
+            <MyListingsPage/>
+        </MarketplaceFeatureRoute>
+    ),
+    'marketplace/sell': (
+        <MarketplaceFeatureRoute>
+            <CreateListingPage/>
+        </MarketplaceFeatureRoute>
+    ),
     'admin/discount-codes': <DiscountCodesAdminPage/>,
 }
 
@@ -63,8 +80,8 @@ const childrenRoutes = [
 
 const additionalRoutes = [
     {
-        index: true,
-        element: <HomePage />
+        path: '/friends/compare/:userId',
+        element: <CompareFriendPage />
     },
     {
         path: '/competition/:id',
@@ -92,7 +109,11 @@ const additionalRoutes = [
     },
     {
         path: '/marketplace/buy/:id',
-        element: <MarketplaceCheckoutPage />
+        element: (
+            <MarketplaceFeatureRoute>
+                <MarketplaceCheckoutPage />
+            </MarketplaceFeatureRoute>
+        ),
     },
     {
         path: '/licenses',
@@ -144,8 +165,12 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                index: true,
+                element: <RootEntry />,
+            },
+            {
                 element: <RequireAuth />,
-                children: [...childrenRoutes, ...additionalRoutes],
+                children: [{ path: 'home', element: <HomePage /> }, ...childrenRoutes, ...additionalRoutes],
             },
         ],
     },

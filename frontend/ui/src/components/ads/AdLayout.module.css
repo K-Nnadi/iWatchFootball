@@ -1,0 +1,19 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ui-space-4);
+  width: 100%;
+  padding: var(--ui-space-4) var(--ui-space-4) 0;
+}
+
+.main {
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .layout {
+    grid-template-columns: 160px minmax(0, 1fr) 160px;
+    align-items: start;
+    padding: var(--ui-space-4) var(--ui-space-5) 0;
+  }
+}

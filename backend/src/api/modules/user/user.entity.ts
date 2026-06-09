@@ -19,6 +19,7 @@ import {CommsPreference} from "../commsPreference/commsPreference.entity";
 import {Credit} from "../credit/credit.entity";
 import {Transaction} from "../transaction/transaction.entity";
 import {Team} from "../team/team.entity";
+import {TrackerVisibility} from "../../enums/social.enum";
 
 
 @Entity('user')
@@ -31,7 +32,8 @@ import {Team} from "../team/team.entity";
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId',
+        'trackerVisibility', 'shareVerifiedOnly'
       ],
     },
     default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }), fields: ['id'] },
@@ -43,7 +45,8 @@ import {Team} from "../team/team.entity";
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId',
+        'trackerVisibility', 'shareVerifiedOnly'
       ],
     },
     [UserRole.USER]: {
@@ -52,7 +55,8 @@ import {Team} from "../team/team.entity";
         return { id: req.user?.id };
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId',
+        'trackerVisibility', 'shareVerifiedOnly'
       ],
     },
     default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }), fields: ['id'] },
@@ -74,7 +78,7 @@ import {Team} from "../team/team.entity";
       filter: (req: RequestWithUser): FindOptionsWhere<User> => {
         return { id: req.user?.id };
       },
-      fields: ['favouriteTeamId'],
+      fields: ['favouriteTeamId', 'trackerVisibility', 'shareVerifiedOnly'],
     },
     default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }) },
   },
@@ -152,6 +156,15 @@ export class User extends BaseDbEntity {
         description: 'User\'s favourite team'
     })
     favouriteTeam?: Promise<Team>;
+
+    @EntityEnumColumn({
+        db: { enum: TrackerVisibility, default: TrackerVisibility.PRIVATE },
+        api: { enum: TrackerVisibility },
+    })
+    trackerVisibility!: TrackerVisibility;
+
+    @EntityColumn({ db: { type: 'boolean', default: true } })
+    shareVerifiedOnly!: boolean;
 }
 
 export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {

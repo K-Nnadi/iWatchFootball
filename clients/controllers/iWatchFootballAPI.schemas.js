@@ -1,14 +1,87 @@
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UserType = {
-    ADMIN: 'ADMIN',
-    MODERATOR: 'MODERATOR',
-    USER: 'USER',
+export const DiscountCodeControllerCreateBodyType = {
+    PERCENTAGE: 'PERCENTAGE',
+    FIXED: 'FIXED',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const IntegrationProvider = {
+    stripe: 'stripe',
+    paypal: 'paypal',
+    openai: 'openai',
+    anthropic: 'anthropic',
+    azure_openai: 'azure_openai',
+    api_sports: 'api_sports',
+    statsbomb: 'statsbomb',
+    custom: 'custom',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const IntegrationKind = {
+    PAYMENT: 'PAYMENT',
+    LLM: 'LLM',
+    HTTP_API: 'HTTP_API',
+    DATA_SYNC: 'DATA_SYNC',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateIntegrationDTOProvider = {
+    stripe: 'stripe',
+    paypal: 'paypal',
+    openai: 'openai',
+    anthropic: 'anthropic',
+    azure_openai: 'azure_openai',
+    api_sports: 'api_sports',
+    statsbomb: 'statsbomb',
+    custom: 'custom',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateIntegrationDTOKind = {
+    PAYMENT: 'PAYMENT',
+    LLM: 'LLM',
+    HTTP_API: 'HTTP_API',
+    DATA_SYNC: 'DATA_SYNC',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdatePlatformConfigDtoValueType = {
+    number: 'number',
+    string: 'string',
+    boolean: 'boolean',
+    array: 'array',
+    json: 'json',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmMarketplacePurchaseDtoPaymentMethod = {
+    CreditCard: 'CreditCard',
+    PayPal: 'PayPal',
+    PlatformCredit: 'PlatformCredit',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateUserDTOType = {
     ADMIN: 'ADMIN',
     MODERATOR: 'MODERATOR',
     USER: 'USER',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserType = {
+    ADMIN: 'ADMIN',
+    MODERATOR: 'MODERATOR',
+    USER: 'USER',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserTrackerVisibility = {
+    PRIVATE: 'PRIVATE',
+    FRIENDS: 'FRIENDS',
+    PUBLIC: 'PUBLIC',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WebhookConfirmCheckoutDtoPaymentMethod = {
+    CreditCard: 'CreditCard',
+    PayPal: 'PayPal',
+    PlatformCredit: 'PlatformCredit',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmCheckoutDtoPaymentMethod = {
+    CreditCard: 'CreditCard',
+    PayPal: 'PayPal',
+    PlatformCredit: 'PlatformCredit',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TeamType = {
@@ -40,18 +113,24 @@ export const CreatePositionDTOType = {
     Forward: 'Forward',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreatePaymentProviderDTOType = {
+export const CreatePaymentProcessorDTOType = {
     CARD: 'CARD',
     WALLET: 'WALLET',
     BANK_TRANSFER: 'BANK_TRANSFER',
     CRYPTO: 'CRYPTO',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const PaymentProviderType = {
+export const PaymentProcessorType = {
     CARD: 'CARD',
     WALLET: 'WALLET',
     BANK_TRANSFER: 'BANK_TRANSFER',
     CRYPTO: 'CRYPTO',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateTrackerPrivacyDtoTrackerVisibility = {
+    PRIVATE: 'PRIVATE',
+    FRIENDS: 'FRIENDS',
+    PUBLIC: 'PUBLIC',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GenericTokenType = {

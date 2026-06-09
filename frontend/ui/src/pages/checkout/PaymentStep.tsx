@@ -7,48 +7,49 @@ import {
     Image,
     Badge,
     Box,
-    TextInput,
-    Button,
     Notification,
     Flex,
     ThemeIcon,
     Skeleton,
     UnstyledButton,
+    Alert,
 } from '@mantine/core';
 import { IconCheck, IconAlertCircle, IconCreditCard, IconCurrencyPound } from '@tabler/icons-react';
-import { ModernButton } from '../../components/modern';
-import { PaymentProvider, PaymentInfo, CheckoutErrors } from './types';
+import { UiButton } from '../../components/ui';
+import { StripeCheckoutPayment } from './StripeCheckoutPayment';
+import { PaymentProcessor, StripeCheckoutSession, CheckoutErrors } from './types';
 
 interface PaymentStepProps {
-    paymentProviders: PaymentProvider[];
-    selectedProvider: PaymentProvider | null;
-    paymentInfo: PaymentInfo;
+    paymentProcessors: PaymentProcessor[];
+    selectedProcessor: PaymentProcessor | null;
     errors: CheckoutErrors;
     loading: boolean;
     paymentProcessing: boolean;
     paymentStatus: 'idle' | 'success' | 'error';
-    /** Total shown on Pay button — primary subtotal − discount when applicable */
     payAmountDue: number;
-    onProviderSelect: (provider: PaymentProvider | null) => void;
-    onPaymentInfoChange: (field: string, value: string) => void;
+    stripeCheckout: StripeCheckoutSession | null;
+    stripeSessionLoading: boolean;
+    stripeSessionError: string | null;
+    onProcessorSelect: (processor: PaymentProcessor | null) => void;
     onBack: () => void;
-    onPaymentSubmit: () => void;
+    onCreditPaymentSubmit: () => void;
+    onStripePaymentComplete: () => Promise<void>;
     onPaymentStatusChange: (status: 'idle' | 'success' | 'error') => void;
+    onStripeError: (message: string) => void;
 }
 
-function PaymentMethodIcon({ provider }: { provider: PaymentProvider }) {
-    const isStripe = provider.slug === 'stripe';
-    const isPaypal = provider.slug === 'paypal';
+function PaymentMethodIcon({ processor }: { processor: PaymentProcessor }) {
+    const isStripe = processor.slug === 'stripe';
+    const isPaypal = processor.slug === 'paypal';
 
-    if (provider.type === 'CREDIT') {
+    if (processor.type === 'CREDIT') {
         return (
             <ThemeIcon size={44} radius="md" variant="light" color="teal">
                 <IconCurrencyPound size={24} stroke={1.5} />
             </ThemeIcon>
         );
     }
-    if (provider.logoUrl) {
-        /** Brand PNGs from `public/logos`: Stripe needs a light tray on dark chrome; PayPal artwork includes its panel. */
+    if (processor.logoUrl) {
         return (
             <Box
                 w={isStripe ? 100 : isPaypal ? 108 : 88}
@@ -62,14 +63,11 @@ function PaymentMethodIcon({ provider }: { provider: PaymentProvider }) {
                     overflow: 'hidden',
                     backgroundColor: isStripe ? '#ffffff' : undefined,
                     padding: isStripe ? '6px 12px' : 0,
-                    border:
-                        isStripe
-                            ? '1px solid var(--mantine-color-default-border)'
-                            : undefined,
+                    border: isStripe ? '1px solid var(--mantine-color-default-border)' : undefined,
                 }}
             >
                 <Image
-                    src={provider.logoUrl}
+                    src={processor.logoUrl}
                     alt=""
                     h={isStripe ? 22 : undefined}
                     w={isPaypal ? '100%' : undefined}
@@ -87,25 +85,60 @@ function PaymentMethodIcon({ provider }: { provider: PaymentProvider }) {
     );
 }
 
+function StripePaymentSection({
+    stripeCheckout,
+    payLabel,
+    paymentProcessing,
+    loading,
+    paymentStatus,
+    onStripePaymentComplete,
+    onStripeError,
+}: {
+    stripeCheckout: StripeCheckoutSession;
+    payLabel: string;
+    paymentProcessing: boolean;
+    loading: boolean;
+    paymentStatus: 'idle' | 'success' | 'error';
+    onStripePaymentComplete: () => Promise<void>;
+    onStripeError: (message: string) => void;
+}) {
+    return (
+        <StripeCheckoutPayment
+            publishableKey={stripeCheckout.publishableKey}
+            clientSecret={stripeCheckout.clientSecret}
+            payLabel={payLabel}
+            paymentProcessing={paymentProcessing}
+            loading={loading}
+            paymentStatus={paymentStatus}
+            onComplete={onStripePaymentComplete}
+            onError={onStripeError}
+        />
+    );
+}
+
 export function PaymentStep({
-    paymentProviders,
-    selectedProvider,
-    paymentInfo,
-    errors,
+    paymentProcessors,
+    selectedProcessor,
+    errors: _errors,
     loading,
     paymentProcessing,
     paymentStatus,
     payAmountDue,
-    onProviderSelect,
-    onPaymentInfoChange,
+    stripeCheckout,
+    stripeSessionLoading,
+    stripeSessionError,
+    onProcessorSelect,
     onBack,
-    onPaymentSubmit,
+    onCreditPaymentSubmit,
+    onStripePaymentComplete,
     onPaymentStatusChange,
+    onStripeError,
 }: PaymentStepProps) {
     const borderSubtle = 'var(--mantine-color-default-border)';
     const borderSelected = 'var(--mantine-color-blue-filled)';
-
     const payLabel = `Pay £${payAmountDue.toFixed(2)}`;
+    const isStripeCard =
+        selectedProcessor?.type === 'CARD' && selectedProcessor.slug === 'stripe';
 
     return (
         <Paper shadow="sm" radius="md" p="lg" withBorder>
@@ -119,36 +152,30 @@ export function PaymentStep({
                     <Skeleton height={64} radius="md" />
                     <Skeleton height={64} radius="md" />
                 </Stack>
-            ) : paymentProviders.length === 0 ? (
+            ) : paymentProcessors.length === 0 ? (
                 <Text size="sm" c="dimmed">
                     No payment methods available
                 </Text>
             ) : (
-                <Stack
-                    gap="sm"
-                    mt="xs"
-                    role="radiogroup"
-                    aria-label="Select payment method"
-                >
-                    {paymentProviders.map((provider) => {
-                        const checked = selectedProvider?.id === provider.id;
+                <Stack gap="sm" mt="xs" role="radiogroup" aria-label="Select payment method">
+                    {paymentProcessors.map((processor) => {
+                        const checked = selectedProcessor?.id === processor.id;
+                        const disabled = processor.disabled === true;
                         const select = (): void => {
-                            onProviderSelect(provider);
-                            onPaymentInfoChange('name', '');
-                            onPaymentInfoChange('cardNumber', '');
-                            onPaymentInfoChange('expiration', '');
-                            onPaymentInfoChange('cvv', '');
-                            onPaymentInfoChange('email', '');
+                            if (disabled) return;
+                            onProcessorSelect(processor);
                         };
                         return (
                             <UnstyledButton
-                                key={provider.id}
+                                key={processor.id}
                                 type="button"
                                 role="radio"
                                 aria-checked={checked}
-                                tabIndex={0}
+                                aria-disabled={disabled}
+                                tabIndex={disabled ? -1 : 0}
                                 onClick={select}
                                 onKeyDown={(e) => {
+                                    if (disabled) return;
                                     if (e.key !== 'Enter' && e.key !== ' ') return;
                                     e.preventDefault();
                                     select();
@@ -158,37 +185,37 @@ export function PaymentStep({
                                     width: '100%',
                                     borderRadius: 'var(--mantine-radius-md)',
                                     border: `1px solid ${checked ? borderSelected : borderSubtle}`,
-                                    backgroundColor: checked ? 'var(--mantine-color-blue-light)' : undefined,
-                                    cursor: 'pointer',
+                                    backgroundColor: checked
+                                        ? 'var(--mantine-color-blue-light)'
+                                        : undefined,
+                                    cursor: disabled ? 'not-allowed' : 'pointer',
+                                    opacity: disabled ? 0.55 : 1,
                                     outline: 'none',
                                     transition:
                                         'border-color 0.15s ease, background-color 0.15s ease',
                                     textAlign: 'left',
                                 }}
-                                styles={{
-                                    root: {
-                                        '&:focus-visible': {
-                                            outline: '2px solid var(--mantine-color-blue-filled)',
-                                            outlineOffset: '2px',
-                                        },
-                                    },
-                                }}
                             >
                                 <Flex align="center" gap="md" wrap="nowrap" p="md" style={{ flex: 1 }}>
-                                    <PaymentMethodIcon provider={provider} />
+                                    <PaymentMethodIcon processor={processor} />
                                     <Box style={{ flex: 1, minWidth: 0 }}>
                                         <Text fw={600} size="sm" lineClamp={2}>
-                                            {provider.name}
+                                            {processor.name}
                                         </Text>
-                                        {provider.type === 'CREDIT' &&
-                                            provider.creditBalance != null && (
+                                        {processor.type === 'CREDIT' &&
+                                            processor.creditBalance != null && (
                                                 <Text size="xs" c="dimmed" mt={2}>
                                                     Available balance
                                                 </Text>
                                             )}
+                                        {disabled && processor.slug === 'paypal' && (
+                                            <Text size="xs" c="dimmed" mt={2}>
+                                                Coming soon
+                                            </Text>
+                                        )}
                                     </Box>
                                     <Badge size="sm" variant="light" color="blue" tt="uppercase">
-                                        {provider.type}
+                                        {processor.type}
                                     </Badge>
                                 </Flex>
                             </UnstyledButton>
@@ -197,103 +224,67 @@ export function PaymentStep({
                 </Stack>
             )}
 
-            {selectedProvider && (
+            {selectedProcessor && (
                 <Box mt="xl">
                     <Title order={4} size="h6" mb="md" fw={600}>
                         Payment information
                     </Title>
 
-                    {selectedProvider.type === 'CARD' && (
-                        <Stack gap="md">
-                            <TextInput
-                                label="Name on card"
-                                placeholder="John Doe"
-                                value={paymentInfo.name}
-                                error={errors.name}
-                                onChange={(e) => onPaymentInfoChange('name', e.currentTarget.value)}
-                            />
-                            <TextInput
-                                label="Card number"
-                                placeholder="1234 5678 9012 3456"
-                                value={paymentInfo.cardNumber}
-                                onChange={(e) => {
-                                    const raw = e.currentTarget.value.replace(/\D/g, '');
-                                    const formatted = raw.match(/.{1,4}/g)?.join(' ') ?? '';
-                                    if (raw.length <= 16) {
-                                        onPaymentInfoChange('cardNumber', formatted);
-                                    }
-                                }}
-                                error={errors.cardNumber}
-                            />
-
-                            <Group grow>
-                                <TextInput
-                                    label="Expiry"
-                                    placeholder="MM/YY"
-                                    value={paymentInfo.expiration}
-                                    onChange={(e) => {
-                                        let val = e.currentTarget.value.replace(/\D/g, '');
-                                        if (val.length > 4) val = val.slice(0, 4);
-
-                                        if (val.length >= 3) {
-                                            val = `${val.slice(0, 2)}/${val.slice(2)}`;
-                                        }
-                                        onPaymentInfoChange('expiration', val);
-                                    }}
-                                    error={errors.expiration}
+                    {isStripeCard && (
+                        <>
+                            {stripeSessionError && (
+                                <Alert color="red" mb="md" icon={<IconAlertCircle size={16} />}>
+                                    {stripeSessionError}
+                                </Alert>
+                            )}
+                            {stripeSessionLoading && (
+                                <Stack gap="sm">
+                                    <Skeleton height={120} radius="md" />
+                                    <Skeleton height={44} radius="md" />
+                                </Stack>
+                            )}
+                            {!stripeSessionLoading && stripeCheckout && (
+                                <StripePaymentSection
+                                    stripeCheckout={stripeCheckout}
+                                    payLabel={payLabel}
+                                    paymentProcessing={paymentProcessing}
+                                    loading={loading}
+                                    paymentStatus={paymentStatus}
+                                    onStripePaymentComplete={onStripePaymentComplete}
+                                    onStripeError={onStripeError}
                                 />
-
-                                <TextInput
-                                    label="CVV"
-                                    placeholder="123"
-                                    value={paymentInfo.cvv}
-                                    onChange={(e) => {
-                                        const raw = e.currentTarget.value.replace(/\D/g, '');
-                                        if (raw.length <= 4) {
-                                            onPaymentInfoChange('cvv', raw);
-                                        }
-                                    }}
-                                    error={errors.cvv}
-                                />
-                            </Group>
-                        </Stack>
+                            )}
+                        </>
                     )}
 
-                    {selectedProvider.type === 'WALLET' && (
-                        <Stack gap="md">
-                            <TextInput
-                                label="Email"
-                                placeholder="your.email@example.com"
-                                type="email"
-                                value={paymentInfo.email}
-                                error={errors.email}
-                                onChange={(e) => onPaymentInfoChange('email', e.currentTarget.value)}
-                            />
-                            <Text size="sm" c="dimmed">
-                                You will be redirected to {selectedProvider.name} to complete your payment.
-                            </Text>
-                        </Stack>
-                    )}
-
-                    {selectedProvider.type === 'CREDIT' && (
+                    {selectedProcessor.type === 'WALLET' && (
                         <Text size="sm" c="dimmed">
-                            Your platform credit balance will be debited when you confirm — no separate card step.
+                            PayPal checkout is not available yet. Choose card or platform credit.
+                        </Text>
+                    )}
+
+                    {selectedProcessor.type === 'CREDIT' && (
+                        <Text size="sm" c="dimmed">
+                            Your platform credit balance will be debited when you confirm — no
+                            separate card step.
                         </Text>
                     )}
 
                     <Group mt="xl" grow>
-                        <Button variant="default" onClick={onBack}>
+                        <UiButton variant="outline" onClick={onBack}>
                             Back
-                        </Button>
-                        <ModernButton
-                            variant="secondary"
-                            size="md"
-                            onClick={onPaymentSubmit}
-                            loading={paymentProcessing}
-                            disabled={loading || paymentProcessing || paymentStatus === 'success'}
-                        >
-                            {payLabel}
-                        </ModernButton>
+                        </UiButton>
+                        {selectedProcessor.type === 'CREDIT' && (
+                            <UiButton
+                                variant="secondary"
+                                size="md"
+                                onClick={onCreditPaymentSubmit}
+                                loading={paymentProcessing}
+                                disabled={loading || paymentProcessing || paymentStatus === 'success'}
+                            >
+                                {payLabel}
+                            </UiButton>
+                        )}
                     </Group>
                 </Box>
             )}

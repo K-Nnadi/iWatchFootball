@@ -11,14 +11,17 @@ import { clientInstance } from '../client-instance';
  * Fetches data from StatsBomb Open Data repository and syncs it with the local database
  * @summary Sync StatsBomb data to database
  */
-export const statsBombControllerSyncData = () => {
-    return clientInstance({ url: `/statsbomb/sync`, method: 'POST'
+export const statsBombControllerSyncData = (statsBombSyncOptionsDTO) => {
+    return clientInstance({ url: `/statsbomb/sync`, method: 'POST',
+        headers: { 'Content-Type': 'application/json', },
+        data: statsBombSyncOptionsDTO
     });
 };
 export const getStatsBombControllerSyncDataMutationOptions = (options) => {
     const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = () => {
-        return statsBombControllerSyncData();
+    const mutationFn = (props) => {
+        const { data } = props !== null && props !== void 0 ? props : {};
+        return statsBombControllerSyncData(data);
     };
     return Object.assign({ mutationFn }, mutationOptions);
 };
