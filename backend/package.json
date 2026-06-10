@@ -12,7 +12,7 @@
     "start:dev": "cross-env NODE_ENV=development ts-node-dev --files src/main.ts",
     "generate:api": "swagger-typescript-api --path ./openapi.json --output ./../clients --axios --modular",
     "clean:openapi": "node clean-openapi.js",
-    "generate:client-gen": "npm run clean:openapi && orval --config ./orval.config.js",
+    "generate:client-gen": "npm run clean:openapi && orval --config ./orval.config.js && pnpm --filter @iWatchFootball/clients build",
     "migrate": "ts-node ./node_modules/typeorm/cli.js migration:generate src/shared/migrations/generatedCli  -d src/shared/ormconfig.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/shared/ormconfig.ts",
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/shared/ormconfig.ts",

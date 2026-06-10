@@ -1,0 +1,7 @@
+dist/
+*.tsbuildinfo
+
+# Legacy in-place tsc output (source lives in *.ts only)
+**/*.js
+**/*.js.map
+**/*.d.ts

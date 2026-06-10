@@ -1,10 +1,8 @@
 {
 	"extends": "../tsconfig.json",
 	"include": [
-		"package.json",
-		"tsconfig.json",
 		"client-instance.ts",
-		"controllers/**/*"
+		"controllers/**/*.ts"
 	],
 	"exclude": [
 		"node_modules",
@@ -19,6 +17,8 @@
 	],
 	"compilerOptions": {
 		"baseUrl": "./",
+		"rootDir": ".",
+		"outDir": "./dist",
 		"skipLibCheck": true,
 		"noImplicitAny": false,
 		"module": "ESNext",

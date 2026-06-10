@@ -4,11 +4,20 @@
 	"description": "",
 	"type": "module",
 	"exports": {
-		"./client-instance": "./client-instance.js",
-		"./controllers/*": "./controllers/*.js"
+		"./client-instance": {
+			"types": "./dist/client-instance.d.ts",
+			"import": "./dist/client-instance.js",
+			"default": "./dist/client-instance.js"
+		},
+		"./controllers/*": {
+			"types": "./dist/controllers/*.d.ts",
+			"import": "./dist/controllers/*.js",
+			"default": "./dist/controllers/*.js"
+		}
 	},
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc",
+		"prepare": "pnpm run build"
 	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5.0.0"

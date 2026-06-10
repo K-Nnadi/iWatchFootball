@@ -236,7 +236,7 @@ export function PlayerPage() {
     const fetchFromApi = !mockPlayer && Number.isFinite(numericId) && numericId > 0;
 
     const { data: apiPlayer, isLoading: apiLoading } = useGetOnePlayer(numericId, {
-        query: { enabled: fetchFromApi },
+        query: { enabled: fetchFromApi } as any,
     });
 
     const firstTeamId = useMemo(() => {
@@ -247,7 +247,7 @@ export function PlayerPage() {
     }, [apiPlayer?.teamIds]);
 
     const { data: apiTeam } = useGetOneTeam(firstTeamId ?? 0, {
-        query: { enabled: fetchFromApi && firstTeamId != null },
+        query: { enabled: fetchFromApi && firstTeamId != null } as any,
     });
 
     const player = useMemo((): PlayerViewModel | null => {
