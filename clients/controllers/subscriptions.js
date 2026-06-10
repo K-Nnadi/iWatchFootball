@@ -34,32 +34,6 @@ export const useSubscriptionControllerGetEntitlements = (options) => {
     return query;
 };
 /**
- * @summary Current tracker plan and limits for the logged-in user
- */
-export const subscriptionControllerGetEntitlements = (signal) => {
-    return clientInstance({ url: `/subscriptions/entitlements`, method: 'GET', signal
-    });
-};
-export const getSubscriptionControllerGetEntitlementsQueryKey = () => {
-    return [`/subscriptions/entitlements`];
-};
-export const getSubscriptionControllerGetEntitlementsQueryOptions = (options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getSubscriptionControllerGetEntitlementsQueryKey();
-    const queryFn = ({ signal }) => subscriptionControllerGetEntitlements(signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Current tracker plan and limits for the logged-in user
- */
-export const useSubscriptionControllerGetEntitlements = (options) => {
-    const queryOptions = getSubscriptionControllerGetEntitlementsQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
  * @summary Create Stripe Checkout session for Premium monthly subscription
  */
 export const subscriptionControllerCreateCheckout = (subscriptionControllerCreateCheckoutBody) => {
@@ -81,54 +55,6 @@ export const getSubscriptionControllerCreateCheckoutMutationOptions = (options) 
 */
 export const useSubscriptionControllerCreateCheckout = (options) => {
     const mutationOptions = getSubscriptionControllerCreateCheckoutMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Create Stripe Checkout session for Premium monthly subscription
-*/
-export const subscriptionControllerCreateCheckout = (subscriptionControllerCreateCheckoutBody) => {
-    return clientInstance({ url: `/subscriptions/checkout`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: subscriptionControllerCreateCheckoutBody
-    });
-};
-export const getSubscriptionControllerCreateCheckoutMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return subscriptionControllerCreateCheckout(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Create Stripe Checkout session for Premium monthly subscription
-*/
-export const useSubscriptionControllerCreateCheckout = (options) => {
-    const mutationOptions = getSubscriptionControllerCreateCheckoutMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Stripe Customer Portal — manage or cancel subscription
-*/
-export const subscriptionControllerCreatePortal = (subscriptionControllerCreatePortalBody) => {
-    return clientInstance({ url: `/subscriptions/portal`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: subscriptionControllerCreatePortalBody
-    });
-};
-export const getSubscriptionControllerCreatePortalMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return subscriptionControllerCreatePortal(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Stripe Customer Portal — manage or cancel subscription
-*/
-export const useSubscriptionControllerCreatePortal = (options) => {
-    const mutationOptions = getSubscriptionControllerCreatePortalMutationOptions(options);
     return useMutation(mutationOptions);
 };
 /**

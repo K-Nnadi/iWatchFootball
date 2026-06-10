@@ -35,59 +35,8 @@ export const useMarketplaceListingControllerGetListings = (params, options) => {
     return query;
 };
 /**
- * @summary Browse active marketplace listings
- */
-export const marketplaceListingControllerGetListings = (params, signal) => {
-    return clientInstance({ url: `/marketplace/listings`, method: 'GET',
-        params, signal
-    });
-};
-export const getMarketplaceListingControllerGetListingsQueryKey = (params) => {
-    return [`/marketplace/listings`, ...(params ? [params] : [])];
-};
-export const getMarketplaceListingControllerGetListingsQueryOptions = (params, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getMarketplaceListingControllerGetListingsQueryKey(params);
-    const queryFn = ({ signal }) => marketplaceListingControllerGetListings(params, signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Browse active marketplace listings
- */
-export const useMarketplaceListingControllerGetListings = (params, options) => {
-    const queryOptions = getMarketplaceListingControllerGetListingsQueryOptions(params, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
  * @summary List an owned ticket for resale
  */
-export const marketplaceListingControllerCreateListing = (createListingDto) => {
-    return clientInstance({ url: `/marketplace/listings`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: createListingDto
-    });
-};
-export const getMarketplaceListingControllerCreateListingMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return marketplaceListingControllerCreateListing(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary List an owned ticket for resale
-*/
-export const useMarketplaceListingControllerCreateListing = (options) => {
-    const mutationOptions = getMarketplaceListingControllerCreateListingMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary List an owned ticket for resale
-*/
 export const marketplaceListingControllerCreateListing = (createListingDto) => {
     return clientInstance({ url: `/marketplace/listings`, method: 'POST',
         headers: { 'Content-Type': 'application/json', },
@@ -131,58 +80,6 @@ export const getMarketplaceListingControllerGetMyListingsQueryOptions = (options
  */
 export const useMarketplaceListingControllerGetMyListings = (options) => {
     const queryOptions = getMarketplaceListingControllerGetMyListingsQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Get the authenticated user's own listings
- */
-export const marketplaceListingControllerGetMyListings = (signal) => {
-    return clientInstance({ url: `/marketplace/listings/my`, method: 'GET', signal
-    });
-};
-export const getMarketplaceListingControllerGetMyListingsQueryKey = () => {
-    return [`/marketplace/listings/my`];
-};
-export const getMarketplaceListingControllerGetMyListingsQueryOptions = (options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getMarketplaceListingControllerGetMyListingsQueryKey();
-    const queryFn = ({ signal }) => marketplaceListingControllerGetMyListings(signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Get the authenticated user's own listings
- */
-export const useMarketplaceListingControllerGetMyListings = (options) => {
-    const queryOptions = getMarketplaceListingControllerGetMyListingsQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Get a single marketplace listing by id
- */
-export const marketplaceListingControllerGetListing = (id, signal) => {
-    return clientInstance({ url: `/marketplace/listings/${id}`, method: 'GET', signal
-    });
-};
-export const getMarketplaceListingControllerGetListingQueryKey = (id) => {
-    return [`/marketplace/listings/${id}`];
-};
-export const getMarketplaceListingControllerGetListingQueryOptions = (id, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getMarketplaceListingControllerGetListingQueryKey(id);
-    const queryFn = ({ signal }) => marketplaceListingControllerGetListing(id, signal);
-    return Object.assign({ queryKey, queryFn, enabled: !!(id) }, queryOptions);
-};
-/**
- * @summary Get a single marketplace listing by id
- */
-export const useMarketplaceListingControllerGetListing = (id, options) => {
-    const queryOptions = getMarketplaceListingControllerGetListingQueryOptions(id, options);
     const query = useQuery(queryOptions);
     query.queryKey = queryOptions.queryKey;
     return query;
@@ -236,50 +133,6 @@ export const useMarketplaceListingControllerCancelListing = (options) => {
     return useMutation(mutationOptions);
 };
 /**
-* @summary Cancel an active listing (seller only). Ticket returned to seller.
-*/
-export const marketplaceListingControllerCancelListing = (id) => {
-    return clientInstance({ url: `/marketplace/listings/${id}`, method: 'DELETE'
-    });
-};
-export const getMarketplaceListingControllerCancelListingMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { id } = props !== null && props !== void 0 ? props : {};
-        return marketplaceListingControllerCancelListing(id);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Cancel an active listing (seller only). Ticket returned to seller.
-*/
-export const useMarketplaceListingControllerCancelListing = (options) => {
-    const mutationOptions = getMarketplaceListingControllerCancelListingMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Reserve a listing exclusively before payment (15 min hold)
-*/
-export const marketplaceCheckoutControllerHoldListing = (listingId) => {
-    return clientInstance({ url: `/marketplace/hold/${listingId}`, method: 'POST'
-    });
-};
-export const getMarketplaceCheckoutControllerHoldListingMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { listingId } = props !== null && props !== void 0 ? props : {};
-        return marketplaceCheckoutControllerHoldListing(listingId);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Reserve a listing exclusively before payment (15 min hold)
-*/
-export const useMarketplaceCheckoutControllerHoldListing = (options) => {
-    const mutationOptions = getMarketplaceCheckoutControllerHoldListingMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
 * @summary Reserve a listing exclusively before payment (15 min hold)
 */
 export const marketplaceCheckoutControllerHoldListing = (listingId) => {
@@ -328,32 +181,6 @@ export const useMarketplaceCheckoutControllerGetFeePreview = (listingId, options
     return query;
 };
 /**
- * @summary Get the fee breakdown for a listing before purchasing
- */
-export const marketplaceCheckoutControllerGetFeePreview = (listingId, signal) => {
-    return clientInstance({ url: `/marketplace/listings/${listingId}/fee-preview`, method: 'GET', signal
-    });
-};
-export const getMarketplaceCheckoutControllerGetFeePreviewQueryKey = (listingId) => {
-    return [`/marketplace/listings/${listingId}/fee-preview`];
-};
-export const getMarketplaceCheckoutControllerGetFeePreviewQueryOptions = (listingId, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getMarketplaceCheckoutControllerGetFeePreviewQueryKey(listingId);
-    const queryFn = ({ signal }) => marketplaceCheckoutControllerGetFeePreview(listingId, signal);
-    return Object.assign({ queryKey, queryFn, enabled: !!(listingId) }, queryOptions);
-};
-/**
- * @summary Get the fee breakdown for a listing before purchasing
- */
-export const useMarketplaceCheckoutControllerGetFeePreview = (listingId, options) => {
-    const queryOptions = getMarketplaceCheckoutControllerGetFeePreviewQueryOptions(listingId, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
  * @summary Complete a marketplace ticket purchase (atomic: payment + ticket transfer + seller credit)
  */
 export const marketplaceCheckoutControllerConfirmPurchase = (confirmMarketplacePurchaseDto) => {
@@ -375,54 +202,6 @@ export const getMarketplaceCheckoutControllerConfirmPurchaseMutationOptions = (o
 */
 export const useMarketplaceCheckoutControllerConfirmPurchase = (options) => {
     const mutationOptions = getMarketplaceCheckoutControllerConfirmPurchaseMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Complete a marketplace ticket purchase (atomic: payment + ticket transfer + seller credit)
-*/
-export const marketplaceCheckoutControllerConfirmPurchase = (confirmMarketplacePurchaseDto) => {
-    return clientInstance({ url: `/marketplace/checkout/confirm`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: confirmMarketplacePurchaseDto
-    });
-};
-export const getMarketplaceCheckoutControllerConfirmPurchaseMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return marketplaceCheckoutControllerConfirmPurchase(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Complete a marketplace ticket purchase (atomic: payment + ticket transfer + seller credit)
-*/
-export const useMarketplaceCheckoutControllerConfirmPurchase = (options) => {
-    const mutationOptions = getMarketplaceCheckoutControllerConfirmPurchaseMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Update a platform config value (admin only)
-*/
-export const marketplaceCheckoutControllerUpdateConfig = (key, updatePlatformConfigDto) => {
-    return clientInstance({ url: `/marketplace/config/${key}`, method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', },
-        data: updatePlatformConfigDto
-    });
-};
-export const getMarketplaceCheckoutControllerUpdateConfigMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { key, data } = props !== null && props !== void 0 ? props : {};
-        return marketplaceCheckoutControllerUpdateConfig(key, data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Update a platform config value (admin only)
-*/
-export const useMarketplaceCheckoutControllerUpdateConfig = (options) => {
-    const mutationOptions = getMarketplaceCheckoutControllerUpdateConfigMutationOptions(options);
     return useMutation(mutationOptions);
 };
 /**

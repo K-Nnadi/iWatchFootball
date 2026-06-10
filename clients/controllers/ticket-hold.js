@@ -32,54 +32,6 @@ export const useTicketHoldControllerAcquire = (options) => {
     return useMutation(mutationOptions);
 };
 /**
-* @summary Reserve a listing exclusively until expiry or checkout
-*/
-export const ticketHoldControllerAcquire = (acquireTicketHoldDto) => {
-    return clientInstance({ url: `/ticket-hold/acquire`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: acquireTicketHoldDto
-    });
-};
-export const getTicketHoldControllerAcquireMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return ticketHoldControllerAcquire(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Reserve a listing exclusively until expiry or checkout
-*/
-export const useTicketHoldControllerAcquire = (options) => {
-    const mutationOptions = getTicketHoldControllerAcquireMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Cancel reservation (timeout or user abandoned)
-*/
-export const ticketHoldControllerRelease = (releaseTicketHoldDto) => {
-    return clientInstance({ url: `/ticket-hold/release`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: releaseTicketHoldDto
-    });
-};
-export const getTicketHoldControllerReleaseMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return ticketHoldControllerRelease(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Cancel reservation (timeout or user abandoned)
-*/
-export const useTicketHoldControllerRelease = (options) => {
-    const mutationOptions = getTicketHoldControllerReleaseMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
 * @summary Cancel reservation (timeout or user abandoned)
 */
 export const ticketHoldControllerRelease = (releaseTicketHoldDto) => {
@@ -106,33 +58,6 @@ export const useTicketHoldControllerRelease = (options) => {
 /**
 * @summary Check reservation is still valid during checkout
 */
-export const ticketHoldControllerVerify = (params, signal) => {
-    return clientInstance({ url: `/ticket-hold/verify`, method: 'GET',
-        params, signal
-    });
-};
-export const getTicketHoldControllerVerifyQueryKey = (params) => {
-    return [`/ticket-hold/verify`, ...(params ? [params] : [])];
-};
-export const getTicketHoldControllerVerifyQueryOptions = (params, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getTicketHoldControllerVerifyQueryKey(params);
-    const queryFn = ({ signal }) => ticketHoldControllerVerify(params, signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Check reservation is still valid during checkout
- */
-export const useTicketHoldControllerVerify = (params, options) => {
-    const queryOptions = getTicketHoldControllerVerifyQueryOptions(params, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Check reservation is still valid during checkout
- */
 export const ticketHoldControllerVerify = (params, signal) => {
     return clientInstance({ url: `/ticket-hold/verify`, method: 'GET',
         params, signal

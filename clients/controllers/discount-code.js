@@ -35,59 +35,6 @@ export const useDiscountCodeControllerValidate = (code, params, options) => {
     return query;
 };
 /**
- * @summary Validate a discount code for current user & order total
- */
-export const discountCodeControllerValidate = (code, params, signal) => {
-    return clientInstance({ url: `/discount-code/validate/${code}`, method: 'GET',
-        params, signal
-    });
-};
-export const getDiscountCodeControllerValidateQueryKey = (code, params) => {
-    return [`/discount-code/validate/${code}`, ...(params ? [params] : [])];
-};
-export const getDiscountCodeControllerValidateQueryOptions = (code, params, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getDiscountCodeControllerValidateQueryKey(code, params);
-    const queryFn = ({ signal }) => discountCodeControllerValidate(code, params, signal);
-    return Object.assign({ queryKey, queryFn, enabled: !!(code) }, queryOptions);
-};
-/**
- * @summary Validate a discount code for current user & order total
- */
-export const useDiscountCodeControllerValidate = (code, params, options) => {
-    const queryOptions = getDiscountCodeControllerValidateQueryOptions(code, params, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Admin: list all discount codes
- */
-export const discountCodeControllerFindAll = (signal) => {
-    return clientInstance({ url: `/discount-code`, method: 'GET', signal
-    });
-};
-export const getDiscountCodeControllerFindAllQueryKey = () => {
-    return [`/discount-code`];
-};
-export const getDiscountCodeControllerFindAllQueryOptions = (options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getDiscountCodeControllerFindAllQueryKey();
-    const queryFn = ({ signal }) => discountCodeControllerFindAll(signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Admin: list all discount codes
- */
-export const useDiscountCodeControllerFindAll = (options) => {
-    const queryOptions = getDiscountCodeControllerFindAllQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
  * @summary Admin: list all discount codes
  */
 export const discountCodeControllerFindAll = (signal) => {
@@ -135,52 +82,6 @@ export const getDiscountCodeControllerCreateMutationOptions = (options) => {
 */
 export const useDiscountCodeControllerCreate = (options) => {
     const mutationOptions = getDiscountCodeControllerCreateMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Admin: create a discount code
-*/
-export const discountCodeControllerCreate = (discountCodeControllerCreateBody) => {
-    return clientInstance({ url: `/discount-code`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: discountCodeControllerCreateBody
-    });
-};
-export const getDiscountCodeControllerCreateMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return discountCodeControllerCreate(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Admin: create a discount code
-*/
-export const useDiscountCodeControllerCreate = (options) => {
-    const mutationOptions = getDiscountCodeControllerCreateMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Admin: toggle a discount code active/inactive
-*/
-export const discountCodeControllerToggle = (id) => {
-    return clientInstance({ url: `/discount-code/${id}/toggle`, method: 'PATCH'
-    });
-};
-export const getDiscountCodeControllerToggleMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { id } = props !== null && props !== void 0 ? props : {};
-        return discountCodeControllerToggle(id);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Admin: toggle a discount code active/inactive
-*/
-export const useDiscountCodeControllerToggle = (options) => {
-    const mutationOptions = getDiscountCodeControllerToggleMutationOptions(options);
     return useMutation(mutationOptions);
 };
 /**

@@ -33,30 +33,4 @@ export const useUserTicketLogControllerGetMyLogs = (options) => {
     query.queryKey = queryOptions.queryKey;
     return query;
 };
-/**
- * @summary Get all tickets currently in the logged-in user's wallet
- */
-export const userTicketLogControllerGetMyLogs = (signal) => {
-    return clientInstance({ url: `/user-ticket-log/my`, method: 'GET', signal
-    });
-};
-export const getUserTicketLogControllerGetMyLogsQueryKey = () => {
-    return [`/user-ticket-log/my`];
-};
-export const getUserTicketLogControllerGetMyLogsQueryOptions = (options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getUserTicketLogControllerGetMyLogsQueryKey();
-    const queryFn = ({ signal }) => userTicketLogControllerGetMyLogs(signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Get all tickets currently in the logged-in user's wallet
- */
-export const useUserTicketLogControllerGetMyLogs = (options) => {
-    const queryOptions = getUserTicketLogControllerGetMyLogsQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
 //# sourceMappingURL=user-ticket-log.js.map

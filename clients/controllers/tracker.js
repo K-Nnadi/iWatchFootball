@@ -34,58 +34,8 @@ export const useTrackerControllerGetPrivacy = (options) => {
     return query;
 };
 /**
- * @summary Get tracker privacy settings for the current user
- */
-export const trackerControllerGetPrivacy = (signal) => {
-    return clientInstance({ url: `/tracker/privacy`, method: 'GET', signal
-    });
-};
-export const getTrackerControllerGetPrivacyQueryKey = () => {
-    return [`/tracker/privacy`];
-};
-export const getTrackerControllerGetPrivacyQueryOptions = (options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getTrackerControllerGetPrivacyQueryKey();
-    const queryFn = ({ signal }) => trackerControllerGetPrivacy(signal);
-    return Object.assign({ queryKey, queryFn }, queryOptions);
-};
-/**
- * @summary Get tracker privacy settings for the current user
- */
-export const useTrackerControllerGetPrivacy = (options) => {
-    const queryOptions = getTrackerControllerGetPrivacyQueryOptions(options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
  * @summary Update tracker privacy settings
  */
-export const trackerControllerUpdatePrivacy = (updateTrackerPrivacyDto) => {
-    return clientInstance({ url: `/tracker/privacy`, method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', },
-        data: updateTrackerPrivacyDto
-    });
-};
-export const getTrackerControllerUpdatePrivacyMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return trackerControllerUpdatePrivacy(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Update tracker privacy settings
-*/
-export const useTrackerControllerUpdatePrivacy = (options) => {
-    const mutationOptions = getTrackerControllerUpdatePrivacyMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Update tracker privacy settings
-*/
 export const trackerControllerUpdatePrivacy = (updateTrackerPrivacyDto) => {
     return clientInstance({ url: `/tracker/privacy`, method: 'PATCH',
         headers: { 'Content-Type': 'application/json', },
@@ -129,58 +79,6 @@ export const getTrackerControllerGetStatsQueryOptions = (userId, options) => {
  */
 export const useTrackerControllerGetStats = (userId, options) => {
     const queryOptions = getTrackerControllerGetStatsQueryOptions(userId, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Get aggregate tracker stats for a user (privacy-gated)
- */
-export const trackerControllerGetStats = (userId, signal) => {
-    return clientInstance({ url: `/tracker/stats/${userId}`, method: 'GET', signal
-    });
-};
-export const getTrackerControllerGetStatsQueryKey = (userId) => {
-    return [`/tracker/stats/${userId}`];
-};
-export const getTrackerControllerGetStatsQueryOptions = (userId, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getTrackerControllerGetStatsQueryKey(userId);
-    const queryFn = ({ signal }) => trackerControllerGetStats(userId, signal);
-    return Object.assign({ queryKey, queryFn, enabled: !!(userId) }, queryOptions);
-};
-/**
- * @summary Get aggregate tracker stats for a user (privacy-gated)
- */
-export const useTrackerControllerGetStats = (userId, options) => {
-    const queryOptions = getTrackerControllerGetStatsQueryOptions(userId, options);
-    const query = useQuery(queryOptions);
-    query.queryKey = queryOptions.queryKey;
-    return query;
-};
-/**
- * @summary Compare tracker stats with a friend (premium)
- */
-export const trackerControllerCompare = (friendUserId, signal) => {
-    return clientInstance({ url: `/tracker/compare/${friendUserId}`, method: 'GET', signal
-    });
-};
-export const getTrackerControllerCompareQueryKey = (friendUserId) => {
-    return [`/tracker/compare/${friendUserId}`];
-};
-export const getTrackerControllerCompareQueryOptions = (friendUserId, options) => {
-    var _a;
-    const { query: queryOptions } = options !== null && options !== void 0 ? options : {};
-    const queryKey = (_a = queryOptions === null || queryOptions === void 0 ? void 0 : queryOptions.queryKey) !== null && _a !== void 0 ? _a : getTrackerControllerCompareQueryKey(friendUserId);
-    const queryFn = ({ signal }) => trackerControllerCompare(friendUserId, signal);
-    return Object.assign({ queryKey, queryFn, enabled: !!(friendUserId) }, queryOptions);
-};
-/**
- * @summary Compare tracker stats with a friend (premium)
- */
-export const useTrackerControllerCompare = (friendUserId, options) => {
-    const queryOptions = getTrackerControllerCompareQueryOptions(friendUserId, options);
     const query = useQuery(queryOptions);
     query.queryKey = queryOptions.queryKey;
     return query;

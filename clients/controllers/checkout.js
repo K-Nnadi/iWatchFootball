@@ -32,53 +32,6 @@ export const useCheckoutControllerConfirm = (options) => {
     return useMutation(mutationOptions);
 };
 /**
-* @summary Confirm ticket purchase (atomic payment + tickets + hold release)
-*/
-export const checkoutControllerConfirm = (confirmCheckoutDto) => {
-    return clientInstance({ url: `/checkout/confirm`, method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        data: confirmCheckoutDto
-    });
-};
-export const getCheckoutControllerConfirmMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { data } = props !== null && props !== void 0 ? props : {};
-        return checkoutControllerConfirm(data);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Confirm ticket purchase (atomic payment + tickets + hold release)
-*/
-export const useCheckoutControllerConfirm = (options) => {
-    const mutationOptions = getCheckoutControllerConfirmMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* Does not initiate Stripe/card network refunds or marketplace reversals.
-* @summary Full primary-market refund (admin): VOID tickets + REFUND ledger + release discount usage
-*/
-export const checkoutControllerRefundPrimary = (paymentId) => {
-    return clientInstance({ url: `/checkout/refund/${paymentId}`, method: 'POST'
-    });
-};
-export const getCheckoutControllerRefundPrimaryMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = (props) => {
-        const { paymentId } = props !== null && props !== void 0 ? props : {};
-        return checkoutControllerRefundPrimary(paymentId);
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Full primary-market refund (admin): VOID tickets + REFUND ledger + release discount usage
-*/
-export const useCheckoutControllerRefundPrimary = (options) => {
-    const mutationOptions = getCheckoutControllerRefundPrimaryMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
 * Does not initiate Stripe/card network refunds or marketplace reversals.
 * @summary Full primary-market refund (admin): VOID tickets + REFUND ledger + release discount usage
 */
