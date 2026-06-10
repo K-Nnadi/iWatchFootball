@@ -65,15 +65,39 @@
 }
 
 .metaRow {
-  gap: 8px;
-  flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: var(--ui-space-3);
+  width: 100%;
 }
 
-.metaSep {
-  color: var(--ui-text-muted);
-  font-size: 0.75rem;
-  user-select: none;
+.metaStart {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.metaEnd {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+
+.metaEnd > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.metaVenueText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 @media (max-width: 48em) {

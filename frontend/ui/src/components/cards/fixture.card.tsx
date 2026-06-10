@@ -306,54 +306,62 @@ export function LoggedFixtureCard({
                     {(hasValidDate || venue) && (
                         <>
                             <Divider color="var(--ui-divider)" mb={isCompact ? 8 : 12} />
-                            <Group className={classes.metaRow}>
-                                {hasValidDate && (
-                                    <Group gap={6} align="center" wrap="nowrap">
-                                        <IconCalendar
-                                            size={14}
-                                            stroke={1.75}
-                                            style={{ color: 'var(--ui-text-secondary)', opacity: 0.85, flexShrink: 0 }}
-                                        />
-                                        <UiCaption
-                                            style={{
-                                                fontWeight: 500,
-                                                letterSpacing: '0.04em',
-                                                lineHeight: 1.35,
-                                                margin: 0,
-                                                fontSize: '0.75rem',
-                                            }}
-                                        >
-                                            {formatLogCardDate(date)}
-                                        </UiCaption>
-                                    </Group>
-                                )}
-                                {hasValidDate && venue && (
-                                    <Text className={classes.metaSep} aria-hidden>
-                                        ·
-                                    </Text>
-                                )}
-                                {venue && (
-                                    <Group gap={6} align="center" wrap="nowrap">
-                                        <IconMapPin
-                                            size={14}
-                                            stroke={1.75}
-                                            style={{ color: 'var(--ui-text-secondary)', opacity: 0.85, flexShrink: 0 }}
-                                        />
-                                        <UiCaption
-                                            style={{
-                                                fontWeight: 500,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.06em',
-                                                lineHeight: 1.35,
-                                                margin: 0,
-                                                fontSize: '0.75rem',
-                                            }}
-                                        >
-                                            {venue}
-                                        </UiCaption>
-                                    </Group>
-                                )}
-                            </Group>
+                            <div className={classes.metaRow}>
+                                <div className={classes.metaStart}>
+                                    {hasValidDate && (
+                                        <Group gap={6} align="center" wrap="nowrap">
+                                            <IconCalendar
+                                                size={14}
+                                                stroke={1.75}
+                                                style={{
+                                                    color: 'var(--ui-text-secondary)',
+                                                    opacity: 0.85,
+                                                    flexShrink: 0,
+                                                }}
+                                            />
+                                            <UiCaption
+                                                style={{
+                                                    fontWeight: 500,
+                                                    letterSpacing: '0.04em',
+                                                    lineHeight: 1.35,
+                                                    margin: 0,
+                                                    fontSize: '0.75rem',
+                                                }}
+                                            >
+                                                {formatLogCardDate(date)}
+                                            </UiCaption>
+                                        </Group>
+                                    )}
+                                </div>
+                                <div className={classes.metaEnd}>
+                                    {venue && (
+                                        <Group gap={6} align="center" wrap="nowrap">
+                                            <IconMapPin
+                                                size={14}
+                                                stroke={1.75}
+                                                style={{
+                                                    color: 'var(--ui-text-secondary)',
+                                                    opacity: 0.85,
+                                                    flexShrink: 0,
+                                                }}
+                                            />
+                                            <UiCaption
+                                                className={classes.metaVenueText}
+                                                style={{
+                                                    fontWeight: 500,
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.06em',
+                                                    lineHeight: 1.35,
+                                                    margin: 0,
+                                                    fontSize: '0.75rem',
+                                                }}
+                                            >
+                                                {venue}
+                                            </UiCaption>
+                                        </Group>
+                                    )}
+                                </div>
+                            </div>
                         </>
                     )}
                 </Stack>
