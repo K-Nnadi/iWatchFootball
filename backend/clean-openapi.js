@@ -62,6 +62,17 @@ function cleanRefs(obj, isProperty = false) {
 }
 
 const cleaned = cleanRefs(spec);
+
+// Orval tag mode emits one block per tag; duplicate tags duplicate exports in the same file.
+for (const methods of Object.values(cleaned.paths ?? {})) {
+  for (const operation of Object.values(methods)) {
+    if (!operation || typeof operation !== 'object' || !Array.isArray(operation.tags)) {
+      continue;
+    }
+    operation.tags = [...new Set(operation.tags)];
+  }
+}
+
 fs.writeFileSync(openapiPath, JSON.stringify(cleaned, null, 2));
-console.log('✅ Cleaned openapi.json - removed empty $ref values');
+console.log('✅ Cleaned openapi.json - removed empty $ref values and deduplicated tags');
 

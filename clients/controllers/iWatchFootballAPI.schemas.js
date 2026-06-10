@@ -4,6 +4,32 @@ export const DiscountCodeControllerCreateBodyType = {
     FIXED: 'FIXED',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdatePlatformConfigDtoValueType = {
+    number: 'number',
+    string: 'string',
+    boolean: 'boolean',
+    array: 'array',
+    json: 'json',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmMarketplacePurchaseDtoPaymentMethod = {
+    CreditCard: 'CreditCard',
+    PayPal: 'PayPal',
+    PlatformCredit: 'PlatformCredit',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WebhookConfirmCheckoutDtoPaymentMethod = {
+    CreditCard: 'CreditCard',
+    PayPal: 'PayPal',
+    PlatformCredit: 'PlatformCredit',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmCheckoutDtoPaymentMethod = {
+    CreditCard: 'CreditCard',
+    PayPal: 'PayPal',
+    PlatformCredit: 'PlatformCredit',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const IntegrationProvider = {
     stripe: 'stripe',
     paypal: 'paypal',
@@ -40,20 +66,6 @@ export const CreateIntegrationDTOKind = {
     DATA_SYNC: 'DATA_SYNC',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UpdatePlatformConfigDtoValueType = {
-    number: 'number',
-    string: 'string',
-    boolean: 'boolean',
-    array: 'array',
-    json: 'json',
-};
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ConfirmMarketplacePurchaseDtoPaymentMethod = {
-    CreditCard: 'CreditCard',
-    PayPal: 'PayPal',
-    PlatformCredit: 'PlatformCredit',
-};
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateUserDTOType = {
     ADMIN: 'ADMIN',
     MODERATOR: 'MODERATOR',
@@ -70,18 +82,6 @@ export const UserTrackerVisibility = {
     PRIVATE: 'PRIVATE',
     FRIENDS: 'FRIENDS',
     PUBLIC: 'PUBLIC',
-};
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WebhookConfirmCheckoutDtoPaymentMethod = {
-    CreditCard: 'CreditCard',
-    PayPal: 'PayPal',
-    PlatformCredit: 'PlatformCredit',
-};
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ConfirmCheckoutDtoPaymentMethod = {
-    CreditCard: 'CreditCard',
-    PayPal: 'PayPal',
-    PlatformCredit: 'PlatformCredit',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TeamType = {
@@ -125,6 +125,11 @@ export const PaymentProcessorType = {
     WALLET: 'WALLET',
     BANK_TRANSFER: 'BANK_TRANSFER',
     CRYPTO: 'CRYPTO',
+};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserNotificationType = {
+    FRIEND_REQUEST_RECEIVED: 'FRIEND_REQUEST_RECEIVED',
+    FRIEND_REQUEST_ACCEPTED: 'FRIEND_REQUEST_ACCEPTED',
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateTrackerPrivacyDtoTrackerVisibility = {

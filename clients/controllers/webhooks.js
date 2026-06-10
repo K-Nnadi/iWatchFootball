@@ -8,8 +8,29 @@
 import { useMutation } from '@tanstack/react-query';
 import { clientInstance } from '../client-instance';
 /**
- * @summary Complete checkout after external PSP success (shared-secret trusted relay)
+ * @summary Stripe webhook (ticket payments + subscriptions)
  */
+export const stripeWebhookControllerHandleStripeWebhook = () => {
+    return clientInstance({ url: `/webhooks/stripe`, method: 'POST'
+    });
+};
+export const getStripeWebhookControllerHandleStripeWebhookMutationOptions = (options) => {
+    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
+    const mutationFn = () => {
+        return stripeWebhookControllerHandleStripeWebhook();
+    };
+    return Object.assign({ mutationFn }, mutationOptions);
+};
+/**
+* @summary Stripe webhook (ticket payments + subscriptions)
+*/
+export const useStripeWebhookControllerHandleStripeWebhook = (options) => {
+    const mutationOptions = getStripeWebhookControllerHandleStripeWebhookMutationOptions(options);
+    return useMutation(mutationOptions);
+};
+/**
+* @summary Complete checkout after external PSP success (shared-secret trusted relay)
+*/
 export const paymentWebhookControllerHandlePaymentConfirmed = (webhookConfirmCheckoutDto) => {
     return clientInstance({ url: `/webhooks/payment`, method: 'POST',
         headers: { 'Content-Type': 'application/json', },
@@ -29,27 +50,6 @@ export const getPaymentWebhookControllerHandlePaymentConfirmedMutationOptions = 
 */
 export const usePaymentWebhookControllerHandlePaymentConfirmed = (options) => {
     const mutationOptions = getPaymentWebhookControllerHandlePaymentConfirmedMutationOptions(options);
-    return useMutation(mutationOptions);
-};
-/**
-* @summary Stripe webhook (subscriptions + future payment events)
-*/
-export const stripeWebhookControllerHandleStripeWebhook = () => {
-    return clientInstance({ url: `/webhooks/stripe`, method: 'POST'
-    });
-};
-export const getStripeWebhookControllerHandleStripeWebhookMutationOptions = (options) => {
-    const { mutation: mutationOptions } = options !== null && options !== void 0 ? options : {};
-    const mutationFn = () => {
-        return stripeWebhookControllerHandleStripeWebhook();
-    };
-    return Object.assign({ mutationFn }, mutationOptions);
-};
-/**
-* @summary Stripe webhook (subscriptions + future payment events)
-*/
-export const useStripeWebhookControllerHandleStripeWebhook = (options) => {
-    const mutationOptions = getStripeWebhookControllerHandleStripeWebhookMutationOptions(options);
     return useMutation(mutationOptions);
 };
 //# sourceMappingURL=webhooks.js.map

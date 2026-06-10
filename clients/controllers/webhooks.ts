@@ -22,6 +22,61 @@ import { clientInstance } from '../client-instance';
 
 
 /**
+ * @summary Stripe webhook (ticket payments + subscriptions)
+ */
+export const stripeWebhookControllerHandleStripeWebhook = (
+    
+ ) => {
+      
+      
+      return clientInstance<void>(
+      {url: `/webhooks/stripe`, method: 'POST'
+    },
+      );
+    }
+  
+
+
+export const getStripeWebhookControllerHandleStripeWebhookMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, TError,void, TContext> => {
+const {mutation: mutationOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, void> = () => {
+          
+
+          return  stripeWebhookControllerHandleStripeWebhook()
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StripeWebhookControllerHandleStripeWebhookMutationResult = NonNullable<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>>
+    
+    export type StripeWebhookControllerHandleStripeWebhookMutationError = unknown
+
+    /**
+ * @summary Stripe webhook (ticket payments + subscriptions)
+ */
+export const useStripeWebhookControllerHandleStripeWebhook = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, TError,void, TContext>, }
+): UseMutationResult<
+        Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getStripeWebhookControllerHandleStripeWebhookMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    /**
  * @summary Complete checkout after external PSP success (shared-secret trusted relay)
  */
 export const paymentWebhookControllerHandlePaymentConfirmed = (
@@ -75,61 +130,6 @@ export const usePaymentWebhookControllerHandlePaymentConfirmed = <TError = unkno
       > => {
 
       const mutationOptions = getPaymentWebhookControllerHandlePaymentConfirmedMutationOptions(options);
-
-      return useMutation(mutationOptions);
-    }
-    /**
- * @summary Stripe webhook (subscriptions + future payment events)
- */
-export const stripeWebhookControllerHandleStripeWebhook = (
-    
- ) => {
-      
-      
-      return clientInstance<void>(
-      {url: `/webhooks/stripe`, method: 'POST'
-    },
-      );
-    }
-  
-
-
-export const getStripeWebhookControllerHandleStripeWebhookMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, TError,void, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, TError,void, TContext> => {
-const {mutation: mutationOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, void> = () => {
-          
-
-          return  stripeWebhookControllerHandleStripeWebhook()
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StripeWebhookControllerHandleStripeWebhookMutationResult = NonNullable<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>>
-    
-    export type StripeWebhookControllerHandleStripeWebhookMutationError = unknown
-
-    /**
- * @summary Stripe webhook (subscriptions + future payment events)
- */
-export const useStripeWebhookControllerHandleStripeWebhook = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>, TError,void, TContext>, }
-): UseMutationResult<
-        Awaited<ReturnType<typeof stripeWebhookControllerHandleStripeWebhook>>,
-        TError,
-        void,
-        TContext
-      > => {
-
-      const mutationOptions = getStripeWebhookControllerHandleStripeWebhookMutationOptions(options);
 
       return useMutation(mutationOptions);
     }

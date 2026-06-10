@@ -5,17 +5,50 @@
  * The API Docs for I Watch Football
  * OpenAPI spec version: 1.0
  */
-export type SubscriptionControllerCreatePortalBody = {
-  returnUrl?: string;
+export type MarketplaceCheckoutControllerConfirmPurchase200 = {
+  marketplaceTransactionId?: number;
+  ticketId?: number;
 };
 
-export type SubscriptionControllerCreateCheckout200 = {
-  url?: string;
+export type MarketplaceCheckoutControllerGetFeePreview200 = {
+  adminFee?: number;
+  adminFeeRate?: number;
+  askPrice?: number;
+  totalBuyerPays?: number;
 };
 
-export type SubscriptionControllerCreateCheckoutBody = {
-  cancelUrl?: string;
-  successUrl?: string;
+export type MarketplaceCheckoutControllerHoldListing200 = {
+  expiresAt?: string;
+  /** Pass this back in confirm to prove your hold */
+  holderId?: string;
+};
+
+export type MarketplaceListingControllerCancelListing200 = {
+  ok?: boolean;
+};
+
+export type MarketplaceListingControllerGetListings200 = {
+  total?: number;
+};
+
+export type MarketplaceListingControllerGetListingsParams = {
+fixtureId?: number;
+maxPrice?: number;
+/**
+ * Filter listings whose fixture involves a team matching this substring (home or away, case-insensitive)
+ */
+team?: string;
+page?: number;
+};
+
+export type CheckoutControllerRefundPrimary200 = {
+  ok?: boolean;
+};
+
+export type CheckoutControllerConfirm200 = {
+  idempotent?: boolean;
+  paymentId?: number;
+  ticketIds?: number[];
 };
 
 export type GetCountIntegrationParams = {
@@ -58,6 +91,29 @@ transaction?: boolean;
  * Query comment
  */
 comment?: string;
+};
+
+export type PaymentsControllerGetProviders200Item = {
+  disabled?: boolean;
+  id?: number;
+  logoUrl?: string;
+  name?: string;
+  publishableKey?: string;
+  slug?: string;
+  type?: string;
+};
+
+export type SubscriptionControllerCreatePortalBody = {
+  returnUrl?: string;
+};
+
+export type SubscriptionControllerCreateCheckout200 = {
+  url?: string;
+};
+
+export type SubscriptionControllerCreateCheckoutBody = {
+  cancelUrl?: string;
+  successUrl?: string;
 };
 
 export type ApiSportsControllerDiscoverCountries200 = { [key: string]: unknown };
@@ -239,6 +295,48 @@ export type StatsBombControllerSyncData200 = {
   timestamp?: string;
 };
 
+export type GetCountUserParams = {
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
+export type GetQueryUserParams = {
+/**
+ * Number of records to skip
+ */
+skip?: number;
+/**
+ * Number of records to take
+ */
+take?: number;
+/**
+ * Include soft deleted records
+ */
+withDeleted?: boolean;
+/**
+ * Load eager relations
+ */
+loadEagerRelations?: boolean;
+/**
+ * Use transaction
+ */
+transaction?: boolean;
+/**
+ * Query comment
+ */
+comment?: string;
+};
+
 export type GetCountTrophyParams = {
 /**
  * Include soft deleted records
@@ -323,42 +421,6 @@ transaction?: boolean;
 comment?: string;
 };
 
-export type MarketplaceCheckoutControllerConfirmPurchase200 = {
-  marketplaceTransactionId?: number;
-  ticketId?: number;
-};
-
-export type MarketplaceCheckoutControllerGetFeePreview200 = {
-  adminFee?: number;
-  adminFeeRate?: number;
-  askPrice?: number;
-  totalBuyerPays?: number;
-};
-
-export type MarketplaceCheckoutControllerHoldListing200 = {
-  expiresAt?: string;
-  /** Pass this back in confirm to prove your hold */
-  holderId?: string;
-};
-
-export type MarketplaceListingControllerCancelListing200 = {
-  ok?: boolean;
-};
-
-export type MarketplaceListingControllerGetListings200 = {
-  total?: number;
-};
-
-export type MarketplaceListingControllerGetListingsParams = {
-fixtureId?: number;
-maxPrice?: number;
-/**
- * Filter listings whose fixture involves a team matching this substring (home or away, case-insensitive)
- */
-team?: string;
-page?: number;
-};
-
 export type DiscountCodeControllerCreateBodyType = typeof DiscountCodeControllerCreateBodyType[keyof typeof DiscountCodeControllerCreateBodyType];
 
 
@@ -378,58 +440,6 @@ export type DiscountCodeControllerCreateBody = {
 
 export type DiscountCodeControllerValidateParams = {
 orderTotal: number;
-};
-
-export type GetCountUserParams = {
-/**
- * Include soft deleted records
- */
-withDeleted?: boolean;
-/**
- * Use transaction
- */
-transaction?: boolean;
-/**
- * Query comment
- */
-comment?: string;
-};
-
-export type GetQueryUserParams = {
-/**
- * Number of records to skip
- */
-skip?: number;
-/**
- * Number of records to take
- */
-take?: number;
-/**
- * Include soft deleted records
- */
-withDeleted?: boolean;
-/**
- * Load eager relations
- */
-loadEagerRelations?: boolean;
-/**
- * Use transaction
- */
-transaction?: boolean;
-/**
- * Query comment
- */
-comment?: string;
-};
-
-export type CheckoutControllerRefundPrimary200 = {
-  ok?: boolean;
-};
-
-export type CheckoutControllerConfirm200 = {
-  idempotent?: boolean;
-  paymentId?: number;
-  ticketIds?: number[];
 };
 
 export type TicketHoldControllerVerifyParams = {
@@ -1328,6 +1338,10 @@ export type SocialControllerSearchUsersParams = {
 q: string;
 };
 
+export type PlatformConfigControllerGetFeatures200 = {
+  marketplaceEnabled?: boolean;
+};
+
 export type GetCountLogParams = {
 /**
  * Include soft deleted records
@@ -1859,29 +1873,6 @@ transaction?: boolean;
 comment?: string;
 };
 
-export interface RegisterBody {
-  email: string;
-  firstName: string;
-  lastName: string;
-  /**
-   * @minLength 8
-   * @maxLength 32
-   */
-  password: string;
-  userName: string;
-}
-
-export interface AuthResponse {
-  access_token?: string;
-  user: User;
-}
-
-export interface LoginBody {
-  email: string;
-  password: string;
-  userName: string;
-}
-
 export interface DataSyncRunDto {
   apiSports?: ApiSportsPipelineDto;
   /** When Redis is configured, defaults true so Swagger returns immediately with bullJobId. Set false to run synchronously. */
@@ -1952,6 +1943,194 @@ export interface StatsBombPipelineOptionsDto {
   skipLineups?: boolean;
   skipPlayers?: boolean;
   skipStadiums?: boolean;
+}
+
+export interface StreamFixtureInsightDto {
+  integrationId?: number;
+  integrationSlug?: string;
+  locale?: string;
+  question?: string;
+}
+
+/**
+ * Discriminator — indicates which value field holds the data
+ */
+export type UpdatePlatformConfigDtoValueType = typeof UpdatePlatformConfigDtoValueType[keyof typeof UpdatePlatformConfigDtoValueType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdatePlatformConfigDtoValueType = {
+  number: 'number',
+  string: 'string',
+  boolean: 'boolean',
+  array: 'array',
+  json: 'json',
+} as const;
+
+/**
+ * Populated when valueType is json
+ */
+export type UpdatePlatformConfigDtoJsonValue = { [key: string]: unknown };
+
+export type UpdatePlatformConfigDtoArrayValueItem = { [key: string]: unknown };
+
+export interface UpdatePlatformConfigDto {
+  /** Populated when valueType is array */
+  arrayValue?: UpdatePlatformConfigDtoArrayValueItem[];
+  /** Populated when valueType is boolean */
+  booleanValue?: boolean;
+  /** Human-readable description (optional update) */
+  description?: string;
+  /** Populated when valueType is json */
+  jsonValue?: UpdatePlatformConfigDtoJsonValue;
+  /** Populated when valueType is number */
+  numberValue?: number;
+  /** Populated when valueType is string */
+  stringValue?: string;
+  /** Discriminator — indicates which value field holds the data */
+  valueType: UpdatePlatformConfigDtoValueType;
+}
+
+export type ConfirmMarketplacePurchaseDtoPaymentMethod = typeof ConfirmMarketplacePurchaseDtoPaymentMethod[keyof typeof ConfirmMarketplacePurchaseDtoPaymentMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmMarketplacePurchaseDtoPaymentMethod = {
+  CreditCard: 'CreditCard',
+  PayPal: 'PayPal',
+  PlatformCredit: 'PlatformCredit',
+} as const;
+
+export interface ConfirmMarketplacePurchaseDto {
+  /** holderId returned by POST /marketplace/hold/:listingId */
+  holderId: string;
+  /** Client-generated idempotency key for safe retries */
+  idempotencyKey?: string;
+  /** ID of the marketplace listing to purchase */
+  listingId: number;
+  paymentMethod: ConfirmMarketplacePurchaseDtoPaymentMethod;
+  /** ID of the payment processor used */
+  paymentProcessorId?: number;
+  /** Provider transaction reference (e.g. Stripe payment_intent) */
+  providerPaymentRef?: string;
+}
+
+export interface CreateListingDto {
+  /**
+   * Asking price set by the seller
+   * @minimum 0.01
+   */
+  askPrice: number;
+  /** ID of the ticket to list for resale */
+  ticketId: number;
+}
+
+export interface RegisterBody {
+  email: string;
+  firstName: string;
+  lastName: string;
+  /**
+   * @minLength 8
+   * @maxLength 32
+   */
+  password: string;
+  userName: string;
+}
+
+export interface AuthResponse {
+  access_token?: string;
+  user: User;
+}
+
+export interface LoginBody {
+  email: string;
+  password: string;
+  userName: string;
+}
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type UserTicketLogMetadata = { [key: string]: unknown } | null;
+
+export interface UserTicketLog {
+  /** Whether the ticket is currently in the user's wallet. False when listed for sale. */
+  active: boolean;
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  id: number;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: UserTicketLogMetadata;
+  /** Ticket id */
+  ticketId: number;
+  updatedAt?: string;
+  /** Owner user id */
+  userId: number;
+}
+
+export type WebhookConfirmCheckoutDtoPaymentMethod = typeof WebhookConfirmCheckoutDtoPaymentMethod[keyof typeof WebhookConfirmCheckoutDtoPaymentMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WebhookConfirmCheckoutDtoPaymentMethod = {
+  CreditCard: 'CreditCard',
+  PayPal: 'PayPal',
+  PlatformCredit: 'PlatformCredit',
+} as const;
+
+export interface WebhookConfirmCheckoutDto {
+  /** Ticket category label stored on Ticket rows */
+  category: string;
+  /** Discount code id to apply (primary market only) */
+  discountCodeId?: number;
+  fixtureId: number;
+  holderId: string;
+  /** Client-generated idempotency key for safe retries */
+  idempotencyKey?: string;
+  offerKey: string;
+  paymentMethod: WebhookConfirmCheckoutDtoPaymentMethod;
+  paymentProcessorId?: number;
+  /** Provider transaction id (e.g. Stripe payment_intent) */
+  providerPaymentRef?: string;
+  /** @minimum 1 */
+  quantity: number;
+  unitPrice: number;
+  /** Purchasing user id (must match Stripe session metadata) */
+  userId: number;
+}
+
+export type ConfirmCheckoutDtoPaymentMethod = typeof ConfirmCheckoutDtoPaymentMethod[keyof typeof ConfirmCheckoutDtoPaymentMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConfirmCheckoutDtoPaymentMethod = {
+  CreditCard: 'CreditCard',
+  PayPal: 'PayPal',
+  PlatformCredit: 'PlatformCredit',
+} as const;
+
+export interface ConfirmCheckoutDto {
+  /** Ticket category label stored on Ticket rows */
+  category: string;
+  /** Discount code id to apply (primary market only) */
+  discountCodeId?: number;
+  fixtureId: number;
+  holderId: string;
+  /** Client-generated idempotency key for safe retries */
+  idempotencyKey?: string;
+  offerKey: string;
+  paymentMethod: ConfirmCheckoutDtoPaymentMethod;
+  paymentProcessorId?: number;
+  /** Provider transaction id (e.g. Stripe payment_intent) */
+  providerPaymentRef?: string;
+  /** @minimum 1 */
+  quantity: number;
+  unitPrice: number;
 }
 
 /**
@@ -2068,11 +2247,17 @@ export interface CreateIntegrationDTO {
   slug: string;
 }
 
-export interface StreamFixtureInsightDto {
-  integrationId?: number;
-  integrationSlug?: string;
-  locale?: string;
-  question?: string;
+export interface CreatePaymentSessionDto {
+  category: string;
+  discountCodeId?: number;
+  fixtureId: number;
+  holderId: string;
+  idempotencyKey?: string;
+  offerKey: string;
+  providerSlug?: string;
+  /** @minimum 1 */
+  quantity: number;
+  unitPrice: number;
 }
 
 export interface ApiSportsSyncTransfersDto {
@@ -2201,6 +2386,91 @@ export interface StatsBombSyncOptionsDTO {
   skipStartingXi?: boolean;
 }
 
+export type CreateUserDTOType = typeof CreateUserDTOType[keyof typeof CreateUserDTOType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateUserDTOType = {
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',
+  USER: 'USER',
+} as const;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type CreateUserDTOMetadata = { [key: string]: unknown } | null;
+
+export interface CreateUserDTO {
+  email: string;
+  firstName: string;
+  lastName: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: CreateUserDTOMetadata;
+  type: CreateUserDTOType;
+  userName: string;
+}
+
+export type UserType = typeof UserType[keyof typeof UserType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserType = {
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',
+  USER: 'USER',
+} as const;
+
+export type UserTrackerVisibility = typeof UserTrackerVisibility[keyof typeof UserTrackerVisibility];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserTrackerVisibility = {
+  PRIVATE: 'PRIVATE',
+  FRIENDS: 'FRIENDS',
+  PUBLIC: 'PUBLIC',
+} as const;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type UserMetadata = { [key: string]: unknown } | null;
+
+export interface User {
+  commsPreference?: Promise;
+  commsPreferenceId?: number;
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  email: string;
+  favouriteTeamId?: number;
+  firstName: string;
+  id: number;
+  lastName: string;
+  logs: Promise;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: UserMetadata;
+  /**
+   * @minLength 8
+   * @maxLength 32
+   */
+  password: string;
+  predictions?: Promise;
+  shareVerifiedOnly: boolean;
+  trackerVisibility: UserTrackerVisibility;
+  type: UserType;
+  updatedAt?: string;
+  userName: string;
+}
+
 /**
  * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
  * @nullable
@@ -2292,219 +2562,6 @@ export interface CreateTransferDTO {
   playerId: number;
   sourceTeamId: number;
   transferFee: number;
-}
-
-/**
- * Discriminator — indicates which value field holds the data
- */
-export type UpdatePlatformConfigDtoValueType = typeof UpdatePlatformConfigDtoValueType[keyof typeof UpdatePlatformConfigDtoValueType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UpdatePlatformConfigDtoValueType = {
-  number: 'number',
-  string: 'string',
-  boolean: 'boolean',
-  array: 'array',
-  json: 'json',
-} as const;
-
-/**
- * Populated when valueType is json
- */
-export type UpdatePlatformConfigDtoJsonValue = { [key: string]: unknown };
-
-export type UpdatePlatformConfigDtoArrayValueItem = { [key: string]: unknown };
-
-export interface UpdatePlatformConfigDto {
-  /** Populated when valueType is array */
-  arrayValue?: UpdatePlatformConfigDtoArrayValueItem[];
-  /** Populated when valueType is boolean */
-  booleanValue?: boolean;
-  /** Human-readable description (optional update) */
-  description?: string;
-  /** Populated when valueType is json */
-  jsonValue?: UpdatePlatformConfigDtoJsonValue;
-  /** Populated when valueType is number */
-  numberValue?: number;
-  /** Populated when valueType is string */
-  stringValue?: string;
-  /** Discriminator — indicates which value field holds the data */
-  valueType: UpdatePlatformConfigDtoValueType;
-}
-
-export type ConfirmMarketplacePurchaseDtoPaymentMethod = typeof ConfirmMarketplacePurchaseDtoPaymentMethod[keyof typeof ConfirmMarketplacePurchaseDtoPaymentMethod];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ConfirmMarketplacePurchaseDtoPaymentMethod = {
-  CreditCard: 'CreditCard',
-  PayPal: 'PayPal',
-  PlatformCredit: 'PlatformCredit',
-} as const;
-
-export interface ConfirmMarketplacePurchaseDto {
-  /** holderId returned by POST /marketplace/hold/:listingId */
-  holderId: string;
-  /** Client-generated idempotency key for safe retries */
-  idempotencyKey?: string;
-  /** ID of the marketplace listing to purchase */
-  listingId: number;
-  paymentMethod: ConfirmMarketplacePurchaseDtoPaymentMethod;
-  /** ID of the payment processor used */
-  paymentProcessorId?: number;
-  /** Provider transaction reference (e.g. Stripe payment_intent) */
-  providerPaymentRef?: string;
-}
-
-export interface CreateListingDto {
-  /**
-   * Asking price set by the seller
-   * @minimum 0.01
-   */
-  askPrice: number;
-  /** ID of the ticket to list for resale */
-  ticketId: number;
-}
-
-/**
- * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
- * @nullable
- */
-export type UserTicketLogMetadata = { [key: string]: unknown } | null;
-
-export interface UserTicketLog {
-  /** Whether the ticket is currently in the user's wallet. False when listed for sale. */
-  active: boolean;
-  createdAt?: string;
-  /** @nullable */
-  deletedAt?: string | null;
-  id: number;
-  /**
-   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
-   * @nullable
-   */
-  metadata?: UserTicketLogMetadata;
-  /** Ticket id */
-  ticketId: number;
-  updatedAt?: string;
-  /** Owner user id */
-  userId: number;
-}
-
-export type CreateUserDTOType = typeof CreateUserDTOType[keyof typeof CreateUserDTOType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreateUserDTOType = {
-  ADMIN: 'ADMIN',
-  MODERATOR: 'MODERATOR',
-  USER: 'USER',
-} as const;
-
-/**
- * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
- * @nullable
- */
-export type CreateUserDTOMetadata = { [key: string]: unknown } | null;
-
-export interface CreateUserDTO {
-  email: string;
-  firstName: string;
-  lastName: string;
-  /**
-   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
-   * @nullable
-   */
-  metadata?: CreateUserDTOMetadata;
-  type: CreateUserDTOType;
-  userName: string;
-}
-
-export type UserType = typeof UserType[keyof typeof UserType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UserType = {
-  ADMIN: 'ADMIN',
-  MODERATOR: 'MODERATOR',
-  USER: 'USER',
-} as const;
-
-export type UserTrackerVisibility = typeof UserTrackerVisibility[keyof typeof UserTrackerVisibility];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UserTrackerVisibility = {
-  PRIVATE: 'PRIVATE',
-  FRIENDS: 'FRIENDS',
-  PUBLIC: 'PUBLIC',
-} as const;
-
-/**
- * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
- * @nullable
- */
-export type UserMetadata = { [key: string]: unknown } | null;
-
-export type WebhookConfirmCheckoutDtoPaymentMethod = typeof WebhookConfirmCheckoutDtoPaymentMethod[keyof typeof WebhookConfirmCheckoutDtoPaymentMethod];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WebhookConfirmCheckoutDtoPaymentMethod = {
-  CreditCard: 'CreditCard',
-  PayPal: 'PayPal',
-  PlatformCredit: 'PlatformCredit',
-} as const;
-
-export interface WebhookConfirmCheckoutDto {
-  /** Ticket category label stored on Ticket rows */
-  category: string;
-  /** Discount code id to apply (primary market only) */
-  discountCodeId?: number;
-  fixtureId: number;
-  holderId: string;
-  /** Client-generated idempotency key for safe retries */
-  idempotencyKey?: string;
-  offerKey: string;
-  paymentMethod: WebhookConfirmCheckoutDtoPaymentMethod;
-  paymentProcessorId?: number;
-  /** Provider transaction id (e.g. Stripe payment_intent) */
-  providerPaymentRef?: string;
-  /** @minimum 1 */
-  quantity: number;
-  unitPrice: number;
-  /** Purchasing user id (must match Stripe session metadata) */
-  userId: number;
-}
-
-export type ConfirmCheckoutDtoPaymentMethod = typeof ConfirmCheckoutDtoPaymentMethod[keyof typeof ConfirmCheckoutDtoPaymentMethod];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ConfirmCheckoutDtoPaymentMethod = {
-  CreditCard: 'CreditCard',
-  PayPal: 'PayPal',
-  PlatformCredit: 'PlatformCredit',
-} as const;
-
-export interface ConfirmCheckoutDto {
-  /** Ticket category label stored on Ticket rows */
-  category: string;
-  /** Discount code id to apply (primary market only) */
-  discountCodeId?: number;
-  fixtureId: number;
-  holderId: string;
-  /** Client-generated idempotency key for safe retries */
-  idempotencyKey?: string;
-  offerKey: string;
-  paymentMethod: ConfirmCheckoutDtoPaymentMethod;
-  paymentProcessorId?: number;
-  /** Provider transaction id (e.g. Stripe payment_intent) */
-  providerPaymentRef?: string;
-  /** @minimum 1 */
-  quantity: number;
-  unitPrice: number;
 }
 
 export interface ReleaseTicketHoldDto {
@@ -3312,8 +3369,8 @@ export const CreatePaymentProcessorDTOType = {
 export type CreatePaymentProcessorDTOMetadata = { [key: string]: unknown } | null;
 
 export interface CreatePaymentProcessorDTO {
-  /** API key or secret (encrypted in production) */
-  apiKey: string;
+  /** Deprecated — use integration.config for PSP credentials */
+  apiKey?: string;
   /** Whether this processor is enabled and available */
   enabled: boolean;
   /** URL to the processor logo */
@@ -3384,8 +3441,8 @@ export const PaymentProcessorType = {
 export type PaymentProcessorMetadata = { [key: string]: unknown } | null;
 
 export interface PaymentProcessor {
-  /** API key or secret (encrypted in production) */
-  apiKey: string;
+  /** Deprecated — use integration.config for PSP credentials */
+  apiKey?: string;
   createdAt?: string;
   /** @nullable */
   deletedAt?: string | null;
@@ -3568,6 +3625,39 @@ export interface CreateManagerDTO {
   nationality: string;
   nickname: string;
   teamIds?: string[];
+}
+
+export type UserNotificationType = typeof UserNotificationType[keyof typeof UserNotificationType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserNotificationType = {
+  FRIEND_REQUEST_RECEIVED: 'FRIEND_REQUEST_RECEIVED',
+  FRIEND_REQUEST_ACCEPTED: 'FRIEND_REQUEST_ACCEPTED',
+} as const;
+
+/**
+ * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+ * @nullable
+ */
+export type UserNotificationMetadata = { [key: string]: unknown } | null;
+
+export interface UserNotification {
+  createdAt?: string;
+  /** @nullable */
+  deletedAt?: string | null;
+  id: number;
+  message: string;
+  /**
+   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
+   * @nullable
+   */
+  metadata?: UserNotificationMetadata;
+  readAt?: string;
+  title: string;
+  type: UserNotificationType;
+  updatedAt?: string;
+  userId: number;
 }
 
 export interface SendFriendRequestDto {
@@ -4458,36 +4548,6 @@ export interface CreateCardDTO {
 export type AddressMetadata = { [key: string]: unknown } | null;
 
 export interface Promise { [key: string]: unknown }
-
-export interface User {
-  commsPreference?: Promise;
-  commsPreferenceId?: number;
-  createdAt?: string;
-  /** @nullable */
-  deletedAt?: string | null;
-  email: string;
-  favouriteTeamId?: number;
-  firstName: string;
-  id: number;
-  lastName: string;
-  logs: Promise;
-  /**
-   * Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.
-   * @nullable
-   */
-  metadata?: UserMetadata;
-  /**
-   * @minLength 8
-   * @maxLength 32
-   */
-  password: string;
-  predictions?: Promise;
-  shareVerifiedOnly: boolean;
-  trackerVisibility: UserTrackerVisibility;
-  type: UserType;
-  updatedAt?: string;
-  userName: string;
-}
 
 /**
  * Associated stadium entity
