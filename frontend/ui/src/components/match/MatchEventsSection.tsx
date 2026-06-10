@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
-import { Box, Group, Loader, Paper, Stack, Text, VisuallyHidden } from '@mantine/core';
+import { Box, Group, Loader, Paper, Stack, Text, UnstyledButton, VisuallyHidden } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import type { Card, Goal } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { clientInstance } from '@iWatchFootball/clients/client-instance';
+import { usePageTransition } from '../../hooks/usePageTransition';
+import { playerPageTransition } from '../../shared/playerNavigation';
 
 export interface MatchEventsSectionProps {
     fixtureId: number;
@@ -29,7 +31,12 @@ interface TimelineRow {
     minuteSort: number;
     minuteLabel: string;
     primaryLine: string;
+    primaryPlayerId?: number;
+    primarySuffix?: string;
     subtitle?: string;
+    assistPlayerId?: number;
+    playerOutId?: number;
+    playerInId?: number;
     accentColor?: string;
     side: RowSide;
     teamLabel?: string;
@@ -178,6 +185,139 @@ function EventKindGlyph({ kind, accentColor }: { kind: TimelineKind; accentColor
     }
 }
 
+function PlayerEventLink({
+    playerId,
+    label,
+    alignEnd,
+}: {
+    playerId: number;
+    label: string;
+    alignEnd?: boolean;
+}) {
+    const { navigateWithTransition } = usePageTransition();
+
+    return (
+        <UnstyledButton
+            type="button"
+            onClick={() => navigateWithTransition(`/player/${playerId}`, playerPageTransition)}
+            styles={{
+                root: {
+                    border: 'none',
+                    background: 'transparent',
+                    padding: 0,
+                    margin: 0,
+                    cursor: 'pointer',
+                    color: 'var(--modern-text-primary)',
+                    fontWeight: 700,
+                    fontSize: 'var(--mantine-font-size-sm)',
+                    lineHeight: 1.35,
+                    textAlign: alignEnd ? 'right' : 'left',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                    '&:hover': {
+                        color: 'var(--modern-lime)',
+                    },
+                },
+            }}
+        >
+            {label}
+        </UnstyledButton>
+    );
+}
+
+function EventPrimaryLine({ row, alignEnd }: { row: TimelineRow; alignEnd?: boolean }) {
+    if (row.kind === 'substitution' && (row.playerOutId != null || row.playerInId != null)) {
+        const parts = row.primaryLine.split('→').map((s) => s.trim());
+        const offName = parts[0] ?? '—';
+        const onName = parts[1] ?? '—';
+
+        return (
+            <Text
+                fw={700}
+                size="sm"
+                ta={alignEnd ? 'right' : 'left'}
+                style={{
+                    color: 'var(--modern-text-primary)',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                }}
+            >
+                {row.playerOutId != null ? (
+                    <PlayerEventLink playerId={row.playerOutId} label={offName} alignEnd={alignEnd} />
+                ) : (
+                    offName
+                )}
+                {' → '}
+                {row.playerInId != null ? (
+                    <PlayerEventLink playerId={row.playerInId} label={onName} alignEnd={alignEnd} />
+                ) : (
+                    onName
+                )}
+            </Text>
+        );
+    }
+
+    if (row.primaryPlayerId != null) {
+        const suffix = row.primarySuffix ?? '';
+        return (
+            <Text
+                fw={700}
+                size="sm"
+                ta={alignEnd ? 'right' : 'left'}
+                lineClamp={4}
+                style={{
+                    color: 'var(--modern-text-primary)',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                }}
+            >
+                <PlayerEventLink
+                    playerId={row.primaryPlayerId}
+                    label={row.primaryLine}
+                    alignEnd={alignEnd}
+                />
+                {suffix}
+            </Text>
+        );
+    }
+
+    return (
+        <Text
+            fw={700}
+            size="sm"
+            ta={alignEnd ? 'right' : 'left'}
+            lineClamp={4}
+            style={{
+                color: 'var(--modern-text-primary)',
+                wordBreak: 'break-word',
+                overflowWrap: 'anywhere',
+            }}
+        >
+            {row.primaryLine}
+        </Text>
+    );
+}
+
+function EventSubtitle({ row, alignEnd }: { row: TimelineRow; alignEnd?: boolean }) {
+    if (!row.subtitle) return null;
+
+    if (row.assistPlayerId != null && row.subtitle.startsWith('↳ ')) {
+        const assistName = row.subtitle.slice(2);
+        return (
+            <Text size="xs" c="dimmed" ta={alignEnd ? 'right' : 'left'}>
+                ↳{' '}
+                <PlayerEventLink playerId={row.assistPlayerId} label={assistName} alignEnd={alignEnd} />
+            </Text>
+        );
+    }
+
+    return (
+        <Text size="xs" c="dimmed" ta={alignEnd ? 'right' : 'left'}>
+            {row.subtitle}
+        </Text>
+    );
+}
+
 function EventSegment({
     row,
     showTeamLabel,
@@ -194,24 +334,8 @@ function EventSegment({
                     {row.teamLabel}
                 </Text>
             ) : null}
-            <Text
-                fw={700}
-                size="sm"
-                ta={alignEnd ? 'right' : 'left'}
-                lineClamp={4}
-                style={{
-                    color: 'var(--modern-text-primary)',
-                    wordBreak: 'break-word',
-                    overflowWrap: 'anywhere',
-                }}
-            >
-                {row.primaryLine}
-            </Text>
-            {row.subtitle ? (
-                <Text size="xs" c="dimmed" ta={alignEnd ? 'right' : 'left'}>
-                    {row.subtitle}
-                </Text>
-            ) : null}
+            <EventPrimaryLine row={row} alignEnd={alignEnd} />
+            <EventSubtitle row={row} alignEnd={alignEnd} />
         </Stack>
     );
 
@@ -443,14 +567,16 @@ export function MatchEventsSection({
             const tagSuffix = tagBits.length ? ` (${tagBits.join(' · ')})` : '';
             const subtitle =
                 typeof g.assistantId === 'number' ? `↳ ${resolve(g.assistantId)}` : undefined;
-            const primaryLine = `${resolve(g.scorerId)}${tagSuffix}`;
             collected.push({
                 reactKey: `goal-${g.id}`,
                 kind: 'goal',
                 minuteSort: typeof g.minute === 'number' ? g.minute : 10_000,
                 minuteLabel: formatMinute(g.minute),
-                primaryLine,
+                primaryLine: resolve(g.scorerId),
+                primaryPlayerId: typeof g.scorerId === 'number' ? g.scorerId : undefined,
+                primarySuffix: tagSuffix,
                 subtitle,
+                assistPlayerId: typeof g.assistantId === 'number' ? g.assistantId : undefined,
                 accentColor: '#00c853',
                 side,
                 teamLabel: side === 'unknown' && team ? team : undefined,
@@ -472,6 +598,7 @@ export function MatchEventsSection({
                 minuteSort: typeof c.minute === 'number' ? c.minute : 10_000,
                 minuteLabel: formatMinute(c.minute),
                 primaryLine: resolve(c.playerId),
+                primaryPlayerId: typeof c.playerId === 'number' ? c.playerId : undefined,
                 accentColor: k === 'red_card' ? '#e53935' : '#fbc02d',
                 side,
                 teamLabel: side === 'unknown' && teamName ? teamName : undefined,
@@ -493,6 +620,8 @@ export function MatchEventsSection({
                 minuteSort: typeof s.minute === 'number' ? s.minute : 10_000,
                 minuteLabel: formatMinute(s.minute),
                 primaryLine: `${offName} → ${onName}`,
+                playerOutId: offId,
+                playerInId: onId,
                 accentColor: 'var(--modern-text-secondary)',
                 side,
                 teamLabel: side === 'unknown' && team ? team : undefined,

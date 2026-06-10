@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { UserGame, MatchEvent } from '../pages/logs.page';
 import { UiCard, UiH3, UiBody, UiButton } from '../components/ui';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { isNavigablePlayerId, playerPageTransition } from '../shared/playerNavigation';
 
 interface PlayerStats {
     rank: number;
@@ -433,11 +434,21 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
     const hasLeaderboards = stats.length > 0;
 
     const handlePlayerClick = (playerName: string, playerId: string, category: string) => {
-        // Only show modal for player-related stats (goals, assists)
-        if (category === CAT_GOALS || category === CAT_ASSISTS || category === CAT_YELLOW_CARDS || category === CAT_RED_CARDS) {
-            setSelectedPlayer({ name: playerName, id: playerId, category });
-            setModalOpen(true);
+        const isPlayerStat =
+            category === CAT_GOALS ||
+            category === CAT_ASSISTS ||
+            category === CAT_YELLOW_CARDS ||
+            category === CAT_RED_CARDS;
+
+        if (!isPlayerStat) return;
+
+        if (isNavigablePlayerId(playerId)) {
+            navigateWithTransition(`/player/${playerId}`, playerPageTransition);
+            return;
         }
+
+        setSelectedPlayer({ name: playerName, id: playerId, category });
+        setModalOpen(true);
     };
 
     const handleTeamClick = (teamName: string, teamId: string) => {

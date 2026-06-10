@@ -1,6 +1,8 @@
 import React from 'react';
-import {Avatar, Box, Paper, Text, Stack} from "@mantine/core";
+import {Avatar, Box, Paper, Text, Stack, UnstyledButton} from "@mantine/core";
 import { useTranslation } from '../../i18n/useTranslation';
+import { usePageTransition } from '../../hooks/usePageTransition';
+import { isNavigablePlayerId, playerPageTransition } from '../../shared/playerNavigation';
 import { Lineup, Player } from "./match.page";
 
 /**
@@ -237,12 +239,19 @@ function FormationBand({
 
 /** Jersey circle + nametag — uniform circle size per pitch; grid columns only share width for layout */
 function FormationChip({ player }: { player: Player }) {
+    const { navigateWithTransition } = usePageTransition();
+    const canNavigate = isNavigablePlayerId(player.id);
     const avatarSz = 'clamp(2rem, 8.25vmin, 3.2rem)';
     const jerseyFs = 'clamp(0.68rem, 3.6vmin, 1.02rem)';
     const labelFs = 'clamp(0.44rem, 2.45vmin, 0.78rem)';
 
-    return (
-        <Stack align="center" gap={4} miw={0} maw="100%" px={4} pb={6} pt={2}>
+    const handleNavigate = () => {
+        if (!canNavigate) return;
+        navigateWithTransition(`/player/${player.id}`, playerPageTransition);
+    };
+
+    const content = (
+        <>
             <Avatar
                 radius="xl"
                 style={{
@@ -277,7 +286,38 @@ function FormationChip({ player }: { player: Player }) {
             >
                 {player.name}
             </Text>
-        </Stack>
+        </>
+    );
+
+    if (!canNavigate) {
+        return (
+            <Stack align="center" gap={4} miw={0} maw="100%" px={4} pb={6} pt={2}>
+                {content}
+            </Stack>
+        );
+    }
+
+    return (
+        <UnstyledButton
+            type="button"
+            onClick={handleNavigate}
+            aria-label={player.name}
+            styles={{
+                root: {
+                    display: 'block',
+                    width: '100%',
+                    borderRadius: 8,
+                    transition: 'background-color 0.15s ease, transform 0.15s ease',
+                    '&:hover': {
+                        backgroundColor: 'color-mix(in srgb, var(--modern-lime) 8%, transparent)',
+                    },
+                },
+            }}
+        >
+            <Stack align="center" gap={4} miw={0} maw="100%" px={4} pb={6} pt={2}>
+                {content}
+            </Stack>
+        </UnstyledButton>
     );
 }
 

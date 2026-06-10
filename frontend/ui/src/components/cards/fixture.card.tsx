@@ -1,9 +1,13 @@
 import { Avatar, Badge, Box, Divider, Group, Modal, Stack, Text, UnstyledButton } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconCalendar, IconCheck, IconExternalLink, IconDownload, IconMapPin } from '@tabler/icons-react';
 import React, { useState } from 'react';
-import { ModernButton, ModernCard, ModernH3, ModernBody } from '../modern';
+import { UiButton, UiCard, UiBody, UiCaption, UiH3 } from '../ui';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { MatchEventsSection } from '../match/MatchEventsSection';
+import { useTranslation } from '../../i18n/useTranslation';
+import { formatLocaleDateTime, formatLogCardDate } from '../../i18n/formatDate';
+import classes from './fixture.card.module.css';
 
 function teamInitials(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -16,46 +20,68 @@ function teamInitials(name: string): string {
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
+/** Hide generic stage labels that repeat the competition name (e.g. "League" under "Premier League"). */
+function shouldShowStage(stage: string, competitionName: string): boolean {
+    const normalized = stage.trim().toLowerCase();
+    if (!normalized) return false;
+
+    const redundantStages = new Set(['league', 'regular season', 'regular', 'domestic league']);
+    if (redundantStages.has(normalized)) return false;
+
+    const comp = competitionName.trim().toLowerCase();
+    if (comp && (normalized === comp || comp.includes(normalized))) return false;
+
+    return true;
+}
+
 function TeamCrestBlock({
     name,
     crestUrl,
     align,
+    compact,
 }: {
     name: string;
     crestUrl?: string;
     align: 'left' | 'right';
+    compact?: boolean;
 }) {
     const ta = align === 'left' ? 'left' : 'right';
     const items = align === 'left' ? 'flex-start' : 'flex-end';
 
-    return (
-        <Stack gap={10} justify="flex-start" align={items} style={{ flex: '1 1 0', minWidth: 0 }}>
-            <Avatar
-                src={crestUrl?.trim() ? crestUrl.trim() : undefined}
-                alt={name}
-                radius={999}
-                styles={{
-                    root: {
-                        width: 52,
-                        height: 52,
-                        border: '2px solid var(--modern-border-color)',
-                        backgroundColor: 'var(--modern-bg-secondary)',
-                    },
-                    image: { objectFit: 'contain', padding: '6px' },
-                }}
+    const crest = (
+        <Avatar
+            src={crestUrl?.trim() ? crestUrl.trim() : undefined}
+            alt={name}
+            radius={999}
+            classNames={{ root: classes.crestRoot, image: classes.crestImage }}
+        >
+            <Text fz={compact ? 10 : 'xs'} fw={800} lh={1} c="var(--ui-accent)">
+                {teamInitials(name)}
+            </Text>
+        </Avatar>
+    );
+
+    if (compact) {
+        return (
+            <Group
+                gap="xs"
+                align="center"
+                wrap="nowrap"
+                className={classes.teamRow}
+                style={{ flexDirection: align === 'right' ? 'row-reverse' : 'row' }}
             >
-                <Text fz="xs" fw={800} lh={1} c="var(--modern-lime)">
-                    {teamInitials(name)}
+                {crest}
+                <Text ta={ta} lineClamp={2} className={classes.teamNameCompact}>
+                    {name}
                 </Text>
-            </Avatar>
-            <Text
-                fz="clamp(0.9rem, 2.8vw, 1.125rem)"
-                fw={700}
-                c="var(--modern-text-primary)"
-                ta={ta}
-                lineClamp={2}
-                style={{ letterSpacing: '0.02em', lineHeight: 1.35 }}
-            >
+            </Group>
+        );
+    }
+
+    return (
+        <Stack justify="flex-start" align={items} className={classes.teamStack} style={{ flex: '1 1 0', minWidth: 0 }}>
+            {crest}
+            <Text ta={ta} lineClamp={2} className={classes.teamName}>
                 {name}
             </Text>
         </Stack>
@@ -104,9 +130,13 @@ export function LoggedFixtureCard({
     userTeam: _userTeam,
     stage,
 }: LoggedFixtureProps) {
+    const { t } = useTranslation();
+    const isCompact = useMediaQuery('(max-width: 48em)');
     const [modalOpen, setModalOpen] = useState(false);
     const { navigateWithTransition } = usePageTransition();
     const fixtureNumericId = fixtureId ? parseInt(fixtureId, 10) : NaN;
+    const showStage = shouldShowStage(stage, competitionName);
+    const hasValidDate = Boolean(date) && !Number.isNaN(new Date(date).getTime());
 
     const handleDownloadTicket = () => {
         if (!fixtureId) return;
@@ -131,7 +161,7 @@ export function LoggedFixtureCard({
                 e.stopPropagation();
                 navigateWithTransition(`/competition/${competitionId}`);
             }}
-            aria-label={`View ${competitionName} competition`}
+            aria-label={t('logs.viewCompetitionAria', { name: competitionName })}
             styles={{
                 root: {
                     border: 'none',
@@ -148,7 +178,7 @@ export function LoggedFixtureCard({
                 fw={600}
                 tt="uppercase"
                 lh={1.35}
-                c="dimmed"
+                c="var(--ui-text-secondary)"
                 td="underline"
                 style={{ letterSpacing: '0.09em', textUnderlineOffset: 4 }}
             >
@@ -158,76 +188,50 @@ export function LoggedFixtureCard({
     );
 
     const competitionPlain = !(competitionId != null && Number.isFinite(competitionId)) && (
-        <Text fz="sm" fw={600} tt="uppercase" lh={1.35} c="dimmed" style={{ letterSpacing: '0.09em' }}>
+        <Text fz="sm" fw={600} tt="uppercase" lh={1.35} c="var(--ui-text-secondary)" style={{ letterSpacing: '0.09em' }}>
             {competitionName}
         </Text>
     );
 
     return (
         <>
-            <Box
+            <UiCard
+                hover
+                density={isCompact ? 'compact' : 'default'}
                 onClick={() => setModalOpen(true)}
-                onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
-                    const card = e.currentTarget.firstChild as HTMLElement;
-                    if (card) {
-                        card.style.transform = 'translateY(-3px)';
-                        card.style.boxShadow = 'var(--modern-shadow-lg)';
-                        card.style.borderColor = 'rgba(0, 255, 136, 0.2)';
-                    }
-                }}
-                onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
-                    const card = e.currentTarget.firstChild as HTMLElement;
-                    if (card) {
-                        card.style.transform = 'translateY(0)';
-                        card.style.boxShadow = 'var(--modern-shadow-sm)';
-                        card.style.borderColor = 'var(--modern-border-color)';
-                    }
-                }}
+                className={classes.card}
                 style={{
-                    marginBottom: '1rem',
-                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
                 }}
             >
-                <ModernCard
+                <Box
+                    aria-hidden
                     style={{
-                        padding: '1.25rem 1.35rem',
-                        backgroundColor: 'var(--modern-card-bg)',
-                        color: 'var(--modern-text-primary)',
-                        border: '1px solid var(--modern-border-color)',
-                        borderRadius: '12px',
-                        boxShadow: 'var(--modern-shadow-sm)',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-                        overflow: 'hidden',
-                        position: 'relative',
+                        position: 'absolute',
+                        inset: 0,
+                        background:
+                            'radial-gradient(1200px ellipse at 50% -20%, var(--ui-accent-muted), transparent 45%)',
+                        pointerEvents: 'none',
+                        zIndex: 0,
                     }}
-                >
-                    {/* Subtle backdrop accent */}
-                    <Box
-                        aria-hidden
-                        style={{
-                            position: 'absolute',
-                            inset: 0,
-                            background:
-                                'radial-gradient(1200px ellipse at 50% -20%, rgba(0, 255, 136, 0.05), transparent 45%)',
-                            pointerEvents: 'none',
-                            zIndex: 0,
-                        }}
-                    />
+                />
 
-                    <Stack gap={0} style={{ position: 'relative', zIndex: 1 }}>
-                        <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs" mb={14}>
-                            <Stack gap={4} style={{ flex: '1 1 220px', minWidth: 0 }}>
-                                {competitionHeading}
-                                {competitionPlain}
-                            </Stack>
-                            <Group gap={8} wrap="wrap" justify="flex-end" style={{ flexShrink: 0 }}>
+                <Stack gap={0} style={{ position: 'relative', zIndex: 1 }}>
+                    <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs" className={classes.header}>
+                        <Stack gap={4} style={{ flex: '1 1 220px', minWidth: 0 }}>
+                            {competitionHeading}
+                            {competitionPlain}
+                        </Stack>
+                        <Group gap={8} wrap="wrap" justify="flex-end" style={{ flexShrink: 0 }}>
+                            {showStage && (
                                 <Badge
                                     variant="outline"
                                     size="sm"
                                     style={{
-                                        borderColor: 'var(--modern-border-color)',
-                                        color: 'var(--modern-text-secondary)',
-                                        backgroundColor: 'var(--modern-bg-secondary)',
+                                        borderColor: 'var(--ui-border)',
+                                        color: 'var(--ui-text-secondary)',
+                                        backgroundColor: 'var(--ui-bg-surface)',
                                         textTransform: 'capitalize',
                                         fontWeight: 600,
                                         fontSize: '0.6875rem',
@@ -236,108 +240,141 @@ export function LoggedFixtureCard({
                                 >
                                     {stage}
                                 </Badge>
-                                {isVerified && (
-                                    <Badge
-                                        size="sm"
-                                        variant="light"
-                                        leftSection={<IconCheck size={12} />}
-                                        style={{
-                                            backgroundColor: 'rgba(0, 255, 136, 0.12)',
-                                            color: 'var(--modern-lime)',
-                                            border: '1px solid rgba(0, 255, 136, 0.35)',
-                                            textTransform: 'none',
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        Verified
-                                    </Badge>
-                                )}
-                            </Group>
-                        </Group>
-
-                        <Divider color="var(--modern-section-divider)" mb="lg" />
-
-                        <Group gap="lg" justify="center" align="stretch" wrap="nowrap" mb="lg">
-                            <TeamCrestBlock name={homeTeam} crestUrl={homeTeamLogo} align="left" />
-                            <Stack justify="center" align="center" gap={6} style={{ flexShrink: 0 }}>
-                                <Box
+                            )}
+                            {isVerified && (
+                                <Badge
+                                    size="sm"
+                                    variant="light"
+                                    leftSection={<IconCheck size={12} />}
                                     style={{
-                                        padding: '10px 18px',
-                                        borderRadius: 12,
-                                        backgroundColor: 'var(--modern-bg-secondary)',
-                                        border: '1px solid rgba(0, 255, 136, 0.38)',
-                                        minWidth: 88,
-                                        textAlign: 'center',
+                                        backgroundColor: 'var(--ui-accent-muted)',
+                                        color: 'var(--ui-accent)',
+                                        border: '1px solid rgba(0, 200, 83, 0.35)',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
                                     }}
                                 >
-                                    <Text
-                                        fz="clamp(1.2rem, 3.8vw, 1.55rem)"
-                                        fw={900}
-                                        c="var(--modern-lime)"
-                                        style={{
-                                            fontVariantNumeric: 'tabular-nums',
-                                            lineHeight: 1.05,
-                                        }}
-                                    >
-                                        {scoresAvailable ? `${homeScore} – ${awayScore}` : '— · —'}
-                                    </Text>
-                                </Box>
-                                {scoresAvailable ? (
-                                    <Text
-                                        fz="xs"
-                                        c="dimmed"
-                                        tt="uppercase"
-                                        fw={600}
-                                        style={{ letterSpacing: '0.08em', opacity: 0.72 }}
-                                    >
-                                        FT
-                                    </Text>
-                                ) : null}
-                            </Stack>
-                            <TeamCrestBlock name={awayTeam} crestUrl={awayTeamLogo} align="right" />
+                                    {t('logs.verified')}
+                                </Badge>
+                            )}
                         </Group>
+                    </Group>
 
-                        {venue ? (
-                            <>
-                                <Divider color="var(--modern-section-divider)" mb={12} />
-                                <Group gap={8} align="center">
-                                    <IconMapPin size={15} stroke={1.75} style={{ color: 'var(--modern-text-secondary)', opacity: 0.85, flexShrink: 0 }} />
-                                    <ModernBody
-                                        style={{
-                                            fontSize: '0.8125rem',
-                                            color: 'var(--modern-text-secondary)',
-                                            fontWeight: 500,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.06em',
-                                            lineHeight: 1.35,
-                                            margin: 0,
-                                        }}
-                                    >
-                                        {venue}
-                                    </ModernBody>
-                                </Group>
-                            </>
-                        ) : null}
-                    </Stack>
-                </ModernCard>
-            </Box>
+                    {!isCompact && <Divider color="var(--ui-divider)" mb="md" />}
+
+                    <Group
+                        gap={isCompact ? 'sm' : 'lg'}
+                        justify="center"
+                        align="center"
+                        wrap="nowrap"
+                        className={classes.matchRow}
+                    >
+                        <TeamCrestBlock
+                            name={homeTeam}
+                            crestUrl={homeTeamLogo}
+                            align="left"
+                            compact={isCompact}
+                        />
+                        <Stack justify="center" align="center" gap={4} style={{ flexShrink: 0 }}>
+                            <Box className={classes.scoreBox}>
+                                <Text className={classes.scoreText}>
+                                    {scoresAvailable ? `${homeScore} – ${awayScore}` : '— · —'}
+                                </Text>
+                            </Box>
+                            {scoresAvailable ? (
+                                <UiCaption
+                                    style={{
+                                        textTransform: 'uppercase',
+                                        fontWeight: 600,
+                                        letterSpacing: '0.08em',
+                                        opacity: 0.72,
+                                        fontSize: '0.6875rem',
+                                    }}
+                                >
+                                    {t('logs.fullTime')}
+                                </UiCaption>
+                            ) : null}
+                        </Stack>
+                        <TeamCrestBlock
+                            name={awayTeam}
+                            crestUrl={awayTeamLogo}
+                            align="right"
+                            compact={isCompact}
+                        />
+                    </Group>
+
+                    {(hasValidDate || venue) && (
+                        <>
+                            <Divider color="var(--ui-divider)" mb={isCompact ? 8 : 12} />
+                            <Group className={classes.metaRow}>
+                                {hasValidDate && (
+                                    <Group gap={6} align="center" wrap="nowrap">
+                                        <IconCalendar
+                                            size={14}
+                                            stroke={1.75}
+                                            style={{ color: 'var(--ui-text-secondary)', opacity: 0.85, flexShrink: 0 }}
+                                        />
+                                        <UiCaption
+                                            style={{
+                                                fontWeight: 500,
+                                                letterSpacing: '0.04em',
+                                                lineHeight: 1.35,
+                                                margin: 0,
+                                                fontSize: '0.75rem',
+                                            }}
+                                        >
+                                            {formatLogCardDate(date)}
+                                        </UiCaption>
+                                    </Group>
+                                )}
+                                {hasValidDate && venue && (
+                                    <Text className={classes.metaSep} aria-hidden>
+                                        ·
+                                    </Text>
+                                )}
+                                {venue && (
+                                    <Group gap={6} align="center" wrap="nowrap">
+                                        <IconMapPin
+                                            size={14}
+                                            stroke={1.75}
+                                            style={{ color: 'var(--ui-text-secondary)', opacity: 0.85, flexShrink: 0 }}
+                                        />
+                                        <UiCaption
+                                            style={{
+                                                fontWeight: 500,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.06em',
+                                                lineHeight: 1.35,
+                                                margin: 0,
+                                                fontSize: '0.75rem',
+                                            }}
+                                        >
+                                            {venue}
+                                        </UiCaption>
+                                    </Group>
+                                )}
+                            </Group>
+                        </>
+                    )}
+                </Stack>
+            </UiCard>
 
             <Modal
                 opened={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={
                     <Stack gap={6}>
-                        <ModernH3 style={{ color: 'var(--modern-text-primary)', fontSize: '1.125rem', fontWeight: 600 }}>
+                        <UiH3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
                             {homeTeam} vs {awayTeam}
-                        </ModernH3>
+                        </UiH3>
                         {scoresAvailable ? (
-                            <ModernBody style={{ color: 'var(--modern-lime)', fontWeight: 800, fontSize: '1.05rem' }}>
+                            <UiBody style={{ color: 'var(--ui-accent)', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>
                                 {homeScore} – {awayScore}
-                            </ModernBody>
+                            </UiBody>
                         ) : (
-                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.85rem' }}>
-                                Final score not available in your log yet.
-                            </ModernBody>
+                            <UiBody style={{ color: 'var(--ui-text-secondary)', fontSize: '0.85rem', margin: 0 }}>
+                                {t('logs.scoreUnavailable')}
+                            </UiBody>
                         )}
                     </Stack>
                 }
@@ -349,23 +386,23 @@ export function LoggedFixtureCard({
                 }}
                 styles={{
                     content: {
-                        backgroundColor: 'var(--modern-card-bg)',
-                        boxShadow: '0 20px 60px var(--modern-shadow-color)',
-                        border: '1px solid var(--modern-border-color)',
+                        backgroundColor: 'var(--ui-bg-elevated)',
+                        boxShadow: 'var(--ui-shadow-md)',
+                        border: '1px solid var(--ui-border)',
                     },
                     header: {
-                        backgroundColor: 'var(--modern-bg-tertiary)',
-                        borderBottom: '1px solid var(--modern-border-color)',
+                        backgroundColor: 'var(--ui-bg-surface)',
+                        borderBottom: '1px solid var(--ui-border)',
                         padding: '1.5rem',
                     },
                     body: {
                         padding: '1.5rem',
-                        backgroundColor: 'var(--modern-card-bg)',
+                        backgroundColor: 'var(--ui-bg-elevated)',
                     },
                     close: {
-                        color: 'var(--modern-text-primary)',
+                        color: 'var(--ui-text-primary)',
                         '&:hover': {
-                            backgroundColor: 'var(--modern-bg-tertiary)',
+                            backgroundColor: 'var(--ui-bg-hover)',
                         },
                     },
                 }}
@@ -387,52 +424,52 @@ export function LoggedFixtureCard({
                                         },
                                     }}
                                 >
-                                    <ModernBody
+                                    <UiBody
                                         style={{
-                                            color: 'var(--modern-lime)',
+                                            color: 'var(--ui-accent)',
                                             fontSize: '0.875rem',
                                             fontWeight: 600,
                                             textDecoration: 'underline',
                                             textUnderlineOffset: 3,
+                                            margin: 0,
                                         }}
                                     >
                                         {competitionName}
-                                    </ModernBody>
+                                    </UiBody>
                                 </UnstyledButton>
                             ) : (
-                                <ModernBody
-                                    style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem', fontWeight: 500 }}
-                                >
+                                <UiBody style={{ color: 'var(--ui-text-secondary)', fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>
                                     {competitionName}
-                                </ModernBody>
+                                </UiBody>
                             )}
-                            <Badge size="sm" style={{ 
-                                backgroundColor: 'var(--modern-bg-tertiary)', 
-                                color: 'var(--modern-text-secondary)',
-                                border: 'none',
-                            }}>
-                                {stage}
-                            </Badge>
+                            {showStage && (
+                                <Badge
+                                    size="sm"
+                                    style={{
+                                        backgroundColor: 'var(--ui-bg-surface)',
+                                        color: 'var(--ui-text-secondary)',
+                                        border: 'none',
+                                    }}
+                                >
+                                    {stage}
+                                </Badge>
+                            )}
                         </Group>
                         {venue && (
-                            <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem' }}>
+                            <UiBody style={{ color: 'var(--ui-text-secondary)', fontSize: '0.875rem', margin: 0 }}>
                                 <IconMapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />
                                 {venue}
-                            </ModernBody>
+                            </UiBody>
                         )}
-                        <ModernBody style={{ color: 'var(--modern-text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
-                            <IconCalendar size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                            {new Date(date).toLocaleDateString('en-US', { 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}
-                        </ModernBody>
+                        {hasValidDate && (
+                            <UiBody style={{ color: 'var(--ui-text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
+                                <IconCalendar size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                {formatLocaleDateTime(date)}
+                            </UiBody>
+                        )}
                     </Box>
 
-                    <Divider color="var(--modern-border-color)" />
+                    <Divider color="var(--ui-border)" />
 
                     {modalOpen && Number.isFinite(fixtureNumericId) && fixtureNumericId > 0 ? (
                         <MatchEventsSection
@@ -444,20 +481,20 @@ export function LoggedFixtureCard({
                         />
                     ) : null}
 
-                    <Divider color="var(--modern-border-color)" />
+                    <Divider color="var(--ui-border)" />
 
                     <Group justify="flex-end" gap="md">
-                        <ModernButton
+                        <UiButton
                             variant="outline"
                             onClick={handleViewMatch}
                             leftSection={<IconExternalLink size={16} />}
                         >
-                            View Match Page
-                        </ModernButton>
+                            {t('logs.viewMatchPage')}
+                        </UiButton>
                         {isVerified && (
-                            <ModernButton variant="primary" onClick={handleDownloadTicket} leftSection={<IconDownload size={16} />}>
-                                Download Ticket
-                            </ModernButton>
+                            <UiButton variant="primary" onClick={handleDownloadTicket} leftSection={<IconDownload size={16} />}>
+                                {t('logs.downloadTicket')}
+                            </UiButton>
                         )}
                     </Group>
                 </Stack>

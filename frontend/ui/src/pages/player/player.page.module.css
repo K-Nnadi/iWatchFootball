@@ -1,0 +1,477 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--ui-bg-base);
+  padding-bottom: var(--ui-space-10);
+}
+
+/* PL-inspired gradient hero, IWF green accent */
+.hero {
+  position: relative;
+  background: linear-gradient(145deg, #1e2433 0%, #252d42 45%, #1a2030 100%);
+  border-bottom: 3px solid var(--ui-accent);
+  padding: var(--ui-space-4) var(--ui-space-5) var(--ui-space-8);
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -10%;
+  top: -30%;
+  width: 55%;
+  height: 140%;
+  background: radial-gradient(ellipse, rgba(0, 200, 83, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroBody {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ui-space-5);
+  position: relative;
+  z-index: 1;
+}
+
+.heroPhoto {
+  width: clamp(100px, 28vw, 140px);
+  height: clamp(120px, 32vw, 168px);
+  object-fit: cover;
+  object-position: top center;
+  border-radius: var(--ui-radius-md);
+  background: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.heroPhotoFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 2.5rem;
+  color: var(--ui-accent);
+}
+
+.heroMeta {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: var(--ui-space-2);
+}
+
+.roleLabel {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: var(--ui-space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.playerName {
+  margin: 0 0 var(--ui-space-2);
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ui-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.teamLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ui-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.teamLink:hover {
+  opacity: 1;
+  color: var(--ui-accent);
+}
+
+.teamCrest {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.shell {
+  margin-top: var(--ui-space-4);
+  padding: 0 var(--ui-space-4);
+  max-width: var(--ui-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 48em) {
+  .shell {
+    padding: 0 var(--ui-space-8);
+  }
+}
+
+.highlightRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ui-space-4) var(--ui-space-2);
+  margin-bottom: var(--ui-space-5);
+  padding: var(--ui-space-4) var(--ui-space-3);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+}
+
+@media (min-width: 40em) {
+  .highlightRow {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--ui-space-2);
+    padding: var(--ui-space-4) var(--ui-space-5);
+  }
+}
+
+.highlightCell {
+  padding: 0 var(--ui-space-1);
+  text-align: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.highlightValue {
+  display: block;
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--ui-text-primary);
+  line-height: 1.1;
+}
+
+.highlightLabel {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.highlightContext {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--ui-accent);
+  margin-top: 6px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sectionCard {
+  background: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  margin-bottom: var(--ui-space-5);
+}
+
+.sectionHeading {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ui-text-primary);
+  margin: 0 0 var(--ui-space-4);
+}
+
+.formScroll {
+  display: flex;
+  gap: var(--ui-space-3);
+  overflow-x: auto;
+  padding-bottom: var(--ui-space-1);
+  scrollbar-width: none;
+}
+
+.formScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.formCard {
+  flex: 0 0 auto;
+  width: 108px;
+  padding: var(--ui-space-3);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-surface);
+  border: 1px solid var(--ui-border);
+  text-align: center;
+}
+
+.formGw {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--ui-text-muted);
+  margin-bottom: var(--ui-space-2);
+}
+
+.formOpp {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ui-text-primary);
+  margin-bottom: 2px;
+}
+
+.formVenue {
+  font-size: 0.625rem;
+  color: var(--ui-text-muted);
+  margin-bottom: var(--ui-space-2);
+}
+
+.formPts {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--ui-accent);
+}
+
+.mainTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--ui-divider);
+  margin-bottom: var(--ui-space-4);
+}
+
+.mainTab {
+  flex: 1;
+  padding: var(--ui-space-3) var(--ui-space-2);
+  border: none;
+  background: transparent;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.mainTabActive {
+  color: var(--ui-text-primary);
+  border-bottom-color: var(--ui-text-primary);
+}
+
+.segmented {
+  display: inline-flex;
+  border-radius: var(--ui-radius-full);
+  background: var(--ui-bg-surface);
+  border: 1px solid var(--ui-border);
+  padding: 3px;
+  margin-bottom: var(--ui-space-4);
+}
+
+.segmentBtn {
+  border: none;
+  background: transparent;
+  padding: 6px 18px;
+  border-radius: var(--ui-radius-full);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.segmentBtnActive {
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text-primary);
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.matchRow {
+  display: grid;
+  grid-template-columns: 52px 1fr auto auto;
+  gap: var(--ui-space-3);
+  align-items: center;
+  padding: var(--ui-space-3) 0;
+  border-bottom: 1px solid var(--ui-divider);
+  font-size: 0.8125rem;
+}
+
+.matchRow:last-child {
+  border-bottom: none;
+}
+
+.matchGw {
+  font-weight: 700;
+  color: var(--ui-text-muted);
+  font-size: 0.75rem;
+}
+
+.matchOppBlock {
+  min-width: 0;
+}
+
+.matchOppName {
+  font-weight: 600;
+  color: var(--ui-text-primary);
+}
+
+.matchOppMeta {
+  font-size: 0.6875rem;
+  color: var(--ui-text-muted);
+}
+
+.scorePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 4px 8px;
+  border-radius: var(--ui-radius-sm);
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+.scoreWin {
+  background: var(--ui-accent);
+  color: var(--ui-accent-text);
+}
+
+.scoreDraw {
+  background: var(--ui-bg-surface);
+  color: var(--ui-text-secondary);
+  border: 1px solid var(--ui-border);
+}
+
+.scoreLoss {
+  background: var(--ui-live-muted);
+  color: var(--ui-live);
+}
+
+.contribBadge {
+  font-weight: 700;
+  color: var(--ui-accent);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.profileGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ui-space-4);
+  margin-bottom: var(--ui-space-5);
+}
+
+@media (min-width: 48em) {
+  .profileGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.profileItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profileValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ui-text-primary);
+}
+
+.profileLabel {
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
+}
+
+.statGroup {
+  margin-bottom: var(--ui-space-5);
+}
+
+.statGroupTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ui-text-primary);
+  margin: 0 0 var(--ui-space-3);
+  padding-bottom: var(--ui-space-2);
+  border-bottom: 1px solid var(--ui-divider);
+}
+
+.statLine {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--ui-divider);
+}
+
+.statLine:last-child {
+  border-bottom: none;
+}
+
+.statName {
+  color: var(--ui-text-secondary);
+}
+
+.statVal {
+  font-weight: 700;
+  color: var(--ui-text-primary);
+}
+
+.careerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-3) 0;
+  border-bottom: 1px solid var(--ui-divider);
+}
+
+.careerRow:last-child {
+  border-bottom: none;
+}
+
+.careerClubBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ui-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.careerCrest {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.careerDates {
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
+  font-weight: 500;
+}
+
+.careerNums {
+  display: flex;
+  gap: var(--ui-space-4);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ui-text-secondary);
+  flex-shrink: 0;
+}
+
+.emptyNote {
+  font-size: 0.875rem;
+  color: var(--ui-text-muted);
+  text-align: center;
+  padding: var(--ui-space-6) 0;
+}

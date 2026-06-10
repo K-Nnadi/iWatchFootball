@@ -97,14 +97,24 @@ export function FiltersPanel({
                 <Text size="md" fw={600} style={{ color: 'var(--modern-text-primary)' }}>
                     Filters
                 </Text>
-                <ActionIcon
-                    variant="subtle"
-                    onClick={onToggle}
-                    style={{ color: 'var(--modern-text-primary)' }}
-                    aria-label={isOpen ? 'Collapse filters' : 'Expand filters'}
-                >
-                    {isOpen ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
-                </ActionIcon>
+                <Group gap="xs">
+                    <Button
+                        variant="subtle"
+                        size="compact-sm"
+                        onClick={onReset}
+                        style={{ color: 'var(--modern-text-secondary)' }}
+                    >
+                        Reset all
+                    </Button>
+                    <ActionIcon
+                        variant="subtle"
+                        onClick={onToggle}
+                        style={{ color: 'var(--modern-text-primary)' }}
+                        aria-label={isOpen ? 'Collapse filters' : 'Expand filters'}
+                    >
+                        {isOpen ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
+                    </ActionIcon>
+                </Group>
             </Group>
 
             <Collapse in={isOpen}>
@@ -269,18 +279,6 @@ export function FiltersPanel({
                             onChange={(value) => onFiltersChange({ fanSide: value })}
                             clearable
                         />
-                    </Grid.Col>
-
-                    <Grid.Col span={{ base: 12, sm: 6, md: 0.5 }}>
-                        <Button
-                            variant="filled"
-                            color="red"
-                            fullWidth
-                            mt="xl"
-                            onClick={onReset}
-                        >
-                            Reset All
-                        </Button>
                     </Grid.Col>
                 </Grid>
             </Collapse>

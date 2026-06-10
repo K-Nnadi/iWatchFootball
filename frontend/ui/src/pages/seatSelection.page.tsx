@@ -26,7 +26,7 @@ const DEFAULT_MATCH_DETAILS: MatchDetails = {
 
 export function SeatSelectionPage() {
     const { navigateWithTransition } = usePageTransition();
-    const { matchId } = useParams<{ matchId: string }>();
+    const { id: matchId } = useParams<{ id: string }>();
     const routerLocation = useLocation();
     const { colorScheme } = useMantineColorScheme();
     const isDark = colorScheme === 'dark';
@@ -45,6 +45,7 @@ export function SeatSelectionPage() {
     });
     const [selectedSectionId, setSelectedSectionId] = useState<string | undefined>();
     const [filtersOpen, setFiltersOpen] = useState(true);
+    const [buyingTicketId, setBuyingTicketId] = useState<string | null>(null);
 
     // Mock tickets data
     const [allTickets] = useState<Ticket[]>([
@@ -149,7 +150,12 @@ export function SeatSelectionPage() {
 
     const handleBuyNow = async (ticketId: string) => {
         const ticket = allTickets.find((t) => t.id === ticketId);
-        if (!ticket || !matchId) return;
+        if (!ticket) return;
+
+        if (!matchId) {
+            notify.error('Invalid match', 'Cannot reserve tickets for this fixture.');
+            return;
+        }
 
         const fixtureId = Number.parseInt(matchId, 10);
         if (!Number.isFinite(fixtureId)) {
@@ -166,6 +172,7 @@ export function SeatSelectionPage() {
         const offerKey = buildTicketOfferKey(matchId, ticket.id);
         const quantity = ticket.seatsTogether || 1;
 
+        setBuyingTicketId(ticketId);
         try {
             const { expiresAt, holdMinutes } = await acquireTicketHold({
                 fixtureId,
@@ -205,7 +212,10 @@ export function SeatSelectionPage() {
             });
         } catch (e: unknown) {
             const status = (e as { response?: { status?: number } })?.response?.status;
-            if (status === 409) {
+            if (status === 401) {
+                notify.warning('Sign in required', 'Please sign in to reserve tickets, then try again.');
+                navigateWithTransition('/login', { state: { from: { pathname: routerLocation.pathname } } });
+            } else if (status === 409) {
                 notify.warning('Ticket currently reserved', 'Another customer is holding this ticket right now. Please try again in a few minutes or choose a different option.');
             } else {
                 const msg =
@@ -214,6 +224,8 @@ export function SeatSelectionPage() {
                     'Could not reserve these tickets.';
                 notify.error('Reservation failed', msg);
             }
+        } finally {
+            setBuyingTicketId(null);
         }
     };
 
@@ -289,6 +301,7 @@ export function SeatSelectionPage() {
                                                 key={ticket.id}
                                                 ticket={ticket}
                                                 onBuyNow={handleBuyNow}
+                                                buying={buyingTicketId === ticket.id}
                                             />
                                         ))
                                     ) : (

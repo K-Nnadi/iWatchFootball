@@ -88,6 +88,8 @@ interface MatchDatePickerProps {
   onChange: (date: Date) => void;
   onToday?: () => void;
   showTodayAction?: boolean;
+  /** Earliest selectable day (inclusive). */
+  minDate?: Date;
 }
 
 export function MatchDatePicker({
@@ -95,6 +97,7 @@ export function MatchDatePicker({
   onChange,
   onToday,
   showTodayAction = true,
+  minDate,
 }: MatchDatePickerProps) {
   const { t } = useTranslation();
   const [displayMonth, setDisplayMonth] = useState(value ?? new Date());
@@ -123,6 +126,7 @@ export function MatchDatePicker({
             onChange(date);
           }
         }}
+        minDate={minDate}
         firstDayOfWeek={1}
         hideOutsideDates
         withCellSpacing={false}

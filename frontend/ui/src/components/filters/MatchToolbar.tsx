@@ -12,7 +12,7 @@ import { UiButton, MatchDatePicker, matchDatePickerClasses } from '../ui';
 import { formatMatchHeadingDate, useTranslation } from '../../i18n';
 import classes from './MatchToolbar.module.css';
 
-interface MatchToolbarProps {
+interface MatchToolbarBaseProps {
     dates: Date[];
     selectedDateIndex: number;
     setSelectedDateIndex: (index: number) => void;
@@ -21,13 +21,31 @@ interface MatchToolbarProps {
     onDateSelect: (date: Date) => void;
     onReturnToToday?: () => void;
     getDateLabel: (d: Date) => string;
-    showLive: boolean;
-    setShowLive: (checked: boolean) => void;
-    showAvailableTickets: boolean;
-    setShowAvailableTickets: (checked: boolean) => void;
     teamSearch: string;
     onTeamSearchChange: (value: string) => void;
+    /** Disable scrolling the carousel to days before minDate. */
+    disableDatePrev?: boolean;
+    /** Earliest day selectable in the calendar popover. */
+    minSelectableDate?: Date;
 }
+
+type MatchToolbarProps = MatchToolbarBaseProps &
+    (
+        | {
+              showFilterChips?: true;
+              showLive: boolean;
+              setShowLive: (checked: boolean) => void;
+              showAvailableTickets: boolean;
+              setShowAvailableTickets: (checked: boolean) => void;
+          }
+        | {
+              showFilterChips: false;
+              showLive?: never;
+              setShowLive?: never;
+              showAvailableTickets?: never;
+              setShowAvailableTickets?: never;
+          }
+    );
 
 export function MatchToolbar({
     dates,
@@ -38,20 +56,25 @@ export function MatchToolbar({
     onDateSelect,
     onReturnToToday,
     getDateLabel,
-    showLive,
-    setShowLive,
-    showAvailableTickets,
-    setShowAvailableTickets,
     teamSearch,
     onTeamSearchChange,
+    disableDatePrev = false,
+    minSelectableDate,
+    ...filterProps
 }: MatchToolbarProps) {
+    const showFilterChips = filterProps.showFilterChips !== false;
+    const showLive = showFilterChips ? filterProps.showLive : false;
+    const setShowLive = showFilterChips ? filterProps.setShowLive : () => {};
+    const showAvailableTickets = showFilterChips ? filterProps.showAvailableTickets : false;
+    const setShowAvailableTickets = showFilterChips ? filterProps.setShowAvailableTickets : () => {};
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isCompact = useMediaQuery('(max-width: 640px)');
     const [datePickerOpened, setDatePickerOpened] = useState(false);
     const { t } = useTranslation();
 
     const selectedDate = dates[selectedDateIndex];
-    const hasActiveFilters = showLive || showAvailableTickets || teamSearch.trim().length > 0;
+    const hasActiveFilters =
+        (showFilterChips && (showLive || showAvailableTickets)) || teamSearch.trim().length > 0;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -62,8 +85,10 @@ export function MatchToolbar({
             today.getTime();
 
     const handleClear = () => {
-        setShowLive(false);
-        setShowAvailableTickets(false);
+        if (showFilterChips) {
+            setShowLive(false);
+            setShowAvailableTickets(false);
+        }
         onTeamSearchChange('');
     };
 
@@ -102,6 +127,7 @@ export function MatchToolbar({
                         size="lg"
                         className={classes.navIcon}
                         aria-label={t('matches.prevDays')}
+                        disabled={disableDatePrev}
                     >
                         <IconChevronLeft size={18} />
                     </ActionIcon>
@@ -163,6 +189,7 @@ export function MatchToolbar({
                     <Popover.Dropdown className={matchDatePickerClasses.popoverDropdown}>
                         <MatchDatePicker
                             value={selectedDate}
+                            minDate={minSelectableDate}
                             onChange={(date) => {
                                 onDateSelect(date);
                                 setDatePickerOpened(false);
@@ -177,26 +204,28 @@ export function MatchToolbar({
             </div>
 
             <div className={classes.filterSection}>
-                <Group gap="sm" wrap="wrap" className={classes.filterChips}>
-                    <Chip
-                        checked={showLive}
-                        onChange={setShowLive}
-                        variant="outline"
-                        color="green"
-                        styles={chipStyles}
-                    >
-                        {t('matches.liveNow')}
-                    </Chip>
-                    <Chip
-                        checked={showAvailableTickets}
-                        onChange={setShowAvailableTickets}
-                        variant="outline"
-                        color="green"
-                        styles={chipStyles}
-                    >
-                        {t('matches.hasTickets')}
-                    </Chip>
-                </Group>
+                {showFilterChips && (
+                    <Group gap="sm" wrap="wrap" className={classes.filterChips}>
+                        <Chip
+                            checked={showLive}
+                            onChange={setShowLive}
+                            variant="outline"
+                            color="green"
+                            styles={chipStyles}
+                        >
+                            {t('matches.liveNow')}
+                        </Chip>
+                        <Chip
+                            checked={showAvailableTickets}
+                            onChange={setShowAvailableTickets}
+                            variant="outline"
+                            color="green"
+                            styles={chipStyles}
+                        >
+                            {t('matches.hasTickets')}
+                        </Chip>
+                    </Group>
+                )}
 
                 <TextInput
                     className={classes.searchInput}

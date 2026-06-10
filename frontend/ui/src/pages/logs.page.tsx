@@ -791,7 +791,7 @@ export function LogsPage() {
                                 ) : (
                                     <SimpleGrid
                                         cols={1}
-                                        style={{ gap: 'var(--mantine-spacing-lg)', maxHeight: '80vh', overflowY: 'auto', padding: '0 8px' }}
+                                        style={{ gap: 'var(--ui-space-3)', maxHeight: '80vh', overflowY: 'auto', padding: '0 8px' }}
                                     >
                                         {filteredLoggedFixtures.map((fixture) => (
                                             <LoggedFixtureCard

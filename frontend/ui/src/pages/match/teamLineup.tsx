@@ -1,6 +1,8 @@
 import React from 'react';
-import { Box, Paper, Title, Tabs, Text, SimpleGrid } from '@mantine/core';
+import { Box, Paper, Title, Tabs, Text, SimpleGrid, UnstyledButton } from '@mantine/core';
 import { useTranslation } from '../../i18n/useTranslation';
+import { usePageTransition } from '../../hooks/usePageTransition';
+import { isNavigablePlayerId, playerPageTransition } from '../../shared/playerNavigation';
 import { FormationView } from "./formation";
 import { Lineup, MatchDetails, Player } from "./match.page";  // Verify import paths
 
@@ -172,6 +174,13 @@ interface SubstitutesListProps {
 
 function SubstitutesList({ substitutes }: SubstitutesListProps) {
     const { t } = useTranslation();
+    const { navigateWithTransition } = usePageTransition();
+
+    const handlePlayerClick = (player: Player) => {
+        if (!isNavigablePlayerId(player.id)) return;
+        navigateWithTransition(`/player/${player.id}`, playerPageTransition);
+    };
+
     return (
         <Box mt="xl" mx="auto" maw={{ base: '100%', sm: 920 }}>
             <Title size="sm" fw={500} mb="md" ta="center" style={{ color: 'var(--modern-text-primary)' }}>{t('match.substitutes')}</Title>
@@ -181,25 +190,52 @@ function SubstitutesList({ substitutes }: SubstitutesListProps) {
                     spacing={{ base: 'xs', xs: 'sm' }}
                     verticalSpacing={{ base: 'xs', xs: 'sm' }}
                 >
-                    {substitutes.map((substitute) => (
-                        <Text
-                            key={substitute.id}
-                            fz="sm"
-                            lh={1.45}
-                            ta={{ base: 'left', xs: 'center' }}
-                            style={{
-                                color: 'var(--modern-text-secondary)',
-                                padding: '0.45rem 0.65rem',
-                                borderRadius: 8,
-                                backgroundColor: 'color-mix(in srgb, var(--modern-border-color) 55%, transparent)',
-                                border: '1px solid var(--modern-border-color)',
-                                overflowWrap: 'anywhere',
-                                wordBreak: 'break-word',
-                            }}
-                        >
-                            {substitute.name}
-                        </Text>
-                    ))}
+                    {substitutes.map((substitute) => {
+                        const canNavigate = isNavigablePlayerId(substitute.id);
+                        const chipStyle = {
+                            color: 'var(--modern-text-secondary)',
+                            padding: '0.45rem 0.65rem',
+                            borderRadius: 8,
+                            backgroundColor: 'color-mix(in srgb, var(--modern-border-color) 55%, transparent)',
+                            border: '1px solid var(--modern-border-color)',
+                            overflowWrap: 'anywhere' as const,
+                            wordBreak: 'break-word' as const,
+                            fontSize: 'var(--mantine-font-size-sm)',
+                            lineHeight: 1.45,
+                            textAlign: 'center' as const,
+                            width: '100%',
+                        };
+
+                        if (!canNavigate) {
+                            return (
+                                <Text key={substitute.id} fz="sm" lh={1.45} ta={{ base: 'left', xs: 'center' }} style={chipStyle}>
+                                    {substitute.name}
+                                </Text>
+                            );
+                        }
+
+                        return (
+                            <UnstyledButton
+                                key={substitute.id}
+                                type="button"
+                                onClick={() => handlePlayerClick(substitute)}
+                                aria-label={substitute.name}
+                                styles={{
+                                    root: {
+                                        ...chipStyle,
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                                        '&:hover': {
+                                            backgroundColor: 'color-mix(in srgb, var(--modern-lime) 8%, transparent)',
+                                            borderColor: 'rgba(0, 255, 136, 0.35)',
+                                        },
+                                    },
+                                }}
+                            >
+                                {substitute.name}
+                            </UnstyledButton>
+                        );
+                    })}
                 </SimpleGrid>
             ) : (
                 <Text size="sm" ta="center" style={{ color: 'var(--modern-text-secondary)' }}>{t('match.noSubstitutes')}</Text>

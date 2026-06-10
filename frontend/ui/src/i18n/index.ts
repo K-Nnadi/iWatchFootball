@@ -8,4 +8,4 @@ export {
     SUPPORTED_LOCALES,
     type AppLocale,
 } from './config';
-export { formatMatchHeadingDate, formatMatchShortDate, formatLocaleDateTime } from './formatDate';
+export { formatMatchHeadingDate, formatMatchShortDate, formatLocaleDateTime, formatLogCardDate } from './formatDate';

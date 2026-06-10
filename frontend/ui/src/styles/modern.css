@@ -88,7 +88,10 @@ body,
   transition: opacity 300ms ease-in-out, background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Page transition ball uses inline styles for transitions - don't override */
+/* Page transition ball — module handles spin/fade; block global transition overrides while spinning */
+.page-transition-ball--spinning {
+  transition: none !important;
+}
 
 /* Ensure all Mantine components use our design system - only for dark theme */
 .dark-theme .mantine-Button-root {

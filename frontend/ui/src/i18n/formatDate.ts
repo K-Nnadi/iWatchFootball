@@ -14,3 +14,8 @@ export function formatMatchShortDate(date: Date): string {
 export function formatLocaleDateTime(date: Date | string): string {
     return dayjs(date).format('ddd, D MMM YYYY, HH:mm');
 }
+
+/** Logged match card — weekday + calendar date. */
+export function formatLogCardDate(date: Date | string): string {
+    return dayjs(date).format('ddd, D MMM YYYY');
+}

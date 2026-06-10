@@ -21,6 +21,7 @@ export interface Ticket {
 interface TicketCardProps {
     ticket: Ticket;
     onBuyNow: (ticketId: string) => void;
+    buying?: boolean;
 }
 
 const CATEGORY_COLORS: Record<number, string> = {
@@ -30,7 +31,7 @@ const CATEGORY_COLORS: Record<number, string> = {
     4: 'gray',
 };
 
-export function TicketCard({ ticket, onBuyNow }: TicketCardProps) {
+export function TicketCard({ ticket, onBuyNow, buying = false }: TicketCardProps) {
     const { colorScheme } = useMantineColorScheme();
     const isDark = colorScheme === 'dark';
     const maxQuantity = Math.min(ticket.available, 10);
@@ -124,7 +125,12 @@ export function TicketCard({ ticket, onBuyNow }: TicketCardProps) {
                     fullWidth
                     variant="primary"
                     size="sm"
-                    onClick={() => onBuyNow(ticket.id)}
+                    loading={buying}
+                    disabled={buying}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onBuyNow(ticket.id);
+                    }}
                 >
                     Buy Now
                 </ModernButton>

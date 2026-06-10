@@ -14,6 +14,7 @@ import {
 import { IconTag, IconCheck, IconX, IconClock } from '@tabler/icons-react';
 import { notify } from '../../shared/notify';
 import { usePageTransition } from '../../hooks/usePageTransition';
+import { useTranslation } from '../../i18n';
 import { ModernH1, ModernBody, ModernButton, ModernCard } from '../../components/modern';
 import {
     getMyListings,
@@ -35,7 +36,23 @@ const STATUS_ICONS: Record<MarketplaceListing['status'], React.ReactNode> = {
     EXPIRED: <IconX size={14} />,
 };
 
+function listingStatusLabel(status: MarketplaceListing['status'], t: (key: string) => string): string {
+    switch (status) {
+        case 'ACTIVE':
+            return t('marketplace.statusActive');
+        case 'SOLD':
+            return t('marketplace.statusSold');
+        case 'EXPIRED':
+            return t('marketplace.statusExpired');
+        case 'CANCELLED':
+            return t('marketplace.statusCancelled');
+        default:
+            return status;
+    }
+}
+
 export function MyListingsPage() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const [listings, setListings] = useState<MarketplaceListing[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,11 +65,11 @@ export function MyListingsPage() {
             const data = await getMyListings();
             setListings(data);
         } catch {
-            notify.error('Could not load listings', 'Please try refreshing.');
+            notify.error(t('marketplace.myListingsLoadFailedTitle'), t('marketplace.myListingsLoadFailedMessage'));
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         void fetchListings();
@@ -62,7 +79,7 @@ export function MyListingsPage() {
         setCancellingId(listingId);
         try {
             await cancelListing(listingId);
-            notify.success('Listing cancelled', 'Your ticket has been returned to your account.');
+            notify.success(t('marketplace.listingCancelledTitle'), t('marketplace.listingCancelledMessage'));
             setListings((prev) =>
                 prev.map((l) =>
                     l.id === listingId ? { ...l, status: 'CANCELLED' as const } : l,
@@ -71,8 +88,8 @@ export function MyListingsPage() {
         } catch (e: unknown) {
             const msg =
                 (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-                'Failed to cancel listing.';
-            notify.error('Cancellation failed', msg);
+                t('marketplace.cancellationFailedMessage');
+            notify.error(t('marketplace.cancellationFailedTitle'), msg);
         } finally {
             setCancellingId(null);
         }
@@ -107,27 +124,29 @@ export function MyListingsPage() {
                             fontWeight: 600,
                         }}
                     >
-                        {listing.status}
+                        {listingStatusLabel(listing.status, t)}
                     </Badge>
                     <Text size="xs" c="dimmed">
                         #{listing.id}
                     </Text>
                 </Group>
                 <Text size="xs" c="dimmed">
-                    Listed {new Date(listing.createdAt).toLocaleDateString()}
+                    {t('marketplace.listedOn', {
+                        date: new Date(listing.createdAt).toLocaleDateString(),
+                    })}
                 </Text>
             </Group>
 
             <Group justify="space-between" mb="sm">
                 <Stack gap={2}>
                     <Text size="sm" fw={500} style={{ color: 'var(--modern-text-primary)' }} lineClamp={2}>
-                        {listing.ticket?.fixtureLabel ?? listing.ticket?.category ?? 'Ticket'}
+                        {listing.ticket?.fixtureLabel ?? listing.ticket?.category ?? t('marketplace.ticketFallback')}
                     </Text>
                     <Text size="xs" c="dimmed">
-                        {listing.ticket?.category ?? 'General Admission'}
+                        {listing.ticket?.category ?? t('marketplace.generalAdmission')}
                         {listing.ticket?.fixtureId != null &&
                             listing.ticket?.fixtureLabel == null &&
-                            ` · Fixture #${listing.ticket.fixtureId}`}
+                            ` · ${t('marketplace.fixtureFallback', { id: listing.ticket.fixtureId })}`}
                         {listing.ticket?.stadiumName ? ` · ${listing.ticket.stadiumName}` : ''}
                         {' · '}
                         Ticket #{listing.ticketId}
@@ -135,7 +154,7 @@ export function MyListingsPage() {
                 </Stack>
                 <Stack gap={2} align="flex-end">
                     <Text size="xs" c="dimmed">
-                        Asking
+                        {t('marketplace.asking')}
                     </Text>
                     <Text size="sm" fw={700} style={{ color: 'var(--modern-lime)' }}>
                         {formatPrice(listing.askPrice)}
@@ -146,7 +165,7 @@ export function MyListingsPage() {
             {listing.status === 'ACTIVE' && (
                 <Group gap="sm">
                     <Text size="xs" c="dimmed" style={{ flex: 1 }}>
-                        Expires{' '}
+                        {t('marketplace.expires')}{' '}
                         {new Date(listing.expiresAt).toLocaleString('en-GB', {
                             weekday: 'short',
                             month: 'short',
@@ -165,7 +184,7 @@ export function MyListingsPage() {
                         {cancellingId === listing.id ? (
                             <Loader size="xs" />
                         ) : (
-                            'Cancel Listing'
+                            t('marketplace.cancelListing')
                         )}
                     </ModernButton>
                 </Group>
@@ -185,21 +204,20 @@ export function MyListingsPage() {
                 <Group justify="space-between" mb="lg" align="center">
                     <Group gap="sm" align="center">
                         <IconTag size={28} color="var(--modern-lime)" />
-                        <ModernH1>My Listings</ModernH1>
+                        <ModernH1>{t('marketplace.myListings')}</ModernH1>
                     </Group>
                     <ModernButton
                         variant="primary"
                         onClick={() => navigateWithTransition('/marketplace/sell')}
                     >
-                        + New Listing
+                        {t('marketplace.newListing')}
                     </ModernButton>
                 </Group>
 
                 <ModernBody
                     style={{ color: 'var(--modern-text-secondary)', marginBottom: '1.5rem' }}
                 >
-                    Manage your marketplace listings. Cancel active listings to reclaim your
-                    tickets.
+                    {t('marketplace.myListingsDescription')}
                 </ModernBody>
 
                 {loading ? (
@@ -222,17 +240,17 @@ export function MyListingsPage() {
                             style={{ margin: '0 auto 1rem' }}
                         />
                         <Text fw={600} mb="xs" style={{ color: 'var(--modern-text-primary)' }}>
-                            No listings yet
+                            {t('marketplace.myListingsEmptyTitle')}
                         </Text>
                         <ModernBody style={{ color: 'var(--modern-light-gray)' }}>
-                            List a ticket on the marketplace and earn platform credit when it sells.
+                            {t('marketplace.myListingsEmptyMessage')}
                         </ModernBody>
                         <ModernButton
                             variant="primary"
                             mt="md"
                             onClick={() => navigateWithTransition('/marketplace/sell')}
                         >
-                            List a Ticket
+                            {t('marketplace.listTicket')}
                         </ModernButton>
                     </ModernCard>
                 ) : (
@@ -246,7 +264,7 @@ export function MyListingsPage() {
                     >
                         <Tabs.List>
                             <Tabs.Tab value="active">
-                                Active{' '}
+                                {t('marketplace.tabActive')}{' '}
                                 {active.length > 0 && (
                                     <Badge
                                         size="xs"
@@ -261,20 +279,20 @@ export function MyListingsPage() {
                                 )}
                             </Tabs.Tab>
                             <Tabs.Tab value="sold">
-                                Sold{' '}
+                                {t('marketplace.tabSold')}{' '}
                                 {sold.length > 0 && (
                                     <Badge size="xs" ml="xs" color="blue">
                                         {sold.length}
                                     </Badge>
                                 )}
                             </Tabs.Tab>
-                            <Tabs.Tab value="past">Past</Tabs.Tab>
+                            <Tabs.Tab value="past">{t('marketplace.tabPast')}</Tabs.Tab>
                         </Tabs.List>
 
                         <Tabs.Panel value="active">
                             {active.length === 0 ? (
                                 <Text c="dimmed" ta="center" py="xl">
-                                    No active listings.
+                                    {t('marketplace.noActiveListings')}
                                 </Text>
                             ) : (
                                 <Stack gap="sm">{active.map(renderListingCard)}</Stack>
@@ -284,7 +302,7 @@ export function MyListingsPage() {
                         <Tabs.Panel value="sold">
                             {sold.length === 0 ? (
                                 <Text c="dimmed" ta="center" py="xl">
-                                    No sold listings yet.
+                                    {t('marketplace.noSoldListings')}
                                 </Text>
                             ) : (
                                 <Stack gap="sm">{sold.map(renderListingCard)}</Stack>
@@ -294,7 +312,7 @@ export function MyListingsPage() {
                         <Tabs.Panel value="past">
                             {past.length === 0 ? (
                                 <Text c="dimmed" ta="center" py="xl">
-                                    No cancelled or expired listings.
+                                    {t('marketplace.noPastListings')}
                                 </Text>
                             ) : (
                                 <Stack gap="sm">{past.map(renderListingCard)}</Stack>
