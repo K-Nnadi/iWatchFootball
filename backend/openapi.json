@@ -4743,6 +4743,7 @@
         ],
         "summary": "Get tracker privacy settings for the current user",
         "tags": [
+          "tracker",
           "tracker"
         ]
       },
@@ -4774,6 +4775,7 @@
         ],
         "summary": "Update tracker privacy settings",
         "tags": [
+          "tracker",
           "tracker"
         ]
       }
@@ -4806,6 +4808,7 @@
         ],
         "summary": "Get aggregate tracker stats for a user (privacy-gated)",
         "tags": [
+          "tracker",
           "tracker"
         ]
       }
@@ -4838,6 +4841,7 @@
         ],
         "summary": "Compare tracker stats with a friend (premium)",
         "tags": [
+          "tracker",
           "tracker"
         ]
       }
@@ -4873,6 +4877,7 @@
         ],
         "summary": "Public platform feature flags for client UI",
         "tags": [
+          "platform-config",
           "platform-config"
         ]
       }
@@ -4896,6 +4901,7 @@
         ],
         "summary": "List accepted friends and pending requests",
         "tags": [
+          "social",
           "social"
         ]
       }
@@ -4928,6 +4934,7 @@
         ],
         "summary": "Search users by username or name (for adding friends)",
         "tags": [
+          "social",
           "social"
         ]
       }
@@ -4961,6 +4968,7 @@
         ],
         "summary": "Send a friend request",
         "tags": [
+          "social",
           "social"
         ]
       }
@@ -4993,6 +5001,7 @@
         ],
         "summary": "Accept an incoming friend request",
         "tags": [
+          "social",
           "social"
         ]
       }
@@ -5025,6 +5034,7 @@
         ],
         "summary": "Decline an incoming friend request",
         "tags": [
+          "social",
           "social"
         ]
       }
@@ -5057,6 +5067,7 @@
         ],
         "summary": "Remove an accepted friend",
         "tags": [
+          "social",
           "social"
         ]
       }
@@ -5090,6 +5101,7 @@
         ],
         "summary": "List recent in-app notifications",
         "tags": [
+          "notifications",
           "notifications"
         ]
       }
@@ -5113,6 +5125,7 @@
         ],
         "summary": "Unread notification count",
         "tags": [
+          "notifications",
           "notifications"
         ]
       }
@@ -5145,6 +5158,7 @@
         ],
         "summary": "Mark one notification as read",
         "tags": [
+          "notifications",
           "notifications"
         ]
       }
@@ -5168,6 +5182,7 @@
         ],
         "summary": "Mark all notifications as read",
         "tags": [
+          "notifications",
           "notifications"
         ]
       }
@@ -13323,6 +13338,7 @@
         ],
         "summary": "Reserve a listing exclusively until expiry or checkout",
         "tags": [
+          "ticket-hold",
           "ticket-hold"
         ]
       }
@@ -13356,6 +13372,7 @@
         ],
         "summary": "Cancel reservation (timeout or user abandoned)",
         "tags": [
+          "ticket-hold",
           "ticket-hold"
         ]
       }
@@ -13404,6 +13421,7 @@
         ],
         "summary": "Check reservation is still valid during checkout",
         "tags": [
+          "ticket-hold",
           "ticket-hold"
         ]
       }
@@ -13444,6 +13462,7 @@
         ],
         "summary": "Validate a discount code for current user & order total",
         "tags": [
+          "discount-code",
           "discount-code"
         ]
       }
@@ -13467,6 +13486,7 @@
         ],
         "summary": "Admin: list all discount codes",
         "tags": [
+          "discount-code",
           "discount-code"
         ]
       },
@@ -13525,6 +13545,7 @@
         ],
         "summary": "Admin: create a discount code",
         "tags": [
+          "discount-code",
           "discount-code"
         ]
       }
@@ -13557,6 +13578,7 @@
         ],
         "summary": "Admin: toggle a discount code active/inactive",
         "tags": [
+          "discount-code",
           "discount-code"
         ]
       }
@@ -15935,6 +15957,7 @@
         ],
         "summary": "Current tracker plan and limits for the logged-in user",
         "tags": [
+          "subscriptions",
           "subscriptions"
         ]
       }
@@ -15986,6 +16009,7 @@
         ],
         "summary": "Create Stripe Checkout session for Premium monthly subscription",
         "tags": [
+          "subscriptions",
           "subscriptions"
         ]
       }
@@ -16023,6 +16047,7 @@
         ],
         "summary": "Stripe Customer Portal — manage or cancel subscription",
         "tags": [
+          "subscriptions",
           "subscriptions"
         ]
       }
@@ -16094,6 +16119,7 @@
         ],
         "summary": "Enabled payment processors for checkout UI",
         "tags": [
+          "payments",
           "payments"
         ]
       }
@@ -16127,6 +16153,7 @@
         ],
         "summary": "Create a PSP checkout session for primary ticket purchase",
         "tags": [
+          "payments",
           "payments"
         ]
       }
@@ -16159,6 +16186,7 @@
         ],
         "summary": "Poll payment session status after Stripe confirm",
         "tags": [
+          "payments",
           "payments"
         ]
       }
@@ -16594,6 +16622,7 @@
         ],
         "summary": "Confirm ticket purchase (atomic payment + tickets + hold release)",
         "tags": [
+          "checkout",
           "checkout"
         ]
       }
@@ -16639,6 +16668,7 @@
         ],
         "summary": "Full primary-market refund (admin): VOID tickets + REFUND ledger + release discount usage",
         "tags": [
+          "checkout",
           "checkout"
         ]
       }
@@ -16697,6 +16727,7 @@
         ],
         "summary": "Get all tickets currently in the logged-in user's wallet",
         "tags": [
+          "user-ticket-log",
           "user-ticket-log"
         ]
       }
@@ -16960,6 +16991,7 @@
         ],
         "summary": "Browse active marketplace listings",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       },
@@ -16991,6 +17023,7 @@
         ],
         "summary": "List an owned ticket for resale",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }
@@ -17014,6 +17047,7 @@
         ],
         "summary": "Get the authenticated user's own listings",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }
@@ -17046,6 +17080,7 @@
         ],
         "summary": "Get a single marketplace listing by id",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       },
@@ -17088,6 +17123,7 @@
         ],
         "summary": "Cancel an active listing (seller only). Ticket returned to seller.",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }
@@ -17138,6 +17174,7 @@
         ],
         "summary": "Reserve a listing exclusively before payment (15 min hold)",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }
@@ -17191,6 +17228,7 @@
         ],
         "summary": "Get the fee breakdown for a listing before purchasing",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }
@@ -17239,6 +17277,7 @@
         ],
         "summary": "Complete a marketplace ticket purchase (atomic: payment + ticket transfer + seller credit)",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }
@@ -17281,6 +17320,7 @@
         ],
         "summary": "Update a platform config value (admin only)",
         "tags": [
+          "marketplace",
           "marketplace"
         ]
       }

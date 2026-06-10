@@ -79,7 +79,7 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 			const rel = query.relations as unknown;
 			// String arrays must bypass recurse helpers — otherwise each relation string is iterated like an object (chars).
 			if (Array.isArray(rel) && rel.every((item) => typeof item === 'string')) {
-				parsedRelations = rel as FindOptionsRelations<T>;
+				parsedRelations = rel as unknown as FindOptionsRelations<T>;
 			} else {
 				parsedRelations = (await recurseWithAsyncValueFunction(query.relations, async (obj, key, val) => {
 					if (val === 'true') {
