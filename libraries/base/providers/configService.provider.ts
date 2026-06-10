@@ -26,9 +26,13 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 		const isCloudRun = !!(process.env.K_SERVICE || process.env.GAE_SERVICE);
 		const isDocker = !!(process.env.DOCKER_ENV === 'true' || fs.existsSync('/.dockerenv'));
 		
-		// In Cloud Run, ALWAYS use Unix socket connection for Cloud SQL (more reliable and secure)
-		// Even if DATABASE_HOST is set to an IP, we override it to use the socket
-		const cloudSqlSocketPath = '/cloudsql/iwatchfootball:europe-west4:iwatchfootball-db';
+		// Cloud SQL Unix socket: /cloudsql/PROJECT:REGION:INSTANCE
+		const cloudSqlConnectionName =
+			getEnv('CLOUD_SQL_CONNECTION_NAME') ||
+			(getEnv('GCP_PROJECT_ID')
+				? `${getEnv('GCP_PROJECT_ID')}:europe-west4:iwatchfootball-db`
+				: 'iwatchfootball:europe-west4:iwatchfootball-db');
+		const cloudSqlSocketPath = `/cloudsql/${cloudSqlConnectionName}`;
 		const explicitHost = getEnv('DATABASE_HOST');
 		
 		// Database host: In Cloud Run, force socket connection; otherwise use explicit or defaults
@@ -65,7 +69,7 @@ export class ConfigServiceProvider implements TypeOrmOptionsFactory {
 				console.error(`Please verify:`);
 				console.error(`1. Cloud Run service has --add-cloudsql-instances flag set`);
 				console.error(`2. Cloud Run service account has "Cloud SQL Client" IAM role`);
-				console.error(`3. Cloud SQL instance name matches: ${defaultHost.replace('/cloudsql/', '')}`);
+				console.error(`3. Cloud SQL instance name matches: ${cloudSqlConnectionName}`);
 				console.error(`4. Cloud SQL instance is in the same region as Cloud Run service`);
 			} else {
 				console.log(`✅ Cloud SQL socket directory found: ${socketDir}`);

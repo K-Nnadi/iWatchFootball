@@ -83,18 +83,41 @@ jobs:
         run: gcloud auth configure-docker europe-west4-docker.pkg.dev
 
       - name: Ensure Cloud Run service account has Cloud SQL Client role
+i898999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999i        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ secrets.GCP_REGION }}
         run: |
-          # Get the default Compute Engine service account (used by Cloud Run if no custom SA is set)
-          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID }} --format="value(projectNumber)")
-          SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-          
-          # Grant Cloud SQL Client role to the service account
-          gcloud projects add-iam-policy-binding ${{ secrets.GCP_PROJECT_ID }} \
-            --member="serviceAccount:${SERVICE_ACCOUNT}" \
-            --role="roles/cloudsql.client" \
-            --condition=None || echo "Role may already be granted or using custom service account"
-          
-          echo "✅ Cloud SQL Client role verified for service account: ${SERVICE_ACCOUNT}"
+          set -euo pipefail
+          CLOUD_SQL_CONNECTION="${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db"
+
+          gcloud services enable sqladmin.googleapis.com run.googleapis.com --project="${GCP_PROJECT_ID}"
+
+          gcloud sql instances describe iwatchfootball-db --project="${GCP_PROJECT_ID}" \
+            || { echo "Cloud SQL instance not found: ${CLOUD_SQL_CONNECTION}"; exit 1; }
+
+          PROJECT_NUMBER=$(gcloud projects describe "${GCP_PROJECT_ID}" --format="value(projectNumber)")
+          DEFAULT_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+          grant_cloudsql_client() {
+            gcloud projects add-iam-policy-binding "${GCP_PROJECT_ID}" \
+              --member="serviceAccount:$1" \
+              --role="roles/cloudsql.client" \
+              --condition=None || true
+          }
+
+          grant_cloudsql_client "${DEFAULT_SA}"
+
+          EXISTING_SA=$(gcloud run services describe iwatchfootball-backend \
+            --region="${GCP_REGION}" \
+            --project="${GCP_PROJECT_ID}" \
+            --format='value(spec.template.spec.serviceAccountName)' 2>/dev/null || true)
+          if [ -n "${EXISTING_SA}" ] && [ "${EXISTING_SA}" != "${DEFAULT_SA}" ]; then
+            grant_cloudsql_client "${EXISTING_SA}"
+            echo "Cloud SQL Client role verified for Cloud Run service account: ${EXISTING_SA}"
+          fi
+
+          echo "Cloud SQL Client role verified for default service account: ${DEFAULT_SA}"
+          echo "Cloud SQL connection: ${CLOUD_SQL_CONNECTION}"
 
       - name: Build and push Docker image
         run: |
@@ -102,11 +125,21 @@ jobs:
           docker push europe-west4-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}
 
       - name: Deploy to Cloud Run
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ secrets.GCP_REGION }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
         run: |
+          set -euo pipefail
+          CLOUD_SQL_CONNECTION="${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db"
+          DATABASE_HOST="/cloudsql/${CLOUD_SQL_CONNECTION}"
+
           gcloud run deploy iwatchfootball-backend \
-            --image europe-west4-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }} \
+            --project "${GCP_PROJECT_ID}" \
+            --image "europe-west4-docker.pkg.dev/${GCP_PROJECT_ID}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}" \
             --platform managed \
-            --region ${{ secrets.GCP_REGION }} \
+            --region "${GCP_REGION}" \
             --allow-unauthenticated \
             --port 8080 \
             --memory 1Gi \
@@ -115,10 +148,13 @@ jobs:
             --max-instances 10 \
             --timeout 600 \
             --cpu-boost \
-            --add-cloudsql-instances iwatchfootball:europe-west4:iwatchfootball-db \
+            --add-cloudsql-instances "${CLOUD_SQL_CONNECTION}" \
             --set-env-vars NODE_ENV=production \
-            --set-env-vars DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
-            --set-env-vars DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            --set-env-vars "DATABASE_HOST=${DATABASE_HOST}" \
+            --set-env-vars "CLOUD_SQL_CONNECTION_NAME=${CLOUD_SQL_CONNECTION}" \
+            --set-env-vars "GCP_PROJECT_ID=${GCP_PROJECT_ID}" \
+            --set-env-vars DATABASE_USERNAME="${DATABASE_USERNAME}" \
+            --set-env-vars DATABASE_PASSWORD="${DATABASE_PASSWORD}" \
             --set-env-vars DATABASE_NAME=iwatchfootball \
             --set-env-vars DATABASE_TYPE=postgres \
             --set-env-vars DATABASE_SYNCHRONIZE=false
