@@ -16,6 +16,7 @@
 		}
 	},
 	"scripts": {
+		"prebuild": "pnpm --filter @iWatchFootball/base-tools build",
 		"build": "tsc",
 		"prepare": "pnpm run build"
 	},

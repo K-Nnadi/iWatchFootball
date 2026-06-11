@@ -1,6 +1,7 @@
 {
 	"name": "@iWatchFootball",
 	"scripts": {
+		"build:ci": "pnpm --filter @iWatchFootball/base-tools build && pnpm --filter ./clients build && pnpm --filter ./backend build && pnpm --filter ./frontend/ui build",
 		"run:frontend": "pnpm --filter ./frontend/ui dev",
 		"run:backend": "pnpm --filter ./backend start:dev",
 		"run:clients": "pnpm --filter ./backend generate:client-gen",

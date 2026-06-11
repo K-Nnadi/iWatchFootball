@@ -43,6 +43,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
+      - name: Build shared libraries
+        run: pnpm --filter @iWatchFootball/base-tools build
+
       - name: Build ${{ matrix.package }}
         if: github.event_name != 'pull_request' || contains(github.event.pull_request.changed_files, matrix.package)
         run: pnpm --filter ${{ matrix.package }} build
