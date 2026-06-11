@@ -90,8 +90,7 @@ jobs:
           set -euo pipefail
           CLOUD_SQL_CONNECTION="${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db"
 
-          gcloud services enable sqladmin.googleapis.com run.googleapis.com --project="${GCP_PROJECT_ID}"
-
+          # APIs must already be enabled on the project (deploy SA lacks serviceusage.services.enable).
           gcloud sql instances describe iwatchfootball-db --project="${GCP_PROJECT_ID}" \
             || { echo "Cloud SQL instance not found: ${CLOUD_SQL_CONNECTION}"; exit 1; }
 
