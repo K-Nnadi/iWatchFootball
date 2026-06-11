@@ -65,7 +65,11 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         try {
             const fastifyInstance = app.getHttpAdapter().getInstance();
 
-            await fastifyInstance.register(helmet, {
+            // Cast avoids TS2769 when pnpm resolves multiple fastify versions (e.g. 4.28 vs 4.29).
+            const registerPlugin = (fastifyInstance as unknown as {
+                register: (plugin: unknown, opts?: unknown) => PromiseLike<unknown>;
+            }).register.bind(fastifyInstance);
+            await registerPlugin(helmet, {
                 contentSecurityPolicy: false,
                 crossOriginEmbedderPolicy: false,
             });
@@ -220,17 +224,25 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         const cleanedDocument = cleanRefs(document);
         pruneOrphanRequiredDeep(cleanedDocument);
 
-        SwaggerModule.setup('api-docs', app, cleanedDocument, {
-            swaggerOptions: {
-                docExpansion: 'none', // All accordions closed by default
-            },
-        });
-        console.log('✅ Swagger documentation setup complete');
+        const exposeApiDocs =
+            process.env.NODE_ENV !== 'production' || process.env.EXPOSE_API_DOCS === 'true';
 
-        // openapi.json on disk (same cleaned doc as /api-docs)
+        if (exposeApiDocs) {
+            SwaggerModule.setup('api-docs', app, cleanedDocument, {
+                swaggerOptions: {
+                    docExpansion: 'none',
+                },
+            });
+            console.log('✅ Swagger documentation setup complete');
+        } else {
+            console.log('🔒 Swagger disabled in production (set EXPOSE_API_DOCS=true to enable)');
+        }
+
         try {
-            fs.writeFileSync('./openapi.json', JSON.stringify(cleanedDocument, null, 2));
-            console.log('✅ OpenAPI JSON file written (cleaned empty $ref values)');
+            if (process.env.NODE_ENV !== 'production') {
+                fs.writeFileSync('./openapi.json', JSON.stringify(cleanedDocument, null, 2));
+                console.log('✅ OpenAPI JSON file written (cleaned empty $ref values)');
+            }
         } catch (error) {
             console.warn('⚠️  Could not write openapi.json file (this is OK in production):', error);
         }

@@ -4,11 +4,9 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import App from "./App";
 import { configureApiClient } from './shared/api-client.config';
+import { ensureApiSession } from './shared/api-session';
 
-/** Must run before first paint so axios.defaults.baseURL is set; otherwise relative URLs hit the Vite origin (5173). */
 configureApiClient();
-
-
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -19,14 +17,19 @@ const queryClient = new QueryClient({
     },
 })
 
-const rootElement = document.getElementById('root')
+const rootElement = document.getElementById('root');
 
+async function bootstrap() {
+    await ensureApiSession();
 
-createRoot(rootElement!).render(
-    <StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <App/>
-            <ReactQueryDevtools initialIsOpen={false}/>
-        </QueryClientProvider>
-    </StrictMode>,
-)
+    createRoot(rootElement!).render(
+        <StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <App/>
+                <ReactQueryDevtools initialIsOpen={false}/>
+            </QueryClientProvider>
+        </StrictMode>,
+    );
+}
+
+void bootstrap();

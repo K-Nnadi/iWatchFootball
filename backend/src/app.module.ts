@@ -61,6 +61,7 @@ import {RateLimitModule} from "./auth/rate-limit/rate-limit.module";
 import {RedisModule} from "./shared/redis/redis.module";
 import {buildBullConnection, isRedisEnabled} from "./shared/redis/redis.config";
 import {HealthModule} from "./health/health.module";
+import {ApiEncryptionModule} from "./shared/crypto/api-encryption.module";
 
 const BULL_MODULE = isRedisEnabled()
     ? BullModule.forRoot({ connection: buildBullConnection() })
@@ -135,6 +136,7 @@ const ComplexModules = [
         RedisModule,
         RateLimitModule,
         HealthModule,
+        ApiEncryptionModule,
         ScheduleModule.forRoot(),
         ...(BULL_MODULE ? [BULL_MODULE] : []),
         ...Modules,

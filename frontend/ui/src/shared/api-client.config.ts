@@ -1,4 +1,48 @@
-import axios from 'axios';
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import {
+    decryptPayload,
+    encryptPayload,
+    isEncryptedPayload,
+} from './api-payload.crypto';
+import { ensureApiSession, getSessionAesKey, isApiPayloadEncryptionEnabled } from './api-session';
+
+const SKIP_ENCRYPTION_PREFIXES = ['/health', '/webhooks/', '/api-docs', '/session/crypto'];
+
+function shouldSkipEncryption(url: string | undefined): boolean {
+    if (!url) return true;
+    const path = url.split('?')[0] ?? url;
+    return SKIP_ENCRYPTION_PREFIXES.some(
+        (prefix) => path === prefix || path.startsWith(prefix),
+    );
+}
+
+async function maybeEncryptRequestBody(config: InternalAxiosRequestConfig): Promise<void> {
+    if (!isApiPayloadEncryptionEnabled()) return;
+    if (shouldSkipEncryption(config.url)) return;
+    if (config.data == null || isEncryptedPayload(config.data)) return;
+
+    const method = (config.method ?? 'get').toLowerCase();
+    if (!['post', 'put', 'patch'].includes(method)) return;
+
+    await ensureApiSession();
+    const aesKey = getSessionAesKey();
+    if (!aesKey) return;
+
+    config.data = await encryptPayload(config.data, aesKey);
+}
+
+async function maybeDecryptResponse(response: AxiosResponse): Promise<AxiosResponse> {
+    if (!isApiPayloadEncryptionEnabled()) return response;
+    if (shouldSkipEncryption(response.config.url)) return response;
+    if (!isEncryptedPayload(response.data)) return response;
+
+    await ensureApiSession();
+    const aesKey = getSessionAesKey();
+    if (!aesKey) return response;
+
+    response.data = await decryptPayload(response.data, aesKey);
+    return response;
+}
 
 /**
  * Configure API base URL and auth interceptors.
@@ -7,40 +51,36 @@ import axios from 'axios';
  * requests resolve relative URLs against the Vite dev server (e.g. `localhost:5173`).
  */
 export function configureApiClient() {
-  // Vite automatically loads .env.development or .env.production based on mode
   const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  
-  // Configure axios defaults
+
   axios.defaults.baseURL = baseURL;
   axios.defaults.withCredentials = true;
 
-  // Configure request interceptor for authentication
   axios.interceptors.request.use(
-    (config) => {
-      // Add auth token if available
+    async (config) => {
       const token = localStorage.getItem('authToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
+      if (isApiPayloadEncryptionEnabled()) {
+        await ensureApiSession();
+      }
+
+      await maybeEncryptRequestBody(config);
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error),
   );
 
-  // Configure response interceptor for error handling
   axios.interceptors.response.use(
-    (response) => response,
+    async (response) => maybeDecryptResponse(response),
     (error) => {
-      // Handle 401 unauthorized - clear auth data
       if (error.response?.status === 401) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
-        // The auth store will update on next render/initialization
       }
       return Promise.reject(error);
-    }
+    },
   );
 }
-

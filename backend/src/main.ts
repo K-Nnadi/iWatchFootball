@@ -78,7 +78,7 @@ const startTime = Date.now();
 const bootstrapPromise = GenericBootstrap(AppModule, port, {
     enableAuth: true,
     GlobalAuthGuard,
-    SecurityInterceptor
+    SecurityInterceptor,
 });
 
 const timeoutPromise = new Promise((_, reject) => {

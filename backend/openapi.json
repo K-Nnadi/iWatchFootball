@@ -49,6 +49,38 @@
         ]
       }
     },
+    "/session/crypto": {
+      "post": {
+        "operationId": "SessionCryptoController_establishSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EstablishSessionBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstablishSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Establish per-tab API payload encryption session (ECDH)",
+        "tags": [
+          "SessionCrypto"
+        ]
+      }
+    },
     "/address": {
       "post": {
         "operationId": "createAddress",
@@ -17530,6 +17562,30 @@
       }
     },
     "schemas": {
+      "EstablishSessionBody": {
+        "type": "object",
+        "properties": {
+          "clientPublicKey": {
+            "type": "string",
+            "description": "Client ECDH P-256 public key (SPKI, base64)"
+          }
+        },
+        "required": [
+          "clientPublicKey"
+        ]
+      },
+      "EstablishSessionResponse": {
+        "type": "object",
+        "properties": {
+          "serverPublicKey": {
+            "type": "string",
+            "description": "Server ECDH P-256 public key (SPKI, base64)"
+          }
+        },
+        "required": [
+          "serverPublicKey"
+        ]
+      },
       "CreateAddressDTO": {
         "type": "object",
         "properties": {
