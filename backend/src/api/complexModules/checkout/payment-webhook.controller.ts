@@ -1,16 +1,26 @@
-import { Body, Controller, Headers, Post, UnauthorizedException } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    GoneException,
+    Headers,
+    Post,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../../auth/decorators/public.decorator';
+import { SkipThrottle } from '@nestjs/throttler';
 import { CheckoutService } from './checkout.service';
 import { WebhookConfirmCheckoutDto } from './checkout.dto';
 
+function isLegacyPaymentWebhookEnabled(): boolean {
+    return process.env.LEGACY_PAYMENT_WEBHOOK_ENABLED === 'true';
+}
+
 /**
- * Trusted payment relay: verify Stripe (or other PSP) in your edge worker, then POST here
- * with X-Payment-Webhook-Secret matching PAYMENT_WEBHOOK_SECRET.
- *
- * Do not expose this URL without the secret. For native Stripe signature verification
- * on raw bodies, add a Fastify raw-body plugin and validate stripe-signature separately.
+ * @deprecated Use native Stripe webhooks at POST /webhooks/stripe (signature-verified).
+ * This shared-secret relay cannot complete card payments under current checkout rules.
  */
+@SkipThrottle()
 @Controller('webhooks')
 @ApiTags('webhooks')
 export class PaymentWebhookController {
@@ -19,14 +29,20 @@ export class PaymentWebhookController {
     @Post('payment')
     @Public()
     @ApiOperation({
-        summary:
-            'Complete checkout after external PSP success (shared-secret trusted relay)',
+        summary: 'Deprecated — use POST /webhooks/stripe',
+        deprecated: true,
     })
     @ApiBody({ type: WebhookConfirmCheckoutDto })
     async handlePaymentConfirmed(
         @Headers('x-payment-webhook-secret') secret: string | undefined,
         @Body() body: WebhookConfirmCheckoutDto,
     ) {
+        if (!isLegacyPaymentWebhookEnabled()) {
+            throw new GoneException(
+                'This endpoint is retired. Configure Stripe to POST to /webhooks/stripe instead.',
+            );
+        }
+
         const expected = process.env.PAYMENT_WEBHOOK_SECRET;
         if (!expected || secret !== expected) {
             throw new UnauthorizedException('Invalid webhook secret');

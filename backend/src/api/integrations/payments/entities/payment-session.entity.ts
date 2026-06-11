@@ -53,4 +53,10 @@ export class PaymentSession extends BaseDbEntity {
 
     @OptionalEntityColumn({ db: { type: 'varchar', length: 255 } })
     providerPaymentRef?: string;
+
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    paymentId?: number;
+
+    @OptionalEntityColumn({ db: { type: 'timestamptz' } })
+    fulfilledAt?: Date;
 }

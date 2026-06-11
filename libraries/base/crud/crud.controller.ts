@@ -154,6 +154,11 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
         @ApiConsumes('multipart/form-data')
         async uploadFile(@Req() request: FastifyRequest) {
             const data = await (request as any).file(); // FastifyMultipart handles this
+            const maxUploadBytes = parseInt(process.env.MAX_UPLOAD_BYTES || '5242880', 10);
+            const buffer = await data.toBuffer();
+            if (buffer.length > maxUploadBytes) {
+                return { message: `File exceeds maximum upload size of ${maxUploadBytes} bytes` };
+            }
             const uploadDir = path.join(__dirname, '..', 'uploads');
 
             if (!fs.existsSync(uploadDir)) {
@@ -162,7 +167,7 @@ export const CrudController = <T, U>(entity: any, createDTO: any): Type<Controll
 
             const filePath = path.join(uploadDir, data.filename);
             const writeStream = fs.createWriteStream(filePath);
-            await data.toBuffer().then((buffer: any) => writeStream.write(buffer));
+            writeStream.write(buffer);
             writeStream.end();
 
             return {message: 'File uploaded successfully', filename: data.filename};

@@ -10,6 +10,7 @@ import {User} from "../modules/user/user.entity";
 import {UserModule, UserService} from "../modules/user/user.module";
 import {LogModule, LogService} from "../modules/log/log.module";
 import {Public} from "../../auth/decorators/public.decorator";
+import {AuthThrottle} from "../../auth/rate-limit/auth-throttle.decorator";
 import {CommsPreferenceModule, CommsPreferenceService} from "../modules/commsPreference/commsPreference.module";
 import {CommunicationFrequency, Language} from "../enums/commsPreference.enum";
 import {UserRole} from "../../auth/types/security.types";
@@ -61,6 +62,7 @@ export class AuthController {
 
     @Post('login')
     @Public()
+    @AuthThrottle()
     @ApiOperation({summary: 'Login user', operationId: 'login'})
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: LoginBody})
@@ -107,6 +109,7 @@ export class AuthController {
 
     @Post('register')
     @Public()
+    @AuthThrottle()
     @ApiOperation({summary: 'Register new user', operationId: 'register'})
     @ApiOkResponse({type: AuthResponse})
     @ApiBody({type: RegisterBody})

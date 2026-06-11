@@ -1,6 +1,13 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import type Redis from 'ioredis';
+import {
+    PLATFORM_CONFIG_INVALIDATE_CHANNEL,
+    REDIS_CLIENT,
+    REDIS_ENABLED,
+    REDIS_SUBSCRIBER,
+} from '../../../shared/redis/redis.constants';
 import { ConfigValueType, PlatformConfig } from './platformConfig.entity';
 
 export interface SetConfigPayload {
@@ -13,19 +20,70 @@ export interface SetConfigPayload {
     description?: string;
 }
 
+const CACHE_TTL_MS = parseInt(process.env.PLATFORM_CONFIG_CACHE_TTL_MS || '30000', 10);
+
 @Injectable()
-export class PlatformConfigService implements OnModuleInit {
+export class PlatformConfigService implements OnModuleInit, OnModuleDestroy {
+    private readonly logger = new Logger(PlatformConfigService.name);
     private readonly cache = new Map<string, PlatformConfig>();
+    private lastCacheRefresh = 0;
 
     constructor(
         @InjectRepository(PlatformConfig)
         private readonly repo: Repository<PlatformConfig>,
+        @Inject(REDIS_CLIENT) private readonly redis: Redis | null,
+        @Inject(REDIS_SUBSCRIBER) private readonly subscriber: Redis | null,
+        @Inject(REDIS_ENABLED) private readonly redisEnabled: boolean,
     ) {}
 
     async onModuleInit(): Promise<void> {
+        await this.reloadAll();
+        if (this.redisEnabled && this.subscriber) {
+            await this.subscriber.subscribe(PLATFORM_CONFIG_INVALIDATE_CHANNEL);
+            this.subscriber.on('message', (channel: string, message: string) => {
+                if (channel !== PLATFORM_CONFIG_INVALIDATE_CHANNEL) return;
+                this.handleInvalidation(message);
+            });
+            this.logger.log('Subscribed to platform-config cache invalidation channel');
+        }
+    }
+
+    async onModuleDestroy(): Promise<void> {
+        if (this.subscriber) {
+            await this.subscriber.unsubscribe(PLATFORM_CONFIG_INVALIDATE_CHANNEL).catch(() => undefined);
+        }
+    }
+
+    private async reloadAll(): Promise<void> {
         const all = await this.repo.find();
+        this.cache.clear();
         for (const row of all) {
             this.cache.set(row.key, row);
+        }
+        this.lastCacheRefresh = Date.now();
+    }
+
+    private handleInvalidation(message: string): void {
+        const key = message?.trim();
+        if (!key || key === '*') {
+            this.cache.clear();
+            this.lastCacheRefresh = 0;
+            void this.reloadAll();
+            return;
+        }
+        this.cache.delete(key);
+    }
+
+    private async publishInvalidation(key: string): Promise<void> {
+        if (!this.redis) return;
+        await this.redis.publish(PLATFORM_CONFIG_INVALIDATE_CHANNEL, key);
+    }
+
+    private maybeExpireCache(): void {
+        if (this.redisEnabled) return;
+        if (Date.now() - this.lastCacheRefresh > CACHE_TTL_MS) {
+            this.cache.clear();
+            this.lastCacheRefresh = Date.now();
         }
     }
 
@@ -40,6 +98,7 @@ export class PlatformConfigService implements OnModuleInit {
     }
 
     private async findRow(key: string): Promise<PlatformConfig | undefined> {
+        this.maybeExpireCache();
         if (this.cache.has(key)) return this.cache.get(key)!;
         const row = await this.repo.findOne({ where: { key } });
         if (row) this.cache.set(key, row);
@@ -104,5 +163,7 @@ export class PlatformConfigService implements OnModuleInit {
             await this.repo.save(created);
             this.cache.set(key, created);
         }
+
+        await this.publishInvalidation(key);
     }
 }

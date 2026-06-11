@@ -7,10 +7,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Service is healthy"
+            "description": "Service health summary"
           }
         },
-        "summary": "Health check endpoint",
+        "summary": "Health check endpoint with dependency status",
         "tags": [
           "Health"
         ]
@@ -23,9 +23,12 @@
         "responses": {
           "200": {
             "description": "Service is ready to accept traffic"
+          },
+          "503": {
+            "description": "A required dependency is unavailable"
           }
         },
-        "summary": "Readiness check endpoint",
+        "summary": "Readiness check — Postgres required; Redis when REDIS_HOST is set",
         "tags": [
           "Health"
         ]
@@ -16675,6 +16678,7 @@
     },
     "/webhooks/payment": {
       "post": {
+        "deprecated": true,
         "operationId": "PaymentWebhookController_handlePaymentConfirmed",
         "parameters": [],
         "requestBody": {
@@ -16692,7 +16696,7 @@
             "description": ""
           }
         },
-        "summary": "Complete checkout after external PSP success (shared-secret trusted relay)",
+        "summary": "Deprecated — use POST /webhooks/stripe",
         "tags": [
           "webhooks"
         ]

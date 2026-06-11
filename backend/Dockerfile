@@ -64,9 +64,9 @@ USER nestjs
 # Expose Cloud Run default port
 EXPOSE 8080
 
-# Health check (optional endpoint /health)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8080/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+# Readiness: Postgres (+ Redis when configured) must be healthy
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:8080/health/ready', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Run the backend service
 CMD ["node", "backend/dist/src/main.js"]

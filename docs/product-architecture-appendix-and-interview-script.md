@@ -15,16 +15,16 @@ Companion to the codebase as of repo state when drafted. Sections label **FACT (
 | **Persistence** | PostgreSQL + TypeORM; migrations under `backend/src/shared/migrations/`. |
 | **Queues** | BullMQ registered when `REDIS_HOST` is set (`backend/src/app.module.ts`); used for news aggregation and data sync processors. |
 | **Auth** | Email/username + bcrypt → JWT (`fast-jwt` sign, `passport-jwt` validate). Roles modeled as ADMIN / MODERATOR / USER; user `type` on entity. |
-| **Primary ticketing** | `Ticket` ties to `Fixture`; checkout in `checkout.service.ts`; optional completion via trusted relay `POST /webhooks/payment` with `X-Payment-Webhook-Secret`. |
+| **Primary ticketing** | `Ticket` ties to `Fixture`; checkout in `checkout.service.ts`; Stripe card flow via `PaymentSession` + native `POST /webhooks/stripe` (signature-verified). Legacy `POST /webhooks/payment` relay retired (410). |
 | **Wallet projection** | `UserTicketLog` with `active` flag; upsert/deactivate inside same DB transactions as purchase/list/sale. |
 | **Marketplace** | `MarketplaceListing`, `MarketplaceTransaction`, admin fee configurable via `PlatformConfigService`; pessimistic listing lock + `TicketHold` for reservation; cron expires stale ACTIVE listings hourly. |
-| **Idempotency** | Primary: duplicate `payment.metadata.idempotencyKey` within 24h returns prior outcome. Marketplace: similar on `marketplaceTransaction.metadata`. Webhook defaults idempotency to `providerPaymentRef` when key omitted. |
+| **Idempotency** | Primary: completed `paymentSession` + `payment.metadata.idempotencyKey` within 24h; atomic session fulfillment. Marketplace: similar on `marketplaceTransaction.metadata`. |
 | **Refund scope** | `PrimaryOrderRefundService`: primary-market credit card / PayPal path; **explicitly excludes** Stripe money automation and **blocks** marketplace purchase refunds until reversal/payout logic exists (see service comment). |
 
 ### POSITIONING / GAPS TO DISCLOSE (not proven by schema alone)
 
 - **Trust & safety for resale**: Fraud, chargebacks, and “real ticket vs screenshot” require process and often PSP/venue integrations beyond DB rows.
-- **Payment webhook model**: Trusted shared-secret relay in code; native Stripe signature verification on raw bodies is documented as a TODO pattern in webhook controller commentary.
+- **Payment webhook model**: Native Stripe signature verification on `/webhooks/stripe` with raw-body hook; reconciliation cron for missed deliveries. Marketplace card path still lacks PSP session parity.
 - **Scale limits**: Marketplace search is SQL `QueryBuilder` with filters — fine for moderate load; dense catalog + ranking may warrant search infra later.
 - **TicketHold misuse of `fixtureId` for marketplace**: Hold rows use `(fixtureId=listingId, offerKey=marketplace-listing-{id})` — works with unique index but is naming debt for reviewers.
 

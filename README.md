@@ -71,9 +71,32 @@ NODE_ENV=development
 JWT_SECRET=your-secret-key-change-in-production
 SALT_ROUNDS=10
 
-# Redis (if using BullMQ)
+# Redis (BullMQ queues, distributed rate limits, platform-config cache sync)
 REDIS_HOST=localhost
 REDIS_PORT=6379
+# REDIS_PASSWORD=
+
+# Rate limiting (@nestjs/throttler; in-memory when Redis is unset)
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_MAX=100
+RATE_LIMIT_TTL_MS=60000
+RATE_LIMIT_AUTH_MAX=10
+RATE_LIMIT_AUTH_TTL_MS=60000
+
+# HTTP / edge
+CORS_ORIGINS=http://localhost:5173,https://iwatchfootball.web.app
+BODY_LIMIT_BYTES=1048576
+MAX_UPLOAD_BYTES=5242880
+REQUEST_LOGGING=true
+LOG_CRUD=false
+
+# Platform config in-process cache TTL when Redis is not configured (ms)
+PLATFORM_CONFIG_CACHE_TTL_MS=30000
+
+# Payments (Stripe primary checkout)
+PAYMENT_RECONCILIATION_ENABLED=true
+PAYMENT_RECONCILIATION_GRACE_MS=120000
+LEGACY_PAYMENT_WEBHOOK_ENABLED=false
 ```
 
 ### Database Setup
@@ -145,6 +168,29 @@ This will start:
 - Backend API on port 8080
 - Frontend on port 3000
 - PostgreSQL database on port 5433
+- Redis on port 6379 (BullMQ queues, distributed rate limits, platform-config cache sync)
+
+The backend container sets `REDIS_HOST=redis` automatically. For local dev outside Docker, point `REDIS_HOST` at `localhost` (run Redis via Docker: `docker run -d -p 6379:6379 redis:7-alpine`).
+
+### Redis in production (Cloud Run)
+
+When `REDIS_HOST` is set, `/health/ready` requires Redis. The app uses it for:
+
+- BullMQ (`data-sync`, news aggregation)
+- Distributed rate limiting (`@nestjs/throttler`)
+- Platform config cache invalidation across instances
+
+**GCP setup (Memorystore):**
+
+1. Create a Memorystore for Redis instance in the same region as Cloud Run.
+2. Create a Serverless VPC Access connector in that VPC/subnet.
+3. Add GitHub Actions secrets:
+   - `REDIS_HOST` — Memorystore private IP
+   - `REDIS_PORT` — usually `6379`
+   - `REDIS_PASSWORD` — if AUTH is enabled on the instance
+   - `VPC_CONNECTOR` — connector resource name (e.g. `projects/…/locations/…/connectors/…`)
+
+The deploy workflow passes these to Cloud Run when `REDIS_HOST` is set. Without them, the API still runs with in-memory rate limits and no Bull queues.
 
 ## Available Scripts
 

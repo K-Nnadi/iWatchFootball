@@ -3,7 +3,7 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Payment } from '../../modules/payment/payment.entity';
 import { Transaction } from '../../modules/transaction/transaction.entity';
 import { Ticket } from '../../modules/ticket/ticket.entity';
@@ -39,6 +39,12 @@ export interface ConfirmPurchaseParams {
     verifiedPaymentSessionId?: number;
 }
 
+export interface ConfirmPurchaseOptions {
+    manager?: EntityManager;
+    /** When fulfillment already locked and validated the payment session */
+    skipSessionAssert?: boolean;
+}
+
 @Injectable()
 export class CheckoutService {
     constructor(
@@ -55,7 +61,10 @@ export class CheckoutService {
     /**
      * Single DB transaction: validate TicketHold → payment → tickets → ledger → consume hold.
      */
-    async confirmPurchase(params: ConfirmPurchaseParams): Promise<{
+    async confirmPurchase(
+        params: ConfirmPurchaseParams,
+        options?: ConfirmPurchaseOptions,
+    ): Promise<{
         paymentId: number;
         ticketIds: number[];
         idempotent: boolean;
@@ -77,11 +86,11 @@ export class CheckoutService {
             );
         }
 
-        if (params.verifiedPaymentSessionId) {
-            await this.assertVerifiedPaymentSession(params);
+        if (params.verifiedPaymentSessionId && !options?.skipSessionAssert) {
+            await this.assertVerifiedPaymentSession(params, options?.manager);
         }
 
-        const result = await this.dataSource.transaction(async (manager) => {
+        const runInTransaction = async (manager: EntityManager) => {
             const holdRepo = manager.getRepository(TicketHold);
             const paymentRepo = manager.getRepository(Payment);
             const ticketRepo = manager.getRepository(Ticket);
@@ -236,7 +245,11 @@ export class CheckoutService {
             await holdRepo.softDelete({ id: hold.id });
 
             return { paymentId, ticketIds, idempotent: false };
-        });
+        };
+
+        const result = options?.manager
+            ? await runInTransaction(options.manager)
+            : await this.dataSource.transaction(runInTransaction);
 
         if (
             !result.idempotent &&
@@ -250,8 +263,14 @@ export class CheckoutService {
         return result;
     }
 
-    private async assertVerifiedPaymentSession(params: ConfirmPurchaseParams): Promise<void> {
-        const session = await this.paymentSessionRepo.findOne({
+    private async assertVerifiedPaymentSession(
+        params: ConfirmPurchaseParams,
+        manager?: EntityManager,
+    ): Promise<void> {
+        const repo = manager
+            ? manager.getRepository(PaymentSession)
+            : this.paymentSessionRepo;
+        const session = await repo.findOne({
             where: { id: params.verifiedPaymentSessionId! },
         });
         if (!session || session.userId !== params.userId) {
@@ -269,6 +288,27 @@ export class CheckoutService {
             ctx.quantity !== params.quantity
         ) {
             throw new BadRequestException('Payment session does not match checkout');
+        }
+
+        const baseTotal = Math.round(params.unitPrice * params.quantity * 100) / 100;
+        let expectedTotal = baseTotal;
+        if (params.discountCodeId) {
+            const resolveDiscount = async (m: EntityManager) => {
+                const discountAmount = await this.discountCodeService.assertEligible(
+                    m,
+                    params.discountCodeId!,
+                    params.userId,
+                    baseTotal,
+                );
+                return Math.max(0, Math.round((baseTotal - discountAmount) * 100) / 100);
+            };
+            expectedTotal = manager
+                ? await resolveDiscount(manager)
+                : await this.dataSource.transaction(resolveDiscount);
+        }
+        const sessionAmount = parseFloat(session.amount);
+        if (Math.abs(sessionAmount - expectedTotal) > 0.01) {
+            throw new BadRequestException('Payment session amount does not match checkout total');
         }
     }
 }

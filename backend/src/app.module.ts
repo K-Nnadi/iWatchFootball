@@ -48,7 +48,6 @@ import {NewsArticleModule} from "./api/modules/newsArticle/newsArticle.module";
 import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {ApiSportsAdapterModule} from "./api/adapters/api-sports/api-sports-adapter.module";
-import {HealthController} from "./health/health.controller";
 import {DataSeedingModule} from "./api/complexControllers/dataSeeding.controller";
 import {InsightsModule} from "./api/complexModules/insights/insights.module";
 import {DataSyncModule} from "./api/complexModules/dataSync/data-sync.module";
@@ -58,14 +57,14 @@ import {PaymentsIntegrationModule} from "./api/integrations/payments/payments-in
 import {IntegrationModule} from "./api/modules/integration/integration.module";
 import {NotificationModule} from "./api/modules/notification/notification.module";
 import {PlatformConfigModule} from "./api/modules/platformConfig/platformConfig.module";
+import {RateLimitModule} from "./auth/rate-limit/rate-limit.module";
+import {RedisModule} from "./shared/redis/redis.module";
+import {buildBullConnection, isRedisEnabled} from "./shared/redis/redis.config";
+import {HealthModule} from "./health/health.module";
 
-// Only configure BullMQ if Redis is available
-const BULL_MODULE = process.env.REDIS_HOST ? BullModule.forRoot({
-    connection: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-    }
-}) : null
+const BULL_MODULE = isRedisEnabled()
+    ? BullModule.forRoot({ connection: buildBullConnection() })
+    : null;
 
 const Modules = [
     AddressModule,
@@ -133,12 +132,14 @@ const ComplexModules = [
     imports: [
         CONFIG,
         TYPEORM_CONFIG,
+        RedisModule,
+        RateLimitModule,
+        HealthModule,
         ScheduleModule.forRoot(),
         ...(BULL_MODULE ? [BULL_MODULE] : []),
         ...Modules,
         ...ComplexModules
     ],
-    controllers: [HealthController],
 })
 export class AppModule {
 }

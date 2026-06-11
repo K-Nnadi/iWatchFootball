@@ -37,4 +37,7 @@ export interface WebhookEventResult {
     providerPaymentRef?: string;
     paymentSessionId?: number;
     userId?: number;
+    paymentStatus?: string;
+    amountTotalCents?: number;
+    currency?: string;
 }

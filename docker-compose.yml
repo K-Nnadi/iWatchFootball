@@ -22,8 +22,13 @@ services:
       - DATABASE_SYNCHRONIZE=false
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
       - SALT_ROUNDS=10
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
     depends_on:
       database:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - app-network
@@ -42,6 +47,19 @@ services:
     depends_on:
       - backend
     command: ["nginx", "-g", "daemon off;"]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - app-network
 
   database:
     image: postgres:15-alpine

@@ -116,4 +116,30 @@ Add `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET` t
 1. Run migrations (`paymentSession` + Stripe processor seed)
 2. `stripe listen --forward-to localhost:8080/webhooks/stripe`
 3. Checkout with test card `4242 4242 4242 4242`
-4. Replay webhook — tickets must not duplicate (idempotent)
+4. Replay webhook — tickets must not duplicate (idempotent via completed `paymentSession` + `payment.metadata.idempotencyKey`)
+
+## Webhook fulfillment
+
+- Replay safety: completed `paymentSession` short-circuits; payment-level idempotency key within 24h.
+- Primary fulfillment runs in a **single DB transaction**: lock `paymentSession` → validate `payment_status` and amount → `confirmPurchase` → mark session `COMPLETED` with `paymentId` / `fulfilledAt`.
+- Validation failures (wrong amount, not paid) set session `FAILED` and ack the webhook (no infinite Stripe retries).
+- Transient errors return **500** so Stripe retries.
+
+## Reconciliation (missed webhooks)
+
+When `PAYMENT_RECONCILIATION_ENABLED` is not `false` (default on), a cron every 15 minutes:
+
+1. Finds stale `PENDING` (past expiry + grace) or `EXPIRED` sessions with `providerSessionId`
+2. Retrieves the Stripe Checkout Session
+3. Fulfills if `payment_status === paid`
+
+Env:
+
+```env
+PAYMENT_RECONCILIATION_ENABLED=true
+PAYMENT_RECONCILIATION_GRACE_MS=120000
+```
+
+## Legacy relay (retired)
+
+`POST /webhooks/payment` (shared-secret relay) returns **410 Gone** unless `LEGACY_PAYMENT_WEBHOOK_ENABLED=true`. Card checkout requires `POST /webhooks/stripe`.

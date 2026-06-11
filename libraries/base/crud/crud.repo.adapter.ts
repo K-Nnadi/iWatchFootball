@@ -28,43 +28,53 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 
 	constructor(private repository: Repository<T>) {}
 
+	private shouldLogCrud(): boolean {
+		return process.env.LOG_CRUD !== 'false';
+	}
+
+	private logCrud(message: string): void {
+		if (this.shouldLogCrud()) {
+			this.logger.log(message);
+		}
+	}
+
 	async getAll(): Promise<T[]> {
-		this.logger.log(`getAll - ${this.repository.metadata.name}`)
+		this.logCrud(`getAll - ${this.repository.metadata.name}`)
 		return this.repository.find();
 	}
 
 	async getQuery(query: FindManyOptions<T>): Promise<T[]> {
-		this.logger.log(`getQuery - ${this.repository.metadata.name} - ${JSON.stringify(query)}`)
+		this.logCrud(`getQuery - ${this.repository.metadata.name} - ${JSON.stringify(query)}`)
 		const finalQuery = await this.parseQueryOptions(query)
 		return this.repository.find(finalQuery);
 	}
 
 	async getOne(findId: number): Promise<T | null> {
-		this.logger.log(`getOne - ${this.repository.metadata.name} - ${findId}`, 'CRUD REPO ADAPTER')
+		this.logCrud(`getOne - ${this.repository.metadata.name} - ${findId}`)
 		return this.repository.findOneBy({id: findId.toString()} as unknown as FindOptionsWhere<T>);
 	}
 
 	async create(entity: U): Promise<any | null> {
-		this.logger.log(`create - ${this.repository.metadata.name} - ${JSON.stringify(entity)}`)
+		this.logCrud(`create - ${this.repository.metadata.name} - ${JSON.stringify(entity)}`)
 		// Plain objects often omit FK scalars when columns are shared with relations — hydrate via metadata first.
 		const model = this.repository.create(entity as unknown as DeepPartial<T>)
 		return await this.repository.save(model)
 	}
 
 	async update(id: number, entity: DeepPartial<T>): Promise<DeepPartial<T> | null> {
-		this.logger.log(`update - ${this.repository.metadata.name} - ${id} - ${JSON.stringify(entity)}`)
+		this.logCrud(`update - ${this.repository.metadata.name} - ${id} - ${JSON.stringify(entity)}`)
 		await this.repository.update({ id } as FindOptionsWhere<T>, entity as any)
 		return { id, ...entity } as DeepPartial<T>
 	}
 
 	async delete(id: number): Promise<DeleteResult | null> {
-		this.logger.log(`delete - ${this.repository.metadata.name} - ${id}`)
+		this.logCrud(`delete - ${this.repository.metadata.name} - ${id}`)
 		const resp = await this.repository.softDelete(id)
 		return resp.raw
 	}
 
 	async count(query?: FindManyOptions<T>): Promise<number> {
-		this.logger.log(`count - ${this.repository.metadata.name} - ${JSON.stringify(query)}`)
+		this.logCrud(`count - ${this.repository.metadata.name} - ${JSON.stringify(query)}`)
 		if (query) {
 			const finalQuery = await this.parseQueryOptions(query)
 			return this.repository.count(finalQuery);

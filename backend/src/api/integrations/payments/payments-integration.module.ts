@@ -22,6 +22,7 @@ import { PaymentIntegrationRegistry } from './registry/payment-integration.regis
 import { PaymentSessionService } from './services/payment-session.service';
 import { PaymentFulfillmentService } from './services/payment-fulfillment.service';
 import { StripePaymentWebhookService } from './services/stripe-payment-webhook.service';
+import { PaymentReconciliationService } from './services/payment-reconciliation.service';
 import { PaymentsIntegrationBootstrap } from './payments-integration.bootstrap';
 
 @Module({
@@ -47,6 +48,7 @@ import { PaymentsIntegrationBootstrap } from './payments-integration.bootstrap';
         PaymentSessionService,
         PaymentFulfillmentService,
         StripePaymentWebhookService,
+        PaymentReconciliationService,
         PaymentsIntegrationBootstrap,
     ],
     exports: [StripeSubscriptionService, StripeCredentialsService],

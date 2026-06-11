@@ -74,8 +74,19 @@ export interface StripeSubscriptionObject {
 }
 
 export interface StripeEvent {
+    id: string;
     type: string;
     data: { object: Record<string, unknown> };
+}
+
+export interface StripeCheckoutSessionObject {
+    id: string;
+    payment_status: string;
+    amount_total: number | null;
+    currency: string | null;
+    payment_intent: string | null;
+    metadata?: Record<string, string>;
+    mode?: string;
 }
 
 function stripeHeaders(secretKey: string): Record<string, string> {
@@ -178,6 +189,13 @@ export async function stripeRetrieveSubscription(
     subscriptionId: string,
 ): Promise<StripeSubscriptionObject> {
     return stripeGet<StripeSubscriptionObject>(`/subscriptions/${subscriptionId}`, secretKey);
+}
+
+export async function stripeRetrieveCheckoutSession(
+    secretKey: string,
+    sessionId: string,
+): Promise<StripeCheckoutSessionObject> {
+    return stripeGet<StripeCheckoutSessionObject>(`/checkout/sessions/${sessionId}`, secretKey);
 }
 
 /** Verify Stripe webhook signature (t=timestamp,v1=sig). */

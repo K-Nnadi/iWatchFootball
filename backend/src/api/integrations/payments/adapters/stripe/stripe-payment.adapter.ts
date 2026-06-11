@@ -67,12 +67,18 @@ export class StripePaymentAdapter implements PaymentProviderAdapter {
                     obj.client_reference_id,
             );
             const userId = Number((obj.metadata as Record<string, string> | undefined)?.userId);
+            const amountTotal = obj.amount_total as number | null | undefined;
+            const currency = obj.currency as string | null | undefined;
+            const paymentStatus = obj.payment_status as string | undefined;
             return {
                 type: event.type,
                 providerSessionId: String(obj.id),
                 providerPaymentRef: String(obj.payment_intent ?? obj.id),
                 paymentSessionId: Number.isFinite(paymentSessionId) ? paymentSessionId : undefined,
                 userId: Number.isFinite(userId) ? userId : undefined,
+                paymentStatus,
+                amountTotalCents: amountTotal != null ? Number(amountTotal) : undefined,
+                currency: currency ?? undefined,
             };
         }
         if (event.type === 'checkout.session.expired') {

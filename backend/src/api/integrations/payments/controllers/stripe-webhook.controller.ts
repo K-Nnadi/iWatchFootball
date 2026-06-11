@@ -8,10 +8,12 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../../../auth/decorators/public.decorator';
+import { SkipThrottle } from '@nestjs/throttler';
 import { StripePaymentWebhookService } from '../services/stripe-payment-webhook.service';
 import type { RawBodyRequest } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 
+@SkipThrottle()
 @Controller('webhooks/stripe')
 @ApiTags('webhooks')
 export class StripeWebhookController {

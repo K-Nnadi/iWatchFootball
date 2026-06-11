@@ -130,34 +130,54 @@ i8989999999999999999999999999999999999999999999999999999999999999999999999999999
           GCP_REGION: ${{ secrets.GCP_REGION }}
           DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          VPC_CONNECTOR: ${{ secrets.VPC_CONNECTOR }}
         run: |
           set -euo pipefail
           CLOUD_SQL_CONNECTION="${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db"
           DATABASE_HOST="/cloudsql/${CLOUD_SQL_CONNECTION}"
 
-          gcloud run deploy iwatchfootball-backend \
-            --project "${GCP_PROJECT_ID}" \
-            --image "europe-west4-docker.pkg.dev/${GCP_PROJECT_ID}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}" \
-            --platform managed \
-            --region "${GCP_REGION}" \
-            --allow-unauthenticated \
-            --port 8080 \
-            --memory 1Gi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 10 \
-            --timeout 600 \
-            --cpu-boost \
-            --add-cloudsql-instances "${CLOUD_SQL_CONNECTION}" \
-            --set-env-vars NODE_ENV=production \
-            --set-env-vars "DATABASE_HOST=${DATABASE_HOST}" \
-            --set-env-vars "CLOUD_SQL_CONNECTION_NAME=${CLOUD_SQL_CONNECTION}" \
-            --set-env-vars "GCP_PROJECT_ID=${GCP_PROJECT_ID}" \
-            --set-env-vars DATABASE_USERNAME="${DATABASE_USERNAME}" \
-            --set-env-vars DATABASE_PASSWORD="${DATABASE_PASSWORD}" \
-            --set-env-vars DATABASE_NAME=iwatchfootball \
-            --set-env-vars DATABASE_TYPE=postgres \
+          DEPLOY_ARGS=(
+            --project "${GCP_PROJECT_ID}"
+            --image "europe-west4-docker.pkg.dev/${GCP_PROJECT_ID}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}"
+            --platform managed
+            --region "${GCP_REGION}"
+            --allow-unauthenticated
+            --port 8080
+            --memory 1Gi
+            --cpu 1
+            --min-instances 0
+            --max-instances 10
+            --timeout 600
+            --cpu-boost
+            --add-cloudsql-instances "${CLOUD_SQL_CONNECTION}"
+            --set-env-vars NODE_ENV=production
+            --set-env-vars "DATABASE_HOST=${DATABASE_HOST}"
+            --set-env-vars "CLOUD_SQL_CONNECTION_NAME=${CLOUD_SQL_CONNECTION}"
+            --set-env-vars "GCP_PROJECT_ID=${GCP_PROJECT_ID}"
+            --set-env-vars DATABASE_USERNAME="${DATABASE_USERNAME}"
+            --set-env-vars DATABASE_PASSWORD="${DATABASE_PASSWORD}"
+            --set-env-vars DATABASE_NAME=iwatchfootball
+            --set-env-vars DATABASE_TYPE=postgres
             --set-env-vars DATABASE_SYNCHRONIZE=false
+          )
+
+          if [ -n "${REDIS_HOST:-}" ]; then
+            DEPLOY_ARGS+=(--set-env-vars "REDIS_HOST=${REDIS_HOST}")
+            DEPLOY_ARGS+=(--set-env-vars "REDIS_PORT=${REDIS_PORT:-6379}")
+            if [ -n "${REDIS_PASSWORD:-}" ]; then
+              DEPLOY_ARGS+=(--set-env-vars "REDIS_PASSWORD=${REDIS_PASSWORD}")
+            fi
+          fi
+
+          if [ -n "${VPC_CONNECTOR:-}" ]; then
+            DEPLOY_ARGS+=(--vpc-connector "${VPC_CONNECTOR}")
+            DEPLOY_ARGS+=(--vpc-egress private-ranges-only)
+          fi
+
+          gcloud run deploy iwatchfootball-backend "${DEPLOY_ARGS[@]}"
 
 
   deploy-frontend:

@@ -4,6 +4,24 @@ import {FastifyAdapter, NestFastifyApplication} from "@nestjs/platform-fastify";
 import {NestApplicationOptions} from "@nestjs/common";
 import * as fs from "fs";
 import {getMetadataArgsStorage} from "typeorm";
+import helmet from '@fastify/helmet';
+
+const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'https://iwatchfootball.web.app'];
+const DEFAULT_BODY_LIMIT_BYTES = 1_048_576;
+
+function resolveCorsOrigins(): string[] {
+    const raw = process.env.CORS_ORIGINS;
+    if (raw == null || raw.trim() === '') return DEFAULT_CORS_ORIGINS;
+    const parsed = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    return parsed.length > 0 ? parsed : DEFAULT_CORS_ORIGINS;
+}
+
+function resolveBodyLimit(): number {
+    const raw = process.env.BODY_LIMIT_BYTES;
+    if (raw == null || raw === '') return DEFAULT_BODY_LIMIT_BYTES;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n > 0 ? n : DEFAULT_BODY_LIMIT_BYTES;
+}
 
 
 export const SWAGGER_DOCUMENT =  new DocumentBuilder()
@@ -22,8 +40,10 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         console.log('📦 Step 1/7: Creating Fastify adapter...');
         // Configure Fastify to listen on 0.0.0.0 for Docker/Cloud Run compatibility
         // Disable Fastify's default logger to reduce noise - we use our own prefixed logs
+        const bodyLimit = resolveBodyLimit();
         const fastifyAdapter = new FastifyAdapter({
             logger: false,
+            bodyLimit,
         }) as NestApplicationOptions;
         console.log('✅ Fastify adapter created');
 
@@ -42,9 +62,38 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         const initTime = Date.now() - startTime;
         console.log(`✅ NestJS application created successfully (took ${initTime}ms)`);
 
-        // Stripe webhooks require the raw request body for signature verification
         try {
             const fastifyInstance = app.getHttpAdapter().getInstance();
+
+            await fastifyInstance.register(helmet, {
+                contentSecurityPolicy: false,
+                crossOriginEmbedderPolicy: false,
+            });
+            console.log('✅ Security headers (helmet) registered');
+
+            if (process.env.REQUEST_LOGGING !== 'false') {
+                fastifyInstance.addHook('onRequest', async (request) => {
+                    (request as { _requestStartMs?: number })._requestStartMs = Date.now();
+                });
+                fastifyInstance.addHook('onResponse', async (request, reply) => {
+                    const started = (request as { _requestStartMs?: number })._requestStartMs ?? Date.now();
+                    const trace = request.headers['x-cloud-trace-context'];
+                    const requestId = typeof trace === 'string' ? trace.split('/')[0] : undefined;
+                    const path = request.routerPath ?? request.url?.split('?')[0] ?? request.url;
+                    console.log(JSON.stringify({
+                        level: 'info',
+                        type: 'http',
+                        method: request.method,
+                        path,
+                        statusCode: reply.statusCode,
+                        durationMs: Date.now() - started,
+                        requestId,
+                    }));
+                });
+                console.log('✅ Structured HTTP request logging enabled');
+            }
+
+            // Stripe webhooks require the raw request body for signature verification
             fastifyInstance.addHook('preParsing', async (request, _reply, payload) => {
                 if (!request.url?.startsWith('/webhooks/stripe')) {
                     return payload;
@@ -74,14 +123,12 @@ export async function GenericBootstrap(module: any, port: number, options?: {
         }
 
         console.log('📦 Step 5/7: Configuring CORS...');
+        const corsOrigins = resolveCorsOrigins();
         app.enableCors({
-            origin: [
-                'http://localhost:5173',
-                'https://iwatchfootball.web.app',
-            ],
+            origin: corsOrigins,
             credentials: true,
         });
-        console.log('✅ CORS configured');
+        console.log(`✅ CORS configured for origins: ${corsOrigins.join(', ')}`);
 
         console.log('📦 Step 6/7: Setting up Swagger/OpenAPI documentation...');
         const document = SwaggerModule.createDocument(app, SWAGGER_DOCUMENT, {ignoreGlobalPrefix: false});
