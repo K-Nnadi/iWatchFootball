@@ -83,22 +83,32 @@ jobs:
         run: gcloud auth configure-docker europe-west4-docker.pkg.dev
 
       - name: Ensure Cloud Run service account has Cloud SQL Client role
+        continue-on-error: true
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_REGION: ${{ secrets.GCP_REGION }}
+          CLOUD_SQL_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
         run: |
           set -euo pipefail
-          CLOUD_SQL_CONNECTION="${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db"
+          CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION_NAME:-${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db}"
+          SQL_PROJECT="${CLOUD_SQL_CONNECTION%%:*}"
+          SQL_TAIL="${CLOUD_SQL_CONNECTION#*:}"
+          SQL_REGION="${SQL_TAIL%%:*}"
+          CLOUD_SQL_INSTANCE="${CLOUD_SQL_CONNECTION##*:}"
 
-          # APIs must already be enabled on the project (deploy SA lacks serviceusage.services.enable).
-          gcloud sql instances describe iwatchfootball-db --project="${GCP_PROJECT_ID}" \
-            || { echo "Cloud SQL instance not found: ${CLOUD_SQL_CONNECTION}"; exit 1; }
+          echo "Cloud SQL connection: ${CLOUD_SQL_CONNECTION}"
 
-          PROJECT_NUMBER=$(gcloud projects describe "${GCP_PROJECT_ID}" --format="value(projectNumber)")
+          if ! gcloud sql instances describe "${CLOUD_SQL_INSTANCE}" \
+            --project="${SQL_PROJECT}" 2>/dev/null; then
+            echo "::warning::Cloud SQL instance not found (${CLOUD_SQL_CONNECTION}). Skipping IAM bootstrap — set CLOUD_SQL_CONNECTION_NAME secret if the name differs."
+            exit 0
+          fi
+
+          PROJECT_NUMBER=$(gcloud projects describe "${SQL_PROJECT}" --format="value(projectNumber)")
           DEFAULT_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
           grant_cloudsql_client() {
-            gcloud projects add-iam-policy-binding "${GCP_PROJECT_ID}" \
+            gcloud projects add-iam-policy-binding "${SQL_PROJECT}" \
               --member="serviceAccount:$1" \
               --role="roles/cloudsql.client" \
               --condition=None || true
@@ -116,7 +126,6 @@ jobs:
           fi
 
           echo "Cloud SQL Client role verified for default service account: ${DEFAULT_SA}"
-          echo "Cloud SQL connection: ${CLOUD_SQL_CONNECTION}"
 
       - name: Build and push Docker image
         run: |
@@ -129,13 +138,14 @@ jobs:
           GCP_REGION: ${{ secrets.GCP_REGION }}
           DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          CLOUD_SQL_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           VPC_CONNECTOR: ${{ secrets.VPC_CONNECTOR }}
         run: |
           set -euo pipefail
-          CLOUD_SQL_CONNECTION="${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db"
+          CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION_NAME:-${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db}"
           DATABASE_HOST="/cloudsql/${CLOUD_SQL_CONNECTION}"
 
           DEPLOY_ARGS=(

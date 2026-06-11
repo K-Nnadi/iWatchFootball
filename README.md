@@ -192,6 +192,14 @@ When `REDIS_HOST` is set, `/health/ready` requires Redis. The app uses it for:
 
 The deploy workflow passes these to Cloud Run when `REDIS_HOST` is set. Without them, the API still runs with in-memory rate limits and no Bull queues.
 
+**GitHub Actions secrets (deploy):**
+
+| Secret | Example |
+|--------|---------|
+| `CLOUD_SQL_CONNECTION_NAME` | `iwatchfootball:europe-west4:iwatchfootball-db` |
+| `GCP_PROJECT_ID` | `iwatchfootball` |
+| `GCP_REGION` | `europe-west4` |
+
 ## Available Scripts
 
 ### Root Level
