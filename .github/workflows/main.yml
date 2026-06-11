@@ -7,12 +7,18 @@ on:
       - 'backend/**'
       - 'frontend/**'
       - 'clients/**'
+      - 'libraries/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: [ main, master ]
     paths:
       - 'backend/**'
       - 'frontend/**'
       - 'clients/**'
+      - 'libraries/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   workflow_dispatch:  # Manual trigger
 
 jobs:
@@ -20,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: [backend, frontend, clients]
+        package: ['./backend', './frontend/ui', './clients']
     steps:
       - uses: actions/checkout@v3
 
@@ -66,7 +72,7 @@ jobs:
         run: pnpm install
 
       - name: Build Backend
-        run: pnpm --filter backend build
+        run: pnpm --filter ./backend build
 
       - name: Configure Docker Buildx
         uses: docker/setup-buildx-action@v3
