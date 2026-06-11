@@ -28,9 +28,11 @@ function base64ToBytes(value: string): Uint8Array {
     return bytes;
 }
 
-/** Satisfies Web Crypto BufferSource typing across TS 5.5+ lib.dom variants. */
-function asBufferSource(bytes: Uint8Array): BufferSource {
-    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+/** Copy into a fresh ArrayBuffer so Web Crypto accepts the value under strict TS 5.5+ lib.dom. */
+function asBufferSource(bytes: Uint8Array): ArrayBuffer {
+    const buffer = new ArrayBuffer(bytes.byteLength);
+    new Uint8Array(buffer).set(bytes);
+    return buffer;
 }
 
 function bytesToBase64(bytes: Uint8Array): string {
