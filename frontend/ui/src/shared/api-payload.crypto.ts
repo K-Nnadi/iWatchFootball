@@ -28,6 +28,11 @@ function base64ToBytes(value: string): Uint8Array {
     return bytes;
 }
 
+/** Satisfies Web Crypto BufferSource typing across TS 5.5+ lib.dom variants. */
+function asBufferSource(bytes: Uint8Array): BufferSource {
+    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+}
+
 function bytesToBase64(bytes: Uint8Array): string {
     let binary = '';
     for (let i = 0; i < bytes.length; i++) {
@@ -45,7 +50,7 @@ async function importPeerPublicKey(spkiBase64: string): Promise<CryptoKey> {
     const spki = base64ToBytes(spkiBase64);
     return crypto.subtle.importKey(
         'spki',
-        spki,
+        asBufferSource(spki),
         { name: 'ECDH', namedCurve: 'P-256' },
         false,
         [],
@@ -80,7 +85,11 @@ export async function encryptPayload(
 ): Promise<EncryptedPayload> {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const plaintext = new TextEncoder().encode(JSON.stringify(data));
-    const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, aesKey, plaintext);
+    const ciphertext = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: asBufferSource(iv) },
+        aesKey,
+        asBufferSource(plaintext),
+    );
 
     const combined = new Uint8Array(ciphertext);
     const tagLength = 16;
@@ -106,7 +115,11 @@ export async function decryptPayload<T = unknown>(
     combined.set(body);
     combined.set(tag, body.length);
 
-    const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, aesKey, combined);
+    const plaintext = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: asBufferSource(iv) },
+        aesKey,
+        asBufferSource(combined),
+    );
     return JSON.parse(new TextDecoder().decode(plaintext)) as T;
 }
 
