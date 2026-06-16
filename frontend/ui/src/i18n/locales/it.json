@@ -366,6 +366,32 @@
     "home": "Casa",
     "away": "Ospite"
   },
+  "auth": {
+    "skip": "SALTA",
+    "welcomeTitle": "Rendi I Watch Football il tuo hub calcistico",
+    "welcomeSubtitle": "Una registrazione salva la cronologia partite, le squadre preferite e le statistiche personali.",
+    "continueWithEmail": "Continua con e-mail",
+    "alreadyHaveAccount": "Hai già un account? Accedi"
+  },
+  "onboarding": {
+    "back": "Indietro",
+    "teamTitle": "Seleziona la tua squadra preferita",
+    "teamSubtitle": "Scegli un club o una nazionale per personalizzare la tua esperienza.",
+    "consentTitle": "Un'ultima cosa prima di iniziare!",
+    "consentSubtitle": "Rivedi come usiamo i tuoi dati e conferma di accettare i nostri termini.",
+    "search": "Cerca",
+    "popularTeams": "Squadre popolari",
+    "searchResults": "Risultati di ricerca",
+    "noTeams": "Nessuna squadra trovata. Prova un'altra ricerca.",
+    "confirm": "CONFERMA",
+    "proceed": "PROCEDI",
+    "marketingConsent": "Inviami aggiornamenti, promemoria partite e offerte di I Watch Football via e-mail.",
+    "termsConsent": "Accetto i Termini e Condizioni e ho letto l'Informativa sulla privacy.",
+    "completeTitle": "Tutto pronto",
+    "completeMessage": "Le tue preferenze sono state salvate.",
+    "saveFailedTitle": "Impossibile salvare le preferenze",
+    "saveFailedMessage": "Riprova."
+  },
   "player": {
     "notFound": "Giocatore non trovato",
     "notFoundDetail": "Nessun giocatore trovato con ID {{id}}",

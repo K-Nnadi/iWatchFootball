@@ -366,6 +366,32 @@
     "home": "Domicile",
     "away": "Extérieur"
   },
+  "auth": {
+    "skip": "PASSER",
+    "welcomeTitle": "Faites d'I Watch Football votre hub football",
+    "welcomeSubtitle": "Une inscription enregistre votre historique de matchs, équipes favorites et statistiques personnelles.",
+    "continueWithEmail": "Continuer avec l'e-mail",
+    "alreadyHaveAccount": "Vous avez déjà un compte ? Connectez-vous"
+  },
+  "onboarding": {
+    "back": "Retour",
+    "teamTitle": "Choisissez votre équipe favorite",
+    "teamSubtitle": "Choisissez un club ou une équipe nationale pour personnaliser votre expérience.",
+    "consentTitle": "Une dernière chose avant de commencer !",
+    "consentSubtitle": "Consultez comment nous utilisons vos données et acceptez nos conditions.",
+    "search": "Rechercher",
+    "popularTeams": "Équipes populaires",
+    "searchResults": "Résultats de recherche",
+    "noTeams": "Aucune équipe trouvée. Essayez une autre recherche.",
+    "confirm": "CONFIRMER",
+    "proceed": "CONTINUER",
+    "marketingConsent": "Envoyez-moi des mises à jour, rappels de matchs et offres d'I Watch Football par e-mail.",
+    "termsConsent": "J'accepte les Conditions générales et j'ai lu la Politique de confidentialité.",
+    "completeTitle": "Vous êtes prêt",
+    "completeMessage": "Vos préférences ont été enregistrées.",
+    "saveFailedTitle": "Impossible d'enregistrer les préférences",
+    "saveFailedMessage": "Veuillez réessayer."
+  },
   "player": {
     "notFound": "Joueur introuvable",
     "notFoundDetail": "Aucun joueur trouvé avec l'ID {{id}}",

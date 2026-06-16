@@ -366,6 +366,32 @@
     "home": "Heim",
     "away": "Auswärts"
   },
+  "auth": {
+    "skip": "ÜBERSPRINGEN",
+    "welcomeTitle": "Mach I Watch Football zu deinem Fußball-Hub",
+    "welcomeSubtitle": "Eine Anmeldung speichert deine Spielhistorie, Lieblingsteams und persönlichen Statistiken.",
+    "continueWithEmail": "Mit E-Mail fortfahren",
+    "alreadyHaveAccount": "Bereits ein Konto? Anmelden"
+  },
+  "onboarding": {
+    "back": "Zurück",
+    "teamTitle": "Wähle dein Lieblingsteam",
+    "teamSubtitle": "Wähle einen Verein oder eine Nationalmannschaft, um dein Erlebnis zu personalisieren.",
+    "consentTitle": "Noch eine Sache, bevor du startest!",
+    "consentSubtitle": "Prüfe, wie wir deine Daten nutzen, und bestätige unsere Bedingungen.",
+    "search": "Suchen",
+    "popularTeams": "Beliebte Teams",
+    "searchResults": "Suchergebnisse",
+    "noTeams": "Keine Teams gefunden. Versuche eine andere Suche.",
+    "confirm": "BESTÄTIGEN",
+    "proceed": "WEITER",
+    "marketingConsent": "Sendet mir Produktupdates, Spielerinnerungen und Angebote von I Watch Football per E-Mail.",
+    "termsConsent": "Ich akzeptiere die AGB und habe die Datenschutzerklärung gelesen.",
+    "completeTitle": "Alles bereit",
+    "completeMessage": "Deine Einstellungen wurden gespeichert.",
+    "saveFailedTitle": "Einstellungen konnten nicht gespeichert werden",
+    "saveFailedMessage": "Bitte versuche es erneut."
+  },
   "player": {
     "notFound": "Spieler nicht gefunden",
     "notFoundDetail": "Kein Spieler mit ID {{id}} gefunden",
