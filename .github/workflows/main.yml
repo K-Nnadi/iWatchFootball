@@ -157,6 +157,32 @@ jobs:
           CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION_NAME:-${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db}"
           DATABASE_HOST="/cloudsql/${CLOUD_SQL_CONNECTION}"
 
+          echo "Deploying with Cloud SQL connection: ${CLOUD_SQL_CONNECTION}"
+
+          # YAML single-quoted values safely handle passwords with &, %, ?, etc.
+          yaml_quote() {
+            printf "'%s'" "$(printf '%s' "$1" | sed "s/'/''/g")"
+          }
+
+          {
+            echo "NODE_ENV: production"
+            echo "DATABASE_HOST: $(yaml_quote "${DATABASE_HOST}")"
+            echo "CLOUD_SQL_CONNECTION_NAME: $(yaml_quote "${CLOUD_SQL_CONNECTION}")"
+            echo "GCP_PROJECT_ID: $(yaml_quote "${GCP_PROJECT_ID}")"
+            echo "DATABASE_USERNAME: $(yaml_quote "${DATABASE_USERNAME}")"
+            echo "DATABASE_PASSWORD: $(yaml_quote "${DATABASE_PASSWORD}")"
+            echo "DATABASE_NAME: iwatchfootball"
+            echo "DATABASE_TYPE: postgres"
+            echo "DATABASE_SYNCHRONIZE: \"false\""
+            if [ -n "${REDIS_HOST:-}" ]; then
+              echo "REDIS_HOST: $(yaml_quote "${REDIS_HOST}")"
+              echo "REDIS_PORT: $(yaml_quote "${REDIS_PORT:-6379}")"
+              if [ -n "${REDIS_PASSWORD:-}" ]; then
+                echo "REDIS_PASSWORD: $(yaml_quote "${REDIS_PASSWORD}")"
+              fi
+            fi
+          } > cloud-run-env.yaml
+
           DEPLOY_ARGS=(
             --project "${GCP_PROJECT_ID}"
             --image "europe-west4-docker.pkg.dev/${GCP_PROJECT_ID}/iwatchfootball-backend/iwatchfootball-backend:${{ github.sha }}"
@@ -170,25 +196,9 @@ jobs:
             --max-instances 10
             --timeout 600
             --cpu-boost
-            --add-cloudsql-instances "${CLOUD_SQL_CONNECTION}"
-            --set-env-vars NODE_ENV=production
-            --set-env-vars "DATABASE_HOST=${DATABASE_HOST}"
-            --set-env-vars "CLOUD_SQL_CONNECTION_NAME=${CLOUD_SQL_CONNECTION}"
-            --set-env-vars "GCP_PROJECT_ID=${GCP_PROJECT_ID}"
-            --set-env-vars DATABASE_USERNAME="${DATABASE_USERNAME}"
-            --set-env-vars DATABASE_PASSWORD="${DATABASE_PASSWORD}"
-            --set-env-vars DATABASE_NAME=iwatchfootball
-            --set-env-vars DATABASE_TYPE=postgres
-            --set-env-vars DATABASE_SYNCHRONIZE=false
+            --set-cloudsql-instances "${CLOUD_SQL_CONNECTION}"
+            --env-vars-file cloud-run-env.yaml
           )
-
-          if [ -n "${REDIS_HOST:-}" ]; then
-            DEPLOY_ARGS+=(--set-env-vars "REDIS_HOST=${REDIS_HOST}")
-            DEPLOY_ARGS+=(--set-env-vars "REDIS_PORT=${REDIS_PORT:-6379}")
-            if [ -n "${REDIS_PASSWORD:-}" ]; then
-              DEPLOY_ARGS+=(--set-env-vars "REDIS_PASSWORD=${REDIS_PASSWORD}")
-            fi
-          fi
 
           if [ -n "${VPC_CONNECTOR:-}" ]; then
             DEPLOY_ARGS+=(--vpc-connector "${VPC_CONNECTOR}")
@@ -196,6 +206,16 @@ jobs:
           fi
 
           gcloud run deploy iwatchfootball-backend "${DEPLOY_ARGS[@]}"
+
+          ATTACHED_SQL=$(gcloud run services describe iwatchfootball-backend \
+            --project "${GCP_PROJECT_ID}" \
+            --region "${GCP_REGION}" \
+            --format='value(spec.template.metadata.annotations."run.googleapis.com/cloudsql-instances")')
+          echo "Attached Cloud SQL instances: ${ATTACHED_SQL:-<none>}"
+          if [ "${ATTACHED_SQL}" != "${CLOUD_SQL_CONNECTION}" ]; then
+            echo "::error::Cloud SQL instance not attached to revision (expected ${CLOUD_SQL_CONNECTION})"
+            exit 1
+          fi
 
 
   deploy-frontend:
