@@ -209,6 +209,16 @@ jobs:
 
           gcloud run deploy iwatchfootball-backend "${DEPLOY_ARGS[@]}"
 
+          ATTACHED_SQL=$(gcloud run services describe iwatchfootball-backend \
+            --project "${GCP_PROJECT_ID}" \
+            --region "${GCP_REGION}" \
+            --format='value(spec.template.metadata.annotations."run.googleapis.com/cloudsql-instances")')
+          echo "Attached Cloud SQL instances: ${ATTACHED_SQL:-<none>}"
+          if [ "${ATTACHED_SQL}" != "${CLOUD_SQL_CONNECTION}" ]; then
+            echo "::error::Cloud SQL instance not attached to revision (expected ${CLOUD_SQL_CONNECTION})"
+            exit 1
+          fi
+
 
   deploy-frontend:
     needs: ci
