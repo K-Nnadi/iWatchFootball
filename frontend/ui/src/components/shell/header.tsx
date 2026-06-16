@@ -12,7 +12,7 @@ import { useTranslation } from '../../i18n';
 import classes from './styles/header.module.css';
 
 /** Navbar cart + Sign In / Join are redundant on public auth screens (already on login / register / recover). */
-const AUTH_LANDING_SEGMENTS = new Set(['signin', 'join', 'forgot-password']);
+const AUTH_LANDING_SEGMENTS = new Set(['signin', 'join', 'forgot-password', 'welcome']);
 
 function isAuthLandingPath(pathname: string): boolean {
     const normalized = pathname.toLowerCase().replace(/\/+$/, '');
@@ -100,7 +100,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                         <Menu.Item onClick={() => navigateWithTransition('/signIn')} className={classes.menuItem}>
                                             Sign In
                                         </Menu.Item>
-                                        <Menu.Item onClick={() => navigateWithTransition('/join')} className={classes.menuItemLime}>
+                                        <Menu.Item onClick={() => navigateWithTransition('/welcome')} className={classes.menuItemLime}>
                                             Join
                                         </Menu.Item>
                                     </Menu.Dropdown>
@@ -144,7 +144,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
                                         <UiButton variant="outline" size="sm" onClick={() => navigateWithTransition('/signIn')}>
                                             {t('nav.signIn')}
                                         </UiButton>
-                                        <UiButton variant="primary" size="sm" onClick={() => navigateWithTransition('/join')}>
+                                        <UiButton variant="primary" size="sm" onClick={() => navigateWithTransition('/welcome')}>
                                             {t('nav.join')}
                                         </UiButton>
                                     </>

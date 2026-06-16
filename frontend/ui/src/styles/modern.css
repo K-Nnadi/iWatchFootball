@@ -475,11 +475,12 @@ body,
 /* Header styling with modern theme */
 .mantine-Header-root {
   background-color: var(--modern-header-bg) !important;
-  box-shadow: 0 1px 3px var(--modern-shadow-color) !important;
-  border-bottom: 1px solid var(--modern-border-color) !important;
+  backdrop-filter: blur(var(--ui-header-blur)) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(var(--ui-header-blur)) saturate(140%) !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--ui-divider) !important;
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .mantine-Title-root {

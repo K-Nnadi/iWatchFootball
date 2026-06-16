@@ -35,6 +35,7 @@ import {
     type PendingFriendRequest,
     type PublicUserSummary,
 } from '../shared/api/tracker.api';
+import classes from './friends.module.css';
 
 function userInitials(user: { firstName: string; lastName: string; userName: string }): string {
     const f = user.firstName?.trim();
@@ -58,106 +59,79 @@ function PendingRequestRow({
     const isIncoming = request.direction === 'incoming';
 
     return (
-        <Box
-            p="md"
-            style={{
-                backgroundColor: 'var(--modern-bg-primary)',
-                border: '1px solid var(--modern-border-color)',
-            }}
-        >
-            <Group justify="space-between" align="center" wrap="nowrap" gap="md">
-                <Group gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                    <Avatar
-                        size={44}
-                        radius="xl"
-                        style={{
-                            backgroundColor: 'var(--modern-bg-tertiary)',
-                            border: '2px solid var(--modern-lime)',
-                            color: 'var(--modern-lime)',
-                            fontWeight: 700,
-                            flexShrink: 0,
-                        }}
-                    >
-                        {userInitials(request.user)}
-                    </Avatar>
-                    <Stack gap={2} style={{ minWidth: 0 }}>
-                        <Text fw={600} size="sm" c="var(--modern-text-primary)" truncate>
-                            @{request.user.userName}
-                        </Text>
-                        <Text size="xs" c="dimmed" truncate>
-                            {request.user.firstName} {request.user.lastName}
-                        </Text>
-                        <Text size="xs" c={isIncoming ? 'var(--modern-lime)' : 'dimmed'}>
-                            {isIncoming ? t('friends.wantsToBeFriends') : t('friends.waitingForResponse')}
-                        </Text>
-                    </Stack>
-                </Group>
+        <div className={classes.requestRow}>
+            <div className={classes.requestUser}>
+                <Avatar size={44} radius="xl" className={classes.avatar}>
+                    {userInitials(request.user)}
+                </Avatar>
+                <div className={classes.requestMeta}>
+                    <Text fw={600} size="sm" c="var(--modern-text-primary)" truncate>
+                        @{request.user.userName}
+                    </Text>
+                    <Text size="xs" c="dimmed" truncate>
+                        {request.user.firstName} {request.user.lastName}
+                    </Text>
+                    <Text size="xs" c={isIncoming ? 'var(--modern-lime)' : 'dimmed'} truncate>
+                        {isIncoming ? t('friends.wantsToBeFriends') : t('friends.waitingForResponse')}
+                    </Text>
+                </div>
+            </div>
 
-                {isIncoming ? (
-                    <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
-                        <ModernButton
-                            size="sm"
-                            variant="primary"
-                            leftSection={<IconCheck size={16} stroke={2.5} />}
-                            onClick={() => onAccept(request.connectionId)}
-                            styles={{
-                                root: {
-                                    minWidth: 96,
-                                    paddingLeft: 14,
-                                    paddingRight: 14,
-                                },
-                            }}
-                        >
-                            {t('friends.accept')}
-                        </ModernButton>
-                        <ModernButton
-                            size="sm"
-                            variant="outline"
-                            leftSection={<IconX size={16} stroke={2.5} />}
-                            onClick={() => onDecline(request.connectionId)}
-                            styles={{
-                                root: {
-                                    minWidth: 96,
-                                    paddingLeft: 14,
-                                    paddingRight: 14,
-                                    backgroundColor: 'transparent',
-                                    border: '2px solid var(--modern-border-color)',
-                                    color: 'var(--modern-text-secondary)',
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(255, 80, 80, 0.08)',
-                                        borderColor: 'var(--mantine-color-red-6)',
-                                        color: 'var(--mantine-color-red-4)',
-                                        transform: 'translateY(-1px)',
-                                        boxShadow: 'none',
-                                    },
-                                },
-                            }}
-                        >
-                            {t('friends.decline')}
-                        </ModernButton>
-                    </Group>
-                ) : (
-                    <Badge
+            {isIncoming ? (
+                <div className={classes.requestActions}>
+                    <ModernButton
+                        size="sm"
+                        variant="primary"
+                        className={classes.actionBtn}
+                        leftSection={<IconCheck size={16} stroke={2.5} />}
+                        onClick={() => onAccept(request.connectionId)}
+                    >
+                        {t('friends.accept')}
+                    </ModernButton>
+                    <ModernButton
+                        size="sm"
                         variant="outline"
-                        color="gray"
-                        size="lg"
-                        radius="sm"
-                        leftSection={<IconClock size={14} />}
+                        className={classes.actionBtn}
+                        leftSection={<IconX size={16} stroke={2.5} />}
+                        onClick={() => onDecline(request.connectionId)}
                         styles={{
                             root: {
-                                textTransform: 'none',
-                                fontWeight: 500,
-                                borderColor: 'var(--modern-border-color)',
+                                backgroundColor: 'transparent',
+                                border: '2px solid var(--modern-border-color)',
                                 color: 'var(--modern-text-secondary)',
-                                flexShrink: 0,
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 80, 80, 0.08)',
+                                    borderColor: 'var(--mantine-color-red-6)',
+                                    color: 'var(--mantine-color-red-4)',
+                                    boxShadow: 'none',
+                                },
+                            },
+                        }}
+                    >
+                        {t('friends.decline')}
+                    </ModernButton>
+                </div>
+            ) : (
+                <div className={classes.requestActions}>
+                    <ModernButton
+                        size="sm"
+                        variant="outline"
+                        disabled
+                        className={classes.pendingBtn}
+                        leftSection={<IconClock size={16} stroke={2} />}
+                        styles={{
+                            root: {
+                                backgroundColor: 'transparent',
+                                border: '2px solid var(--modern-border-color)',
+                                color: 'var(--modern-text-secondary)',
                             },
                         }}
                     >
                         {t('friends.pending')}
-                    </Badge>
-                )}
-            </Group>
-        </Box>
+                    </ModernButton>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -310,24 +284,17 @@ export function FriendsPage() {
                                         </Badge>
                                     )}
                                 </Group>
-                                <Stack gap={0}>
-                                    {data!.pending.map((p, i) => (
-                                        <Box
-                                            key={p.connectionId}
-                                            style={
-                                                i > 0
-                                                    ? { borderTop: '1px solid var(--modern-border-color)' }
-                                                    : undefined
-                                            }
-                                        >
+                                <div className={classes.rowList}>
+                                    {data!.pending.map((p) => (
+                                        <div key={p.connectionId} className={classes.rowDivider}>
                                             <PendingRequestRow
                                                 request={p}
                                                 onAccept={(id) => void handleAccept(id)}
                                                 onDecline={(id) => void handleDecline(id)}
                                             />
-                                        </Box>
+                                        </div>
                                     ))}
-                                </Stack>
+                                </div>
                             </ModernCard>
                         )}
 

@@ -31,11 +31,14 @@ import { MyListingsPage } from "./pages/marketplace/myListings.page";
 import { WalletPage } from "./pages/wallet.page";
 import { DiscountCodesAdminPage } from "./pages/admin/discountCodes.page";
 import { RequireAuth } from "./components/auth/RequireAuth";
+import { OnboardingGate } from "./components/auth/OnboardingGate";
 import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 import { RootEntry } from "./components/auth/RootEntry";
 import { MarketplaceFeatureRoute } from "./components/auth/MarketplaceFeatureRoute";
 import { FriendsPage } from "./pages/friends.page";
 import { CompareFriendPage } from "./pages/friendsCompare.page";
+import { AuthWelcomePage } from "./pages/auth/authWelcome.page";
+import { OnboardingPage } from "./pages/onboarding/onboarding.page";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -141,6 +144,14 @@ const router = createBrowserRouter([
         element: <AppWrapper />,
         children: [
             {
+                path: 'welcome',
+                element: (
+                    <PublicOnlyRoute>
+                        <AuthWelcomePage />
+                    </PublicOnlyRoute>
+                ),
+            },
+            {
                 path: 'signIn',
                 element: (
                     <PublicOnlyRoute>
@@ -170,7 +181,17 @@ const router = createBrowserRouter([
             },
             {
                 element: <RequireAuth />,
-                children: [{ path: 'home', element: <HomePage /> }, ...childrenRoutes, ...additionalRoutes],
+                children: [
+                    { path: 'onboarding', element: <OnboardingPage /> },
+                    {
+                        element: <OnboardingGate />,
+                        children: [
+                            { path: 'home', element: <HomePage /> },
+                            ...childrenRoutes,
+                            ...additionalRoutes,
+                        ],
+                    },
+                ],
             },
         ],
     },

@@ -4,6 +4,7 @@ import { Navbar } from './navbar';
 import { Main } from "./main";
 import { PageTransition } from '../transitions/PageTransition';
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useHeaderNavbarStore } from "../../shared/stores/headerNavbar.store";
 // Assume we have an auth store or context that provides isLoggedIn
 import { useAuthStore } from '../../shared/stores/auth.store'; // Example import
@@ -11,8 +12,14 @@ import { useCartStore } from '../../shared/stores/cart.store';
 import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
 
 export function AppWrapper() {
+    const location = useLocation();
     const { navbarOpen } = useHeaderNavbarStore();
     const [showHeader, setShowHeader] = useState(false);
+
+    const immersiveAuthRoutes = ['/welcome', '/join', '/signIn', '/signin', '/forgot-password', '/onboarding'];
+    const hideChrome = immersiveAuthRoutes.some(
+        (path) => location.pathname.toLowerCase() === path.toLowerCase(),
+    );
 
     const width = 768;
 
@@ -55,9 +62,8 @@ export function AppWrapper() {
             }}
             padding={0}
         >
-            {/* Pass isLoggedIn to Header */}
-            <Header showHeader={showHeader} isLoggedIn={isLoggedIn} />
-            <Navbar />
+            {!hideChrome && <Header showHeader={showHeader} isLoggedIn={isLoggedIn} />}
+            {!hideChrome && <Navbar />}
             <PageTransition>
                 <Main />
             </PageTransition>

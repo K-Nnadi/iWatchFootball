@@ -1,0 +1,106 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--ui-bg-base);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.skipBtn {
+  position: absolute;
+  top: var(--ui-space-4);
+  right: var(--ui-space-4);
+  z-index: 2;
+  border: none;
+  background: transparent;
+  color: var(--ui-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: var(--ui-space-2) var(--ui-space-3);
+}
+
+.skipBtn:hover {
+  color: var(--ui-text-primary);
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ui-space-10) var(--ui-space-6) var(--ui-space-8);
+  text-align: center;
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.logo {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  margin-bottom: var(--ui-space-8);
+}
+
+.title {
+  margin: 0 0 var(--ui-space-4);
+  font-size: clamp(1.375rem, 5vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ui-text-primary);
+}
+
+.subtitle {
+  margin: 0 0 var(--ui-space-8);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ui-text-secondary);
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-3);
+}
+
+.emailBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  border-radius: var(--ui-radius-full);
+  border: 1px solid var(--ui-border-strong);
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.emailBtn:hover {
+  border-color: var(--ui-accent);
+  background: var(--ui-bg-hover);
+}
+
+.signInLink {
+  margin-top: var(--ui-space-4);
+  border: none;
+  background: transparent;
+  color: var(--ui-text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.signInLink:hover {
+  color: var(--ui-accent);
+}

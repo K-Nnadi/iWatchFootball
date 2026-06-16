@@ -19,6 +19,7 @@ import { UiButton } from '../components/ui';
 import { useLogin, type LoginMutationResult } from '@iWatchFootball/clients/controllers/auth';
 import type { LoginBody } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { useAuthStore } from '../shared/stores/auth.store';
+import { isOnboardingComplete } from '../shared/onboarding';
 import { notify } from '../shared/notify';
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
@@ -52,6 +53,11 @@ export function LoginPage() {
 					}
 
 					notify.success('Success', 'Logged in successfully!');
+
+					if (!isOnboardingComplete(data.user)) {
+						navigateWithTransition('/onboarding');
+						return;
+					}
 
 					const from =
 						(location.state as { from?: { pathname: string } } | null)?.from?.pathname ??

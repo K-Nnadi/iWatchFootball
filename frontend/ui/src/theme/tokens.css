@@ -60,6 +60,8 @@
 
   /* Layout */
   --ui-header-height: 56px;
+  --ui-header-bg: rgba(11, 14, 17, 0.72);
+  --ui-header-blur: 12px;
   --ui-max-width: 1200px;
 
   /* Legacy aliases — keeps existing --modern-* usage working */
@@ -78,7 +80,7 @@
   --modern-card-bg: var(--ui-bg-elevated);
   --modern-card-border: var(--ui-border);
   --modern-navbar-bg: var(--ui-bg-base);
-  --modern-header-bg: var(--ui-bg-base);
+  --modern-header-bg: var(--ui-header-bg);
   --modern-shadow-color: rgba(0, 0, 0, 0.4);
   --modern-backdrop-color: rgba(0, 0, 0, 0.6);
   --modern-section-divider: var(--ui-divider);
@@ -109,4 +111,5 @@
   --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --ui-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --ui-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --ui-header-bg: rgba(245, 246, 248, 0.78);
 }

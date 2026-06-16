@@ -1,31 +1,48 @@
-import React, { useMemo } from 'react';
-import { Group, Image, rem, Stack } from '@mantine/core';
+import { useMemo } from 'react';
+import {
+    IconChartBar,
+    IconHistory,
+    IconMapPin,
+    IconTicket,
+} from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 import { useTranslation } from '../i18n/useTranslation';
-import { UiBody, UiButton, UiCard, UiH1, UiH2, UiH3, UiPageContainer } from '../components/ui';
+import { UiButton } from '../components/ui';
+import classes from './landing.module.css';
+
+const HERO_IMAGE =
+    'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&w=900&q=80';
 
 export function LandingPage() {
     const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
+    const pillarsAnim = useScrollAnimation({ animationType: 'fadeUp', threshold: 0.15 });
+    const storyAnim = useScrollAnimation({ animationType: 'fadeUp', delay: 100, threshold: 0.15 });
+    const ctaAnim = useScrollAnimation({ animationType: 'scale', delay: 80, threshold: 0.2 });
 
     const pillars = useMemo(
         () => [
             {
+                icon: IconHistory,
                 title: t('landing.pillarHistoryTitle'),
                 body: t('landing.pillarHistoryBody'),
             },
             {
+                icon: IconChartBar,
                 title: t('landing.pillarInsightsTitle'),
                 body: t('landing.pillarInsightsBody'),
             },
             marketplaceEnabled
                 ? {
+                      icon: IconTicket,
                       title: t('landing.pillarTicketsTitle'),
                       body: t('landing.pillarTicketsBody'),
                   }
                 : {
+                      icon: IconMapPin,
                       title: t('landing.pillarAttendanceTitle'),
                       body: t('landing.pillarAttendanceBody'),
                   },
@@ -34,68 +51,112 @@ export function LandingPage() {
     );
 
     return (
-        <UiPageContainer>
-            <UiCard density="spacious" mb="xl">
-                <Group justify="space-between" align="center" wrap="wrap" gap="xl">
-                    <Stack gap="md" style={{ flex: '1 1 280px', maxWidth: rem(520) }}>
-                        <UiH1>{t('landing.heroTitle')}</UiH1>
-                        <UiBody>{t('landing.heroBody')}</UiBody>
-                        <div>
-                            <UiButton onClick={() => navigateWithTransition('/home')}>
-                                {t('landing.exploreApp')}
+        <div className={classes.page}>
+            <section className={classes.hero}>
+                <div className={classes.heroGlow} aria-hidden />
+                <div className={classes.heroGrid}>
+                    <div className={classes.heroCopy}>
+                        <span className={classes.heroEyebrow}>{t('landing.heroEyebrow')}</span>
+                        <h1 className={classes.heroTitle}>
+                            {t('landing.heroTitlePrefix')}{' '}
+                            <span className={classes.heroTitleAccent}>{t('landing.heroTitleAccent')}</span>
+                        </h1>
+                        <p className={classes.heroBody}>{t('landing.heroBody')}</p>
+                        <div className={classes.heroActions}>
+                            <UiButton size="md" onClick={() => navigateWithTransition('/welcome')}>
+                                {t('nav.join')}
+                            </UiButton>
+                            <UiButton variant="outline" size="md" onClick={() => navigateWithTransition('/signIn')}>
+                                {t('nav.signIn')}
                             </UiButton>
                         </div>
-                    </Stack>
-                    <Image
-                        src="https://images.unsplash.com/photo-1618247674062-3bf7d57ea5b5?auto=format&w=700&q=80"
-                        alt="Football fans in stadium"
-                        radius="md"
-                        fit="cover"
-                        w={300}
-                        h={200}
-                        style={{ flexShrink: 0 }}
-                    />
-                </Group>
-            </UiCard>
+                    </div>
 
-            <Group justify="center" gap="lg" align="stretch" mb="xl">
-                {pillars.map((pillar) => (
-                    <UiCard key={pillar.title} density="default" style={{ maxWidth: rem(300), flex: '1 1 240px' }}>
-                        <UiH3 style={{ marginBottom: rem(8) }}>{pillar.title}</UiH3>
-                        <UiBody>{pillar.body}</UiBody>
-                    </UiCard>
-                ))}
-            </Group>
+                    <div className={classes.heroVisual}>
+                        <div className={classes.heroImageWrap}>
+                            <img src={HERO_IMAGE} alt="" className={classes.heroImage} />
+                            <div className={classes.heroImageOverlay} aria-hidden />
+                        </div>
+                        <div className={`${classes.heroStat} ${classes.heroStatTop}`}>
+                            <span className={classes.heroStatValue}>{t('landing.heroStatMatches')}</span>
+                            <span className={classes.heroStatLabel}>{t('landing.heroStatMatchesLabel')}</span>
+                        </div>
+                        <div className={`${classes.heroStat} ${classes.heroStatBottom}`}>
+                            <span className={classes.heroStatValue}>{t('landing.heroStatInsights')}</span>
+                            <span className={classes.heroStatLabel}>{t('landing.heroStatInsightsLabel')}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <UiCard density="spacious" mb="xl">
-                <UiH2 style={{ marginBottom: rem(12) }}>{t('landing.whyWeBuilt')}</UiH2>
-                <Stack gap="md">
-                    <UiBody>{t('landing.whyWeBuiltBody')}</UiBody>
-                    <UiCard density="compact" style={{ borderLeft: '3px solid var(--ui-accent)' }}>
-                        <UiBody style={{ fontStyle: 'italic' }}>{t('landing.founderQuote')}</UiBody>
-                        <UiBody style={{ marginTop: rem(8), fontSize: rem(13) }}>
-                            {t('landing.founderAttribution')}
-                        </UiBody>
-                    </UiCard>
-                </Stack>
-            </UiCard>
+            <section className={classes.pillars}>
+                <div
+                    ref={pillarsAnim.ref}
+                    className={`${classes.pillarsInner} ${pillarsAnim.className}`}
+                >
+                    <div className={classes.sectionHeader}>
+                        <h2 className={classes.sectionTitle}>{t('landing.pillarsTitle')}</h2>
+                        <p className={classes.sectionSubtitle}>{t('landing.pillarsSubtitle')}</p>
+                    </div>
+                    <div className={classes.pillarGrid}>
+                        {pillars.map((pillar) => (
+                            <article key={pillar.title} className={classes.pillarCard}>
+                                <span className={classes.pillarIcon} aria-hidden>
+                                    <pillar.icon size={22} stroke={2.2} />
+                                </span>
+                                <h3 className={classes.pillarTitle}>{pillar.title}</h3>
+                                <p className={classes.pillarBody}>{pillar.body}</p>
+                            </article>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-            <UiCard density="spacious" style={{ textAlign: 'center' }}>
-                <UiH2 style={{ marginBottom: rem(12) }}>{t('landing.startHistory')}</UiH2>
-                <UiBody style={{ marginBottom: rem(16) }}>
-                    {marketplaceEnabled
-                        ? t('landing.startHistoryBodyMarketplace')
-                        : t('landing.startHistoryBody')}
-                </UiBody>
-                <Group justify="center" gap="sm">
-                    <UiButton variant="primary" onClick={() => navigateWithTransition('/join')}>
-                        {t('nav.join')}
-                    </UiButton>
-                    <UiButton variant="outline" onClick={() => navigateWithTransition('/signIn')}>
-                        {t('nav.signIn')}
-                    </UiButton>
-                </Group>
-            </UiCard>
-        </UiPageContainer>
+            <section className={classes.story}>
+                <div
+                    ref={storyAnim.ref}
+                    className={`${classes.storyInner} ${storyAnim.className}`}
+                >
+                    <div className={classes.storyCopy}>
+                        <h2 className={classes.storyTitle}>{t('landing.whyWeBuilt')}</h2>
+                        <p className={classes.storyBody}>{t('landing.whyWeBuiltBody')}</p>
+                    </div>
+                    <blockquote className={classes.quoteCard}>
+                        <p className={classes.quoteText}>{t('landing.founderQuote')}</p>
+                        <footer className={classes.quoteFooter}>
+                            <span className={classes.quoteAvatar} aria-hidden>
+                                {t('landing.founderInitials')}
+                            </span>
+                            <cite className={classes.quoteAttribution}>
+                                <span className={classes.quoteName}>{t('landing.founderName')}</span>
+                                <span className={classes.quoteRole}>{t('landing.founderRole')}</span>
+                            </cite>
+                        </footer>
+                    </blockquote>
+                </div>
+            </section>
+
+            <section className={classes.cta}>
+                <div
+                    ref={ctaAnim.ref}
+                    className={`${classes.ctaCard} ${ctaAnim.className}`}
+                >
+                    <h2 className={classes.ctaTitle}>{t('landing.startHistory')}</h2>
+                    <p className={classes.ctaBody}>
+                        {marketplaceEnabled
+                            ? t('landing.startHistoryBodyMarketplace')
+                            : t('landing.startHistoryBody')}
+                    </p>
+                    <div className={classes.ctaActions}>
+                        <UiButton size="md" onClick={() => navigateWithTransition('/welcome')}>
+                            {t('nav.join')}
+                        </UiButton>
+                        <UiButton variant="outline" size="md" onClick={() => navigateWithTransition('/signIn')}>
+                            {t('nav.signIn')}
+                        </UiButton>
+                    </div>
+                </div>
+            </section>
+        </div>
     );
 }

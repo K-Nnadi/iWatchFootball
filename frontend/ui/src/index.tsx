@@ -19,17 +19,17 @@ const queryClient = new QueryClient({
 
 const rootElement = document.getElementById('root');
 
-async function bootstrap() {
-    await ensureApiSession();
-
-    createRoot(rootElement!).render(
-        <StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <App/>
-                <ReactQueryDevtools initialIsOpen={false}/>
-            </QueryClientProvider>
-        </StrictMode>,
-    );
+if (!rootElement) {
+    throw new Error('Root element #root not found');
 }
 
-void bootstrap();
+createRoot(rootElement).render(
+    <StrictMode>
+        <QueryClientProvider client={queryClient}>
+            <App/>
+            {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false}/> : null}
+        </QueryClientProvider>
+    </StrictMode>,
+);
+
+void ensureApiSession();

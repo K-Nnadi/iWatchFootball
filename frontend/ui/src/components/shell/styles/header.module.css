@@ -1,12 +1,14 @@
 .header {
 	height: var(--ui-header-height);
 	margin: 0;
-	background-color: var(--ui-bg-base);
+	background-color: var(--ui-header-bg);
+	backdrop-filter: blur(var(--ui-header-blur)) saturate(140%);
+	-webkit-backdrop-filter: blur(var(--ui-header-blur)) saturate(140%);
 	box-shadow: none;
 	position: sticky;
 	top: 0;
 	z-index: 1000;
-	border-bottom: 1px solid var(--ui-border);
+	border-bottom: 1px solid var(--ui-divider);
 }
 
 .inner {

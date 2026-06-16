@@ -32,19 +32,23 @@ export function ensureApiSession(): Promise<void> {
 }
 
 async function bootstrapSession(): Promise<void> {
-    const keyPair = await generateClientEcdhKeyPair();
-    const clientPublicKey = await exportClientPublicKey(keyPair.publicKey);
-    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    try {
+        const keyPair = await generateClientEcdhKeyPair();
+        const clientPublicKey = await exportClientPublicKey(keyPair.publicKey);
+        const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-    const response = await axios.post<{ serverPublicKey?: string; enabled?: false }>(
-        '/session/crypto',
-        { clientPublicKey },
-        { baseURL, withCredentials: true },
-    );
+        const response = await axios.post<{ serverPublicKey?: string; enabled?: false }>(
+            '/session/crypto',
+            { clientPublicKey },
+            { baseURL, withCredentials: true },
+        );
 
-    if (!response.data.serverPublicKey) {
-        return;
+        if (!response.data.serverPublicKey) {
+            return;
+        }
+
+        sessionAesKey = await deriveAesKey(keyPair.privateKey, response.data.serverPublicKey);
+    } catch (error) {
+        console.warn('API encryption session could not be established; continuing without encrypted payloads.', error);
     }
-
-    sessionAesKey = await deriveAesKey(keyPair.privateKey, response.data.serverPublicKey);
 }

@@ -523,11 +523,11 @@ function FeaturesSection() {
                     {t('home.whyChooseSuffix')}
                 </ModernH2>
 
-                <Grid gutter="xl">
+                <Grid gutter="xl" align="stretch">
                     {features.map((feature, index) => (
-                        <Grid.Col key={index} span={{base: 12, md: 4}}>
-                            <ModernCard hover accent>
-                                <Stack align="center" gap="lg" p="xl">
+                        <Grid.Col key={index} span={{ base: 12, md: 4 }}>
+                            <ModernCard hover accent h="100%">
+                                <Stack align="center" gap="lg" p="xl" style={{ height: '100%' }}>
                                     <Box
                                         style={{
                                             backgroundColor: 'var(--modern-lime)',

@@ -330,9 +330,18 @@
     "featureHighlightsDesc": "Watch extended highlights and key moments from all the top matches."
   },
   "landing": {
+    "heroEyebrow": "Built for match-going fans",
+    "heroTitlePrefix": "Your football story lives",
+    "heroTitleAccent": "in the stands",
     "heroTitle": "For fans who go to matches — not only from the sofa",
     "heroBody": "I Watch Football is for supporters who actually attend games. Ticketing sites help you buy a seat; stats apps show generic match data — none of them build your personal football history.",
+    "heroStatMatches": "Every game",
+    "heroStatMatchesLabel": "Logged from real attendance",
+    "heroStatInsights": "Your stats",
+    "heroStatInsightsLabel": "Built from your journey",
     "exploreApp": "Explore the app",
+    "pillarsTitle": "More than scores and fixtures",
+    "pillarsSubtitle": "Everything connects back to the matches you've actually been to.",
     "pillarHistoryTitle": "A verified match history",
     "pillarHistoryBody": "Build a record of the matches you've attended — grounded in real attendance — automatically enriched with context so it becomes more than a list of fixtures.",
     "pillarInsightsTitle": "Insights from your journey",
@@ -344,7 +353,9 @@
     "whyWeBuilt": "Why we built this",
     "whyWeBuiltBody": "The idea came from travelling across Europe with family to watch football — loving the ritual of being there, but missing a product that answered one simple question: across every match I've attended, what's my football story?",
     "founderQuote": "\"I'm naturally data-driven; nothing out there connected tickets, attendance, and personal narratives in one place. I Watch Football is our answer.\"",
-    "founderAttribution": "— founder",
+    "founderInitials": "KN",
+    "founderName": "Kenneth Nnadi",
+    "founderRole": "Founder",
     "startHistory": "Start your history",
     "startHistoryBody": "Create an account to log matches and explore your stats.",
     "startHistoryBodyMarketplace": "Create an account to log matches and explore your stats, and find tickets for your next game in the stands."
@@ -354,6 +365,32 @@
     "error": "Error",
     "home": "Home",
     "away": "Away"
+  },
+  "auth": {
+    "skip": "SKIP",
+    "welcomeTitle": "Make I Watch Football your own football hub",
+    "welcomeSubtitle": "One sign-up saves your match history, favourite teams, and personal stats.",
+    "continueWithEmail": "Continue with Email",
+    "alreadyHaveAccount": "Already have an account? Sign in"
+  },
+  "onboarding": {
+    "back": "Back",
+    "teamTitle": "Select your favourite team",
+    "teamSubtitle": "Pick a club or national team to personalise your experience.",
+    "consentTitle": "One last thing before you start!",
+    "consentSubtitle": "Review how we use your data and confirm you accept our terms.",
+    "search": "Search",
+    "popularTeams": "Popular teams",
+    "searchResults": "Search results",
+    "noTeams": "No teams found. Try a different search.",
+    "confirm": "CONFIRM",
+    "proceed": "PROCEED",
+    "marketingConsent": "Send me product updates, match reminders, and offers from I Watch Football by email.",
+    "termsConsent": "I accept the Terms and Conditions and have read the Privacy Policy.",
+    "completeTitle": "You're all set",
+    "completeMessage": "Your preferences have been saved.",
+    "saveFailedTitle": "Could not save preferences",
+    "saveFailedMessage": "Please try again."
   },
   "player": {
     "notFound": "Player not found",

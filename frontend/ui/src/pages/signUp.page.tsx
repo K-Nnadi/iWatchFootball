@@ -34,7 +34,7 @@ export function SignUpPage() {
 					
 					notify.success('Success', 'Account created successfully!');
 
-					navigateWithTransition('/home');
+					navigateWithTransition('/onboarding');
 				}
 			},
 			onError: (error: any) => {
