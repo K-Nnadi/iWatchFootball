@@ -147,6 +147,7 @@ jobs:
           GCP_REGION: ${{ secrets.GCP_REGION }}
           DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
           CLOUD_SQL_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
@@ -159,7 +160,7 @@ jobs:
 
           echo "Deploying with Cloud SQL connection: ${CLOUD_SQL_CONNECTION}"
 
-          # YAML single-quoted values safely handle passwords with &, %, ?, etc.
+          # YAML single-quoted values safely handle secrets with &, %, ?, etc.
           yaml_quote() {
             printf "'%s'" "$(printf '%s' "$1" | sed "s/'/''/g")"
           }
@@ -174,6 +175,7 @@ jobs:
             echo "DATABASE_NAME: iwatchfootball"
             echo "DATABASE_TYPE: postgres"
             echo "DATABASE_SYNCHRONIZE: \"false\""
+            echo "JWT_SECRET: $(yaml_quote "${JWT_SECRET}")"
             if [ -n "${REDIS_HOST:-}" ]; then
               echo "REDIS_HOST: $(yaml_quote "${REDIS_HOST}")"
               echo "REDIS_PORT: $(yaml_quote "${REDIS_PORT:-6379}")"
