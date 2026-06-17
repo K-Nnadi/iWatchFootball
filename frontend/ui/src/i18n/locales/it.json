@@ -181,6 +181,20 @@
     "licenses": "Licenze",
     "copyright": "© {{year}} I Watch Football. Tutti i diritti riservati."
   },
+  "legal": {
+    "privacy": {
+      "title": "Informativa sulla privacy",
+      "body": "Raccogliamo e usiamo i tuoi dati per tracciamento partite, statistiche personali e funzioni account. Non vendiamo le tue informazioni personali. Per domande: iwatchfootball@gmail.com."
+    },
+    "terms": {
+      "title": "Termini e condizioni",
+      "body": "Usando I Watch Football accetti di utilizzare il servizio in modo responsabile e conforme alla legge. Account, biglietti e marketplace possono avere termini aggiuntivi."
+    },
+    "cookies": {
+      "title": "Politica sui cookie",
+      "body": "Usiamo cookie essenziali e archiviazione locale per accesso e preferenze. Analisi opzionali potrebbero essere aggiunte in futuro — aggiorneremo questa pagina."
+    }
+  },
   "friends": {
     "title": "Amici",
     "description": "Aggiungi amici per confrontare le statistiche. Devono condividere il tracker (Impostazioni → Privacy tracker).",
@@ -371,7 +385,61 @@
     "welcomeTitle": "Rendi I Watch Football il tuo hub calcistico",
     "welcomeSubtitle": "Una registrazione salva la cronologia partite, le squadre preferite e le statistiche personali.",
     "continueWithEmail": "Continua con e-mail",
-    "alreadyHaveAccount": "Hai già un account? Accedi"
+    "alreadyHaveAccount": "Hai già un account? Accedi",
+    "signUpTitle": "Registrati",
+    "signUpSubtitle": "Crea un account e inizia a tracciare le tue partite!",
+    "signUpButton": "Registrati",
+    "signUpSuccessTitle": "Successo",
+    "signUpSuccessMessage": "Account creato con successo!",
+    "signUpFailedTitle": "Registrazione fallita",
+    "signUpFailedMessage": "Registrazione non riuscita. Controlla i dati inseriti.",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Mario",
+    "firstNameRequired": "Il nome è obbligatorio",
+    "lastName": "Cognome",
+    "lastNamePlaceholder": "Rossi",
+    "lastNameRequired": "Il cognome è obbligatorio",
+    "email": "E-mail",
+    "emailPlaceholder": "tu@esempio.it",
+    "emailInvalid": "E-mail non valida",
+    "username": "Username",
+    "usernamePlaceholder": "marior",
+    "usernameRequired": "Username obbligatorio",
+    "usernameMinLength": "Minimo 3 caratteri",
+    "usernameFormat": "Solo lettere, numeri e underscore",
+    "password": "Password",
+    "passwordPlaceholder": "La tua password sicura",
+    "passwordRequirements": "Minimo 8 caratteri, una maiuscola e un carattere speciale",
+    "newPassword": "Nuova password",
+    "confirmPassword": "Conferma password",
+    "passwordsDoNotMatch": "Le password non coincidono",
+    "securityQuestionLabel": "Domanda di sicurezza",
+    "securityQuestionPlaceholder": "Scegli una domanda di recupero",
+    "securityQuestionRequired": "Scegli una domanda di sicurezza",
+    "securityQuestionHint": "Ti servirà per reimpostare la password.",
+    "securityAnswerLabel": "La tua risposta",
+    "securityAnswerPlaceholder": "Risposta (non sensibile alle maiuscole)",
+    "securityAnswerMinLength": "Minimo 2 caratteri",
+    "securityAnswerMaxLength": "Massimo 128 caratteri",
+    "securityQuestions": {
+      "FIRST_TEAM": "Qual è stata la prima squadra che hai tifato?",
+      "FIRST_STADIUM": "Qual è stato il primo stadio che hai visitato?",
+      "CHILDHOOD_HERO": "Chi era il tuo eroe calcistico d'infanzia?",
+      "FIRST_LIVE_MATCH": "Quale squadra hai visto alla tua prima partita dal vivo?"
+    },
+    "forgotPasswordTitle": "Password dimenticata",
+    "forgotPasswordIdentifySubtitle": "Inserisci e-mail o username.",
+    "forgotPasswordResetSubtitle": "Rispondi alla domanda di sicurezza e scegli una nuova password.",
+    "recoveryIdentifierLabel": "E-mail o username",
+    "recoveryIdentifierPlaceholder": "tu@esempio.it o marior",
+    "recoveryIdentifierRequired": "E-mail o username obbligatorio",
+    "recoveryFailedTitle": "Impossibile reimpostare la password",
+    "recoveryFailedMessage": "Controlla i dati e riprova.",
+    "recoverySuccessTitle": "Password aggiornata",
+    "recoverySuccessMessage": "Ora puoi accedere con la nuova password.",
+    "continue": "Continua",
+    "resetPassword": "Reimposta password",
+    "backToSignIn": "Torna al login"
   },
   "onboarding": {
     "back": "Indietro",

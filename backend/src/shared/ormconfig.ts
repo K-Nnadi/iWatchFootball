@@ -23,9 +23,12 @@ export default new DataSource({
 	migrationsRun: false,
 	synchronize: false,
 	logging: true,
-	migrations: ['src/shared/migrations/*{.ts,.js}'],
+	migrations: [
+		join(__dirname, 'migrations/*.ts'),
+		join(__dirname, 'migrations/*.js'),
+	],
 	cli: {
-		migrationsDir: 'src/shared/migrations'
+		migrationsDir: join(__dirname, 'migrations'),
 	},
 	// SSL configuration for remote PostgreSQL connections
 	ssl: process.env.DATABASE_SSL === 'true' ? {

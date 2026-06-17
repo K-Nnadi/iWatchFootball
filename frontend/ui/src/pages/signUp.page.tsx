@@ -6,14 +6,19 @@ import {
 	TextInput,
 	Title,
 	PasswordInput,
-	Alert
+	Alert,
+	Select,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useEffect, useMemo, useState } from "react";
 import { usePageTransition } from "../hooks/usePageTransition";
 import { UiButton } from "../components/ui";
 import { useRegister, type RegisterMutationResult } from "@iWatchFootball/clients/controllers/auth";
 import { useAuthStore } from "../shared/stores/auth.store";
 import { notify } from "../shared/notify";
+import { getSecurityQuestions } from "../shared/api/authRecovery.api";
+import { SECURITY_QUESTION_VALUES, type SecurityQuestion } from "../shared/securityQuestion";
+import { useTranslation } from "../i18n";
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const upperCase = /[A-Z]/;
@@ -23,23 +28,44 @@ export const passwordValidation = (value: string) => {
 };
 
 export function SignUpPage() {
+	const { t } = useTranslation();
 	const { navigateWithTransition } = usePageTransition();
 	const { login: setAuthState } = useAuthStore();
+	const [questions, setQuestions] = useState<SecurityQuestion[]>([...SECURITY_QUESTION_VALUES]);
+
+	useEffect(() => {
+		void getSecurityQuestions()
+			.then((res) => {
+				if (res.questions?.length) setQuestions(res.questions as SecurityQuestion[]);
+			})
+			.catch(() => {
+				/* use local fallback list */
+			});
+	}, []);
+
+	const questionOptions = useMemo(
+		() =>
+			questions.map((q) => ({
+				value: q,
+				label: t(`auth.securityQuestions.${q}`),
+			})),
+		[questions, t],
+	);
 
 	const registerMutation = useRegister({
 		mutation: {
 			onSuccess: (data: RegisterMutationResult) => {
 				if (data.access_token && data.user) {
 					setAuthState(data.access_token, data.user);
-					
-					notify.success('Success', 'Account created successfully!');
-
+					notify.success(t('auth.signUpSuccessTitle'), t('auth.signUpSuccessMessage'));
 					navigateWithTransition('/onboarding');
 				}
 			},
-			onError: (error: any) => {
-				const errorMessage = error?.response?.data?.message || error?.message || 'Registration failed. Please try again.';
-				notify.error('Registration Failed', errorMessage);
+			onError: (error: unknown) => {
+				const err = error as { response?: { data?: { message?: string } }; message?: string };
+				const errorMessage =
+					err?.response?.data?.message || err?.message || t('auth.signUpFailedMessage');
+				notify.error(t('auth.signUpFailedTitle'), errorMessage);
 			},
 		},
 	});
@@ -50,24 +76,30 @@ export function SignUpPage() {
 			lastName: '',
 			email: '',
 			userName: '',
-			password: ''
+			password: '',
+			securityQuestion: '' as SecurityQuestion | '',
+			securityAnswer: '',
 		},
 		validate: {
-			firstName: (value: string) => (value.trim() ? null : 'First name is required'),
-			lastName: (value: string) => (value.trim() ? null : 'Last name is required'),
-			email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+			firstName: (value: string) => (value.trim() ? null : t('auth.firstNameRequired')),
+			lastName: (value: string) => (value.trim() ? null : t('auth.lastNameRequired')),
+			email: (value: string) => (/^\S+@\S+$/.test(value) ? null : t('auth.emailInvalid')),
 			userName: (value: string) => {
-				if (!value.trim()) return 'Username is required';
-				if (value.length < 3) return 'Username must be at least 3 characters';
-				if (!/^[a-zA-Z0-9_]+$/.test(value)) return 'Username can only contain letters, numbers, and underscores';
+				if (!value.trim()) return t('auth.usernameRequired');
+				if (value.length < 3) return t('auth.usernameMinLength');
+				if (!/^[a-zA-Z0-9_]+$/.test(value)) return t('auth.usernameFormat');
 				return null;
 			},
-			password: (value: string) => {
-				return passwordValidation(value)
-					? null
-					: 'Password must contain at least 8 characters, one uppercase letter and one special character';
-			}
-		}
+			password: (value: string) =>
+				passwordValidation(value) ? null : t('auth.passwordRequirements'),
+			securityQuestion: (value: string) => (value ? null : t('auth.securityQuestionRequired')),
+			securityAnswer: (value: string) => {
+				const trimmed = value.trim();
+				if (trimmed.length < 2) return t('auth.securityAnswerMinLength');
+				if (trimmed.length > 128) return t('auth.securityAnswerMaxLength');
+				return null;
+			},
+		},
 	});
 
 	const formSubmit = (values: typeof form.values) => {
@@ -77,8 +109,10 @@ export function SignUpPage() {
 				firstName: values.firstName,
 				lastName: values.lastName,
 				userName: values.userName,
-				password: values.password
-			}
+				password: values.password,
+				securityQuestion: values.securityQuestion,
+				securityAnswer: values.securityAnswer.trim(),
+			},
 		});
 	};
 
@@ -88,56 +122,52 @@ export function SignUpPage() {
 				<form onSubmit={form.onSubmit((values) => formSubmit(values))}>
 					<Box mb="xl">
 						<Title order={2} ta="center" mt="md" mb="lg">
-							Sign Up
+							{t('auth.signUpTitle')}
 						</Title>
-						<Text size="sm" color="dimmed" ta="center" mb="lg">
-							Create an account to start tracking your games!
+						<Text size="sm" c="dimmed" ta="center" mb="lg">
+							{t('auth.signUpSubtitle')}
 						</Text>
 					</Box>
 
-					<Text size="sm" mb="xs">First Name</Text>
+					<Text size="sm" mb="xs">{t('auth.firstName')}</Text>
+					<TextInput size="md" placeholder={t('auth.firstNamePlaceholder')} mb="md" {...form.getInputProps('firstName')} />
+
+					<Text size="sm" mb="xs">{t('auth.lastName')}</Text>
+					<TextInput size="md" placeholder={t('auth.lastNamePlaceholder')} mb="md" {...form.getInputProps('lastName')} />
+
+					<Text size="sm" mb="xs">{t('auth.email')}</Text>
+					<TextInput size="md" placeholder={t('auth.emailPlaceholder')} mb="md" {...form.getInputProps('email')} />
+
+					<Text size="sm" mb="xs">{t('auth.username')}</Text>
+					<TextInput size="md" placeholder={t('auth.usernamePlaceholder')} mb="md" {...form.getInputProps('userName')} />
+
+					<Text size="sm" mb="xs">{t('auth.password')}</Text>
+					<PasswordInput size="md" placeholder={t('auth.passwordPlaceholder')} mb="md" {...form.getInputProps('password')} />
+
+					<Text size="sm" mb="xs">{t('auth.securityQuestionLabel')}</Text>
+					<Select
+						size="md"
+						placeholder={t('auth.securityQuestionPlaceholder')}
+						data={questionOptions}
+						mb="xs"
+						{...form.getInputProps('securityQuestion')}
+					/>
+					<Text size="xs" c="dimmed" mb="md">
+						{t('auth.securityQuestionHint')}
+					</Text>
+
+					<Text size="sm" mb="xs">{t('auth.securityAnswerLabel')}</Text>
 					<TextInput
 						size="md"
-						placeholder="John"
+						placeholder={t('auth.securityAnswerPlaceholder')}
 						mb="md"
-						{...form.getInputProps('firstName')}
-					/>
-
-					<Text size="sm" mb="xs">Last Name</Text>
-					<TextInput
-						size="md"
-						placeholder="Doe"
-						mb="md"
-						{...form.getInputProps('lastName')}
-					/>
-
-					<Text size="sm" mb="xs">Email</Text>
-					<TextInput
-						size="md"
-						placeholder="you@example.com"
-						mb="md"
-						{...form.getInputProps('email')}
-					/>
-
-					<Text size="sm" mb="xs">Username</Text>
-					<TextInput
-						size="md"
-						placeholder="johndoe"
-						mb="md"
-						{...form.getInputProps('userName')}
-					/>
-
-					<Text size="sm" mb="xs">Password</Text>
-					<PasswordInput
-						size="md"
-						placeholder="Your secure password"
-						mb="md"
-						{...form.getInputProps('password')}
+						autoComplete="off"
+						{...form.getInputProps('securityAnswer')}
 					/>
 
 					{registerMutation.isError && (
 						<Alert color="red" mb="md">
-							Registration failed. Please check your information and try again.
+							{t('auth.signUpFailedMessage')}
 						</Alert>
 					)}
 
@@ -149,7 +179,7 @@ export function SignUpPage() {
 						loading={registerMutation.isPending}
 						disabled={registerMutation.isPending}
 					>
-						Sign up
+						{t('auth.signUpButton')}
 					</UiButton>
 					<UiButton
 						my="xl"
@@ -158,7 +188,7 @@ export function SignUpPage() {
 						fullWidth
 						onClick={() => navigateWithTransition('/signIn')}
 					>
-						Login
+						{t('nav.signIn')}
 					</UiButton>
 				</form>
 			</Paper>

@@ -1,19 +1,21 @@
 import {ApiBody, ApiOkResponse, ApiOperation, ApiProperty, ApiPropertyOptional, PickType} from '@nestjs/swagger';
-import {Body, Module, Post, Response} from '@nestjs/common';
+import {Body, Get, Module, Post, Response} from '@nestjs/common';
 import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
-import {IsEmail, IsNotEmpty, IsOptional, ValidateIf} from 'class-validator';
+import {IsEmail, IsEnum, IsNotEmpty, IsOptional, MaxLength, MinLength} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
-import {UserType} from "../enums/user.enum";
 import {compare, hash} from "bcryptjs";
 import {User} from "../modules/user/user.entity";
 import {UserModule, UserService} from "../modules/user/user.module";
-import {LogModule, LogService} from "../modules/log/log.module";
+import {LogModule} from "../modules/log/log.module";
 import {Public} from "../../auth/decorators/public.decorator";
 import {AuthThrottle} from "../../auth/rate-limit/auth-throttle.decorator";
 import {CommsPreferenceModule, CommsPreferenceService} from "../modules/commsPreference/commsPreference.module";
 import {CommunicationFrequency, Language} from "../enums/commsPreference.enum";
 import {UserRole} from "../../auth/types/security.types";
+import {SecurityQuestion} from "../enums/securityQuestion.enum";
+import {UserSecurityAnswerModule} from "../modules/userSecurityAnswer/userSecurityAnswer.module";
+import {UserSecurityAnswerService} from "../modules/userSecurityAnswer/userSecurityAnswer.service";
 
 
 export class ValidateBody {
@@ -38,6 +40,59 @@ export class LoginBody {
 }
 
 export class RegisterBody extends PickType(User, ['firstName', 'lastName', 'email', 'password', 'userName'] as const) {
+    @ApiProperty({ enum: SecurityQuestion })
+    @IsEnum(SecurityQuestion)
+    securityQuestion!: SecurityQuestion;
+
+    @ApiProperty({ minLength: 2, maxLength: 128 })
+    @IsNotEmpty()
+    @MinLength(2)
+    @MaxLength(128)
+    securityAnswer!: string;
+}
+
+export class ForgotPasswordChallengeBody {
+    @IsEmail()
+    @IsOptional()
+    @ApiPropertyOptional()
+    email?: string;
+
+    @IsOptional()
+    @ApiPropertyOptional()
+    userName?: string;
+}
+
+export class ForgotPasswordChallengeResponse {
+    @ApiProperty({ enum: SecurityQuestion })
+    question!: SecurityQuestion;
+}
+
+export class ForgotPasswordResetBody {
+    @IsEmail()
+    @IsOptional()
+    @ApiPropertyOptional()
+    email?: string;
+
+    @IsOptional()
+    @ApiPropertyOptional()
+    userName?: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @MinLength(2)
+    @MaxLength(128)
+    securityAnswer!: string;
+
+    @ApiProperty({ minLength: 8, maxLength: 32 })
+    @IsNotEmpty()
+    @MinLength(8)
+    @MaxLength(32)
+    newPassword!: string;
+}
+
+export class SecurityQuestionsResponse {
+    @ApiProperty({ enum: SecurityQuestion, isArray: true })
+    questions!: SecurityQuestion[];
 }
 
 
@@ -56,8 +111,91 @@ export class AuthController {
 
     constructor(
         private userService: UserService,
-        private commsPreferenceService: CommsPreferenceService
+        private commsPreferenceService: CommsPreferenceService,
+        private userSecurityAnswerService: UserSecurityAnswerService,
     ) {
+    }
+
+    private async resolveUserByEmailOrUserName(email?: string, userName?: string): Promise<User | null> {
+        if (email) {
+            const users = await this.userService.getQuery({ where: { email: email.toLowerCase() } });
+            return users[0] ?? null;
+        }
+        if (userName) {
+            const users = await this.userService.getQuery({ where: { userName } });
+            return users[0] ?? null;
+        }
+        return null;
+    }
+
+    @Get('security-questions')
+    @Public()
+    @ApiOperation({ summary: 'List available security questions', operationId: 'getSecurityQuestions' })
+    @ApiOkResponse({ type: SecurityQuestionsResponse })
+    getSecurityQuestions(): SecurityQuestionsResponse {
+        return { questions: Object.values(SecurityQuestion) };
+    }
+
+    @Post('forgot-password/challenge')
+    @Public()
+    @AuthThrottle()
+    @ApiOperation({ summary: 'Get security question for account recovery', operationId: 'forgotPasswordChallenge' })
+    @ApiOkResponse({ type: ForgotPasswordChallengeResponse })
+    @ApiBody({ type: ForgotPasswordChallengeBody })
+    async forgotPasswordChallenge(
+        @Body() body: ForgotPasswordChallengeBody,
+        @Response() response: FastifyReply,
+    ): Promise<void> {
+        if (!body.email && !body.userName) {
+            void response.code(400).send({ message: 'Either email or userName must be provided' });
+            return;
+        }
+
+        const user = await this.resolveUserByEmailOrUserName(body.email, body.userName);
+        if (!user) {
+            void response.code(404).send({ message: 'Account not found' });
+            return;
+        }
+
+        const security = await this.userSecurityAnswerService.findByUserId(user.id);
+        if (!security) {
+            void response.code(400).send({ message: 'No security question is set for this account' });
+            return;
+        }
+
+        void response.code(200).send({ question: security.question });
+    }
+
+    @Post('forgot-password/reset')
+    @Public()
+    @AuthThrottle()
+    @ApiOperation({ summary: 'Reset password using security question answer', operationId: 'forgotPasswordReset' })
+    @ApiBody({ type: ForgotPasswordResetBody })
+    async forgotPasswordReset(
+        @Body() body: ForgotPasswordResetBody,
+        @Response() response: FastifyReply,
+    ): Promise<void> {
+        if (!body.email && !body.userName) {
+            void response.code(400).send({ message: 'Either email or userName must be provided' });
+            return;
+        }
+
+        const user = await this.resolveUserByEmailOrUserName(body.email, body.userName);
+        if (!user) {
+            void response.code(404).send({ message: 'Account not found' });
+            return;
+        }
+
+        const valid = await this.userSecurityAnswerService.verifyForUser(user.id, body.securityAnswer);
+        if (!valid) {
+            void response.code(401).send({ message: 'Incorrect security answer' });
+            return;
+        }
+
+        const newPasswordHash = await hash(body.newPassword, parseInt(process.env.SALT_ROUNDS || '10', 10));
+        await this.userService.update(user.id, { id: user.id, password: newPasswordHash });
+
+        void response.code(200).send({ message: 'Password updated successfully' });
     }
 
     @Post('login')
@@ -142,6 +280,18 @@ export class AuthController {
         });
 
         if (user) {
+            try {
+                await this.userSecurityAnswerService.createForUser(
+                    user.id,
+                    register.securityQuestion,
+                    register.securityAnswer,
+                );
+            } catch {
+                await this.userService.delete(user.id);
+                void response.code(400).send({ message: 'Invalid security answer' });
+                return;
+            }
+
             const commsPreference = await this.commsPreferenceService.create({
                 userId: user.id,
                 emailNotifications: CommunicationFrequency.DAILY,
@@ -173,7 +323,7 @@ export class AuthController {
 }
 
 @Module({
-    imports: [UserModule, LogModule, CommsPreferenceModule],
+    imports: [UserModule, LogModule, CommsPreferenceModule, UserSecurityAnswerModule],
     controllers: [AuthController]
 })
 export class AuthModule {

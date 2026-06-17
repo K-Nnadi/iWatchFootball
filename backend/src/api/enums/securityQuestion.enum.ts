@@ -1,0 +1,6 @@
+export enum SecurityQuestion {
+    FIRST_TEAM = 'FIRST_TEAM',
+    FIRST_STADIUM = 'FIRST_STADIUM',
+    CHILDHOOD_HERO = 'CHILDHOOD_HERO',
+    FIRST_LIVE_MATCH = 'FIRST_LIVE_MATCH',
+}

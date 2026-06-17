@@ -181,6 +181,20 @@
     "licenses": "Licenses",
     "copyright": "© {{year}} I Watch Football. All rights reserved."
   },
+  "legal": {
+    "privacy": {
+      "title": "Privacy policy",
+      "body": "We collect and use your data to provide match tracking, personal stats, and account features. We do not sell your personal information. For questions about your data, contact us at iwatchfootball@gmail.com."
+    },
+    "terms": {
+      "title": "Terms and conditions",
+      "body": "By using I Watch Football you agree to use the service responsibly and in compliance with applicable laws. Account features, ticketing, and marketplace services may have additional terms shown at the point of use."
+    },
+    "cookies": {
+      "title": "Cookie policy",
+      "body": "We use essential cookies and local storage to keep you signed in and remember your preferences. Optional analytics may be added in future — we will update this page if that changes."
+    }
+  },
   "friends": {
     "title": "Friends",
     "description": "Add friends to compare match-going stats. Friends must share their tracker (Settings → Tracker privacy) for compare to work.",
@@ -371,7 +385,61 @@
     "welcomeTitle": "Make I Watch Football your own football hub",
     "welcomeSubtitle": "One sign-up saves your match history, favourite teams, and personal stats.",
     "continueWithEmail": "Continue with Email",
-    "alreadyHaveAccount": "Already have an account? Sign in"
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "signUpTitle": "Sign Up",
+    "signUpSubtitle": "Create an account to start tracking your games!",
+    "signUpButton": "Sign up",
+    "signUpSuccessTitle": "Success",
+    "signUpSuccessMessage": "Account created successfully!",
+    "signUpFailedTitle": "Registration Failed",
+    "signUpFailedMessage": "Registration failed. Please check your information and try again.",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "John",
+    "firstNameRequired": "First name is required",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Doe",
+    "lastNameRequired": "Last name is required",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailInvalid": "Invalid email",
+    "username": "Username",
+    "usernamePlaceholder": "johndoe",
+    "usernameRequired": "Username is required",
+    "usernameMinLength": "Username must be at least 3 characters",
+    "usernameFormat": "Username can only contain letters, numbers, and underscores",
+    "password": "Password",
+    "passwordPlaceholder": "Your secure password",
+    "passwordRequirements": "Password must contain at least 8 characters, one uppercase letter and one special character",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "securityQuestionLabel": "Security question",
+    "securityQuestionPlaceholder": "Choose a recovery question",
+    "securityQuestionRequired": "Please choose a security question",
+    "securityQuestionHint": "You'll need this answer to reset your password if you forget it.",
+    "securityAnswerLabel": "Your answer",
+    "securityAnswerPlaceholder": "Answer (case-insensitive)",
+    "securityAnswerMinLength": "Answer must be at least 2 characters",
+    "securityAnswerMaxLength": "Answer must be at most 128 characters",
+    "securityQuestions": {
+      "FIRST_TEAM": "What was the first club you supported?",
+      "FIRST_STADIUM": "What was the first stadium you visited?",
+      "CHILDHOOD_HERO": "Who was your childhood football hero?",
+      "FIRST_LIVE_MATCH": "Which team did you see at your first live match?"
+    },
+    "forgotPasswordTitle": "Forgot password",
+    "forgotPasswordIdentifySubtitle": "Enter your email or username to recover your account.",
+    "forgotPasswordResetSubtitle": "Answer your security question and choose a new password.",
+    "recoveryIdentifierLabel": "Email or username",
+    "recoveryIdentifierPlaceholder": "you@example.com or johndoe",
+    "recoveryIdentifierRequired": "Email or username is required",
+    "recoveryFailedTitle": "Could not reset password",
+    "recoveryFailedMessage": "Please check your details and try again.",
+    "recoverySuccessTitle": "Password updated",
+    "recoverySuccessMessage": "You can now sign in with your new password.",
+    "continue": "Continue",
+    "resetPassword": "Reset password",
+    "backToSignIn": "Back to sign in"
   },
   "onboarding": {
     "back": "Back",

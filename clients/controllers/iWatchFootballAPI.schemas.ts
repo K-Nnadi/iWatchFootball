@@ -1340,6 +1340,7 @@ q: string;
 
 export type PlatformConfigControllerGetFeatures200 = {
   marketplaceEnabled?: boolean;
+  adsEnabled?: boolean;
 };
 
 export type GetCountLogParams = {
@@ -2035,6 +2036,12 @@ export interface RegisterBody {
    */
   password: string;
   userName: string;
+  securityQuestion: string;
+  /**
+   * @minLength 2
+   * @maxLength 128
+   */
+  securityAnswer: string;
 }
 
 export interface AuthResponse {

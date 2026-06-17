@@ -181,6 +181,20 @@
     "licenses": "Lizenzen",
     "copyright": "© {{year}} I Watch Football. Alle Rechte vorbehalten."
   },
+  "legal": {
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "body": "Wir erheben und nutzen deine Daten für Spieltracking, persönliche Statistiken und Kontofunktionen. Wir verkaufen deine personenbezogenen Daten nicht. Bei Fragen: iwatchfootball@gmail.com."
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "body": "Mit der Nutzung von I Watch Football stimmst du zu, den Dienst verantwortungsvoll und gesetzeskonform zu nutzen. Konto-, Ticket- und Marktplatzfunktionen können zusätzliche Bedingungen haben."
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie",
+      "body": "Wir verwenden notwendige Cookies und lokalen Speicher für Anmeldung und Einstellungen. Optionale Analysen können später hinzukommen — diese Seite wird dann aktualisiert."
+    }
+  },
   "friends": {
     "title": "Freunde",
     "description": "Freunde hinzufügen, um Spielstatistiken zu vergleichen. Freunde müssen ihren Tracker teilen (Einstellungen → Tracker-Datenschutz).",
@@ -371,7 +385,61 @@
     "welcomeTitle": "Mach I Watch Football zu deinem Fußball-Hub",
     "welcomeSubtitle": "Eine Anmeldung speichert deine Spielhistorie, Lieblingsteams und persönlichen Statistiken.",
     "continueWithEmail": "Mit E-Mail fortfahren",
-    "alreadyHaveAccount": "Bereits ein Konto? Anmelden"
+    "alreadyHaveAccount": "Bereits ein Konto? Anmelden",
+    "signUpTitle": "Registrieren",
+    "signUpSubtitle": "Erstelle ein Konto und verfolge deine Spiele!",
+    "signUpButton": "Registrieren",
+    "signUpSuccessTitle": "Erfolg",
+    "signUpSuccessMessage": "Konto erfolgreich erstellt!",
+    "signUpFailedTitle": "Registrierung fehlgeschlagen",
+    "signUpFailedMessage": "Registrierung fehlgeschlagen. Bitte prüfe deine Angaben.",
+    "firstName": "Vorname",
+    "firstNamePlaceholder": "Max",
+    "firstNameRequired": "Vorname ist erforderlich",
+    "lastName": "Nachname",
+    "lastNamePlaceholder": "Mustermann",
+    "lastNameRequired": "Nachname ist erforderlich",
+    "email": "E-Mail",
+    "emailPlaceholder": "du@beispiel.de",
+    "emailInvalid": "Ungültige E-Mail",
+    "username": "Benutzername",
+    "usernamePlaceholder": "maxm",
+    "usernameRequired": "Benutzername ist erforderlich",
+    "usernameMinLength": "Mindestens 3 Zeichen",
+    "usernameFormat": "Nur Buchstaben, Zahlen und Unterstriche",
+    "password": "Passwort",
+    "passwordPlaceholder": "Dein sicheres Passwort",
+    "passwordRequirements": "Mindestens 8 Zeichen, ein Großbuchstabe und ein Sonderzeichen",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+    "securityQuestionLabel": "Sicherheitsfrage",
+    "securityQuestionPlaceholder": "Wähle eine Wiederherstellungsfrage",
+    "securityQuestionRequired": "Bitte wähle eine Sicherheitsfrage",
+    "securityQuestionHint": "Du brauchst diese Antwort, um dein Passwort zurückzusetzen.",
+    "securityAnswerLabel": "Deine Antwort",
+    "securityAnswerPlaceholder": "Antwort (Groß-/Kleinschreibung egal)",
+    "securityAnswerMinLength": "Mindestens 2 Zeichen",
+    "securityAnswerMaxLength": "Maximal 128 Zeichen",
+    "securityQuestions": {
+      "FIRST_TEAM": "Welcher Verein war dein erster Favorit?",
+      "FIRST_STADIUM": "Welches Stadion hast du zuerst besucht?",
+      "CHILDHOOD_HERO": "Wer war dein Fußballheld in der Kindheit?",
+      "FIRST_LIVE_MATCH": "Welches Team hast du beim ersten Live-Spiel gesehen?"
+    },
+    "forgotPasswordTitle": "Passwort vergessen",
+    "forgotPasswordIdentifySubtitle": "Gib E-Mail oder Benutzername ein.",
+    "forgotPasswordResetSubtitle": "Beantworte deine Sicherheitsfrage und wähle ein neues Passwort.",
+    "recoveryIdentifierLabel": "E-Mail oder Benutzername",
+    "recoveryIdentifierPlaceholder": "du@beispiel.de oder maxm",
+    "recoveryIdentifierRequired": "E-Mail oder Benutzername erforderlich",
+    "recoveryFailedTitle": "Passwort konnte nicht zurückgesetzt werden",
+    "recoveryFailedMessage": "Bitte prüfe deine Angaben und versuche es erneut.",
+    "recoverySuccessTitle": "Passwort aktualisiert",
+    "recoverySuccessMessage": "Du kannst dich jetzt mit deinem neuen Passwort anmelden.",
+    "continue": "Weiter",
+    "resetPassword": "Passwort zurücksetzen",
+    "backToSignIn": "Zur Anmeldung"
   },
   "onboarding": {
     "back": "Zurück",

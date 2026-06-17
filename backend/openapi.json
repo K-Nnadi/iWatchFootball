@@ -4895,6 +4895,9 @@
                   "properties": {
                     "marketplaceEnabled": {
                       "type": "boolean"
+                    },
+                    "adsEnabled": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -16768,6 +16771,85 @@
         ]
       }
     },
+    "/auth/security-questions": {
+      "get": {
+        "operationId": "getSecurityQuestions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityQuestionsResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List available security questions",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/forgot-password/challenge": {
+      "post": {
+        "operationId": "forgotPasswordChallenge",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordChallengeBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordChallengeResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get security question for account recovery",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/forgot-password/reset": {
+      "post": {
+        "operationId": "forgotPasswordReset",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordResetBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Reset password using security question answer",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/auth/login": {
       "post": {
         "operationId": "login",
@@ -23056,6 +23138,77 @@
           "active"
         ]
       },
+      "SecurityQuestionsResponse": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "FIRST_TEAM",
+                "FIRST_STADIUM",
+                "CHILDHOOD_HERO",
+                "FIRST_LIVE_MATCH"
+              ]
+            }
+          }
+        },
+        "required": [
+          "questions"
+        ]
+      },
+      "ForgotPasswordChallengeBody": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          }
+        }
+      },
+      "ForgotPasswordChallengeResponse": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "enum": [
+              "FIRST_TEAM",
+              "FIRST_STADIUM",
+              "CHILDHOOD_HERO",
+              "FIRST_LIVE_MATCH"
+            ]
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "ForgotPasswordResetBody": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "securityAnswer": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "securityAnswer",
+          "newPassword"
+        ]
+      },
       "LoginBody": {
         "type": "object",
         "properties": {
@@ -23109,6 +23262,20 @@
             "type": "string",
             "minLength": 8,
             "maxLength": 32
+          },
+          "securityQuestion": {
+            "type": "string",
+            "enum": [
+              "FIRST_TEAM",
+              "FIRST_STADIUM",
+              "CHILDHOOD_HERO",
+              "FIRST_LIVE_MATCH"
+            ]
+          },
+          "securityAnswer": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 128
           }
         },
         "required": [
@@ -23116,7 +23283,9 @@
           "lastName",
           "userName",
           "email",
-          "password"
+          "password",
+          "securityQuestion",
+          "securityAnswer"
         ]
       },
       "CreateListingDto": {

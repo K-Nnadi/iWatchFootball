@@ -39,6 +39,7 @@ import { FriendsPage } from "./pages/friends.page";
 import { CompareFriendPage } from "./pages/friendsCompare.page";
 import { AuthWelcomePage } from "./pages/auth/authWelcome.page";
 import { OnboardingPage } from "./pages/onboarding/onboarding.page";
+import { LegalDocumentPage } from "./pages/legal/legalDocument.page";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -119,18 +120,6 @@ const additionalRoutes = [
         ),
     },
     {
-        path: '/licenses',
-        element: <LicensesPage />
-    },
-    {
-        path: '/contact',
-        element: <ContactPage />
-    },
-    {
-        path: '/help',
-        element: <HelpPage />
-    },
-    {
         path: '/*',
         element: <NotFound />
     }
@@ -179,6 +168,12 @@ const router = createBrowserRouter([
                 index: true,
                 element: <RootEntry />,
             },
+            { path: 'contact', element: <ContactPage /> },
+            { path: 'help', element: <HelpPage /> },
+            { path: 'licenses', element: <LicensesPage /> },
+            { path: 'privacy', element: <LegalDocumentPage doc="privacy" /> },
+            { path: 'terms', element: <LegalDocumentPage doc="terms" /> },
+            { path: 'cookies', element: <LegalDocumentPage doc="cookies" /> },
             {
                 element: <RequireAuth />,
                 children: [

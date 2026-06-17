@@ -181,6 +181,20 @@
     "licenses": "Licenças",
     "copyright": "© {{year}} I Watch Football. Todos os direitos reservados."
   },
+  "legal": {
+    "privacy": {
+      "title": "Política de privacidade",
+      "body": "Recolhemos e usamos os seus dados para acompanhamento de jogos, estatísticas pessoais e funcionalidades de conta. Não vendemos a sua informação pessoal. Contacto: iwatchfootball@gmail.com."
+    },
+    "terms": {
+      "title": "Termos e condições",
+      "body": "Ao usar o I Watch Football concorda em utilizar o serviço de forma responsável e em conformidade com a lei. Conta, bilhetes e marketplace podem ter termos adicionais."
+    },
+    "cookies": {
+      "title": "Política de cookies",
+      "body": "Usamos cookies essenciais e armazenamento local para sessão e preferências. Análises opcionais poderão ser adicionadas no futuro — esta página será atualizada."
+    }
+  },
   "friends": {
     "title": "Amigos",
     "description": "Adicione amigos para comparar estatísticas. Devem partilhar o tracker (Definições → Privacidade do tracker).",
@@ -371,7 +385,61 @@
     "welcomeTitle": "Faça do I Watch Football o seu hub de futebol",
     "welcomeSubtitle": "Um registo guarda o seu historial de jogos, equipas favoritas e estatísticas pessoais.",
     "continueWithEmail": "Continuar com e-mail",
-    "alreadyHaveAccount": "Já tem conta? Iniciar sessão"
+    "alreadyHaveAccount": "Já tem conta? Iniciar sessão",
+    "signUpTitle": "Registar",
+    "signUpSubtitle": "Crie uma conta e comece a registar os seus jogos!",
+    "signUpButton": "Registar",
+    "signUpSuccessTitle": "Sucesso",
+    "signUpSuccessMessage": "Conta criada com sucesso!",
+    "signUpFailedTitle": "Registo falhou",
+    "signUpFailedMessage": "Não foi possível concluir o registo. Verifique os dados.",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "João",
+    "firstNameRequired": "O nome é obrigatório",
+    "lastName": "Apelido",
+    "lastNamePlaceholder": "Silva",
+    "lastNameRequired": "O apelido é obrigatório",
+    "email": "E-mail",
+    "emailPlaceholder": "voce@exemplo.com",
+    "emailInvalid": "E-mail inválido",
+    "username": "Utilizador",
+    "usernamePlaceholder": "joaos",
+    "usernameRequired": "Utilizador obrigatório",
+    "usernameMinLength": "Mínimo 3 caracteres",
+    "usernameFormat": "Apenas letras, números e underscores",
+    "password": "Palavra-passe",
+    "passwordPlaceholder": "A sua palavra-passe segura",
+    "passwordRequirements": "Mínimo 8 caracteres, uma maiúscula e um carácter especial",
+    "newPassword": "Nova palavra-passe",
+    "confirmPassword": "Confirmar palavra-passe",
+    "passwordsDoNotMatch": "As palavras-passe não coincidem",
+    "securityQuestionLabel": "Pergunta de segurança",
+    "securityQuestionPlaceholder": "Escolha uma pergunta de recuperação",
+    "securityQuestionRequired": "Escolha uma pergunta de segurança",
+    "securityQuestionHint": "Precisará desta resposta para repor a palavra-passe.",
+    "securityAnswerLabel": "A sua resposta",
+    "securityAnswerPlaceholder": "Resposta (não distingue maiúsculas)",
+    "securityAnswerMinLength": "Mínimo 2 caracteres",
+    "securityAnswerMaxLength": "Máximo 128 caracteres",
+    "securityQuestions": {
+      "FIRST_TEAM": "Qual foi o primeiro clube de que foi adepto?",
+      "FIRST_STADIUM": "Qual foi o primeiro estádio que visitou?",
+      "CHILDHOOD_HERO": "Quem foi o seu herói de futebol de infância?",
+      "FIRST_LIVE_MATCH": "Que equipa viu no seu primeiro jogo ao vivo?"
+    },
+    "forgotPasswordTitle": "Esqueci a palavra-passe",
+    "forgotPasswordIdentifySubtitle": "Introduza o e-mail ou utilizador.",
+    "forgotPasswordResetSubtitle": "Responda à pergunta de segurança e escolha uma nova palavra-passe.",
+    "recoveryIdentifierLabel": "E-mail ou utilizador",
+    "recoveryIdentifierPlaceholder": "voce@exemplo.com ou joaos",
+    "recoveryIdentifierRequired": "E-mail ou utilizador obrigatório",
+    "recoveryFailedTitle": "Não foi possível repor a palavra-passe",
+    "recoveryFailedMessage": "Verifique os dados e tente novamente.",
+    "recoverySuccessTitle": "Palavra-passe atualizada",
+    "recoverySuccessMessage": "Já pode iniciar sessão com a nova palavra-passe.",
+    "continue": "Continuar",
+    "resetPassword": "Repor palavra-passe",
+    "backToSignIn": "Voltar ao início de sessão"
   },
   "onboarding": {
     "back": "Voltar",

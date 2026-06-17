@@ -181,6 +181,20 @@
     "licenses": "Licences",
     "copyright": "© {{year}} I Watch Football. Tous droits réservés."
   },
+  "legal": {
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "body": "Nous collectons et utilisons vos données pour le suivi des matchs, les statistiques personnelles et les fonctionnalités du compte. Nous ne vendons pas vos informations personnelles. Contact : iwatchfootball@gmail.com."
+    },
+    "terms": {
+      "title": "Conditions générales",
+      "body": "En utilisant I Watch Football, vous acceptez d'utiliser le service de manière responsable et conforme à la loi. Compte, billetterie et marketplace peuvent avoir des conditions supplémentaires."
+    },
+    "cookies": {
+      "title": "Politique de cookies",
+      "body": "Nous utilisons des cookies essentiels et le stockage local pour votre connexion et vos préférences. Des analyses optionnelles pourront être ajoutées — cette page sera mise à jour."
+    }
+  },
   "friends": {
     "title": "Amis",
     "description": "Ajoutez des amis pour comparer vos stats de matchs. Ils doivent partager leur tracker (Paramètres → Confidentialité du tracker).",
@@ -371,7 +385,61 @@
     "welcomeTitle": "Faites d'I Watch Football votre hub football",
     "welcomeSubtitle": "Une inscription enregistre votre historique de matchs, équipes favorites et statistiques personnelles.",
     "continueWithEmail": "Continuer avec l'e-mail",
-    "alreadyHaveAccount": "Vous avez déjà un compte ? Connectez-vous"
+    "alreadyHaveAccount": "Vous avez déjà un compte ? Connectez-vous",
+    "signUpTitle": "Inscription",
+    "signUpSubtitle": "Créez un compte pour suivre vos matchs !",
+    "signUpButton": "S'inscrire",
+    "signUpSuccessTitle": "Succès",
+    "signUpSuccessMessage": "Compte créé avec succès !",
+    "signUpFailedTitle": "Échec de l'inscription",
+    "signUpFailedMessage": "Inscription impossible. Vérifiez vos informations.",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "firstNameRequired": "Le prénom est requis",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "lastNameRequired": "Le nom est requis",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "emailInvalid": "E-mail invalide",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "jeand",
+    "usernameRequired": "Nom d'utilisateur requis",
+    "usernameMinLength": "Minimum 3 caractères",
+    "usernameFormat": "Lettres, chiffres et underscores uniquement",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe sécurisé",
+    "passwordRequirements": "8 caractères min., une majuscule et un caractère spécial",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "securityQuestionLabel": "Question de sécurité",
+    "securityQuestionPlaceholder": "Choisissez une question de récupération",
+    "securityQuestionRequired": "Choisissez une question de sécurité",
+    "securityQuestionHint": "Vous en aurez besoin pour réinitialiser votre mot de passe.",
+    "securityAnswerLabel": "Votre réponse",
+    "securityAnswerPlaceholder": "Réponse (insensible à la casse)",
+    "securityAnswerMinLength": "Minimum 2 caractères",
+    "securityAnswerMaxLength": "Maximum 128 caractères",
+    "securityQuestions": {
+      "FIRST_TEAM": "Quel a été votre premier club de cœur ?",
+      "FIRST_STADIUM": "Quel a été le premier stade que vous avez visité ?",
+      "CHILDHOOD_HERO": "Qui était votre héros football de l'enfance ?",
+      "FIRST_LIVE_MATCH": "Quelle équipe avez-vous vue lors de votre premier match ?"
+    },
+    "forgotPasswordTitle": "Mot de passe oublié",
+    "forgotPasswordIdentifySubtitle": "Entrez votre e-mail ou nom d'utilisateur.",
+    "forgotPasswordResetSubtitle": "Répondez à votre question de sécurité et choisissez un nouveau mot de passe.",
+    "recoveryIdentifierLabel": "E-mail ou nom d'utilisateur",
+    "recoveryIdentifierPlaceholder": "vous@exemple.com ou jeand",
+    "recoveryIdentifierRequired": "E-mail ou nom d'utilisateur requis",
+    "recoveryFailedTitle": "Impossible de réinitialiser le mot de passe",
+    "recoveryFailedMessage": "Vérifiez vos informations et réessayez.",
+    "recoverySuccessTitle": "Mot de passe mis à jour",
+    "recoverySuccessMessage": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+    "continue": "Continuer",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "backToSignIn": "Retour à la connexion"
   },
   "onboarding": {
     "back": "Retour",

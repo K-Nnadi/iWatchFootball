@@ -181,6 +181,20 @@
     "licenses": "Licencias",
     "copyright": "© {{year}} I Watch Football. Todos los derechos reservados."
   },
+  "legal": {
+    "privacy": {
+      "title": "Política de privacidad",
+      "body": "Recopilamos y usamos tus datos para seguimiento de partidos, estadísticas personales y funciones de cuenta. No vendemos tu información personal. Para consultas: iwatchfootball@gmail.com."
+    },
+    "terms": {
+      "title": "Términos y condiciones",
+      "body": "Al usar I Watch Football aceptas utilizar el servicio de forma responsable y conforme a la ley. Cuenta, entradas y marketplace pueden tener términos adicionales."
+    },
+    "cookies": {
+      "title": "Política de cookies",
+      "body": "Usamos cookies esenciales y almacenamiento local para mantener tu sesión y preferencias. Las analíticas opcionales se añadirán en el futuro si cambia."
+    }
+  },
   "friends": {
     "title": "Amigos",
     "description": "Añade amigos para comparar estadísticas de partidos. Deben compartir su tracker (Ajustes → Privacidad del tracker) para que la comparación funcione.",
@@ -371,7 +385,61 @@
     "welcomeTitle": "Haz de I Watch Football tu centro futbolístico",
     "welcomeSubtitle": "Un registro guarda tu historial de partidos, equipos favoritos y estadísticas personales.",
     "continueWithEmail": "Continuar con correo",
-    "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión"
+    "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
+    "signUpTitle": "Registrarse",
+    "signUpSubtitle": "¡Crea una cuenta y empieza a registrar tus partidos!",
+    "signUpButton": "Registrarse",
+    "signUpSuccessTitle": "Éxito",
+    "signUpSuccessMessage": "¡Cuenta creada correctamente!",
+    "signUpFailedTitle": "Error al registrarse",
+    "signUpFailedMessage": "No se pudo completar el registro. Revisa tus datos.",
+    "firstName": "Nombre",
+    "firstNamePlaceholder": "Juan",
+    "firstNameRequired": "El nombre es obligatorio",
+    "lastName": "Apellidos",
+    "lastNamePlaceholder": "García",
+    "lastNameRequired": "Los apellidos son obligatorios",
+    "email": "Correo",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailInvalid": "Correo no válido",
+    "username": "Usuario",
+    "usernamePlaceholder": "juang",
+    "usernameRequired": "El usuario es obligatorio",
+    "usernameMinLength": "Mínimo 3 caracteres",
+    "usernameFormat": "Solo letras, números y guiones bajos",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Tu contraseña segura",
+    "passwordRequirements": "Mínimo 8 caracteres, una mayúscula y un carácter especial",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "securityQuestionLabel": "Pregunta de seguridad",
+    "securityQuestionPlaceholder": "Elige una pregunta de recuperación",
+    "securityQuestionRequired": "Elige una pregunta de seguridad",
+    "securityQuestionHint": "La necesitarás para restablecer tu contraseña.",
+    "securityAnswerLabel": "Tu respuesta",
+    "securityAnswerPlaceholder": "Respuesta (no distingue mayúsculas)",
+    "securityAnswerMinLength": "Mínimo 2 caracteres",
+    "securityAnswerMaxLength": "Máximo 128 caracteres",
+    "securityQuestions": {
+      "FIRST_TEAM": "¿Cuál fue el primer club del que fuiste fan?",
+      "FIRST_STADIUM": "¿Cuál fue el primer estadio que visitaste?",
+      "CHILDHOOD_HERO": "¿Quién fue tu héroe futbolístico de la infancia?",
+      "FIRST_LIVE_MATCH": "¿Qué equipo viste en tu primer partido en vivo?"
+    },
+    "forgotPasswordTitle": "Olvidé mi contraseña",
+    "forgotPasswordIdentifySubtitle": "Introduce tu correo o usuario.",
+    "forgotPasswordResetSubtitle": "Responde tu pregunta de seguridad y elige una nueva contraseña.",
+    "recoveryIdentifierLabel": "Correo o usuario",
+    "recoveryIdentifierPlaceholder": "tu@ejemplo.com o juang",
+    "recoveryIdentifierRequired": "Correo o usuario obligatorio",
+    "recoveryFailedTitle": "No se pudo restablecer la contraseña",
+    "recoveryFailedMessage": "Revisa tus datos e inténtalo de nuevo.",
+    "recoverySuccessTitle": "Contraseña actualizada",
+    "recoverySuccessMessage": "Ya puedes iniciar sesión con tu nueva contraseña.",
+    "continue": "Continuar",
+    "resetPassword": "Restablecer contraseña",
+    "backToSignIn": "Volver al inicio de sesión"
   },
   "onboarding": {
     "back": "Atrás",
