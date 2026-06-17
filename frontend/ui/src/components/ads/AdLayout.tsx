@@ -9,20 +9,23 @@ interface AdLayoutProps {
 }
 
 /**
- * Wraps page content with optional side-rail ads on wide screens.
- * Keeps a stable wrapper so page content is not remounted when ad visibility changes.
+ * Side rails sit in fixed-width flex columns; main content always gets the remaining width.
  */
 export function AdLayout({ children }: AdLayoutProps) {
   const showAds = useShowAds();
 
   return (
-    <Box className={classes.layout}>
-      {showAds ? <AdSlot placement="rail-left" unitId="app-rail-left" /> : null}
+    <Box className={`${classes.layout} ${showAds ? classes.withRails : ''}`}>
+      <Box className={classes.railSlot} aria-hidden={!showAds}>
+        {showAds ? <AdSlot placement="rail-left" unitId="app-rail-left" /> : null}
+      </Box>
       <Box className={classes.main}>
         {showAds ? <AdSlot placement="banner" unitId="app-banner" /> : null}
         {children}
       </Box>
-      {showAds ? <AdSlot placement="rail-right" unitId="app-rail-right" /> : null}
+      <Box className={classes.railSlot} aria-hidden={!showAds}>
+        {showAds ? <AdSlot placement="rail-right" unitId="app-rail-right" /> : null}
+      </Box>
     </Box>
   );
 }

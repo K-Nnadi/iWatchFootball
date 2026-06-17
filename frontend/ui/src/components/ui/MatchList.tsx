@@ -46,7 +46,9 @@ export function UiMatchRow({ match, onClick }: MatchRowProps) {
     : (match.time ?? '–');
   const centerSecondary = hasScore ? match.time : undefined;
   const isLive = match.isLive ?? false;
-  const showMeta = isLive || match.hasTickets;
+  const isFinished = match.time === 'FT' || (hasScore && !isLive);
+  const showTickets = !!match.hasTickets && !isFinished;
+  const showMeta = isLive || showTickets;
 
   const handleActivate = () => onClick?.(match.id);
 
@@ -55,7 +57,7 @@ export function UiMatchRow({ match, onClick }: MatchRowProps) {
       {showMeta && (
         <div className={classes.matchMeta}>
           {isLive && <UiLiveBadge />}
-          {match.hasTickets && (
+          {showTickets && (
             <UiBadge size="sm" color="green">
               Tickets
             </UiBadge>

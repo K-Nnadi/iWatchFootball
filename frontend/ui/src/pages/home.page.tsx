@@ -44,11 +44,7 @@ function HeroSection() {
                 alignItems: 'center',
                 backgroundColor: 'var(--modern-bg-primary)',
                 color: 'var(--modern-text-primary)',
-                ...(!isMobile && {
-                    width: '100vw',
-                    marginLeft: 'calc(50% - 50vw)',
-                    marginRight: 'calc(50% - 50vw)',
-                }),
+                width: '100%',
             }}
         >
             {/* Subtle Background Pattern */}
@@ -279,11 +275,7 @@ function TopNewsSection() {
                 borderBottom: '1px solid var(--modern-section-divider)',
                 position: 'relative',
                 overflowX: 'hidden',
-                ...(!isMobile && {
-                    width: '100vw',
-                    marginLeft: 'calc(50% - 50vw)',
-                    marginRight: 'calc(50% - 50vw)',
-                }),
+                width: '100%',
             }}
         >
             {/* Subtle Background Pattern */}

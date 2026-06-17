@@ -41,6 +41,15 @@ const teamCrests: Record<string, string> = {
     'Team L': 'https://logos-world.net/wp-content/uploads/2020/06/AC-Milan-Logo.png',
 };
 
+function isFinishedMatch(m: TodayMatch): boolean {
+    if (m.isLive) return false;
+    return m.homeScore != null && m.awayScore != null;
+}
+
+function ticketsAvailable(m: TodayMatch): boolean {
+    return !!m.hasTickets && !isFinishedMatch(m);
+}
+
 function toMatchRowData(m: TodayMatch): MatchRowData {
     const kickoff = new Date(m.date).toLocaleTimeString(undefined, {
         hour: '2-digit',
@@ -58,7 +67,7 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
             awayLogo: teamCrests[m.awayTeam],
             time: 'LIVE',
             isLive: true,
-            hasTickets: m.hasTickets,
+            hasTickets: ticketsAvailable(m),
         };
     }
 
@@ -73,7 +82,7 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
             awayLogo: teamCrests[m.awayTeam],
             time: 'FT',
             isLive: false,
-            hasTickets: m.hasTickets,
+            hasTickets: false,
         };
     }
 
@@ -85,7 +94,7 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
         awayLogo: teamCrests[m.awayTeam],
         time: kickoff,
         isLive: false,
-        hasTickets: m.hasTickets,
+        hasTickets: ticketsAvailable(m),
     };
 }
 
@@ -271,7 +280,7 @@ export function MatchesPage() {
         const query = teamSearch.trim().toLowerCase();
         return matches.filter((match) => {
             if (showLive && !match.isLive) return false;
-            if (showAvailableTickets && !match.hasTickets) return false;
+            if (showAvailableTickets && !ticketsAvailable(match)) return false;
             if (query) {
                 const inHome = match.homeTeam.toLowerCase().includes(query);
                 const inAway = match.awayTeam.toLowerCase().includes(query);

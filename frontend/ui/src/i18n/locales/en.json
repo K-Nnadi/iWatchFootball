@@ -13,8 +13,8 @@
   },
   "matches": {
     "title": "Matches",
-    "liveNow": "Live now",
-    "hasTickets": "Has tickets",
+    "liveNow": "Live",
+    "hasTickets": "Tickets",
     "searchTeams": "Search by team…",
     "clearFilters": "Clear filters",
     "jumpToToday": "Jump to today",

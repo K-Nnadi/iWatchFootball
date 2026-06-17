@@ -1,19 +1,31 @@
 .layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   gap: var(--ui-space-4);
   width: 100%;
   padding: var(--ui-space-4) var(--ui-space-4) 0;
+  box-sizing: border-box;
 }
 
 .main {
+  flex: 1 1 0;
   min-width: 0;
+  width: 100%;
+}
+
+.railSlot {
+  display: none;
+  flex: 0 0 160px;
+  width: 160px;
 }
 
 @media (min-width: 1200px) {
-  .layout {
-    grid-template-columns: 160px minmax(0, 1fr) 160px;
-    align-items: start;
+  .withRails {
     padding: var(--ui-space-4) var(--ui-space-5) 0;
+  }
+
+  .withRails .railSlot {
+    display: block;
   }
 }

@@ -1,4 +1,5 @@
 import axios, {AxiosBasicCredentials, AxiosRequestHeaders, AxiosResponse, Method, ResponseType} from 'axios';
+import type { Agent } from 'https';
 
 
 export type HttpWrapperProperties = {
@@ -9,6 +10,7 @@ export type HttpWrapperProperties = {
     append?: string;
     auth?: AxiosBasicCredentials;
     responseType?: ResponseType;
+    httpsAgent?: Agent;
 };
 
 export type HttpRequestPayload = {
@@ -35,6 +37,7 @@ export class HttpWrapper implements HttpWrapperProperties {
     throwOnError: boolean;
     numRetries: number;
     responseType: ResponseType;
+    httpsAgent?: Agent;
 
     constructor({
                     baseUrl,
@@ -42,7 +45,8 @@ export class HttpWrapper implements HttpWrapperProperties {
                     headers,
                     auth,
                     append,
-                    responseType
+                    responseType,
+                    httpsAgent,
                 }: HttpWrapperProperties, throwOnError?: boolean, numRetries?: number) {
         this.baseUrl = baseUrl || '';
         this.apiKey = apiKey;
@@ -52,6 +56,7 @@ export class HttpWrapper implements HttpWrapperProperties {
         this.throwOnError = throwOnError ?? true;
         this.numRetries = numRetries || 1;
         this.responseType = responseType ?? 'json';
+        this.httpsAgent = httpsAgent;
     }
 
     request = async <T>({
@@ -92,7 +97,8 @@ export class HttpWrapper implements HttpWrapperProperties {
                     auth: auth || this.auth,
                     data: data,
                     params: params,
-                    responseType: responseType || this.responseType
+                    responseType: responseType || this.responseType,
+                    ...(this.httpsAgent ? { httpsAgent: this.httpsAgent } : {}),
                 });
                 return response; // If successful, return the response
             } catch (error) {

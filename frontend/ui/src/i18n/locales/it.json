@@ -13,8 +13,8 @@
   },
   "matches": {
     "title": "Partite",
-    "liveNow": "In diretta",
-    "hasTickets": "Biglietti disponibili",
+    "liveNow": "Live",
+    "hasTickets": "Biglietti",
     "searchTeams": "Cerca per squadra…",
     "clearFilters": "Cancella filtri",
     "jumpToToday": "Vai a oggi",
