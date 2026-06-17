@@ -4,6 +4,7 @@ import { AuthedController } from '@iWatchFootball/base-tools/decorators/controll
 import { StripeSubscriptionService } from '../services/stripe-subscription.service';
 import { TrackerEntitlementService } from '../../../complexModules/tracker/tracker-entitlement.service';
 import { UserSubscriptionService } from '../../../modules/userSubscription/userSubscription.service';
+import { LogService } from '../../../modules/log/log.service';
 import type { Request } from 'express';
 
 type AuthedRequest = Request & { user?: { id: number } };
@@ -24,6 +25,7 @@ export class SubscriptionController {
         private readonly stripeSubscription: StripeSubscriptionService,
         private readonly trackerEntitlement: TrackerEntitlementService,
         private readonly userSubscription: UserSubscriptionService,
+        private readonly logService: LogService,
     ) {}
 
     @Get('entitlements')
@@ -34,6 +36,8 @@ export class SubscriptionController {
 
         const isPremium = await this.trackerEntitlement.hasPremium(userId);
         const freeVerifiedLimit = await this.trackerEntitlement.getFreeVerifiedLimit();
+        const freeUnverifiedLimit = await this.trackerEntitlement.getFreeUnverifiedLimit();
+        const unverifiedTotal = await this.logService.countUnverifiedForUser(userId);
         const sub = await this.userSubscription.findByUserId(userId);
         const checkout = await this.stripeSubscription.getCheckoutAvailability();
 
@@ -41,6 +45,9 @@ export class SubscriptionController {
             plan: isPremium ? 'premium' : 'free',
             isPremium,
             freeVerifiedLimit,
+            freeUnverifiedLimit,
+            unverifiedTotal,
+            unverifiedUpgradeRequired: !isPremium && unverifiedTotal >= freeUnverifiedLimit,
             currentPeriodEnd: sub?.currentPeriodEnd?.toISOString(),
             cancelAtPeriodEnd: sub?.cancelAtPeriodEnd ?? false,
             status: sub?.status ?? 'none',

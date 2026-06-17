@@ -4,6 +4,7 @@ import { PlatformConfigModule } from '../../modules/platformConfig/platformConfi
 import { UserSubscriptionModule } from '../../modules/userSubscription/userSubscription.module';
 import { UserModule } from '../../modules/user/user.module';
 import { TrackerModule } from '../../complexModules/tracker/tracker.module';
+import { LogModule } from '../../modules/log/log.module';
 import { IntegrationModule } from '../../modules/integration/integration.module';
 import { Integration } from '../../modules/integration/integration.entity';
 import { CheckoutModule } from '../../complexModules/checkout/checkout.module';
@@ -32,6 +33,7 @@ import { PaymentsIntegrationBootstrap } from './payments-integration.bootstrap';
         UserSubscriptionModule,
         UserModule,
         TrackerModule,
+        LogModule,
         IntegrationModule,
         CheckoutModule,
         TicketHoldModule,

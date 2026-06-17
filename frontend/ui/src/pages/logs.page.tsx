@@ -45,6 +45,8 @@ import {
     createPremiumCheckout,
     extractApiErrorMessage,
     getMyLogHistory,
+    isLogAlreadyExistsError,
+    isUnverifiedLogLimitError,
     openSubscriptionPortal,
     type TrackerEntitlements,
 } from '../shared/api/tracker.api';
@@ -198,6 +200,16 @@ export function LogsPage() {
     });
     const userLogsData = logHistory?.logs ?? [];
     const trackerEntitlements: TrackerEntitlements | undefined = logHistory?.entitlements;
+
+    const loggedFixtureIdSet = useMemo(
+        () => new Set(userLogsData.map((log) => log.fixtureId)),
+        [userLogsData],
+    );
+
+    const addableFixtures = useMemo(
+        () => fixturesData.filter((fixture) => !loggedFixtureIdSet.has(fixture.id)),
+        [fixturesData, loggedFixtureIdSet],
+    );
 
     const handleUpgradePremium = async () => {
         setUpgradeLoading(true);
@@ -388,10 +400,30 @@ export function LogsPage() {
             setSelectedAwayTeam(null);
             setSelectedFixture(null);
 
-        } catch {
+        } catch (err) {
+            if (isLogAlreadyExistsError(err)) {
+                showNotification({
+                    title: t('logs.alreadyLoggedTitle'),
+                    message: t('logs.alreadyLoggedMessage'),
+                    color: 'orange',
+                    autoClose: 4000,
+                });
+                return;
+            }
+            if (isUnverifiedLogLimitError(err)) {
+                showNotification({
+                    title: t('logs.unverifiedLimitReachedTitle'),
+                    message: t('logs.unverifiedLimitReachedMessage', {
+                        limit: trackerEntitlements?.freeUnverifiedLimit ?? 10,
+                    }),
+                    color: 'orange',
+                    autoClose: 6000,
+                });
+                return;
+            }
             showNotification({
                 title: t('logs.matchAddFailedTitle'),
-                message: t('logs.matchAddFailedMessage'),
+                message: extractApiErrorMessage(err) || t('logs.matchAddFailedMessage'),
                 color: 'red',
                 autoClose: 4000,
             });
@@ -545,8 +577,38 @@ export function LogsPage() {
                                         <UiBody style={{ textAlign: 'center', fontSize: '0.9rem' }}>
                                             {t('logs.addNewMatchHint')}
                                         </UiBody>
+                                        {trackerEntitlements && !trackerEntitlements.isPremium && (
+                                            <UiCaption style={{ textAlign: 'center' }}>
+                                                {t('logs.manualLogUsage', {
+                                                    used: trackerEntitlements.unverifiedTotal,
+                                                    limit: trackerEntitlements.freeUnverifiedLimit,
+                                                })}
+                                            </UiCaption>
+                                        )}
                                     </Stack>
 
+                                    {trackerEntitlements?.unverifiedUpgradeRequired && (
+                                        <UiCard density="compact" accent>
+                                            <Stack gap="sm" align="center">
+                                                <UiBody style={{ textAlign: 'center' }}>
+                                                    {t('logs.unverifiedLimitPrompt', {
+                                                        limit: trackerEntitlements.freeUnverifiedLimit,
+                                                    })}
+                                                </UiBody>
+                                                <Group gap="sm" justify="center">
+                                                    <UiButton loading={upgradeLoading} onClick={handleUpgradePremium}>
+                                                        {t('logs.upgradePremium')}
+                                                    </UiButton>
+                                                    <UiButton variant="ghost" onClick={() => navigateWithTransition('/premium')}>
+                                                        {t('logs.viewPremium')}
+                                                    </UiButton>
+                                                </Group>
+                                            </Stack>
+                                        </UiCard>
+                                    )}
+
+                                    {!trackerEntitlements?.unverifiedUpgradeRequired && (
+                                    <>
                                     <Box>
                                         <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>
                                             {t('logs.competition')}
@@ -643,12 +705,12 @@ export function LogsPage() {
                                             </Box>
                                         </SimpleGrid>
 
-                                        {selectedHomeTeam && selectedAwayTeam && fixturesData.length > 0 && (
+                                        {selectedHomeTeam && selectedAwayTeam && addableFixtures.length > 0 && (
                                             <Box>
                                                 <UiCaption style={{ display: 'block', marginBottom: '0.75rem' }}>{t('logs.selectFixture')}</UiCaption>
                                                 <Select
                                                     placeholder={isLoadingFixtures ? t('logs.loadingFixtures') : t('logs.chooseFixture')}
-                                                    data={fixturesData.map((f) => {
+                                                    data={addableFixtures.map((f) => {
                                                         const home = teamsData.find(t => t.id === f.homeTeamId)?.name || String(f.homeTeamId);
                                                         const away = teamsData.find(t => t.id === f.awayTeamId)?.name || String(f.awayTeamId);
                                                         return {
@@ -663,10 +725,18 @@ export function LogsPage() {
                                                     size="md" styles={uiSelectStyles}
                                                 />
                                                 <UiCaption style={{ color: 'var(--modern-text-secondary)', marginTop: '0.5rem', fontSize: '0.8rem' }}>
-                                                    {fixturesData.length === 1
-                                                        ? t('logs.matchesFoundSingular', { count: fixturesData.length })
-                                                        : t('logs.matchesFoundPlural', { count: fixturesData.length })}
+                                                    {addableFixtures.length === 1
+                                                        ? t('logs.matchesFoundSingular', { count: addableFixtures.length })
+                                                        : t('logs.matchesFoundPlural', { count: addableFixtures.length })}
                                                 </UiCaption>
+                                            </Box>
+                                        )}
+
+                                        {selectedHomeTeam && selectedAwayTeam && !isLoadingFixtures && fixturesData.length > 0 && addableFixtures.length === 0 && (
+                                            <Box style={{ textAlign: 'center', padding: '1rem' }}>
+                                                <UiBody style={{ color: 'var(--modern-text-secondary)' }}>
+                                                    {t('logs.allFixturesAlreadyLogged')}
+                                                </UiBody>
                                             </Box>
                                         )}
 
@@ -682,7 +752,7 @@ export function LogsPage() {
                                             <Box mt="md">
                                                 <UiButton
                                                     onClick={handleAddToLog}
-                                                    disabled={!selectedFixture}
+                                                    disabled={!selectedFixture || trackerEntitlements?.unverifiedUpgradeRequired}
                                                     fullWidth
                                                     size="md"
                                                     variant="primary"
@@ -693,6 +763,8 @@ export function LogsPage() {
                                         )}
                                     </>
                                 )}
+                                    </>
+                                    )}
                             </Stack>
                             </UiCard>
                         </Box>

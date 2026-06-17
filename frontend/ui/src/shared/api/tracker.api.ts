@@ -9,8 +9,25 @@ export interface TrackerEntitlements {
     verifiedVisible: number;
     verifiedHidden: number;
     upgradeRequired: boolean;
+    freeUnverifiedLimit: number;
+    unverifiedTotal: number;
+    unverifiedUpgradeRequired: boolean;
     currentPeriodEnd?: string;
     cancelAtPeriodEnd?: boolean;
+}
+
+export interface SubscriptionEntitlements {
+    plan: 'free' | 'premium';
+    isPremium: boolean;
+    freeVerifiedLimit: number;
+    freeUnverifiedLimit: number;
+    unverifiedTotal: number;
+    unverifiedUpgradeRequired: boolean;
+    currentPeriodEnd?: string;
+    cancelAtPeriodEnd: boolean;
+    status: string;
+    checkoutAvailable?: boolean;
+    checkoutUnavailableReason?: string;
 }
 
 export interface LogHistoryEntry {
@@ -29,29 +46,40 @@ export interface LogHistoryResponse {
     entitlements: TrackerEntitlements;
 }
 
-export interface SubscriptionEntitlements {
-    plan: 'free' | 'premium';
-    isPremium: boolean;
-    freeVerifiedLimit: number;
-    currentPeriodEnd?: string;
-    cancelAtPeriodEnd: boolean;
-    status: string;
-    checkoutAvailable?: boolean;
-    checkoutUnavailableReason?: string;
-}
-
 export function extractApiErrorMessage(err: unknown): string {
     if (axios.isAxiosError(err)) {
-        const data = err.response?.data as { message?: string | string[] } | undefined;
+        const data = err.response?.data as { message?: string | string[] | Record<string, unknown> } | undefined;
         const msg = data?.message;
         if (typeof msg === 'string' && msg.length > 0) return msg;
         if (Array.isArray(msg) && msg.length > 0) return msg.join(', ');
+        if (msg && typeof msg === 'object' && !Array.isArray(msg)) {
+            const inner = (msg as { message?: string }).message;
+            if (typeof inner === 'string' && inner.length > 0) return inner;
+        }
         if (err.response?.status === 503) {
             return 'Premium checkout is not configured on the server yet.';
         }
     }
     if (err instanceof Error) return err.message;
     return 'Something went wrong';
+}
+
+export function isUnverifiedLogLimitError(err: unknown): boolean {
+    if (!axios.isAxiosError(err)) return false;
+    const data = err.response?.data as { message?: string | Record<string, unknown>; code?: string } | undefined;
+    if (data?.code === 'UNVERIFIED_LOG_LIMIT_REACHED') return true;
+    const msg = data?.message;
+    if (msg && typeof msg === 'object' && msg.code === 'UNVERIFIED_LOG_LIMIT_REACHED') return true;
+    return false;
+}
+
+export function isLogAlreadyExistsError(err: unknown): boolean {
+    if (!axios.isAxiosError(err)) return false;
+    const data = err.response?.data as { message?: string | Record<string, unknown>; code?: string } | undefined;
+    if (data?.code === 'LOG_ALREADY_EXISTS') return true;
+    const msg = data?.message;
+    if (msg && typeof msg === 'object' && msg.code === 'LOG_ALREADY_EXISTS') return true;
+    return err.response?.status === 409;
 }
 
 export async function getMyLogHistory(): Promise<LogHistoryResponse> {

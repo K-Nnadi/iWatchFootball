@@ -6,6 +6,7 @@ const EXCLUDED_EXACT = new Set([
     '/forgot-password',
     '/checkout',
     '/thankYou',
+    '/premium',
 ]);
 
 const EXCLUDED_PREFIXES = ['/seat-selection/', '/marketplace/buy/'];

@@ -40,6 +40,7 @@ import { CompareFriendPage } from "./pages/friendsCompare.page";
 import { AuthWelcomePage } from "./pages/auth/authWelcome.page";
 import { OnboardingPage } from "./pages/onboarding/onboarding.page";
 import { LegalDocumentPage } from "./pages/legal/legalDocument.page";
+import { PremiumPage } from "./pages/premium.page";
 
 export type ElementMap = {
     [x: string]: React.ReactElement;
@@ -55,6 +56,7 @@ const IWatchFootballElements: ElementMap = {
     thankYou: <ThankYouPage/>,
     news: <NewsPage/>,
     tickets: <TicketsPage/>,
+    premium: <PremiumPage/>,
     marketplace: (
         <MarketplaceFeatureRoute>
             <MarketplacePage/>

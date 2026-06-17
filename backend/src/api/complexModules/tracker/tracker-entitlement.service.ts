@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PlatformConfigService } from '../../modules/platformConfig/platformConfig.service';
 import { UserSubscriptionService } from '../../modules/userSubscription/userSubscription.service';
 import {
@@ -18,6 +18,9 @@ export interface TrackerEntitlements {
     verifiedVisible: number;
     verifiedHidden: number;
     upgradeRequired: boolean;
+    freeUnverifiedLimit: number;
+    unverifiedTotal: number;
+    unverifiedUpgradeRequired: boolean;
     currentPeriodEnd?: string;
     cancelAtPeriodEnd?: boolean;
 }
@@ -41,6 +44,29 @@ export class TrackerEntitlementService {
         );
     }
 
+    async getFreeUnverifiedLimit(): Promise<number> {
+        return this.platformConfig.getNumber(
+            TRACKER_CONFIG.FREE_UNVERIFIED_LIMIT,
+            TRACKER_DEFAULTS.FREE_UNVERIFIED_LIMIT,
+        );
+    }
+
+    /** Throws when a free user has reached the manual (non-verified) log cap. */
+    async assertCanAddUnverifiedLog(userId: number, currentUnverifiedCount: number): Promise<void> {
+        if (await this.hasPremium(userId)) {
+            return;
+        }
+        const limit = await this.getFreeUnverifiedLimit();
+        if (currentUnverifiedCount >= limit) {
+            throw new ForbiddenException({
+                message: `Free plan allows up to ${limit} manual match logs. Upgrade to Premium for unlimited logs.`,
+                code: 'UNVERIFIED_LOG_LIMIT_REACHED',
+                freeUnverifiedLimit: limit,
+                unverifiedTotal: currentUnverifiedCount,
+            });
+        }
+    }
+
     async hasPremium(userId: number): Promise<boolean> {
         const sub = await this.userSubscription.findByUserId(userId);
         if (!sub) return false;
@@ -56,9 +82,11 @@ export class TrackerEntitlementService {
         userId: number,
         verifiedTotal: number,
         verifiedReturned: number,
+        unverifiedTotal: number,
     ): Promise<TrackerEntitlements> {
         const isPremium = await this.hasPremium(userId);
         const freeVerifiedLimit = await this.getFreeVerifiedLimit();
+        const freeUnverifiedLimit = await this.getFreeUnverifiedLimit();
         const sub = await this.userSubscription.findByUserId(userId);
 
         if (isPremium) {
@@ -70,6 +98,9 @@ export class TrackerEntitlementService {
                 verifiedVisible: verifiedReturned,
                 verifiedHidden: 0,
                 upgradeRequired: false,
+                freeUnverifiedLimit,
+                unverifiedTotal,
+                unverifiedUpgradeRequired: false,
                 currentPeriodEnd: sub?.currentPeriodEnd?.toISOString(),
                 cancelAtPeriodEnd: sub?.cancelAtPeriodEnd,
             };
@@ -84,6 +115,9 @@ export class TrackerEntitlementService {
             verifiedVisible: verifiedReturned,
             verifiedHidden,
             upgradeRequired: verifiedHidden > 0,
+            freeUnverifiedLimit,
+            unverifiedTotal,
+            unverifiedUpgradeRequired: unverifiedTotal >= freeUnverifiedLimit,
             currentPeriodEnd: undefined,
             cancelAtPeriodEnd: false,
         };

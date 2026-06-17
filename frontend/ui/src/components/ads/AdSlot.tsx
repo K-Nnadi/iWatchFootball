@@ -40,7 +40,7 @@ export function AdSlot({ placement, unitId, className = '' }: AdSlotProps) {
         {placementCopy}
         {unitId ? ` · ${unitId}` : ''}
       </span>
-      <Link to="/logs" className={classes.adUpsell}>
+      <Link to="/premium" className={classes.adUpsell}>
         {t('ads.goAdFree')}
       </Link>
     </aside>

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { CreateLogDTO, Log } from './log.entity';
@@ -52,12 +52,88 @@ export class LogService extends CrudRepoAdapter<Log, CreateLogDTO> {
         );
     }
 
+    /** Count manual (non-verified) logs for freemium enforcement (one per fixture). */
+    async countUnverifiedForUser(userId: number): Promise<number> {
+        const rows = await this.entityRepo.find({
+            where: { userId, isVerified: false },
+            select: ['fixtureId'],
+        });
+        return new Set(rows.map((row) => row.fixtureId)).size;
+    }
+
+    private dedupeByFixture(logs: Log[]): Log[] {
+        const bestByFixture = new Map<number, Log>();
+        for (const log of logs) {
+            const existing = bestByFixture.get(log.fixtureId);
+            if (!existing) {
+                bestByFixture.set(log.fixtureId, log);
+                continue;
+            }
+            if (log.isVerified && !existing.isVerified) {
+                bestByFixture.set(log.fixtureId, log);
+                continue;
+            }
+            if (!log.isVerified && existing.isVerified) {
+                continue;
+            }
+            if (log.createdAt.getTime() >= existing.createdAt.getTime()) {
+                bestByFixture.set(log.fixtureId, log);
+            }
+        }
+        return Array.from(bestByFixture.values());
+    }
+
+    override async create(entity: CreateLogDTO): Promise<Log | null> {
+        const userId = entity.userId;
+        const fixtureId = entity.fixtureId;
+        const isVerified = entity.isVerified === true;
+
+        if (userId && fixtureId) {
+            const existing = await this.entityRepo.findOne({ where: { userId, fixtureId } });
+            if (existing) {
+                throw new ConflictException({
+                    message: 'This match is already in your logs.',
+                    code: 'LOG_ALREADY_EXISTS',
+                    fixtureId,
+                });
+            }
+        }
+
+        if (!isVerified && userId) {
+            const unverifiedCount = await this.countUnverifiedForUser(userId);
+            await this.trackerEntitlement.assertCanAddUnverifiedLog(userId, unverifiedCount);
+        }
+
+        try {
+            return super.create({
+                ...entity,
+                isVerified,
+            }) as Promise<Log | null>;
+        } catch (err: unknown) {
+            const code =
+                err &&
+                typeof err === 'object' &&
+                'driverError' in err &&
+                (err as { driverError?: { code?: string } }).driverError?.code;
+            if (code === '23505') {
+                throw new ConflictException({
+                    message: 'This match is already in your logs.',
+                    code: 'LOG_ALREADY_EXISTS',
+                    fixtureId,
+                });
+            }
+            throw err;
+        }
+    }
+
     /** Gated history: free users see all manual logs + limited verified; premium sees all. */
     async getMyHistory(userId: number): Promise<LogHistoryResponse> {
-        const all = await this.entityRepo.find({
-            where: { userId },
-            order: { createdAt: 'DESC' },
-        });
+        const all = this.dedupeByFixture(
+            await this.entityRepo.find({
+                where: { userId },
+                order: { createdAt: 'DESC' },
+            }),
+        );
 
         const verified = all.filter((l) => l.isVerified);
         const unverified = all.filter((l) => !l.isVerified);
@@ -77,6 +153,7 @@ export class LogService extends CrudRepoAdapter<Log, CreateLogDTO> {
             userId,
             verified.length,
             visibleVerified.length,
+            unverified.length,
         );
 
         return { logs, entitlements };
