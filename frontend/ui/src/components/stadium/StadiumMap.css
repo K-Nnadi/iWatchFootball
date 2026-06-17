@@ -62,6 +62,14 @@
     color: var(--modern-black);
 }
 
+.stadium-map-unavailable {
+    min-height: 500px;
+    padding: 2rem 1.5rem;
+    background-color: var(--modern-bg-primary);
+    border: 1px dashed var(--modern-border-color);
+    border-radius: 8px;
+}
+
 .stadium-map-container .mantine-Button-root {
     min-width: 60px;
 }

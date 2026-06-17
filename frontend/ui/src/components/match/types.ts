@@ -42,5 +42,7 @@ export interface MatchDetails {
     /** Last five outcomes (most recent left→right or as provided by API). Only show form UI when both sides are set. */
     homeRecentForm?: ('W' | 'D' | 'L')[];
     awayRecentForm?: ('W' | 'D' | 'L')[];
+    stadiumId?: number;
+    stadiumMetadata?: unknown;
 }
 

@@ -32,6 +32,11 @@
     "goToToday": "Ir para hoje",
     "searchAriaLabel": "Pesquisar por equipa"
   },
+  "seatSelection": {
+    "noSeatmapTitle": "Mapa de lugares indisponível",
+    "noSeatmapBody": "Escolha um bilhete da lista.",
+    "noSeatmapVenue": "Ainda não temos um mapa interativo para {{venue}}. Veja os bilhetes disponíveis abaixo."
+  },
   "competitions": {
     "title": "Competições",
     "subtitle": "Explore competições de futebol de todo o mundo",

@@ -22,19 +22,14 @@ export class NewsAggregatorController {
   @ApiOperation({ summary: 'Manually trigger news aggregation' })
   @ApiResponse({ status: 200, description: 'News aggregation job triggered' })
   async triggerAggregation() {
-    if (!this.scheduler) {
-      throw new HttpException(
-        'News aggregation scheduler is not available. Redis connection required.',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+    if (this.scheduler) {
+      const job = await this.scheduler.triggerAggregation();
+      return { message: 'News aggregation job queued', jobId: job.id, queued: true };
     }
-    const job = await this.scheduler.triggerAggregation();
-    return {
-      message: 'News aggregation job triggered',
-      jobId: job.id,
-    };
+    // No Redis — run synchronously
+    const result = await this.aggregatorService.aggregateAllFeeds();
+    return { message: 'News aggregation completed (no-Redis sync)', queued: false, result };
   }
-
 
   @Post('trigger/:feedName')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -43,17 +38,13 @@ export class NewsAggregatorController {
   @ApiOperation({ summary: 'Manually trigger news aggregation for a specific feed' })
   @ApiResponse({ status: 200, description: 'News aggregation job triggered for feed' })
   async triggerFeedAggregation(@Param('feedName') feedName: string) {
-    if (!this.scheduler) {
-      throw new HttpException(
-        'News aggregation scheduler is not available. Redis connection required.',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+    if (this.scheduler) {
+      const job = await this.scheduler.triggerAggregation(feedName);
+      return { message: `News aggregation job queued for feed: ${feedName}`, jobId: job.id, queued: true };
     }
-    const job = await this.scheduler.triggerAggregation(feedName);
-    return {
-      message: `News aggregation job triggered for feed: ${feedName}`,
-      jobId: job.id,
-    };
+    // No Redis — run synchronously
+    const result = await this.aggregatorService.aggregateFeed(feedName);
+    return { message: `News aggregation completed for feed: ${feedName}`, queued: false, result };
   }
 
   @Get('status')

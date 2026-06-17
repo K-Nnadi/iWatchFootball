@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Box, Button, Group } from '@mantine/core';
+import { Box, Button, Center, Group, Stack, Text } from '@mantine/core';
+import { IconMapOff } from '@tabler/icons-react';
 import { SeatMapCanvas } from '@alisaitteke/seatmap-canvas';
 import '@alisaitteke/seatmap-canvas/dist/seatmap.canvas.css';
 import type { StadiumSection } from './anfieldStadium';
@@ -8,10 +9,13 @@ import {
     sectionIdFromSeatmapBlock,
     sectionIdFromSeatmapSeat,
 } from './stadiumSectionsToSeatmapBlocks';
+import { hasStadiumSeatmap } from './resolveStadiumSeatmap';
+import { useTranslation } from '../../i18n';
 import './StadiumMap.css';
 
 export interface StadiumSeatmapPanelProps {
-    sections: StadiumSection[];
+    sections: StadiumSection[] | null;
+    venueName?: string;
     onSectionClick?: (sectionId: string) => void;
     selectedSectionId?: string;
     /** Block / section identifiers that have ticket rows in the sidebar (matches `Ticket.block` or section id). */
@@ -19,13 +23,19 @@ export interface StadiumSeatmapPanelProps {
     isDark: boolean;
 }
 
-export const StadiumSeatmapPanel: React.FC<StadiumSeatmapPanelProps> = ({
+function StadiumSeatmapCanvas({
     sections,
     onSectionClick,
     selectedSectionId,
     blocksWithListings,
     isDark,
-}) => {
+}: {
+    sections: StadiumSection[];
+    blocksWithListings: string[];
+    isDark: boolean;
+    onSectionClick?: (sectionId: string) => void;
+    selectedSectionId?: string;
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const seatmapRef = useRef<SeatMapCanvas | null>(null);
     const listings = useMemo(() => new Set(blocksWithListings), [blocksWithListings]);
@@ -126,7 +136,7 @@ export const StadiumSeatmapPanel: React.FC<StadiumSeatmapPanelProps> = ({
     };
 
     return (
-        <Box className="stadium-map-container">
+        <>
             <Group justify="flex-end" mb="md">
                 <Button size="xs" variant="outline" onClick={handleResetView}>
                     RESET VIEW
@@ -141,6 +151,49 @@ export const StadiumSeatmapPanel: React.FC<StadiumSeatmapPanelProps> = ({
                     style={{ width: '100%', height: '100%', minHeight: '100%' }}
                 />
             </Box>
+        </>
+    );
+}
+
+export const StadiumSeatmapPanel: React.FC<StadiumSeatmapPanelProps> = ({
+    sections,
+    venueName,
+    onSectionClick,
+    selectedSectionId,
+    blocksWithListings,
+    isDark,
+}) => {
+    const { t } = useTranslation();
+
+    if (!hasStadiumSeatmap(sections)) {
+        return (
+            <Box className="stadium-map-container">
+                <Center className="stadium-map-unavailable">
+                    <Stack align="center" gap="sm" maw={360}>
+                        <IconMapOff size={40} stroke={1.5} color="var(--modern-text-secondary)" />
+                        <Text fw={600} ta="center" style={{ color: 'var(--modern-text-primary)' }}>
+                            {t('seatSelection.noSeatmapTitle')}
+                        </Text>
+                        <Text size="sm" ta="center" style={{ color: 'var(--modern-text-secondary)' }}>
+                            {venueName
+                                ? t('seatSelection.noSeatmapVenue', { venue: venueName })
+                                : t('seatSelection.noSeatmapBody')}
+                        </Text>
+                    </Stack>
+                </Center>
+            </Box>
+        );
+    }
+
+    return (
+        <Box className="stadium-map-container">
+            <StadiumSeatmapCanvas
+                sections={sections}
+                onSectionClick={onSectionClick}
+                selectedSectionId={selectedSectionId}
+                blocksWithListings={blocksWithListings}
+                isDark={isDark}
+            />
         </Box>
     );
 };

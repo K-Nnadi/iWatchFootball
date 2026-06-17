@@ -1,6 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
+import https from 'https';
 import { HttpWrapper } from '@iWatchFootball/base-tools/http/httpWrapper';
 import { STATSBOMB_CONFIG } from './statsbomb.config';
+
+function statsBombHttpsAgent(): https.Agent | undefined {
+  const insecure =
+    process.env.STATSBOMB_INSECURE_TLS === 'true' ||
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0';
+  return insecure ? new https.Agent({ rejectUnauthorized: false }) : undefined;
+}
 
 @Injectable()
 export class StatsBombHttpService {
@@ -8,6 +16,12 @@ export class StatsBombHttpService {
   private readonly httpWrapper: HttpWrapper;
 
   constructor() {
+    const httpsAgent = statsBombHttpsAgent();
+    if (httpsAgent) {
+      this.logger.warn(
+        'StatsBomb HTTP client using insecure TLS (STATSBOMB_INSECURE_TLS or NODE_TLS_REJECT_UNAUTHORIZED)',
+      );
+    }
     this.httpWrapper = new HttpWrapper(
       {
         baseUrl: STATSBOMB_CONFIG.baseUrl,
@@ -15,7 +29,8 @@ export class StatsBombHttpService {
           'User-Agent': 'StatsBomb-Adapter/1.0',
           'Accept': 'application/json',
         },
-        responseType: 'json'
+        responseType: 'json',
+        httpsAgent,
       },
       true, // throwOnError
       STATSBOMB_CONFIG.retryAttempts // numRetries

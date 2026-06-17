@@ -32,6 +32,11 @@
     "goToToday": "Go to today",
     "searchAriaLabel": "Search by team name"
   },
+  "seatSelection": {
+    "noSeatmapTitle": "Seat map unavailable",
+    "noSeatmapBody": "Choose a ticket from the list.",
+    "noSeatmapVenue": "We don't have an interactive map for {{venue}} yet. Browse available tickets below."
+  },
   "competitions": {
     "title": "Competitions",
     "subtitle": "Explore football competitions from around the world",

@@ -267,6 +267,8 @@ export function MatchPage() {
             ...(homeRecentForm && awayRecentForm
                 ? { homeRecentForm, awayRecentForm }
                 : {}),
+            stadiumId: stadium.id,
+            stadiumMetadata: stadium.metadata,
         };
     }, [fixture, homeTeam, awayTeam, stadium, competition, bundleLineUps, positionsById]);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     Avatar,
     Box,
@@ -7,6 +7,7 @@ import {
     Container,
     Grid,
     Group,
+    Skeleton,
     Stack,
     Text,
     useMantineTheme
@@ -20,6 +21,8 @@ import {
     IconVideo
 } from '@tabler/icons-react';
 import {Carousel} from '@mantine/carousel';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import '../styles/homepage.css';
 import carouselClasses from '../components/carousel/news.carousel.module.css';
 import {usePageTransition} from "../hooks/usePageTransition";
@@ -27,6 +30,11 @@ import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
 import { UiAccent, UiCaption, UiMatchList, UiSectionHeader } from '../components/ui';
 import { useTranslation } from '../i18n/useTranslation';
+import { useGetAllNewsArticle } from '@iWatchFootball/clients/controllers/news-article';
+
+dayjs.extend(relativeTime);
+
+const NEWS_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&w=600&q=80';
 
 function HeroSection() {
     const { t } = useTranslation();
@@ -195,73 +203,17 @@ function TopNewsSection() {
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
 
-    const featuredArticle = {
-        id: 1,
-        title: 'How Thomas Tuchel plans to turn England headache into World Cup advantage',
-        excerpt: 'The German manager has been analyzing England\'s recent performances and believes he has found key weaknesses to exploit in the upcoming World Cup campaign.',
-        source: 'The Independent',
-        time: '7 hours ago',
-        image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&w=1200&q=80'
-    };
+    const { data: allArticles, isLoading } = useGetAllNewsArticle();
 
-    const topNews = [
-        {
-            id: 2,
-            title: 'Mauricio Pochettino hails MLS decision to make calendar change',
-            source: 'OneFootball',
-            time: 'about an hour ago',
-            image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&w=600&q=80'
-        },
-        {
-            id: 3,
-            title: '5 spicy fixtures you must watch this weekend',
-            source: 'The Football Faithful',
-            time: '13 hours ago',
-            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
-        },
-        {
-            id: 4,
-            title: 'Croatia win to secure 2026 WC spot; Germany victorious & Netherlands draw',
-            source: 'OneFootball',
-            time: '6 hours ago',
-            image: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=600&q=80'
-        },
-        {
-            id: 5,
-            title: 'Chelsea dealt new injury worry ahead of Barcelona and Arsenal fixtures',
-            source: 'Evening Standard',
-            time: '3 hours ago',
-            image: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=600&q=80'
-        },
-        {
-            id: 6,
-            title: 'Liverpool\'s Title Hopes Dented by Draw at Anfield',
-            source: 'Sky Sports',
-            time: '1 hour ago',
-            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
-        },
-        {
-            id: 7,
-            title: 'Mbappé Announces Decision on Future',
-            source: 'L\'Equipe',
-            time: '4 hours ago',
-            image: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=600&q=80'
-        },
-        {
-            id: 8,
-            title: 'Barcelona\'s Financial Recovery Plan Approved',
-            source: 'Marca',
-            time: '8 hours ago',
-            image: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=600&q=80'
-        },
-        {
-            id: 9,
-            title: 'Bayern Munich Appoint New Sporting Director',
-            source: 'Kicker',
-            time: '12 hours ago',
-            image: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80'
-        }
-    ];
+    const latestArticles = useMemo(() => {
+        if (!allArticles) return [];
+        return [...allArticles]
+            .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+            .slice(0, 9);
+    }, [allArticles]);
+
+    const featuredArticle = latestArticles[0];
+    const topNews = latestArticles.slice(1);
 
     return (
         <Box
@@ -308,145 +260,182 @@ function TopNewsSection() {
                 </Group>
 
                 {/* Featured Article */}
-                <Grid gutter={0} mb="3rem">
-                    <Grid.Col span={{ base: 12, md: 7 }}>
-                        <Box
-                            onClick={() => navigateWithTransition(`/news/${featuredArticle.id}`)}
-                            style={{
-                                cursor: 'pointer',
-                                position: 'relative',
-                                height: isMobile ? '250px' : '400px',
-                                borderRadius: isMobile ? '8px 8px 0 0' : '8px 0 0 8px',
-                                overflow: 'hidden',
-                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isMobile) {
-                                    e.currentTarget.style.transform = 'translateY(-4px)';
-                                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
+                {isLoading ? (
+                    <Grid gutter={0} mb="3rem">
+                        <Grid.Col span={{ base: 12, md: 7 }}>
+                            <Skeleton height={isMobile ? 250 : 400} style={{ borderRadius: isMobile ? '8px 8px 0 0' : '8px 0 0 8px' }} />
+                        </Grid.Col>
+                        <Grid.Col span={{ base: 12, md: 5 }}>
                             <Box
-                                component="img"
-                                src={featuredArticle.image}
-                                alt={featuredArticle.title}
                                 style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
+                                    height: isMobile ? 'auto' : '400px',
+                                    backgroundColor: 'var(--modern-card-bg)',
+                                    padding: isMobile ? '1.5rem' : '3rem',
+                                    borderRadius: isMobile ? '0 0 8px 8px' : '0 8px 8px 0',
+                                    display: 'flex', flexDirection: 'column', justifyContent: 'center',
                                 }}
-                            />
-                        </Box>
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, md: 5 }}>
-                        <Box
-                            onClick={() => navigateWithTransition(`/news/${featuredArticle.id}`)}
-                            style={{
-                                cursor: 'pointer',
-                                minHeight: isMobile ? 'auto' : '400px',
-                                height: isMobile ? 'auto' : '400px',
-                                backgroundColor: 'var(--modern-card-bg)',
-                                padding: isMobile ? '1.5rem' : '3rem',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                borderRadius: isMobile ? '0 0 8px 8px' : '0 8px 8px 0',
-                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isMobile) {
-                                    e.currentTarget.style.transform = 'translateY(-4px)';
-                                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
-                            <Stack gap="md">
-                                <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', lineHeight: 1.3 }}>
-                                    {featuredArticle.title}
-                                </ModernH2>
-                                <ModernBody style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}>
-                                    {featuredArticle.excerpt}
-                                </ModernBody>
-                                <Group gap="xs" mt="md">
-                                    <Text size="sm" c="dimmed">{featuredArticle.source}</Text>
-                                    <Text size="sm" c="dimmed">•</Text>
-                                    <Text size="sm" c="dimmed">{featuredArticle.time}</Text>
-                                </Group>
-                            </Stack>
-                        </Box>
-                    </Grid.Col>
-                </Grid>
+                            >
+                                <Stack gap="md">
+                                    <Skeleton height={28} />
+                                    <Skeleton height={28} width="80%" />
+                                    <Skeleton height={16} />
+                                    <Skeleton height={16} width="90%" />
+                                    <Skeleton height={12} width="40%" mt="md" />
+                                </Stack>
+                            </Box>
+                        </Grid.Col>
+                    </Grid>
+                ) : featuredArticle ? (
+                    <Grid gutter={0} mb="3rem">
+                        <Grid.Col span={{ base: 12, md: 7 }}>
+                            <Box
+                                onClick={() => navigateWithTransition(`/news/${featuredArticle.id}`)}
+                                style={{
+                                    cursor: 'pointer',
+                                    position: 'relative',
+                                    height: isMobile ? '250px' : '400px',
+                                    borderRadius: isMobile ? '8px 8px 0 0' : '8px 0 0 8px',
+                                    overflow: 'hidden',
+                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isMobile) {
+                                        e.currentTarget.style.transform = 'translateY(-4px)';
+                                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={featuredArticle.imageUrl || NEWS_FALLBACK_IMAGE}
+                                    alt={featuredArticle.title}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                            </Box>
+                        </Grid.Col>
+                        <Grid.Col span={{ base: 12, md: 5 }}>
+                            <Box
+                                onClick={() => navigateWithTransition(`/news/${featuredArticle.id}`)}
+                                style={{
+                                    cursor: 'pointer',
+                                    minHeight: isMobile ? 'auto' : '400px',
+                                    height: isMobile ? 'auto' : '400px',
+                                    backgroundColor: 'var(--modern-card-bg)',
+                                    padding: isMobile ? '1.5rem' : '3rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    borderRadius: isMobile ? '0 0 8px 8px' : '0 8px 8px 0',
+                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isMobile) {
+                                        e.currentTarget.style.transform = 'translateY(-4px)';
+                                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
+                                <Stack gap="md">
+                                    <ModernH2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', lineHeight: 1.3 }}>
+                                        {featuredArticle.title}
+                                    </ModernH2>
+                                    {featuredArticle.summary && (
+                                        <ModernBody style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}>
+                                            {featuredArticle.summary}
+                                        </ModernBody>
+                                    )}
+                                    <Group gap="xs" mt="md">
+                                        <Text size="sm" c="dimmed">{featuredArticle.source}</Text>
+                                        <Text size="sm" c="dimmed">•</Text>
+                                        <Text size="sm" c="dimmed">{dayjs(featuredArticle.publishedAt).fromNow()}</Text>
+                                    </Group>
+                                </Stack>
+                            </Box>
+                        </Grid.Col>
+                    </Grid>
+                ) : null}
 
                 {/* Top News Carousel */}
-                <Box style={{ position: 'relative', paddingBottom: '32px' }}>
-                    <Carousel
-                        slideSize={{base: '85%', sm: '50%', md: '25%'}}
-                        slideGap="lg"
-                        align="start"
-                        slidesToScroll={1}
-                        withIndicators
-                        loop
-                        dragFree
-                        height="100%"
-                        classNames={
-                            carouselClasses as {
-                                control?: string;
-                                indicator?: string;
-                                indicators?: string;
-                                card?: string;
-                                category?: string;
-                                title?: string;
+                {(isLoading || topNews.length > 0) && (
+                    <Box style={{ position: 'relative', paddingBottom: '32px' }}>
+                        <Carousel
+                            slideSize={{base: '85%', sm: '50%', md: '25%'}}
+                            slideGap="lg"
+                            align="start"
+                            slidesToScroll={1}
+                            withIndicators
+                            loop
+                            dragFree
+                            height="100%"
+                            classNames={
+                                carouselClasses as {
+                                    control?: string;
+                                    indicator?: string;
+                                    indicators?: string;
+                                    card?: string;
+                                    category?: string;
+                                    title?: string;
+                                }
                             }
-                        }
-                    >
-                        {topNews.map((article) => (
-                            <Carousel.Slide key={article.id}>
-                                <Box
-                                    onClick={() => navigateWithTransition(`/news/${article.id}`)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        height: '100%',
-                                    }}
-                                >
-                                    <ModernCard hover style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                        <Stack gap="md" style={{ flex: 1 }}>
-                                            <Box
-                                                component="img"
-                                                src={article.image}
-                                                alt={article.title}
-                                                style={{
-                                                    width: '100%',
-                                                    height: '180px',
-                                                    objectFit: 'cover',
-                                                    borderRadius: '4px',
-                                                }}
-                                            />
-                                            <Stack gap="xs" style={{ flex: 1 }}>
-                                                <ModernH3 style={{ fontSize: '1rem', lineHeight: 1.4 }}>
-                                                    {article.title}
-                                                </ModernH3>
-                                                <Group gap="xs" mt="auto">
-                                                    <Text size="xs" c="dimmed">{article.source}</Text>
-                                                    <Text size="xs" c="dimmed">•</Text>
-                                                    <Text size="xs" c="dimmed">{article.time}</Text>
-                                                </Group>
-                                            </Stack>
-                                        </Stack>
-                                    </ModernCard>
-                                </Box>
-                            </Carousel.Slide>
-                        ))}
-                    </Carousel>
-                </Box>
+                        >
+                            {isLoading
+                                ? Array.from({ length: 4 }).map((_, i) => (
+                                      <Carousel.Slide key={i}>
+                                          <ModernCard style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                              <Stack gap="md" style={{ flex: 1 }}>
+                                                  <Skeleton height={180} radius="xs" />
+                                                  <Skeleton height={14} />
+                                                  <Skeleton height={14} width="70%" />
+                                                  <Skeleton height={10} width="50%" mt="auto" />
+                                              </Stack>
+                                          </ModernCard>
+                                      </Carousel.Slide>
+                                  ))
+                                : topNews.map((article) => (
+                                      <Carousel.Slide key={article.id}>
+                                          <Box
+                                              onClick={() => navigateWithTransition(`/news/${article.id}`)}
+                                              style={{ cursor: 'pointer', height: '100%' }}
+                                          >
+                                              <ModernCard hover style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                                  <Stack gap="md" style={{ flex: 1 }}>
+                                                      <Box
+                                                          component="img"
+                                                          src={article.imageUrl || NEWS_FALLBACK_IMAGE}
+                                                          alt={article.title}
+                                                          style={{
+                                                              width: '100%',
+                                                              height: '180px',
+                                                              objectFit: 'cover',
+                                                              borderRadius: '4px',
+                                                          }}
+                                                      />
+                                                      <Stack gap="xs" style={{ flex: 1 }}>
+                                                          <ModernH3 style={{ fontSize: '1rem', lineHeight: 1.4 }}>
+                                                              {article.title}
+                                                          </ModernH3>
+                                                          <Group gap="xs" mt="auto">
+                                                              <Text size="xs" c="dimmed">{article.source}</Text>
+                                                              <Text size="xs" c="dimmed">•</Text>
+                                                              <Text size="xs" c="dimmed">{dayjs(article.publishedAt).fromNow()}</Text>
+                                                          </Group>
+                                                      </Stack>
+                                                  </Stack>
+                                              </ModernCard>
+                                          </Box>
+                                      </Carousel.Slide>
+                                  ))}
+                        </Carousel>
+                    </Box>
+                )}
             </Container>
         </Box>
     );

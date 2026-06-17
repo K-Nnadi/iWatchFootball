@@ -36,6 +36,8 @@ interface TicketMatch {
     awayTeam: string;
     date: string;
     venue: string;
+    stadiumId?: number;
+    stadiumMetadata?: unknown;
     homeScore?: number;
     awayScore?: number;
     isLive?: boolean;
@@ -494,6 +496,8 @@ export function TicketsPage() {
                     date: match.date,
                     venue: match.venue,
                     competition: match.competitionName,
+                    stadiumId: match.stadiumId,
+                    stadiumMetadata: match.stadiumMetadata,
                 },
             });
         },

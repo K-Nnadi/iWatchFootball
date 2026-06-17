@@ -165,6 +165,8 @@ export function MatchHeader({
                     date: matchDetails.date,
                     venue: matchDetails.venue,
                     competition: matchDetails.competition,
+                    stadiumId: matchDetails.stadiumId,
+                    stadiumMetadata: matchDetails.stadiumMetadata,
                 }
             });
         }

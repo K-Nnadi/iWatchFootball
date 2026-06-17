@@ -12,6 +12,8 @@ export interface MatchDetails {
     date: string;
     venue: string;
     competition?: string;
+    stadiumId?: number;
+    stadiumMetadata?: unknown;
 }
 
 interface MatchHeaderProps {

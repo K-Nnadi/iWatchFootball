@@ -32,6 +32,11 @@
     "goToToday": "Zu heute",
     "searchAriaLabel": "Nach Team suchen"
   },
+  "seatSelection": {
+    "noSeatmapTitle": "Sitzplan nicht verfügbar",
+    "noSeatmapBody": "Wähle ein Ticket aus der Liste.",
+    "noSeatmapVenue": "Für {{venue}} haben wir noch keinen interaktiven Plan. Wähle unten aus den verfügbaren Tickets."
+  },
   "competitions": {
     "title": "Wettbewerbe",
     "subtitle": "Entdecke Fußballwettbewerbe aus aller Welt",

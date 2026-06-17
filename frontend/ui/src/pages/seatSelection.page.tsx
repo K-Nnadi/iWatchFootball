@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Container, Grid, Paper, Stack, Text, Group, ScrollArea, useMantineColorScheme } from '@mantine/core';
+import { Box, Container, Grid, Paper, Stack, Text, Group, ScrollArea, Alert, useMantineColorScheme } from '@mantine/core';
+import { IconMapOff } from '@tabler/icons-react';
 import { notify } from '../shared/notify';
 import { useParams, useLocation } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
@@ -7,9 +8,11 @@ import { useCartStore } from '../shared/stores/cart.store';
 import { acquireTicketHold } from '../shared/api/ticketHold.api';
 import { buildTicketOfferKey } from '../shared/ticketOffer';
 import { StadiumSeatmapPanel } from '../components/stadium/StadiumSeatmapPanel';
+import { resolveStadiumSections, hasStadiumSeatmap } from '../components/stadium/resolveStadiumSeatmap';
 import { ModernH3 } from '../components/modern';
 import { MatchHeader, FiltersPanel, TicketCard, type Ticket, type TicketFilters, type MatchDetails } from '../components/tickets';
-import { getAllSections } from '../components/stadium/anfieldStadium';
+import { useGetOneStadium } from '@iWatchFootball/clients/controllers/stadium';
+import { useTranslation } from '../i18n';
 import './seatSelection.page.css';
 
 // Default match details for fallback
@@ -25,6 +28,7 @@ const DEFAULT_MATCH_DETAILS: MatchDetails = {
     };
 
 export function SeatSelectionPage() {
+    const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const { id: matchId } = useParams<{ id: string }>();
     const routerLocation = useLocation();
@@ -34,7 +38,28 @@ export function SeatSelectionPage() {
 
     const matchDetails: MatchDetails = (routerLocation.state as MatchDetails) || DEFAULT_MATCH_DETAILS;
 
-    // Filters state
+    const { data: stadiumRecord } = useGetOneStadium(matchDetails.stadiumId ?? 0, {
+        query: { enabled: !!matchDetails.stadiumId } as never,
+    });
+
+    const stadiumSections = useMemo(() => {
+        const fromState = resolveStadiumSections({
+            venue: matchDetails.venue,
+            metadata: matchDetails.stadiumMetadata,
+        });
+        if (fromState) return fromState;
+
+        if (stadiumRecord?.metadata) {
+            return resolveStadiumSections({
+                venue: matchDetails.venue,
+                metadata: stadiumRecord.metadata,
+            });
+        }
+
+        return resolveStadiumSections({ venue: matchDetails.venue });
+    }, [matchDetails.venue, matchDetails.stadiumMetadata, stadiumRecord?.metadata]);
+
+    const showSeatmap = hasStadiumSeatmap(stadiumSections);
     const [filters, setFilters] = useState<TicketFilters>({
         priceRange: [229, 498],
         ticketType: null,
@@ -113,10 +138,7 @@ export function SeatSelectionPage() {
         },
     ]);
 
-    // Use Anfield stadium sections
-    const stadiumSections = useMemo(() => getAllSections(), []);
-
-    // Filter tickets based on filters
+    // Filters state
     const filteredTickets = useMemo(() => {
         return allTickets.filter((ticket) => {
             if (ticket.price < filters.priceRange[0] || ticket.price > filters.priceRange[1]) return false;
@@ -256,21 +278,34 @@ export function SeatSelectionPage() {
                     onToggle={() => setFiltersOpen(!filtersOpen)}
                 />
 
+                {!showSeatmap && (
+                    <Alert
+                        icon={<IconMapOff size={18} />}
+                        color="gray"
+                        variant="light"
+                        mb="lg"
+                        title={t('seatSelection.noSeatmapTitle')}
+                    >
+                        {t('seatSelection.noSeatmapVenue', { venue: matchDetails.venue })}
+                    </Alert>
+                )}
+
                 {/* Main Content: Stadium Map and Ticket List */}
                 <Grid gutter="lg">
-                    {/* Stadium Map */}
-                    <Grid.Col span={{base: 12, lg: 8}}>
-                        <StadiumSeatmapPanel
-                            sections={stadiumSections}
-                            onSectionClick={handleSectionClick}
-                            selectedSectionId={selectedSectionId}
-                            blocksWithListings={availableBlocks}
-                            isDark={isDark}
-                        />
-                    </Grid.Col>
+                    {showSeatmap && (
+                        <Grid.Col span={{ base: 12, lg: 8 }}>
+                            <StadiumSeatmapPanel
+                                sections={stadiumSections}
+                                venueName={matchDetails.venue}
+                                onSectionClick={handleSectionClick}
+                                selectedSectionId={selectedSectionId}
+                                blocksWithListings={availableBlocks}
+                                isDark={isDark}
+                            />
+                        </Grid.Col>
+                    )}
 
-                    {/* Ticket Listing */}
-                    <Grid.Col span={{ base: 12, lg: 4 }}>
+                    <Grid.Col span={{ base: 12, lg: showSeatmap ? 4 : 8 }} offset={{ lg: showSeatmap ? 0 : 2 }}>
                         <Paper
                             p="md"
                             style={{
