@@ -103,7 +103,7 @@ export class TrackerCompareService {
             userName: user.userName,
             firstName: user.firstName,
             lastName: user.lastName,
-            favouriteTeamId: user.favouriteTeamId,
+            favouriteTeamIds: user.favouriteTeamIds ?? [],
         };
     }
 }

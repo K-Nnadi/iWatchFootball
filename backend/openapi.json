@@ -22370,8 +22370,15 @@
           "commsPreference": {
             "$ref": "#/components/schemas/Promise"
           },
-          "favouriteTeamId": {
-            "type": "number"
+          "favouriteTeamIds": {
+            "description": "Favourite team IDs (not a DB column; populated from userFavouriteTeam join rows)",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "favouriteTeamLinks": {
+            "$ref": "#/components/schemas/Promise"
           },
           "trackerVisibility": {
             "type": "string",

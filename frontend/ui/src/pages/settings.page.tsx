@@ -14,6 +14,7 @@ import {
     Box,
     ActionIcon,
     SimpleGrid,
+    Chip,
 } from '@mantine/core';
 import { useMantineColorScheme } from '@mantine/core';
 import { useLocalStorage } from "@mantine/hooks";
@@ -33,8 +34,8 @@ import { UiButton } from '../components/ui';
 import { commsLanguageToLocale, useI18nStore, useTranslation } from '../i18n';
 import { useAuthStore } from '../shared/stores/auth.store';
 import { notify } from '../shared/notify';
-import { useGetQueryTeam, useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
-import { useUpdateOneUser } from '@iWatchFootball/clients/controllers/user';
+import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
+import { useGetOneUser, useUpdateOneUser } from '@iWatchFootball/clients/controllers/user';
 import { useGetOneCommsPreference, useUpdateOneCommsPreference } from '@iWatchFootball/clients/controllers/comms-preference';
 import {
     CommsPreferenceEmailNotifications,
@@ -57,14 +58,14 @@ import type {
     CommsPreferenceLanguage as LanguageType,
 } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import {
-    getTrackerPrivacy,
     updateTrackerPrivacy,
+    useTrackerPrivacy,
     type TrackerVisibility,
 } from '../shared/api/tracker.api';
 
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
-    const { isLoggedIn, logout, user } = useAuthStore();
+    const { isLoggedIn, logout, user, mergeUser } = useAuthStore();
     const { t } = useTranslation();
     const setLocale = useI18nStore((s) => s.setLocale);
 
@@ -88,22 +89,30 @@ export function SettingsPage() {
     const [teamSearchValue, setTeamSearchValue] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [isEditingTeam, setIsEditingTeam] = useState(false);
-    const [selectedTeamId, setSelectedTeamId] = useState<number | null>(user?.favouriteTeamId || null);
-    const [favoriteTeamName, setFavoriteTeamName] = useState<string | null>(null);
+    const [selectedTeamIds, setSelectedTeamIds] = useState<number[]>(user?.favouriteTeamIds ?? []);
     const [trackerVisibility, setTrackerVisibility] = useState<TrackerVisibility>('PRIVATE');
     const [shareVerifiedOnly, setShareVerifiedOnly] = useState(true);
     const [savingTrackerPrivacy, setSavingTrackerPrivacy] = useState(false);
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const locale = useI18nStore((s) => s.locale);
+
+    const { data: profileUser } = useGetOneUser(user?.id ?? 0, {
+        query: { enabled: isLoggedIn && !!user?.id } as never,
+    });
 
     useEffect(() => {
-        if (!isLoggedIn) return;
-        void getTrackerPrivacy()
-            .then((p) => {
-                setTrackerVisibility(p.trackerVisibility);
-                setShareVerifiedOnly(p.shareVerifiedOnly);
-            })
-            .catch(() => {});
-    }, [isLoggedIn]);
+        if (profileUser) {
+            mergeUser(profileUser);
+        }
+    }, [profileUser, mergeUser]);
+
+    const { data: trackerPrivacy } = useTrackerPrivacy(isLoggedIn && !!user?.id);
+
+    useEffect(() => {
+        if (!trackerPrivacy) return;
+        setTrackerVisibility(trackerPrivacy.trackerVisibility);
+        setShareVerifiedOnly(trackerPrivacy.shareVerifiedOnly);
+    }, [trackerPrivacy]);
 
     const handleSaveTrackerPrivacy = async () => {
         setSavingTrackerPrivacy(true);
@@ -147,41 +156,49 @@ export function SettingsPage() {
         }
     );
 
-    // Fetch the current favorite team name by ID (only once when not editing)
-    const { data: favoriteTeamData } = useGetOneTeam(
-        user?.favouriteTeamId as number,
+    const favouriteTeamIds = user?.favouriteTeamIds ?? [];
+
+    const { data: favouriteTeamsData = [] } = useGetQueryTeam(
+        {
+            where: { id: { $in: favouriteTeamIds.length ? favouriteTeamIds : [-1] } },
+            take: 50,
+        } as any,
         {
             query: {
-                enabled: !!user?.favouriteTeamId && !favoriteTeamName,
-            } as any
-        }
+                enabled: favouriteTeamIds.length > 0,
+            } as any,
+        },
     );
 
-    useEffect(() => {
-        if (favoriteTeamData && !favoriteTeamName) {
-            setFavoriteTeamName(favoriteTeamData.name);
+    const favouriteTeamsLabel = useMemo(
+        () => favouriteTeamsData.map((team) => team.name).join(', '),
+        [favouriteTeamsData],
+    );
+
+    const selectedTeamNames = useMemo(() => {
+        const byId = new Map(favouriteTeamsData.map((team) => [team.id, team.name]));
+        for (const team of teamsData) {
+            byId.set(team.id, team.name);
         }
-    }, [favoriteTeamData, favoriteTeamName]);
+        return selectedTeamIds
+            .map((id) => byId.get(id))
+            .filter((name): name is string => Boolean(name));
+    }, [selectedTeamIds, favouriteTeamsData, teamsData]);
 
     // Update user mutation
     const updateUserMutation = useUpdateOneUser({
         mutation: {
-            onSuccess: () => {
-                notify.success('Success', 'Favorite team updated successfully!');
+            onSuccess: (updated) => {
+                notify.success('Success', 'Favourite teams updated successfully!');
                 setIsEditingTeam(false);
-                // teamSearchValue holds the selected team's name at point of selection
-                if (teamSearchValue) {
-                    setFavoriteTeamName(teamSearchValue);
-                }
-                // Refresh user data by reloading from localStorage
-                if (user) {
-                    const updatedUser = { ...user, favouriteTeamId: selectedTeamId || undefined };
+                if (user && updated) {
+                    const updatedUser = { ...user, ...updated, favouriteTeamIds: updated.favouriteTeamIds ?? selectedTeamIds };
                     localStorage.setItem('user', JSON.stringify(updatedUser));
                     useAuthStore.setState((state) => ({ ...state, user: updatedUser }));
                 }
             },
             onError: (error: any) => {
-                notify.error('Error', error?.response?.data?.message || 'Failed to update favorite team');
+                notify.error('Error', error?.response?.data?.message || 'Failed to update favourite teams');
             },
         },
     });
@@ -210,9 +227,12 @@ export function SettingsPage() {
             setNewsletterEmails(commsPreferenceData.newsletterEmails);
             setMatchReminders(commsPreferenceData.matchReminders);
             setLanguage(commsPreferenceData.language);
-            setLocale(commsLanguageToLocale(commsPreferenceData.language));
+            const nextLocale = commsLanguageToLocale(commsPreferenceData.language);
+            if (nextLocale !== locale) {
+                setLocale(nextLocale);
+            }
         }
-    }, [commsPreferenceData, setLocale]);
+    }, [commsPreferenceData, locale, setLocale]);
 
     const updateCommsPrefMutation = useUpdateOneCommsPreference({
         mutation: {
@@ -243,17 +263,18 @@ export function SettingsPage() {
         });
     };
 
-    // Get user data from auth store (API may omit name fields after login)
-    const userData = user ? {
-        firstName: user.firstName ?? '',
-        lastName: user.lastName ?? '',
-        userName: user.userName ?? '',
-        email: user.email ?? '',
+    // Get user data from auth store, refreshed from API when available
+    const activeUser = profileUser ?? user;
+    const userData = activeUser ? {
+        firstName: activeUser.firstName ?? '',
+        lastName: activeUser.lastName ?? '',
+        userName: activeUser.userName ?? '',
+        email: activeUser.email ?? '',
     } : {
-        firstName: 'John',
-        lastName: 'Doe',
-        userName: 'johndoe',
-        email: 'john.doe@example.com',
+        firstName: '',
+        lastName: '',
+        userName: '',
+        email: '',
     };
 
 
@@ -341,17 +362,17 @@ export function SettingsPage() {
 
     const handleEditTeam = () => {
         setIsEditingTeam(true);
-        handleTeamSearchChange(favoriteTeamName || '');
-        setSelectedTeamId(user?.favouriteTeamId || null);
+        setTeamSearchValue('');
+        setSelectedTeamIds(user?.favouriteTeamIds ?? []);
     };
 
     const handleSaveTeam = () => {
-        if (selectedTeamId && user) {
+        if (user) {
             updateUserMutation.mutate({
                 id: user.id,
                 data: {
                     ...user,
-                    favouriteTeamId: selectedTeamId,
+                    favouriteTeamIds: selectedTeamIds,
                 },
             });
         } else {
@@ -360,23 +381,27 @@ export function SettingsPage() {
     };
 
     const handleCancelEdit = () => {
-        handleTeamSearchChange(favoriteTeamName || '');
-        setSelectedTeamId(user?.favouriteTeamId || null);
+        setTeamSearchValue('');
+        setSelectedTeamIds(user?.favouriteTeamIds ?? []);
         setIsEditingTeam(false);
     };
 
     const handleTeamSelect = (value: string | null) => {
-        if (value) {
-            const teamId = parseInt(value, 10);
-            setSelectedTeamId(teamId);
-            const selectedTeam = teamsData.find(t => t.id === teamId);
-            if (selectedTeam) {
-                setTeamSearchValue(selectedTeam.name);
-            }
-        } else {
-            setSelectedTeamId(null);
+        if (!value) {
             setTeamSearchValue('');
+            return;
         }
+        const teamId = parseInt(value, 10);
+        if (!Number.isFinite(teamId)) {
+            return;
+        }
+        setSelectedTeamIds((prev) => (prev.includes(teamId) ? prev : [...prev, teamId]));
+        const selectedTeam = teamsData.find((team) => team.id === teamId);
+        setTeamSearchValue(selectedTeam?.name ?? '');
+    };
+
+    const handleRemoveTeam = (teamId: number) => {
+        setSelectedTeamIds((prev) => prev.filter((id) => id !== teamId));
     };
 
     return (
@@ -593,9 +618,23 @@ export function SettingsPage() {
                                         )}
                                     </Group>
                                     {isEditingTeam ? (
-                                        <Group gap="sm" style={{ paddingLeft: '28px' }}>
+                                        <Stack gap="sm" style={{ paddingLeft: '28px' }}>
+                                            {selectedTeamIds.length > 0 && (
+                                                <Group gap="xs">
+                                                    {selectedTeamIds.map((teamId, index) => (
+                                                        <Chip
+                                                            key={teamId}
+                                                            checked
+                                                            onChange={() => handleRemoveTeam(teamId)}
+                                                        >
+                                                            {selectedTeamNames[index] ?? `Team #${teamId}`}
+                                                        </Chip>
+                                                    ))}
+                                                </Group>
+                                            )}
+                                            <Group gap="sm">
                                             <Autocomplete
-                                                placeholder="Start typing to search for your favorite team"
+                                                placeholder="Search to add a favourite team"
                                                 data={teamOptions}
                                                 value={teamSearchValue}
                                                 onChange={handleTeamSearchChange}
@@ -622,7 +661,7 @@ export function SettingsPage() {
                                             <ActionIcon
                                                 variant="filled"
                                                 onClick={handleSaveTeam}
-                                                disabled={!selectedTeamId || updateUserMutation.isPending}
+                                                disabled={selectedTeamIds.length === 0 || updateUserMutation.isPending}
                                                 loading={updateUserMutation.isPending}
                                                 style={{
                                                     backgroundColor: 'var(--modern-lime)',
@@ -642,6 +681,7 @@ export function SettingsPage() {
                                                 <IconX size={18} />
                                             </ActionIcon>
                                         </Group>
+                                        </Stack>
                                     ) : (
                                         <Text 
                                             style={{ 
@@ -649,7 +689,7 @@ export function SettingsPage() {
                                                 paddingLeft: '28px',
                                             }}
                                         >
-                                            {favoriteTeamName || 'Not set'}
+                                            {favouriteTeamsLabel || 'Not set'}
                                         </Text>
                                     )}
                                 </Box>

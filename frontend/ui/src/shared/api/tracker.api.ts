@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
 
 export interface TrackerEntitlements {
     plan: 'free' | 'premium';
@@ -83,7 +84,7 @@ export interface PublicUserSummary {
     userName: string;
     firstName: string;
     lastName: string;
-    favouriteTeamId?: number;
+    favouriteTeamIds?: number[];
 }
 
 export interface FriendListItem extends PublicUserSummary {
@@ -168,6 +169,16 @@ export async function getTrackerPrivacy(): Promise<TrackerPrivacySettings> {
 export async function updateTrackerPrivacy(body: Partial<TrackerPrivacySettings>): Promise<TrackerPrivacySettings> {
     const { data } = await axios.patch<TrackerPrivacySettings>('/tracker/privacy', body);
     return data;
+}
+
+export function useTrackerPrivacy(enabled = true) {
+    return useQuery({
+        queryKey: ['tracker-privacy'],
+        queryFn: getTrackerPrivacy,
+        enabled,
+        staleTime: 5 * 60 * 1000,
+        retry: false,
+    });
 }
 
 export async function compareWithFriend(friendUserId: number): Promise<CompareResult> {

@@ -10,24 +10,19 @@ interface AdLayoutProps {
 
 /**
  * Wraps page content with optional side-rail ads on wide screens.
- * Place `<AdSlot placement="banner" />` inside children where the mobile
- * banner should appear (typically directly below the filter toolbar).
+ * Keeps a stable wrapper so page content is not remounted when ad visibility changes.
  */
 export function AdLayout({ children }: AdLayoutProps) {
   const showAds = useShowAds();
 
-  if (!showAds) {
-    return <>{children}</>;
-  }
-
   return (
     <Box className={classes.layout}>
-      <AdSlot placement="rail-left" unitId="app-rail-left" />
+      {showAds ? <AdSlot placement="rail-left" unitId="app-rail-left" /> : null}
       <Box className={classes.main}>
-        <AdSlot placement="banner" unitId="app-banner" />
+        {showAds ? <AdSlot placement="banner" unitId="app-banner" /> : null}
         {children}
       </Box>
-      <AdSlot placement="rail-right" unitId="app-rail-right" />
+      {showAds ? <AdSlot placement="rail-right" unitId="app-rail-right" /> : null}
     </Box>
   );
 }

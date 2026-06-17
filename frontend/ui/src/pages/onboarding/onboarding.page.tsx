@@ -58,14 +58,14 @@ function getVisibleTeams(allTeams: Team[], suggestedNames: string[], query: stri
 
 function TeamGrid({
     teams,
-    selectedId,
-    onSelect,
+    selectedIds,
+    onToggle,
     loading,
     emptyLabel,
 }: {
     teams: Team[];
-    selectedId: number | null;
-    onSelect: (team: Team) => void;
+    selectedIds: number[];
+    onToggle: (team: Team) => void;
     loading: boolean;
     emptyLabel: string;
 }) {
@@ -84,13 +84,13 @@ function TeamGrid({
     return (
         <div className={classes.grid}>
             {teams.map((team) => {
-                const selected = selectedId === team.id;
+                const selected = selectedIds.includes(team.id);
                 return (
                     <button
                         key={team.id}
                         type="button"
                         className={`${classes.teamBtn} ${selected ? classes.teamBtnSelected : ''}`}
-                        onClick={() => onSelect(team)}
+                        onClick={() => onToggle(team)}
                     >
                         <span className={classes.crestWrap}>
                             {team.logoUrl ? (
@@ -114,7 +114,7 @@ export function OnboardingPage() {
 
     const [step, setStep] = useState<Step>('team');
     const [search, setSearch] = useState('');
-    const [favouriteTeamId, setFavouriteTeamId] = useState<number | null>(user?.favouriteTeamId ?? null);
+    const [favouriteTeamIds, setFavouriteTeamIds] = useState<number[]>(user?.favouriteTeamIds ?? []);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [marketingOptIn, setMarketingOptIn] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -147,13 +147,13 @@ export function OnboardingPage() {
                 id: user.id,
                 data: {
                     ...user,
-                    favouriteTeamId: favouriteTeamId ?? user.favouriteTeamId,
+                    favouriteTeamIds: favouriteTeamIds.length > 0 ? favouriteTeamIds : user.favouriteTeamIds ?? [],
                     metadata,
                 },
             });
 
             markOnboardingComplete(user.id);
-            setAuthState(token, updated);
+            setAuthState(token, { ...user, ...updated });
             notify.success(t('onboarding.completeTitle'), t('onboarding.completeMessage'));
             navigateWithTransition('/home');
         } catch {
@@ -215,8 +215,14 @@ export function OnboardingPage() {
                         </p>
                         <TeamGrid
                             teams={visibleTeams}
-                            selectedId={favouriteTeamId}
-                            onSelect={(team) => setFavouriteTeamId(team.id)}
+                            selectedIds={favouriteTeamIds}
+                            onToggle={(team) =>
+                                setFavouriteTeamIds((prev) =>
+                                    prev.includes(team.id)
+                                        ? prev.filter((id) => id !== team.id)
+                                        : [...prev, team.id],
+                                )
+                            }
                             loading={loadingTeams}
                             emptyLabel={t('onboarding.noTeams')}
                         />
@@ -251,7 +257,7 @@ export function OnboardingPage() {
                     <button
                         type="button"
                         className={classes.confirmBtn}
-                        disabled={!favouriteTeamId || saving}
+                        disabled={favouriteTeamIds.length === 0 || saving}
                         onClick={goNextFromTeam}
                     >
                         {t('onboarding.confirm')}

@@ -2455,7 +2455,7 @@ export interface User {
   /** @nullable */
   deletedAt?: string | null;
   email: string;
-  favouriteTeamId?: number;
+  favouriteTeamIds?: number[];
   firstName: string;
   id: number;
   lastName: string;

@@ -11,13 +11,14 @@ import { User } from '../user/user.entity';
 import { UserConnectionStatus, TrackerVisibility } from '../../enums/social.enum';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../enums/notification.enum';
+import { UserFavouriteTeamService } from '../userFavouriteTeam/userFavouriteTeam.service';
 
 export type PublicUserSummary = {
     id: number;
     userName: string;
     firstName: string;
     lastName: string;
-    favouriteTeamId?: number;
+    favouriteTeamIds?: number[];
 };
 
 export type FriendListItem = PublicUserSummary & {
@@ -45,6 +46,7 @@ export class SocialService {
         @InjectRepository(User)
         private readonly userRepo: Repository<User>,
         private readonly notificationService: NotificationService,
+        private readonly favouriteTeamService: UserFavouriteTeamService,
     ) {}
 
     async searchUsers(query: string, excludeUserId: number, limit = 20): Promise<PublicUserSummary[]> {
@@ -60,7 +62,6 @@ export class SocialService {
                 'u.userName',
                 'u.firstName',
                 'u.lastName',
-                'u.favouriteTeamId',
             ])
             .where('u.id != :excludeUserId', { excludeUserId })
             .andWhere(
@@ -74,7 +75,7 @@ export class SocialService {
             .take(limit)
             .getMany();
 
-        return rows.map((u) => this.toPublicSummary(u));
+        return this.enrichPublicSummaries(rows);
     }
 
     async listFriends(userId: number): Promise<FriendsListResponse> {
@@ -103,6 +104,7 @@ export class SocialService {
 
         const allUserIds = [...new Set([...friendUserIds, ...pendingUserIds])];
         const usersById = await this.loadUsersByIds(allUserIds);
+        const teamIdsByUser = await this.favouriteTeamService.getTeamIdsByUserIds(allUserIds);
 
         const friends: FriendListItem[] = connections
             .map((c) => {
@@ -110,7 +112,7 @@ export class SocialService {
                 const user = usersById.get(friendId);
                 if (!user) return null;
                 return {
-                    ...this.toPublicSummary(user),
+                    ...this.toPublicSummary(user, teamIdsByUser.get(user.id) ?? []),
                     connectionId: c.id,
                     friendsSince: c.updatedAt.toISOString(),
                 };
@@ -124,7 +126,7 @@ export class SocialService {
                 if (!user) return null;
                 return {
                     connectionId: c.id,
-                    user: this.toPublicSummary(user),
+                    user: this.toPublicSummary(user, teamIdsByUser.get(user.id) ?? []),
                     direction: c.addresseeId === userId ? 'incoming' : 'outgoing',
                     requestedAt: c.createdAt.toISOString(),
                 };
@@ -318,13 +320,21 @@ export class SocialService {
         return new Map(users.map((u) => [u.id, u]));
     }
 
-    private toPublicSummary(user: User): PublicUserSummary {
+    private async enrichPublicSummaries(users: User[]): Promise<PublicUserSummary[]> {
+        if (users.length === 0) {
+            return [];
+        }
+        const teamIdsByUser = await this.favouriteTeamService.getTeamIdsByUserIds(users.map((user) => user.id));
+        return users.map((user) => this.toPublicSummary(user, teamIdsByUser.get(user.id) ?? []));
+    }
+
+    private toPublicSummary(user: User, favouriteTeamIds: number[] = []): PublicUserSummary {
         return {
             id: user.id,
             userName: user.userName,
             firstName: user.firstName,
             lastName: user.lastName,
-            favouriteTeamId: user.favouriteTeamId,
+            favouriteTeamIds,
         };
     }
 

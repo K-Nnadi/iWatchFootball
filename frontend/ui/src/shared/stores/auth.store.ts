@@ -6,8 +6,10 @@ function readStoredAuth(): { isLoggedIn: boolean; user: User | null; token: stri
     const userStr = localStorage.getItem('user');
     if (token && userStr) {
         try {
-            const user = JSON.parse(userStr) as User;
-            return { isLoggedIn: true, user, token };
+            const user = JSON.parse(userStr) as User | null;
+            if (user?.id) {
+                return { isLoggedIn: true, user, token };
+            }
         } catch {
             localStorage.removeItem('authToken');
             localStorage.removeItem('user');
@@ -21,6 +23,7 @@ interface AuthStore {
     user: User | null;
     token: string | null;
     login: (token: string, user: User) => void;
+    mergeUser: (patch: Partial<User>) => void;
     logout: () => void;
     initializeAuth: () => void;
 }
@@ -31,6 +34,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(user));
         set({ isLoggedIn: true, user, token });
+    },
+    mergeUser: (patch: Partial<User>) => {
+        set((state) => {
+            if (!state.user) {
+                return state;
+            }
+            const user = { ...state.user, ...patch };
+            localStorage.setItem('user', JSON.stringify(user));
+            return { ...state, user };
+        });
     },
     logout: () => {
         localStorage.removeItem('authToken');

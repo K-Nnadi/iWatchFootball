@@ -18,8 +18,8 @@ import { FindOptionsWhere } from 'typeorm';
 import {CommsPreference} from "../commsPreference/commsPreference.entity";
 import {Credit} from "../credit/credit.entity";
 import {Transaction} from "../transaction/transaction.entity";
-import {Team} from "../team/team.entity";
 import {TrackerVisibility} from "../../enums/social.enum";
+import {UserFavouriteTeam} from "../userFavouriteTeam/userFavouriteTeam.entity";
 
 
 @Entity('user')
@@ -32,7 +32,7 @@ import {TrackerVisibility} from "../../enums/social.enum";
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId',
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamIds',
         'trackerVisibility', 'shareVerifiedOnly'
       ],
     },
@@ -45,7 +45,7 @@ import {TrackerVisibility} from "../../enums/social.enum";
         return {};
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId',
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamIds',
         'trackerVisibility', 'shareVerifiedOnly'
       ],
     },
@@ -55,7 +55,7 @@ import {TrackerVisibility} from "../../enums/social.enum";
         return { id: req.user?.id };
       },
       fields: [
-        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId',
+        'id', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamIds',
         'trackerVisibility', 'shareVerifiedOnly'
       ],
     },
@@ -71,14 +71,14 @@ import {TrackerVisibility} from "../../enums/social.enum";
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can update users
-      fields: ['firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamId'],
+      fields: ['firstName', 'lastName', 'userName', 'email', 'type', 'favouriteTeamIds'],
     },
     [UserRole.USER]: {
-      // Users can update their own favouriteTeamId
+      // Users can update their own favourite teams
       filter: (req: RequestWithUser): FindOptionsWhere<User> => {
         return { id: req.user?.id };
       },
-      fields: ['favouriteTeamId', 'trackerVisibility', 'shareVerifiedOnly'],
+      fields: ['favouriteTeamIds', 'trackerVisibility', 'shareVerifiedOnly'],
     },
     default: { filter: (): FindOptionsWhere<User> => ({ id: -1 }) },
   },
@@ -145,17 +145,12 @@ export class User extends BaseDbEntity {
     })
     transactions?: Promise<Transaction[]>;
 
-    @OptionalEntityColumn({db: {type: "int"}})
-    favouriteTeamId?: number;
+    @ApiPropertyOptional({ type: [Number], description: 'Favourite team IDs (not a DB column; populated from userFavouriteTeam join rows)' })
+    favouriteTeamIds?: number[];
 
     @ApiPropertyOptional()
-    @EntityRelation({
-        type: RelationshipType.MANY_TO_ONE,
-        entity: () => Team,
-        joinOptions: {name: 'favouriteTeamId'},
-        description: 'User\'s favourite team'
-    })
-    favouriteTeam?: Promise<Team>;
+    @OneToMany(() => UserFavouriteTeam, (link) => link.user, { lazy: true })
+    favouriteTeamLinks?: Promise<UserFavouriteTeam[]>;
 
     @EntityEnumColumn({
         db: { enum: TrackerVisibility, default: TrackerVisibility.PRIVATE },

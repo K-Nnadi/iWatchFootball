@@ -11,27 +11,15 @@ import { I18nProvider } from './i18n';
 import { Notifications } from '@mantine/notifications';
 
 import {Router} from "./router";
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            refetchOnWindowFocus: false,
-            retry: false
-        }
-    }
-});
 
 function App() {
     return (
-        <QueryClientProvider client={queryClient}>
-            <MantineProvider theme={appTheme} defaultColorScheme={'dark'}>
-                <I18nProvider>
-                    <Notifications />
-                    <Router/>
-                </I18nProvider>
-            </MantineProvider>
-        </QueryClientProvider>
+        <MantineProvider theme={appTheme} defaultColorScheme={'dark'}>
+            <I18nProvider>
+                <Notifications />
+                <Router/>
+            </I18nProvider>
+        </MantineProvider>
     );
 }
 

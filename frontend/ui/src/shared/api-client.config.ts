@@ -79,6 +79,9 @@ export function configureApiClient() {
       if (error.response?.status === 401) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
+        import('./stores/auth.store').then(({ useAuthStore }) => {
+          useAuthStore.getState().logout();
+        });
       }
       return Promise.reject(error);
     },

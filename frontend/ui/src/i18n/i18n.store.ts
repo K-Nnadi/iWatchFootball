@@ -20,8 +20,13 @@ export const useI18nStore = create<I18nStore>((set) => ({
 
     setLocale: (locale) => {
         const next = normalizeLocale(locale);
-        localStorage.setItem(LOCALE_STORAGE_KEY, next);
-        set({ locale: next });
+        set((state) => {
+            if (state.locale === next) {
+                return state;
+            }
+            localStorage.setItem(LOCALE_STORAGE_KEY, next);
+            return { locale: next };
+        });
     },
 
     initializeLocale: () => {

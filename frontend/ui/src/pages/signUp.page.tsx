@@ -181,15 +181,6 @@ export function SignUpPage() {
 					>
 						{t('auth.signUpButton')}
 					</UiButton>
-					<UiButton
-						my="xl"
-						variant="outline"
-						size="md"
-						fullWidth
-						onClick={() => navigateWithTransition('/signIn')}
-					>
-						{t('nav.signIn')}
-					</UiButton>
 				</form>
 			</Paper>
 		</Container>

@@ -238,9 +238,10 @@ export class AuthController {
         if (!passwordMatch) {
             void response.code(401).send({message: 'Invalid Login'});
         } else {
-            const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(user);
+            const freshUser = await this.userService.getOne(user.id);
+            const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(freshUser ?? user);
             void response.code(200).send({
-                user, access_token: token
+                user: freshUser ?? user, access_token: token
             });
         }
     }
@@ -311,10 +312,12 @@ export class AuthController {
                     commsPreferenceId: commsPreference.id
                 });
             }
-            
-            const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(user);
+
+            const freshUser = await this.userService.getOne(user!.id);
+            const tokenUser = freshUser ?? user!;
+            const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(tokenUser);
             void response.code(200).send({
-                user, access_token: token
+                user: tokenUser, access_token: token
             });
         } else {
             void response.code(400).send({message: 'Something went wrong..'});

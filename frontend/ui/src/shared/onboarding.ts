@@ -11,7 +11,7 @@ export function isOnboardingComplete(user: User | null | undefined): boolean {
     if (localStorage.getItem(onboardingStorageKey(user.id)) === '1') return true;
     const meta = user.metadata as { onboardingCompleted?: boolean } | null | undefined;
     if (meta?.onboardingCompleted) return true;
-    if (user.favouriteTeamId) {
+    if (user.favouriteTeamIds?.length) {
         markOnboardingComplete(user.id);
         return true;
     }

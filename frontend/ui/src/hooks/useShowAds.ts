@@ -16,6 +16,7 @@ export function useShowAds(): boolean {
         enabled: isLoggedIn && featuresLoaded && adsEnabled,
         staleTime: 5 * 60 * 1000,
         retry: false,
+        placeholderData: (previous) => previous,
     });
 
     if (!featuresLoaded || !adsEnabled) {
@@ -30,7 +31,7 @@ export function useShowAds(): boolean {
         return true;
     }
 
-    if (isLoading) {
+    if (isLoggedIn && isLoading && !data) {
         return false;
     }
 
