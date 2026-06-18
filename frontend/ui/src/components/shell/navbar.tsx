@@ -4,12 +4,13 @@ import {useLocation} from "react-router-dom";
 import {useHeaderNavbarStore} from "../../shared/stores/headerNavbar.store";
 import {useAuthStore} from "../../shared/stores/auth.store";
 import {usePlatformFeaturesStore} from "../../shared/stores/platformFeatures.store";
+import { UserType } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import {useTranslation} from "../../i18n";
 import {useEffect, useState, useRef} from "react";
 
 export function Navbar() {
     const { navigateWithTransition } = usePageTransition();
-    const { isLoggedIn } = useAuthStore();
+    const { isLoggedIn, user } = useAuthStore();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
     const { t } = useTranslation();
     const location = useLocation();
@@ -52,6 +53,7 @@ export function Navbar() {
         { label: t('nav.matches'), path: "/matches" },
         { label: t('nav.competitions'), path: "/competitions" },
         ...(marketplaceEnabled ? [{ label: t('nav.marketplace'), path: "/marketplace" }] : []),
+        ...(user?.type === UserType.ADMIN ? [{ label: t('nav.admin'), path: "/admin" }] : []),
         { label: t('nav.settings'), path: "/settings" }
     ];
     

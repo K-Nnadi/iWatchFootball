@@ -23,7 +23,10 @@ export function NewsDetailPage() {
     const { navigateWithTransition } = usePageTransition();
 
     const { data: article, isLoading } = useGetOneNewsArticle(Number(id), {
-        query: { enabled: !!id && !isNaN(Number(id)) },
+        query: {
+            enabled: !!id && !isNaN(Number(id)),
+            queryKey: [`/newsArticle/${id}`],
+        },
     });
 
     const backButton = (

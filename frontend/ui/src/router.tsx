@@ -30,7 +30,9 @@ import { MarketplaceCheckoutPage } from "./pages/marketplace/marketplaceCheckout
 import { MyListingsPage } from "./pages/marketplace/myListings.page";
 import { WalletPage } from "./pages/wallet.page";
 import { DiscountCodesAdminPage } from "./pages/admin/discountCodes.page";
+import { AdminDashboardPage } from "./pages/admin/dashboard.page";
 import { RequireAuth } from "./components/auth/RequireAuth";
+import { RequireAdmin } from "./components/auth/RequireAdmin";
 import { OnboardingGate } from "./components/auth/OnboardingGate";
 import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 import { RootEntry } from "./components/auth/RootEntry";
@@ -72,7 +74,6 @@ const IWatchFootballElements: ElementMap = {
             <CreateListingPage/>
         </MarketplaceFeatureRoute>
     ),
-    'admin/discount-codes': <DiscountCodesAdminPage/>,
 }
 
 /** Relative `wallet` under `/` reliably matches `/wallet` for auth layout children. */
@@ -186,6 +187,13 @@ const router = createBrowserRouter([
                             { path: 'home', element: <HomePage /> },
                             ...childrenRoutes,
                             ...additionalRoutes,
+                            {
+                                element: <RequireAdmin />,
+                                children: [
+                                    { path: '/admin', element: <AdminDashboardPage /> },
+                                    { path: '/admin/discount-codes', element: <DiscountCodesAdminPage /> },
+                                ],
+                            },
                         ],
                     },
                 ],

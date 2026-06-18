@@ -140,6 +140,25 @@ export class PlatformConfigService implements OnModuleInit, OnModuleDestroy {
         return row.jsonValue;
     }
 
+    async listAll(): Promise<Array<{
+        key: string;
+        valueType: ConfigValueType;
+        value: unknown;
+        description?: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>> {
+        const all = await this.repo.find({ order: { key: 'ASC' } });
+        return all.map((row) => ({
+            key: row.key,
+            valueType: row.valueType,
+            value: this.extractValue(row),
+            description: row.description,
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+        }));
+    }
+
     async set(key: string, payload: SetConfigPayload): Promise<void> {
         const existing = await this.repo.findOne({ where: { key } });
 

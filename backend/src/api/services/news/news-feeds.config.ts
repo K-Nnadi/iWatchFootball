@@ -9,6 +9,8 @@ export interface NewsFeed {
   category?: string;
   source: string;
   enabled: boolean;
+  /** When set, only items whose link contains this substring are ingested */
+  urlIncludes?: string;
 }
 
 export const NEWS_FEEDS: NewsFeed[] = [
@@ -29,7 +31,9 @@ export const NEWS_FEEDS: NewsFeed[] = [
   },
   {
     name: 'Sky Sports Football',
-    url: 'https://www.skysports.com/rss/12040',
+    // 12040 is the general multi-sport feed (F1, cricket, golf, etc.); 11095 is football
+    url: 'https://www.skysports.com/rss/11095',
+    urlIncludes: '/football/',
     category: 'General',
     source: 'Sky Sports',
     enabled: true,

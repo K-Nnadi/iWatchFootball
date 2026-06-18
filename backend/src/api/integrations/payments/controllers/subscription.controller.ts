@@ -5,6 +5,8 @@ import { StripeSubscriptionService } from '../services/stripe-subscription.servi
 import { TrackerEntitlementService } from '../../../complexModules/tracker/tracker-entitlement.service';
 import { UserSubscriptionService } from '../../../modules/userSubscription/userSubscription.service';
 import { LogService } from '../../../modules/log/log.service';
+import { PlatformConfigService } from '../../../modules/platformConfig/platformConfig.service';
+import { ADS_CONFIG, ADS_DEFAULTS } from '../../../modules/platformConfig/platform-features.constants';
 import type { Request } from 'express';
 
 type AuthedRequest = Request & { user?: { id: number } };
@@ -26,6 +28,7 @@ export class SubscriptionController {
         private readonly trackerEntitlement: TrackerEntitlementService,
         private readonly userSubscription: UserSubscriptionService,
         private readonly logService: LogService,
+        private readonly platformConfig: PlatformConfigService,
     ) {}
 
     @Get('entitlements')
@@ -35,6 +38,9 @@ export class SubscriptionController {
         if (!userId) throw new UnauthorizedException('Not authenticated');
 
         const isPremium = await this.trackerEntitlement.hasPremium(userId);
+        const isAdmin = await this.trackerEntitlement.isAdminUser(userId);
+        const showAds = await this.trackerEntitlement.shouldShowAds(userId);
+        const adsEnabled = await this.platformConfig.getBoolean(ADS_CONFIG.ENABLED, ADS_DEFAULTS.ENABLED);
         const freeVerifiedLimit = await this.trackerEntitlement.getFreeVerifiedLimit();
         const freeUnverifiedLimit = await this.trackerEntitlement.getFreeUnverifiedLimit();
         const unverifiedTotal = await this.logService.countUnverifiedForUser(userId);
@@ -44,6 +50,10 @@ export class SubscriptionController {
         return {
             plan: isPremium ? 'premium' : 'free',
             isPremium,
+            isAdmin,
+            limitsBypassed: isAdmin,
+            showAds,
+            adsEnabled,
             freeVerifiedLimit,
             freeUnverifiedLimit,
             unverifiedTotal,

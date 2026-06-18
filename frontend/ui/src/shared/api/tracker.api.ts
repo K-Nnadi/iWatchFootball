@@ -19,6 +19,10 @@ export interface TrackerEntitlements {
 export interface SubscriptionEntitlements {
     plan: 'free' | 'premium';
     isPremium: boolean;
+    isAdmin?: boolean;
+    limitsBypassed?: boolean;
+    showAds?: boolean;
+    adsEnabled?: boolean;
     freeVerifiedLimit: number;
     freeUnverifiedLimit: number;
     unverifiedTotal: number;

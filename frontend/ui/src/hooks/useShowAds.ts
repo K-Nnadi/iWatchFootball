@@ -13,7 +13,7 @@ export function useShowAds(): boolean {
     const { data, isLoading, isError } = useQuery({
         queryKey: ['subscription-entitlements'],
         queryFn: getSubscriptionEntitlements,
-        enabled: isLoggedIn && featuresLoaded && adsEnabled,
+        enabled: isLoggedIn && featuresLoaded,
         staleTime: 5 * 60 * 1000,
         retry: false,
         placeholderData: (previous) => previous,
@@ -31,12 +31,16 @@ export function useShowAds(): boolean {
         return true;
     }
 
-    if (isLoggedIn && isLoading && !data) {
+    if (isLoading && !data) {
         return false;
     }
 
     if (isError || !data) {
         return true;
+    }
+
+    if (typeof data.showAds === 'boolean') {
+        return data.showAds;
     }
 
     return !data.isPremium;

@@ -4920,6 +4920,73 @@
         ]
       }
     },
+    "/platform-config": {
+      "get": {
+        "operationId": "PlatformConfigController_listAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all platform config entries (admin only)",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
+    "/platform-config/{key}": {
+      "patch": {
+        "operationId": "PlatformConfigController_updateConfig",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlatformConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a platform config value (admin only)",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
     "/social/friends": {
       "get": {
         "operationId": "SocialController_listFriends",
@@ -19423,6 +19490,52 @@
           }
         }
       },
+      "UpdatePlatformConfigDto": {
+        "type": "object",
+        "properties": {
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "number",
+              "string",
+              "boolean",
+              "array",
+              "json"
+            ],
+            "description": "Discriminator — indicates which value field holds the data"
+          },
+          "numberValue": {
+            "type": "number",
+            "description": "Populated when valueType is number"
+          },
+          "stringValue": {
+            "type": "string",
+            "description": "Populated when valueType is string"
+          },
+          "booleanValue": {
+            "type": "boolean",
+            "description": "Populated when valueType is boolean"
+          },
+          "arrayValue": {
+            "description": "Populated when valueType is array",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "jsonValue": {
+            "type": "object",
+            "description": "Populated when valueType is json"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description (optional update)"
+          }
+        },
+        "required": [
+          "valueType"
+        ]
+      },
       "SendFriendRequestDto": {
         "type": "object",
         "properties": {
@@ -23349,52 +23462,6 @@
           "listingId",
           "holderId",
           "paymentMethod"
-        ]
-      },
-      "UpdatePlatformConfigDto": {
-        "type": "object",
-        "properties": {
-          "valueType": {
-            "type": "string",
-            "enum": [
-              "number",
-              "string",
-              "boolean",
-              "array",
-              "json"
-            ],
-            "description": "Discriminator — indicates which value field holds the data"
-          },
-          "numberValue": {
-            "type": "number",
-            "description": "Populated when valueType is number"
-          },
-          "stringValue": {
-            "type": "string",
-            "description": "Populated when valueType is string"
-          },
-          "booleanValue": {
-            "type": "boolean",
-            "description": "Populated when valueType is boolean"
-          },
-          "arrayValue": {
-            "description": "Populated when valueType is array",
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          },
-          "jsonValue": {
-            "type": "object",
-            "description": "Populated when valueType is json"
-          },
-          "description": {
-            "type": "string",
-            "description": "Human-readable description (optional update)"
-          }
-        },
-        "required": [
-          "valueType"
         ]
       },
       "StreamFixtureInsightDto": {

@@ -185,6 +185,11 @@ export class NewsAggregatorService {
         return null;
       }
 
+      if (feed.urlIncludes && !item.link.includes(feed.urlIncludes)) {
+        this.logger.debug(`Skipping non-matching item for ${feed.name}: ${item.link}`);
+        return null;
+      }
+
       // Check if article already exists (by URL)
       const existing = await this.newsArticleRepository.findOne({
         where: { url: item.link },

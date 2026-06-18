@@ -4,6 +4,7 @@ import { PlatformConfigModule } from '../../modules/platformConfig/platformConfi
 import { UserSubscriptionModule } from '../../modules/userSubscription/userSubscription.module';
 import { SocialModule } from '../../modules/social/social.module';
 import { Log } from '../../modules/log/log.entity';
+import { User } from '../../modules/user/user.entity';
 import { TrackerEntitlementService } from './tracker-entitlement.service';
 import { TrackerStatsService } from './tracker-stats.service';
 import { TrackerCompareService } from './tracker-compare.service';
@@ -11,7 +12,7 @@ import { TrackerController } from './tracker.controller';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Log]),
+        TypeOrmModule.forFeature([Log, User]),
         PlatformConfigModule,
         UserSubscriptionModule,
         SocialModule,

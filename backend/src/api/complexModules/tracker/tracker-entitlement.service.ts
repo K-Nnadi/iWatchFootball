@@ -1,5 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../../modules/user/user.entity';
+import { UserRole } from '../../../auth/types/security.types';
 import { PlatformConfigService } from '../../modules/platformConfig/platformConfig.service';
+import { ADS_CONFIG, ADS_DEFAULTS } from '../../modules/platformConfig/platform-features.constants';
 import { UserSubscriptionService } from '../../modules/userSubscription/userSubscription.service';
 import {
     SubscriptionPlanSlug,
@@ -13,6 +18,7 @@ import {
 export interface TrackerEntitlements {
     plan: 'free' | 'premium';
     isPremium: boolean;
+    isAdmin?: boolean;
     freeVerifiedLimit: number;
     verifiedTotal: number;
     verifiedVisible: number;
@@ -35,7 +41,21 @@ export class TrackerEntitlementService {
     constructor(
         private readonly platformConfig: PlatformConfigService,
         private readonly userSubscription: UserSubscriptionService,
+        @InjectRepository(User) private readonly userRepo: Repository<User>,
     ) {}
+
+    async isAdminUser(userId: number): Promise<boolean> {
+        const user = await this.userRepo.findOne({ where: { id: userId }, select: ['id', 'type'] });
+        return user?.type === UserRole.ADMIN;
+    }
+
+    /** Whether the user should see ad placements (backend-driven; admins never see ads). */
+    async shouldShowAds(userId: number): Promise<boolean> {
+        const adsEnabled = await this.platformConfig.getBoolean(ADS_CONFIG.ENABLED, ADS_DEFAULTS.ENABLED);
+        if (!adsEnabled) return false;
+        if (await this.hasPremium(userId)) return false;
+        return true;
+    }
 
     async getFreeVerifiedLimit(): Promise<number> {
         return this.platformConfig.getNumber(
@@ -68,6 +88,9 @@ export class TrackerEntitlementService {
     }
 
     async hasPremium(userId: number): Promise<boolean> {
+        if (await this.isAdminUser(userId)) {
+            return true;
+        }
         const sub = await this.userSubscription.findByUserId(userId);
         if (!sub) return false;
         if (sub.planSlug !== SubscriptionPlanSlug.PREMIUM_MONTHLY) return false;
@@ -103,6 +126,7 @@ export class TrackerEntitlementService {
                 unverifiedUpgradeRequired: false,
                 currentPeriodEnd: sub?.currentPeriodEnd?.toISOString(),
                 cancelAtPeriodEnd: sub?.cancelAtPeriodEnd,
+                isAdmin: await this.isAdminUser(userId),
             };
         }
 
@@ -120,6 +144,7 @@ export class TrackerEntitlementService {
             unverifiedUpgradeRequired: unverifiedTotal >= freeUnverifiedLimit,
             currentPeriodEnd: undefined,
             cancelAtPeriodEnd: false,
+            isAdmin: false,
         };
     }
 }
