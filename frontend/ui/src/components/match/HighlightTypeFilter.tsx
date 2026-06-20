@@ -1,4 +1,4 @@
-import { ScrollArea, Tabs } from '@mantine/core';
+import { Group, ScrollArea, Tabs } from '@mantine/core';
 import {
     FixtureHighlight,
     HIGHLIGHT_TYPE_LABELS,
@@ -23,13 +23,15 @@ export function HighlightTypeFilter({ highlights, activeType, onChange }: Highli
                 onChange={(val) => onChange((val as HighlightType | 'all') ?? 'all')}
                 variant="pills"
             >
-                <Tabs.List gap={4}>
-                    <Tabs.Tab value="all">All</Tabs.Tab>
-                    {availableTypes.map((type) => (
-                        <Tabs.Tab key={type} value={type}>
-                            {HIGHLIGHT_TYPE_LABELS[type]}
-                        </Tabs.Tab>
-                    ))}
+                <Tabs.List>
+                    <Group gap={4}>
+                        <Tabs.Tab value="all">All</Tabs.Tab>
+                        {availableTypes.map((type) => (
+                            <Tabs.Tab key={type} value={type}>
+                                {HIGHLIGHT_TYPE_LABELS[type]}
+                            </Tabs.Tab>
+                        ))}
+                    </Group>
                 </Tabs.List>
             </Tabs>
         </ScrollArea>

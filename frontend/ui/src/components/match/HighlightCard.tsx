@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import {
     ActionIcon,
-    AspectRatio,
     Badge,
     Box,
     Card,
     Group,
     Image,
-    Overlay,
     Stack,
     Text,
 } from '@mantine/core';
@@ -17,6 +15,8 @@ import {
     HighlightProvider,
     formatHighlightDuration,
 } from '../../shared/api/fixture-highlight.api';
+
+const CARD_VIDEO_HEIGHT = 180;
 
 interface HighlightCardProps {
     highlight: FixtureHighlight;
@@ -32,68 +32,68 @@ export function HighlightCard({ highlight }: HighlightCardProps) {
 
     return (
         <Card radius="md" withBorder p={0} style={{ overflow: 'hidden' }}>
-            {showEmbed && highlight.embedUrl ? (
-                <AspectRatio ratio={16 / 9}>
+            {/* Fixed-height video area — same size whether thumbnail or iframe */}
+            <Box style={{ height: CARD_VIDEO_HEIGHT, position: 'relative', flexShrink: 0 }}>
+                {showEmbed && highlight.embedUrl ? (
                     <iframe
                         src={`${highlight.embedUrl}?autoplay=1&rel=0`}
                         title={highlight.title}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
-                        style={{ border: 'none', width: '100%', height: '100%' }}
+                        style={{
+                            border: 'none',
+                            width: '100%',
+                            height: '100%',
+                            display: 'block',
+                        }}
                     />
-                </AspectRatio>
-            ) : (
-                <Box style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setShowEmbed(true)}>
-                    <AspectRatio ratio={16 / 9}>
+                ) : (
+                    <Box
+                        style={{ width: '100%', height: '100%', cursor: 'pointer', position: 'relative' }}
+                        onClick={() => setShowEmbed(true)}
+                    >
                         {highlight.thumbnailUrl ? (
                             <Image
                                 src={highlight.thumbnailUrl}
                                 alt={highlight.title}
-                                style={{ objectFit: 'cover' }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                         ) : (
-                            <Box bg="dark.7" />
+                            <Box bg="dark.7" style={{ width: '100%', height: '100%' }} />
                         )}
-                    </AspectRatio>
-                    <Overlay color="#000" backgroundOpacity={0.3} radius={0} />
-                    <Box
-                        style={{
-                            position: 'absolute',
-                            inset: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 2,
-                        }}
-                    >
-                        <ActionIcon
-                            size={52}
-                            radius="xl"
-                            variant="white"
-                            color="dark"
-                            aria-label="Play highlight"
-                        >
-                            <IconPlayerPlay size={28} />
-                        </ActionIcon>
-                    </Box>
-                    {highlight.durationSeconds ? (
-                        <Badge
-                            size="xs"
-                            radius="sm"
-                            color="dark"
+                        {/* Overlay */}
+                        <Box
                             style={{
                                 position: 'absolute',
-                                bottom: 8,
-                                right: 8,
-                                zIndex: 2,
-                                opacity: 0.9,
+                                inset: 0,
+                                background: 'rgba(0,0,0,0.3)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                             }}
                         >
-                            {formatHighlightDuration(highlight.durationSeconds)}
-                        </Badge>
-                    ) : null}
-                </Box>
-            )}
+                            <ActionIcon size={52} radius="xl" variant="white" color="dark" aria-label="Play">
+                                <IconPlayerPlay size={28} />
+                            </ActionIcon>
+                        </Box>
+                        {highlight.durationSeconds ? (
+                            <Badge
+                                size="xs"
+                                radius="sm"
+                                color="dark"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 8,
+                                    right: 8,
+                                    opacity: 0.9,
+                                }}
+                            >
+                                {formatHighlightDuration(highlight.durationSeconds)}
+                            </Badge>
+                        ) : null}
+                    </Box>
+                )}
+            </Box>
 
             <Stack gap={4} p="xs">
                 <Text size="sm" fw={500} lineClamp={2} title={highlight.title}>
