@@ -16838,6 +16838,410 @@
         ]
       }
     },
+    "/fixture-highlight": {
+      "post": {
+        "operationId": "createFixtureHighlight",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFixtureHighlightDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FixtureHighlight"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create FixtureHighlight",
+        "tags": [
+          "fixture-highlight"
+        ]
+      },
+      "get": {
+        "operationId": "getAllFixtureHighlight",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FixtureHighlight"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all FixtureHighlights",
+        "tags": [
+          "fixture-highlight"
+        ]
+      }
+    },
+    "/fixture-highlight/query": {
+      "get": {
+        "operationId": "getQueryFixtureHighlight",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FixtureHighlight"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all FixtureHighlights",
+        "tags": [
+          "fixture-highlight"
+        ]
+      }
+    },
+    "/fixture-highlight/count": {
+      "get": {
+        "operationId": "getCountFixtureHighlight",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of FixtureHighlights",
+        "tags": [
+          "fixture-highlight"
+        ]
+      }
+    },
+    "/fixture-highlight/{id}": {
+      "get": {
+        "operationId": "getOneFixtureHighlight",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FixtureHighlight"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one FixtureHighlight",
+        "tags": [
+          "fixture-highlight"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneFixtureHighlight",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FixtureHighlight"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one FixtureHighlight",
+        "tags": [
+          "fixture-highlight"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneFixtureHighlight",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one FixtureHighlight",
+        "tags": [
+          "fixture-highlight"
+        ]
+      }
+    },
+    "/fixture-highlight/upload": {
+      "post": {
+        "operationId": "uploadFixtureHighlight",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for FixtureHighlight",
+        "tags": [
+          "fixture-highlight"
+        ]
+      }
+    },
+    "/fixture-highlight/download/{filename}": {
+      "get": {
+        "operationId": "downloadFixtureHighlight",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to FixtureHighlight",
+        "tags": [
+          "fixture-highlight"
+        ]
+      }
+    },
+    "/fixtures/{id}/highlights": {
+      "get": {
+        "operationId": "FixtureHighlightsController_getFixtureHighlights",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "fixtures"
+        ]
+      }
+    },
     "/auth/security-questions": {
       "get": {
         "operationId": "getSecurityQuestions",
@@ -17690,6 +18094,30 @@
         "summary": "Get sync job, steps, and cursors",
         "tags": [
           "Admin data sync"
+        ]
+      }
+    },
+    "/fixtures/{id}/highlights/sync": {
+      "post": {
+        "operationId": "HighlightsController_syncHighlights",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sync triggered"
+          }
+        },
+        "summary": "Trigger highlight sync for a fixture (admin only)",
+        "tags": [
+          "fixtures"
         ]
       }
     }
@@ -23256,6 +23684,194 @@
           "userId",
           "ticketId",
           "active"
+        ]
+      },
+      "CreateFixtureHighlightDTO": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "YouTube",
+              "Highlightly",
+              "Sportmonks",
+              "OfficialWebsite"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Match",
+              "Extended",
+              "Goal",
+              "RedCard",
+              "Penalty",
+              "Interview",
+              "FanReaction"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "providerVideoId": {
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "type": "string"
+          },
+          "embedUrl": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "durationSeconds": {
+            "type": "number"
+          },
+          "publishedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isOfficial": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Pending",
+              "Active",
+              "Removed",
+              "Failed"
+            ]
+          },
+          "channelName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "provider",
+          "type",
+          "title",
+          "providerVideoId",
+          "isOfficial",
+          "status"
+        ]
+      },
+      "FixtureHighlight": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "YouTube",
+              "Highlightly",
+              "Sportmonks",
+              "OfficialWebsite"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Match",
+              "Extended",
+              "Goal",
+              "RedCard",
+              "Penalty",
+              "Interview",
+              "FanReaction"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "providerVideoId": {
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "type": "string"
+          },
+          "embedUrl": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "durationSeconds": {
+            "type": "number"
+          },
+          "publishedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isOfficial": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Pending",
+              "Active",
+              "Removed",
+              "Failed"
+            ]
+          },
+          "channelName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fixtureId",
+          "provider",
+          "type",
+          "title",
+          "providerVideoId",
+          "isOfficial",
+          "status"
         ]
       },
       "SecurityQuestionsResponse": {

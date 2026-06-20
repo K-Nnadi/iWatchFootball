@@ -53,7 +53,7 @@ function getProxyPath(): string {
 }
 
 export function runProxy(): void {
-	const port = getArg('port') || process.env.CLOUD_SQL_PORT || '5432';
+	const port = getArg('port') || process.env.CLOUD_SQL_PORT || '15432';
 	const environment = getArg('environment') || process.env.NODE_ENV || 'development';
 	const instance = getInstance(environment);
 	const proxyPath = getProxyPath();

@@ -11,6 +11,7 @@ import {
 import {useParams} from 'react-router-dom';
 import {ScorePredictionCard} from '../../components/predictions';
 import {MatchHeader, MatchEventsSection, TeamFormSection, type MatchDetails, type TeamFormResult, getMatchStatus} from '../../components/match';
+import { MatchHighlightsSection } from '../../components/match/MatchHighlightsSection';
 import TeamLineups from "./teamLineup";
 import { MatchInsightPanel } from '../../components/match/MatchInsightPanel';
 import { useGetOneFixture } from '@iWatchFootball/clients/controllers/fixture';
@@ -464,6 +465,15 @@ export function MatchPage() {
                     <TeamLineups matchDetails={matchDetails} status={status}/>
                 </Container>
             </Box>
+
+            {/* Match Highlights Section */}
+            {fetchFromApi && (
+                <Box py={{ base: '2rem', md: '4rem' }}>
+                    <Container size="xl" px={{ base: 'md', md: 'xl' }}>
+                        <MatchHighlightsSection fixtureId={fixtureNumericId} />
+                    </Container>
+                </Box>
+            )}
         </>
     );
 }

@@ -57,6 +57,8 @@ import {PaymentsIntegrationModule} from "./api/integrations/payments/payments-in
 import {IntegrationModule} from "./api/modules/integration/integration.module";
 import {NotificationModule} from "./api/modules/notification/notification.module";
 import {PlatformConfigModule} from "./api/modules/platformConfig/platformConfig.module";
+import {FixtureHighlightModule} from "./api/modules/fixtureHighlight/fixtureHighlight.module";
+import {HighlightsModule} from "./api/complexModules/highlights/highlights.module";
 import {RateLimitModule} from "./auth/rate-limit/rate-limit.module";
 import {RedisModule} from "./shared/redis/redis.module";
 import {buildBullConnection, isRedisEnabled} from "./shared/redis/redis.config";
@@ -114,6 +116,7 @@ const Modules = [
     IntegrationModule,
     NotificationModule,
     PlatformConfigModule,
+    FixtureHighlightModule,
 ];
 
 const ComplexModules = [
@@ -126,6 +129,7 @@ const ComplexModules = [
     InsightsModule,
     DataSyncModule,
     TrackerModule,
+    HighlightsModule,
 ];
 
 

@@ -153,6 +153,8 @@ jobs:
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           VPC_CONNECTOR: ${{ secrets.VPC_CONNECTOR }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_OFFICIAL_CHANNEL_IDS: ${{ secrets.YOUTUBE_OFFICIAL_CHANNEL_IDS }}
         run: |
           set -euo pipefail
           CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION_NAME:-${GCP_PROJECT_ID}:europe-west4:iwatchfootball-db}"
@@ -182,6 +184,12 @@ jobs:
               if [ -n "${REDIS_PASSWORD:-}" ]; then
                 echo "REDIS_PASSWORD: $(yaml_quote "${REDIS_PASSWORD}")"
               fi
+            fi
+            if [ -n "${YOUTUBE_API_KEY:-}" ]; then
+              echo "YOUTUBE_API_KEY: $(yaml_quote "${YOUTUBE_API_KEY}")"
+            fi
+            if [ -n "${YOUTUBE_OFFICIAL_CHANNEL_IDS:-}" ]; then
+              echo "YOUTUBE_OFFICIAL_CHANNEL_IDS: $(yaml_quote "${YOUTUBE_OFFICIAL_CHANNEL_IDS}")"
             fi
           } > cloud-run-env.yaml
 

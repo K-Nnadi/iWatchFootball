@@ -24,10 +24,12 @@ import {
     IconNews,
     IconRefresh,
     IconSoccerField,
+    IconVideo,
 } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { ModernButton, ModernH2 } from '../../components/modern';
 import { notify } from '../../shared/notify';
+import { syncFixtureHighlights, useFixtureHighlightCount } from '../../shared/api/fixture-highlight.api';
 import { useNewsAggregatorControllerGetStatus, useNewsAggregatorControllerTriggerAggregation } from '@iWatchFootball/clients/controllers/news-aggregation';
 import { useGetCountNewsArticle } from '@iWatchFootball/clients/controllers/news-article';
 import {
@@ -53,6 +55,7 @@ function StatTile({ label, value }: { label: string; value?: number }) {
 export function AdminDashboardPage() {
     const { data: sbStatus, isLoading: sbLoading, refetch: refetchSbStatus } = useStatsBombControllerGetSyncStatus();
     const { data: newsCount, refetch: refetchNewsCount } = useGetCountNewsArticle();
+    const { data: highlightCount, refetch: refetchHighlightCount } = useFixtureHighlightCount();
     const { data: newsStatusRaw, refetch: refetchNewsStatus } = useNewsAggregatorControllerGetStatus();
     const newsStatus = newsStatusRaw as { redisConfigured?: boolean; scheduler?: string } | undefined;
 
@@ -108,6 +111,9 @@ export function AdminDashboardPage() {
     const [apiSeason, setApiSeason] = useState(2024);
     const [apiMaxRequests, setApiMaxRequests] = useState(80);
     const [apiLeagueIds, setApiLeagueIds] = useState('39');
+
+    const [highlightFixtureId, setHighlightFixtureId] = useState<number | ''>('');
+    const [highlightSyncing, setHighlightSyncing] = useState(false);
 
     const runBulkSync = () => {
         const dto: DataSyncRunDto = {
@@ -176,6 +182,7 @@ export function AdminDashboardPage() {
                             onClick={() => {
                                 void refetchSbStatus();
                                 void refetchNewsCount();
+                                void refetchHighlightCount();
                             }}
                         >
                             Refresh
@@ -194,6 +201,7 @@ export function AdminDashboardPage() {
                             <StatTile label="Substitutions" value={sbStatus?.substitutions} />
                             <StatTile label="Events" value={sbStatus?.events} />
                             <StatTile label="News articles" value={newsCount} />
+                            <StatTile label="Highlights" value={highlightCount} />
                         </SimpleGrid>
                     )}
                     {sbStatus?.lastSync && (
@@ -343,6 +351,51 @@ export function AdminDashboardPage() {
                                 </Box>
                             </Alert>
                         )}
+                    </Stack>
+                </Paper>
+
+                <Divider />
+
+                {/* Match Highlights */}
+                <Paper p="lg" radius="md" withBorder>
+                    <Stack gap="md">
+                        <Group gap="xs">
+                            <IconVideo size={20} />
+                            <Title order={4}>Match highlights</Title>
+                        </Group>
+                        <Text size="sm" c="dimmed">
+                            Fetch and store highlight metadata from YouTube for a completed fixture.
+                            Only embed URLs and thumbnails are saved — no video is downloaded.
+                            The scheduler auto-runs 15 minutes after fixture completion when Redis is enabled.
+                        </Text>
+                        <Group align="flex-end" gap="sm">
+                            <NumberInput
+                                label="Fixture ID"
+                                placeholder="e.g. 123"
+                                value={highlightFixtureId}
+                                onChange={(v) => setHighlightFixtureId(v === '' ? '' : Number(v))}
+                                min={1}
+                                style={{ width: 160 }}
+                            />
+                            <ModernButton
+                                loading={highlightSyncing}
+                                disabled={!highlightFixtureId}
+                                onClick={async () => {
+                                    if (!highlightFixtureId) return;
+                                    setHighlightSyncing(true);
+                                    try {
+                                        const result = await syncFixtureHighlights(Number(highlightFixtureId));
+                                        notify.success('Highlights', result.message);
+                                    } catch {
+                                        notify.error('Highlights sync failed', 'Check the fixture ID and YouTube API key.');
+                                    } finally {
+                                        setHighlightSyncing(false);
+                                    }
+                                }}
+                            >
+                                Sync highlights
+                            </ModernButton>
+                        </Group>
                     </Stack>
                 </Paper>
 
