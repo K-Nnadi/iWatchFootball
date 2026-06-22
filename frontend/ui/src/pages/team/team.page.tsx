@@ -22,6 +22,13 @@ import { IconUsers, IconCalendar, IconExchange, IconTrophy, IconFlag, IconBuildi
 import { useParams } from 'react-router-dom';
 import { mockTeams } from './mockTeams';
 import { useMemo, useState, type CSSProperties } from 'react';
+import { useTranslation } from '../../i18n';
+import {
+    parseFixtureResultFromMetadata,
+    resolveFixtureOutcome,
+    isPenaltyDecided,
+    type FixtureResultFields,
+} from '../../shared/fixtureResult';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import '../../styles/modern.css';
 import { useGetOneTeam, useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
@@ -32,25 +39,47 @@ import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture'
 import { useGetQueryPlayer } from '@iWatchFootball/clients/controllers/player';
 import { useGetQueryPosition } from '@iWatchFootball/clients/controllers/position';
 import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
+import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
+import { useTeamSquad, useTeamTransfers } from '../../shared/api/teamSquad.api';
+import {
+    resolvePositionGroup,
+    SQUAD_POSITION_GROUP_ORDER,
+    type SquadPositionGroup,
+} from '../../shared/positionGroup';
 
 type DisplaySquadMember = {
     name: string;
     position: string;
+    positionGroup: SquadPositionGroup;
     age: number;
     nationality: string;
     playerRouteId: string;
 };
 
 type DisplayFixture = {
-    opponent: string;
+    homeTeamName: string;
+    awayTeamName: string;
     date: string;
     home: boolean;
     competition: string;
+    seasonId?: number;
+    seasonLabel: string;
+    seasonSortKey: number;
     /** When set, the card links to `/match/:id` */
     fixtureRouteId?: number;
     /** Goal totals (always home-club · away-club left-to-right); both set when a result exists. */
     homeScore?: number;
     awayScore?: number;
+    homeTeamId?: number;
+    awayTeamId?: number;
+    metadata?: unknown;
+} & FixtureResultFields;
+
+type FixtureSeasonGroup = {
+    seasonKey: string;
+    seasonLabel: string;
+    seasonSortKey: number;
+    fixtures: DisplayFixture[];
 };
 
 type TransferBlock = {
@@ -65,6 +94,7 @@ type DisplayTeam = {
     crestUrl?: string | null;
     foundedDisplay: string;
     stadiumLabel: string;
+    stadiumId?: number;
     managerName: string;
     managerNationality: string;
     managerPhotoUrl?: string | null;
@@ -154,18 +184,50 @@ function scoresFromFixtureRow(f: {
     return { homeScore: hs, awayScore: ascr };
 }
 
-/** Result from the perspective of the team whose page we're on. */
-function fixtureOutcomeForClub(f: {
-    home: boolean;
-    homeScore?: number;
-    awayScore?: number;
-}): 'win' | 'draw' | 'loss' | null {
-    if (f.homeScore === undefined || f.awayScore === undefined) return null;
-    const ours = f.home ? f.homeScore : f.awayScore;
-    const theirs = f.home ? f.awayScore : f.homeScore;
-    if (ours > theirs) return 'win';
-    if (ours < theirs) return 'loss';
-    return 'draw';
+function seasonLabelFromId(
+    seasonId: number | undefined,
+    seasonsById: Map<number, { yearStart?: number; yearEnd?: number }>,
+): { seasonLabel: string; seasonSortKey: number } {
+    if (seasonId === undefined) {
+        return { seasonLabel: 'Season TBC', seasonSortKey: 0 };
+    }
+    const season = seasonsById.get(seasonId);
+    if (!season) {
+        return { seasonLabel: `Season ${seasonId}`, seasonSortKey: seasonId };
+    }
+    const start = season.yearStart ?? 0;
+    const end = season.yearEnd ?? start;
+    return {
+        seasonLabel: `${start}/${end}`,
+        seasonSortKey: start,
+    };
+}
+
+function groupFixturesBySeason(fixtures: DisplayFixture[]): FixtureSeasonGroup[] {
+    const bySeason = new Map<string, FixtureSeasonGroup>();
+    for (const fixture of fixtures) {
+        const seasonKey = fixture.seasonId != null ? String(fixture.seasonId) : fixture.seasonLabel;
+        const existing = bySeason.get(seasonKey);
+        if (existing) {
+            existing.fixtures.push(fixture);
+        } else {
+            bySeason.set(seasonKey, {
+                seasonKey,
+                seasonLabel: fixture.seasonLabel,
+                seasonSortKey: fixture.seasonSortKey,
+                fixtures: [fixture],
+            });
+        }
+    }
+
+    return Array.from(bySeason.values())
+        .sort((a, b) => b.seasonSortKey - a.seasonSortKey)
+        .map((group) => ({
+            ...group,
+            fixtures: [...group.fixtures].sort(
+                (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+            ),
+        }));
 }
 
 function outcomeBadgeStyle(outcome: 'win' | 'draw' | 'loss'): CSSProperties {
@@ -240,42 +302,39 @@ function mapMockToDisplay(team: (typeof mockTeams)[number]): DisplayTeam {
         squad: team.squad.map((p) => ({
             name: p.name,
             position: p.position,
+            positionGroup: resolvePositionGroup(p.position),
             age: p.age,
             nationality: p.nationality,
             playerRouteId: getMockPlayerRouteId(p.name, team.id),
         })),
-        fixtures: team.fixtures.map((f) => ({
-            opponent: f.opponent,
-            date: f.date,
-            home: f.home,
-            competition: f.competition,
-        })),
+        fixtures: team.fixtures.map((f) => {
+            const year = new Date(f.date).getFullYear();
+            return {
+                homeTeamName: f.home ? team.name : f.opponent,
+                awayTeamName: f.home ? f.opponent : team.name,
+                date: f.date,
+                home: f.home,
+                competition: f.competition,
+                seasonLabel: String(year),
+                seasonSortKey: year,
+            };
+        }),
         transfers: team.transfers,
         achievements: team.achievements,
     };
 }
 
 function groupSquadByPosition(squad: DisplaySquadMember[]) {
-    const positionOrder = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Striker', 'Winger'];
-
-    const grouped = squad.reduce<Record<string, DisplaySquadMember[]>>((acc, player) => {
-        const pos = player.position;
-        if (!acc[pos]) acc[pos] = [];
-        acc[pos].push(player);
-        return acc;
-    }, {});
-
-    const sorted: Record<string, DisplaySquadMember[]> = {};
-    positionOrder.forEach((pos) => {
-        if (grouped[pos]) sorted[pos] = grouped[pos];
-    });
-    Object.keys(grouped).forEach((pos) => {
-        if (!sorted[pos]) sorted[pos] = grouped[pos];
-    });
-    return sorted;
+    const grouped: Partial<Record<SquadPositionGroup, DisplaySquadMember[]>> = {};
+    for (const group of SQUAD_POSITION_GROUP_ORDER) {
+        const players = squad.filter((p) => p.positionGroup === group);
+        if (players.length > 0) grouped[group] = players;
+    }
+    return grouped as Record<SquadPositionGroup, DisplaySquadMember[]>;
 }
 
 export function TeamPage() {
+    const { t } = useTranslation();
     const { id } = useParams<{ id?: string }>();
     const routeId = id ?? '';
     const teamIdNum = routeId !== '' ? parseInt(routeId, 10) : NaN;
@@ -283,6 +342,7 @@ export function TeamPage() {
 
     const [selectedComp, setSelectedComp] = useState<string>('All Competitions');
     const [homeAwayFilter, setHomeAwayFilter] = useState<'all' | 'home' | 'away'>('all');
+    const [squadSeasonId, setSquadSeasonId] = useState<string | null>(null);
     const { navigateWithTransition } = usePageTransition();
 
     const { data: apiTeam, isLoading: loadingApiTeam } = useGetOneTeam(teamIdNum, {
@@ -342,18 +402,40 @@ export function TeamPage() {
         return linkedStadiums.find((s) => s.id === pid);
     }, [primaryStadiumLink, linkedStadiums]);
 
-    const pidList: number[] =
-        fetchFromApi && apiTeam?.playerIds?.length
-            ? apiTeam.playerIds.map((pid) => asFiniteNumberId(pid)).filter((n): n is number => n !== undefined)
-            : [];
+    const { data: squadResponse, isLoading: loadingSquad } = useTeamSquad(
+        teamIdNum,
+        squadSeasonId != null && squadSeasonId !== '' ? Number(squadSeasonId) : undefined,
+        fetchFromApi && !!apiTeam,
+    );
 
-    const { data: playersData = [] } = useGetQueryPlayer(
-        { where: { id: { $in: pidList.length ? pidList : [-1] } }, take: 200 } as any,
+    const { data: transfersResponse } = useTeamTransfers(teamIdNum, fetchFromApi && !!apiTeam);
+
+    const transferPlayerIds = useMemo(() => {
+        const ids = new Set<number>();
+        for (const row of [...(transfersResponse?.ins ?? []), ...(transfersResponse?.outs ?? [])]) {
+            const pid = asFiniteNumberId(row.playerId);
+            if (pid !== undefined) ids.add(pid);
+        }
+        return Array.from(ids);
+    }, [transfersResponse]);
+
+    const { data: transferPlayers = [] } = useGetQueryPlayer(
+        { where: { id: { $in: transferPlayerIds.length ? transferPlayerIds : [-1] } }, take: 200 } as any,
         {
             query: {
-                enabled: fetchFromApi && !!apiTeam && pidList.length > 0,
+                enabled: fetchFromApi && transferPlayerIds.length > 0,
             } as any,
-        }
+        },
+    );
+
+    const playerNameById = useMemo(
+        () => new Map(transferPlayers.map((p) => [p.id, p.name])),
+        [transferPlayers],
+    );
+
+    const playersData = useMemo(
+        () => [...(squadResponse?.players ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+        [squadResponse?.players],
     );
 
     const positionIdsForSquad = useMemo(() => {
@@ -380,9 +462,9 @@ export function TeamPage() {
     );
 
     const positionsById = useMemo(() => {
-        const m = new Map<number, string>();
+        const m = new Map<number, { name: string; type?: string }>();
         for (const p of positionRows) {
-            m.set(p.id, p.name);
+            m.set(p.id, { name: p.name, type: p.type });
         }
         return m;
     }, [positionRows]);
@@ -407,6 +489,15 @@ export function TeamPage() {
         { query: { enabled: fetchFromApi && !!apiTeam } as any }
     );
 
+    const { data: allSeasons = [] } = useGetAllSeason({
+        query: { enabled: fetchFromApi && !!apiTeam } as any,
+    });
+
+    const seasonsById = useMemo(
+        () => new Map(allSeasons.map((s) => [s.id, { yearStart: s.yearStart, yearEnd: s.yearEnd }])),
+        [allSeasons],
+    );
+
     const mergedApiFixtures = useMemo(() => {
         type Fx = {
             id?: number | string;
@@ -414,6 +505,7 @@ export function TeamPage() {
             homeTeamId?: number | string;
             awayTeamId?: number | string;
             competitionId?: number | string;
+            seasonId?: number | string;
             homeScore?: unknown;
             awayScore?: unknown;
             metadata?: unknown;
@@ -436,21 +528,33 @@ export function TeamPage() {
         const mockFallback = mockTeams.find((t) => t.id === teamIdNum);
 
         if (fetchFromApi && apiTeam) {
-            const primaryPosFor = (p: (typeof playersData)[number]): string => {
+            const primaryPosFor = (p: (typeof playersData)[number]): { name: string; group: SquadPositionGroup } => {
                 const pid0 = (p.positionIds ?? []).map(asFiniteNumberId).find((n) => n !== undefined);
-                return pid0 != null ? positionsById.get(pid0) ?? 'Player' : 'Player';
+                const info = pid0 != null ? positionsById.get(pid0) : undefined;
+                const name = info?.name ?? 'Player';
+                return { name, group: resolvePositionGroup(name, info?.type) };
             };
 
             const fixturesMapped: DisplayFixture[] = mergedApiFixtures.map((f) => {
                 const isHome = asFiniteNumberId(f.homeTeamId) === teamIdNum;
-                const oppIdNum = asFiniteNumberId(isHome ? f.awayTeamId : f.homeTeamId);
-                const oppName =
-                    oppIdNum !== undefined ? teamNameLookup.get(oppIdNum) ?? `Team #${oppIdNum}` : 'TBD';
+                const homeTeamId = asFiniteNumberId(f.homeTeamId);
+                const awayTeamId = asFiniteNumberId(f.awayTeamId);
+                const homeTeamName =
+                    homeTeamId !== undefined
+                        ? teamNameLookup.get(homeTeamId) ?? `Team #${homeTeamId}`
+                        : 'TBD';
+                const awayTeamName =
+                    awayTeamId !== undefined
+                        ? teamNameLookup.get(awayTeamId) ?? `Team #${awayTeamId}`
+                        : 'TBD';
                 const compNumericId = asFiniteNumberId(f.competitionId);
                 const compLabel =
                     compNumericId !== undefined
                         ? competitionNameLookup.get(compNumericId) ?? `Competition ${compNumericId}`
                         : 'Friendly';
+
+                const seasonNumericId = asFiniteNumberId(f.seasonId);
+                const { seasonLabel, seasonSortKey } = seasonLabelFromId(seasonNumericId, seasonsById);
 
                 const dateIso =
                     typeof f.date === 'string'
@@ -462,13 +566,22 @@ export function TeamPage() {
                 const scorePair = scoresFromFixtureRow(f);
                 const hasResultLine =
                     scorePair.homeScore !== undefined && scorePair.awayScore !== undefined;
+                const resultMeta = parseFixtureResultFromMetadata(f.metadata, homeTeamId, awayTeamId);
 
                 return {
-                    opponent: oppName,
+                    homeTeamName,
+                    awayTeamName,
                     date: dateIso,
                     home: isHome,
                     competition: compLabel,
+                    seasonId: seasonNumericId,
+                    seasonLabel,
+                    seasonSortKey,
                     fixtureRouteId: f.id,
+                    homeTeamId,
+                    awayTeamId,
+                    metadata: f.metadata,
+                    ...resultMeta,
                     ...(hasResultLine
                         ? { homeScore: scorePair.homeScore, awayScore: scorePair.awayScore }
                         : {}),
@@ -492,16 +605,21 @@ export function TeamPage() {
                 crestUrl: apiTeam.logoUrl,
                 foundedDisplay: foundedDisp,
                 stadiumLabel,
+                ...(primaryStadium?.id != null ? { stadiumId: primaryStadium.id } : {}),
                 managerName: manager?.name ?? '—',
                 managerNationality: displayNationalityLabel(manager?.nationality),
                 managerPhotoUrl: null,
-                squad: playersData.map((p) => ({
-                    name: p.name,
-                    position: primaryPosFor(p),
-                    age: Math.max(0, ageFromIsoDate(typeof p.dateOfBirth === 'string' ? p.dateOfBirth : String(p.dateOfBirth))),
-                    nationality: displayNationalityLabel(p.nationality),
-                    playerRouteId: String(p.id),
-                })),
+                squad: playersData.map((p) => {
+                    const pos = primaryPosFor(p);
+                    return {
+                        name: p.name,
+                        position: pos.name,
+                        positionGroup: pos.group,
+                        age: Math.max(0, ageFromIsoDate(typeof p.dateOfBirth === 'string' ? p.dateOfBirth : String(p.dateOfBirth))),
+                        nationality: displayNationalityLabel(p.nationality),
+                        playerRouteId: String(p.id),
+                    };
+                }),
                 fixtures: fixturesMapped,
                 transfers: emptyTransfers,
                 achievements: [],
@@ -522,6 +640,7 @@ export function TeamPage() {
         mergedApiFixtures,
         teamNameLookup,
         competitionNameLookup,
+        seasonsById,
         primaryStadium,
         linkedStadiums,
         linkedStadiumIds.length,
@@ -530,6 +649,16 @@ export function TeamPage() {
     ]);
 
     const groupedSquad = useMemo(() => (displayTeam ? groupSquadByPosition(displayTeam.squad) : {}), [displayTeam]);
+
+    const squadGroupLabels = useMemo(
+        (): Record<SquadPositionGroup, string> => ({
+            Goalkeeper: t('teamPage.squadGroupGoalkeepers'),
+            Defender: t('teamPage.squadGroupDefenders'),
+            Midfielder: t('teamPage.squadGroupMidfielders'),
+            Forward: t('teamPage.squadGroupForwards'),
+        }),
+        [t],
+    );
 
     const competitions = displayTeam ? Array.from(new Set(displayTeam.fixtures.map((f) => f.competition))) : [];
     const compOptions = ['All Competitions', ...competitions];
@@ -541,6 +670,37 @@ export function TeamPage() {
                 homeAwayFilter === 'all' ? true : homeAwayFilter === 'home' ? f.home === true : f.home === false;
             return matchesComp && matchesVenue;
         }) ?? [];
+
+    const fixtureGroups = useMemo(() => groupFixturesBySeason(filteredFixtures), [filteredFixtures]);
+
+    const squadSeasonOptions = useMemo(
+        () => [
+            { value: '', label: t('teamPage.squadCurrent') },
+            ...[...allSeasons]
+                .sort((a, b) => (b.yearStart ?? 0) - (a.yearStart ?? 0))
+                .map((s) => ({
+                    value: String(s.id),
+                    label: `${s.yearStart}/${s.yearEnd}`,
+                })),
+        ],
+        [allSeasons, t],
+    );
+
+    const transferDisplay = useMemo((): TransferBlock => {
+        if (!fetchFromApi || !transfersResponse) return emptyTransfers;
+        const formatFee = (fee: number) =>
+            fee > 0 ? `£${(fee / 1_000_000).toFixed(1)}m` : t('teamPage.transferUndisclosed');
+        return {
+            ins: transfersResponse.ins.map((row) => ({
+                name: playerNameById.get(row.playerId) ?? `Player #${row.playerId}`,
+                fee: formatFee(row.transferFee),
+            })),
+            outs: transfersResponse.outs.map((row) => ({
+                name: playerNameById.get(row.playerId) ?? `Player #${row.playerId}`,
+                fee: formatFee(row.transferFee),
+            })),
+        };
+    }, [fetchFromApi, transfersResponse, playerNameById, t]);
 
     const loadingPrimary = fetchFromApi && loadingApiTeam;
 
@@ -627,20 +787,56 @@ export function TeamPage() {
                             </Group>
                             <Group gap="xs">
                                 <IconMapPin size={18} style={{ color: 'var(--modern-text-secondary)' }} />
-                                <Text size="sm" c="dimmed">
-                                    {team.stadiumLabel}
-                                </Text>
+                                {team.stadiumId != null ? (
+                                    <Text
+                                        component="button"
+                                        type="button"
+                                        size="sm"
+                                        c="dimmed"
+                                        onClick={() =>
+                                            navigateWithTransition(`/stadium/${team.stadiumId}`, {
+                                                transitionType: 'loading',
+                                                duration: 900,
+                                            })
+                                        }
+                                        style={{
+                                            border: 'none',
+                                            background: 'transparent',
+                                            padding: 0,
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                        }}
+                                    >
+                                        {team.stadiumLabel}
+                                    </Text>
+                                ) : (
+                                    <Text size="sm" c="dimmed">
+                                        {team.stadiumLabel}
+                                    </Text>
+                                )}
                             </Group>
                         </Group>
                     </Stack>
 
                     <Box
+                        component={managerNumericId != null ? 'button' : 'div'}
+                        onClick={
+                            managerNumericId != null
+                                ? () =>
+                                      navigateWithTransition(`/manager/${managerNumericId}`, {
+                                          transitionType: 'loading',
+                                          duration: 900,
+                                      })
+                                : undefined
+                        }
                         style={{
                             padding: '1.5rem',
                             backgroundColor: 'var(--modern-bg-tertiary)',
                             border: '1px solid var(--modern-card-border)',
                             borderRadius: 0,
                             minWidth: '200px',
+                            cursor: managerNumericId != null ? 'pointer' : 'default',
+                            textAlign: 'left',
                         }}
                     >
                         <Group gap="md">
@@ -723,21 +919,35 @@ export function TeamPage() {
 
                 <Tabs.Panel value="squad" pt="xl">
                     <Stack gap="xl">
-                        {Object.keys(groupedSquad).length === 0 ? (
+                        {fetchFromApi && squadSeasonOptions.length > 1 && (
+                            <Select
+                                label={t('teamPage.squadSeasonLabel')}
+                                data={squadSeasonOptions}
+                                value={squadSeasonId ?? ''}
+                                onChange={(v) => setSquadSeasonId(v === '' || v == null ? null : v)}
+                                maw={280}
+                                allowDeselect={false}
+                            />
+                        )}
+                        {loadingSquad && fetchFromApi ? (
+                            <Center py="xl">
+                                <LoadingOverlay visible zIndex={5} overlayProps={{ blur: 1 }} />
+                            </Center>
+                        ) : Object.keys(groupedSquad).length === 0 ? (
                             <Center py="xl">
                                 <Stack align="center" gap="md">
                                     <IconUsers size={48} style={{ color: 'var(--modern-text-secondary)', opacity: 0.5 }} />
                                     <Text size="lg" c="dimmed" fw={500}>
-                                        No squad data yet
+                                        {t('teamPage.squadEmptyTitle')}
                                     </Text>
                                     <Text size="sm" ta="center" maw={480} c="dimmed">
-                                        Squad lists come from synced player IDs on this team (or from the offline demo clubs).
+                                        {t('teamPage.squadEmptyHint')}
                                     </Text>
                                 </Stack>
                             </Center>
                         ) : (
-                            Object.entries(groupedSquad).map(([position, players], positionIndex) => (
-                                <Box key={position}>
+                            Object.entries(groupedSquad).map(([positionGroup, players], positionIndex) => (
+                                <Box key={positionGroup}>
                                     <Group gap="md" mb="lg" align="center">
                                         <Box
                                             style={{
@@ -753,7 +963,7 @@ export function TeamPage() {
                                                 fontWeight: 600,
                                             }}
                                         >
-                                            {position}
+                                            {squadGroupLabels[positionGroup as SquadPositionGroup] ?? positionGroup}
                                         </Title>
                                         <Badge
                                             variant="light"
@@ -927,151 +1137,236 @@ export function TeamPage() {
                             </Stack>
                         </Center>
                     ) : (
-                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                            {filteredFixtures.map((f, i) => {
-                                const openFixture = f.fixtureRouteId != null;
-                                const outcome = fixtureOutcomeForClub(f);
-                                const hasScores = f.homeScore !== undefined && f.awayScore !== undefined;
-                                const ours = hasScores
-                                    ? f.home
-                                      ? (f.homeScore as number)
-                                      : (f.awayScore as number)
-                                    : null;
-                                const theirs = hasScores
-                                    ? f.home
-                                      ? (f.awayScore as number)
-                                      : (f.homeScore as number)
-                                    : null;
-                                const resultAccentBorder =
-                                    outcome === 'win'
-                                        ? 'var(--modern-lime)'
-                                        : outcome === 'draw'
-                                          ? '#c9ab3d'
-                                          : outcome === 'loss'
-                                            ? 'rgba(255, 105, 105, 0.9)'
-                                            : undefined;
+                        <Stack gap="xl">
+                            {fixtureGroups.map((seasonGroup) => (
+                                <Box key={seasonGroup.seasonKey}>
+                                    <Group gap="md" mb="lg" align="center">
+                                        <Box
+                                            style={{
+                                                width: '4px',
+                                                height: '24px',
+                                                backgroundColor: 'var(--modern-lime)',
+                                            }}
+                                        />
+                                        <Title order={3} style={{ fontSize: '1.35rem', fontWeight: 600 }}>
+                                            {seasonGroup.seasonLabel}
+                                        </Title>
+                                        <Badge
+                                            variant="light"
+                                            style={{
+                                                backgroundColor: 'rgba(0, 255, 136, 0.08)',
+                                                color: 'var(--modern-lime)',
+                                                border: '1px solid rgba(0, 255, 136, 0.2)',
+                                            }}
+                                        >
+                                            {seasonGroup.fixtures.length}{' '}
+                                            {seasonGroup.fixtures.length === 1 ? 'match' : 'matches'}
+                                        </Badge>
+                                    </Group>
 
-                                return (
-                                <Card
-                                    key={f.fixtureRouteId != null ? `fx-${f.fixtureRouteId}` : `${f.date}-${f.opponent}-${i}`}
-                                    className="modern-card"
-                                    padding="xl"
-                                    radius={0}
-                                    withBorder={false}
-                                    onClick={
-                                        openFixture
-                                            ? () =>
-                                                  navigateWithTransition(`/match/${f.fixtureRouteId}`, {
-                                                      transitionType: 'loading',
-                                                      duration: 1200,
-                                                  })
-                                            : undefined
-                                    }
-                                    style={{
-                                        animation: `fadeInUp 0.6s ease-out ${i * 0.05}s both`,
-                                        cursor: openFixture ? 'pointer' : 'default',
-                                        ...(resultAccentBorder != null && outcome != null
-                                            ? { borderLeft: `4px solid ${resultAccentBorder}` }
-                                            : {}),
-                                    }}
-                                    role={openFixture ? 'button' : undefined}
-                                >
-                                    <Stack gap="sm">
-                                        <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs">
-                                            <Badge
-                                                variant="light"
-                                                style={{
-                                                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
-                                                    color: 'var(--modern-lime)',
-                                                    border: '1px solid rgba(0, 255, 136, 0.2)',
-                                                    flexShrink: 0,
-                                                }}
-                                            >
-                                                {f.competition}
-                                            </Badge>
-                                            <Group gap="xs" justify="flex-end" wrap="wrap">
-                                                {outcome != null && (
-                                                    <Badge
-                                                        variant="light"
-                                                        fw={700}
-                                                        tt="uppercase"
-                                                        style={{ flexShrink: 0, ...outcomeBadgeStyle(outcome) }}
-                                                    >
-                                                        {outcome === 'win'
-                                                            ? 'Win'
-                                                            : outcome === 'draw'
-                                                              ? 'Draw'
-                                                              : 'Loss'}
-                                                    </Badge>
-                                                )}
-                                                <Badge
-                                                    variant={f.home ? 'filled' : 'outline'}
+                                    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+                                        {seasonGroup.fixtures.map((f, i) => {
+                                            const openFixture = f.fixtureRouteId != null;
+                                            const outcome = resolveFixtureOutcome(
+                                                {
+                                                    homeScore: f.homeScore,
+                                                    awayScore: f.awayScore,
+                                                    homeTeamId: f.homeTeamId,
+                                                    awayTeamId: f.awayTeamId,
+                                                    metadata: f.metadata as Record<string, unknown> | undefined,
+                                                },
+                                                teamIdNum,
+                                            );
+                                            const decidedOnPens = isPenaltyDecided(f);
+                                            const hasScores =
+                                                f.homeScore !== undefined && f.awayScore !== undefined;
+                                            const hasPenScoreline =
+                                                decidedOnPens &&
+                                                f.homePenaltyScore !== undefined &&
+                                                f.awayPenaltyScore !== undefined;
+                                            const resultAccentBorder =
+                                                outcome === 'win'
+                                                    ? 'var(--modern-lime)'
+                                                    : outcome === 'draw'
+                                                      ? '#c9ab3d'
+                                                      : outcome === 'loss'
+                                                        ? 'rgba(255, 105, 105, 0.9)'
+                                                        : undefined;
+
+                                            return (
+                                                <Card
+                                                    key={
+                                                        f.fixtureRouteId != null
+                                                            ? `fx-${f.fixtureRouteId}`
+                                                            : `${f.date}-${f.homeTeamName}-${f.awayTeamName}-${i}`
+                                                    }
+                                                    className="modern-card"
+                                                    padding="lg"
+                                                    radius={0}
+                                                    withBorder={false}
+                                                    onClick={
+                                                        openFixture
+                                                            ? () =>
+                                                                  navigateWithTransition(
+                                                                      `/match/${f.fixtureRouteId}`,
+                                                                      {
+                                                                          transitionType: 'loading',
+                                                                          duration: 1200,
+                                                                      },
+                                                                  )
+                                                            : undefined
+                                                    }
                                                     style={{
-                                                        flexShrink: 0,
-                                                        backgroundColor: f.home
-                                                            ? 'var(--modern-lime)'
-                                                            : 'transparent',
-                                                        color: f.home
-                                                            ? 'var(--modern-bg-primary)'
-                                                            : 'var(--modern-lime)',
-                                                        borderColor: 'var(--modern-lime)',
+                                                        animation: `fadeInUp 0.6s ease-out ${i * 0.05}s both`,
+                                                        cursor: openFixture ? 'pointer' : 'default',
+                                                        ...(resultAccentBorder != null && outcome != null
+                                                            ? {
+                                                                  borderLeft: `4px solid ${resultAccentBorder}`,
+                                                              }
+                                                            : {}),
                                                     }}
+                                                    role={openFixture ? 'button' : undefined}
                                                 >
-                                                    {f.home ? 'Home' : 'Away'}
-                                                </Badge>
-                                            </Group>
-                                        </Group>
-                                        <Divider color="var(--modern-card-border)" />
-                                        <Stack gap={2} align="center">
-                                            <Text fw={600} size="lg" ta="center" lh={1.25}>
-                                                {team.name}{' '}
-                                                <span
-                                                    style={{
-                                                        color: 'var(--modern-text-secondary)',
-                                                        fontWeight: 500,
-                                                    }}
-                                                >
-                                                    vs
-                                                </span>{' '}
-                                                {f.opponent}
-                                            </Text>
-                                        </Stack>
-                                        {hasScores && ours !== null && theirs !== null && (
-                                            <Stack gap={4}>
-                                                <Text
-                                                    fw={700}
-                                                    size="xl"
-                                                    ta="center"
-                                                    lh={1.2}
-                                                    title={`${team.name}: ${ours} · ${f.opponent}: ${theirs} (final)`}
-                                                    style={{
-                                                        fontVariantNumeric: 'tabular-nums',
-                                                        letterSpacing: '0.05em',
-                                                    }}
-                                                >
-                                                    {ours} – {theirs}
-                                                </Text>
-                                                <Text size="xs" c="dimmed" ta="center" lh={1.35}>
-                                                    Full time — leading score is {team.name}
-                                                </Text>
-                                            </Stack>
-                                        )}
-                                        <Group justify="center" gap="xs">
-                                            <IconCalendar size={14} style={{ color: 'var(--modern-text-secondary)' }} />
-                                            <Text size="sm" c="dimmed">
-                                                {new Date(f.date).toLocaleDateString('en-US', {
-                                                    weekday: 'long',
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                })}
-                                            </Text>
-                                        </Group>
-                                    </Stack>
-                                </Card>
-                            );
-                            })}
-                        </SimpleGrid>
+                                                    <Stack gap="sm">
+                                                        <Group
+                                                            justify="space-between"
+                                                            align="flex-start"
+                                                            wrap="nowrap"
+                                                            gap="xs"
+                                                        >
+                                                            <Badge
+                                                                variant="light"
+                                                                style={{
+                                                                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                                                                    color: 'var(--modern-lime)',
+                                                                    border: '1px solid rgba(0, 255, 136, 0.2)',
+                                                                    flexShrink: 0,
+                                                                }}
+                                                            >
+                                                                {f.competition}
+                                                            </Badge>
+                                                            <Group gap="xs" justify="flex-end" wrap="wrap">
+                                                                {outcome != null && (
+                                                                    <Badge
+                                                                        variant="light"
+                                                                        fw={700}
+                                                                        tt="uppercase"
+                                                                        style={{
+                                                                            flexShrink: 0,
+                                                                            ...outcomeBadgeStyle(outcome),
+                                                                        }}
+                                                                    >
+                                                                        {outcome === 'win'
+                                                                            ? decidedOnPens
+                                                                                ? t('teamPage.outcomeWinPens')
+                                                                                : t('teamPage.outcomeWin')
+                                                                            : outcome === 'draw'
+                                                                              ? t('teamPage.outcomeDraw')
+                                                                              : decidedOnPens
+                                                                                ? t('teamPage.outcomeLossPens')
+                                                                                : t('teamPage.outcomeLoss')}
+                                                                    </Badge>
+                                                                )}
+                                                                <Badge
+                                                                    variant={f.home ? 'filled' : 'outline'}
+                                                                    style={{
+                                                                        flexShrink: 0,
+                                                                        backgroundColor: f.home
+                                                                            ? 'var(--modern-lime)'
+                                                                            : 'transparent',
+                                                                        color: f.home
+                                                                            ? 'var(--modern-bg-primary)'
+                                                                            : 'var(--modern-lime)',
+                                                                        borderColor: 'var(--modern-lime)',
+                                                                    }}
+                                                                >
+                                                                    {f.home ? t('teamPage.home') : t('teamPage.away')}
+                                                                </Badge>
+                                                            </Group>
+                                                        </Group>
+                                                        <Divider color="var(--modern-card-border)" />
+                                                        <Stack gap={2} align="center">
+                                                            <Text fw={600} size="lg" ta="center" lh={1.25}>
+                                                                {f.homeTeamName}{' '}
+                                                                <span
+                                                                    style={{
+                                                                        color: 'var(--modern-text-secondary)',
+                                                                        fontWeight: 500,
+                                                                    }}
+                                                                >
+                                                                    vs
+                                                                </span>{' '}
+                                                                {f.awayTeamName}
+                                                            </Text>
+                                                        </Stack>
+                                                        {hasScores && (
+                                                            <Stack gap={4} align="center">
+                                                                <Text
+                                                                    fw={700}
+                                                                    size="xl"
+                                                                    ta="center"
+                                                                    lh={1.2}
+                                                                    title={
+                                                                        hasPenScoreline
+                                                                            ? t('teamPage.scoreTooltipWithPens', {
+                                                                                  homeTeam: f.homeTeamName,
+                                                                                  awayTeam: f.awayTeamName,
+                                                                                  homeScore: f.homeScore!,
+                                                                                  awayScore: f.awayScore!,
+                                                                                  homePens: f.homePenaltyScore!,
+                                                                                  awayPens: f.awayPenaltyScore!,
+                                                                              })
+                                                                            : t('teamPage.scoreTooltip', {
+                                                                                  homeTeam: f.homeTeamName,
+                                                                                  awayTeam: f.awayTeamName,
+                                                                                  homeScore: f.homeScore!,
+                                                                                  awayScore: f.awayScore!,
+                                                                              })
+                                                                    }
+                                                                    style={{
+                                                                        fontVariantNumeric: 'tabular-nums',
+                                                                        letterSpacing: '0.05em',
+                                                                    }}
+                                                                >
+                                                                    {f.homeScore} – {f.awayScore}
+                                                                </Text>
+                                                                {hasPenScoreline && (
+                                                                    <Text
+                                                                        size="sm"
+                                                                        c="dimmed"
+                                                                        ta="center"
+                                                                        style={{ fontVariantNumeric: 'tabular-nums' }}
+                                                                    >
+                                                                        {t('teamPage.penaltiesLine', {
+                                                                            home: f.homePenaltyScore!,
+                                                                            away: f.awayPenaltyScore!,
+                                                                        })}
+                                                                    </Text>
+                                                                )}
+                                                            </Stack>
+                                                        )}
+                                                        <Group justify="center" gap="xs">
+                                                            <IconCalendar
+                                                                size={14}
+                                                                style={{ color: 'var(--modern-text-secondary)' }}
+                                                            />
+                                                            <Text size="sm" c="dimmed">
+                                                                {new Date(f.date).toLocaleDateString('en-US', {
+                                                                    weekday: 'long',
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    day: 'numeric',
+                                                                })}
+                                                            </Text>
+                                                        </Group>
+                                                    </Stack>
+                                                </Card>
+                                            );
+                                        })}
+                                    </SimpleGrid>
+                                </Box>
+                            ))}
+                        </Stack>
                     )}
                 </Tabs.Panel>
 
@@ -1091,13 +1386,13 @@ export function TeamPage() {
                                     Transfers In
                                 </Title>
                             </Group>
-                            {team.transfers.ins.length === 0 ? (
-                                <Text c="dimmed">No incoming transfers</Text>
+                            {transferDisplay.ins.length === 0 ? (
+                                <Text c="dimmed">{t('teamPage.noTransfersIn')}</Text>
                             ) : (
                                 <Stack gap="md">
-                                    {team.transfers.ins.map((t) => (
+                                    {transferDisplay.ins.map((tr) => (
                                         <Card
-                                            key={t.name}
+                                            key={`in-${tr.name}-${tr.fee}`}
                                             style={{
                                                 backgroundColor: 'var(--modern-bg-tertiary)',
                                                 border: '1px solid var(--modern-card-border)',
@@ -1105,7 +1400,7 @@ export function TeamPage() {
                                             }}
                                         >
                                             <Group justify="space-between" align="center">
-                                                <Text fw={500}>{t.name}</Text>
+                                                <Text fw={500}>{tr.name}</Text>
                                                 <Badge
                                                     variant="light"
                                                     style={{
@@ -1114,7 +1409,7 @@ export function TeamPage() {
                                                         border: '1px solid rgba(0, 255, 136, 0.2)',
                                                     }}
                                                 >
-                                                    {t.fee}
+                                                    {tr.fee}
                                                 </Badge>
                                             </Group>
                                         </Card>
@@ -1135,13 +1430,13 @@ export function TeamPage() {
                                 <IconExchange size={20} style={{ color: 'var(--modern-text-secondary)' }} />
                                 <Title order={3}>Transfers Out</Title>
                             </Group>
-                            {team.transfers.outs.length === 0 ? (
-                                <Text c="dimmed">No outgoing transfers</Text>
+                            {transferDisplay.outs.length === 0 ? (
+                                <Text c="dimmed">{t('teamPage.noTransfersOut')}</Text>
                             ) : (
                                 <Stack gap="md">
-                                    {team.transfers.outs.map((t) => (
+                                    {transferDisplay.outs.map((tr) => (
                                         <Card
-                                            key={t.name}
+                                            key={`out-${tr.name}-${tr.fee}`}
                                             style={{
                                                 backgroundColor: 'var(--modern-bg-tertiary)',
                                                 border: '1px solid var(--modern-card-border)',
@@ -1149,7 +1444,7 @@ export function TeamPage() {
                                             }}
                                         >
                                             <Group justify="space-between" align="center">
-                                                <Text fw={500}>{t.name}</Text>
+                                                <Text fw={500}>{tr.name}</Text>
                                                 <Badge
                                                     variant="outline"
                                                     style={{
@@ -1157,7 +1452,7 @@ export function TeamPage() {
                                                         borderColor: 'var(--modern-card-border)',
                                                     }}
                                                 >
-                                                    {t.fee}
+                                                    {tr.fee}
                                                 </Badge>
                                             </Group>
                                         </Card>

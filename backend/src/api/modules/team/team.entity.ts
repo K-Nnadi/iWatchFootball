@@ -1,11 +1,10 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, ManyToMany, ManyToOne, OneToMany} from 'typeorm';
+import {Entity, ManyToOne, OneToMany} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {TeamStadium} from "../teamStadium/teamStadium.entity";
 import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
 import {TeamGender, TeamType} from "../../enums/team.enum";
 import {Manager} from "../manager/manager.entity";
-import {Player} from "../player/player.entity";
 import {
     EntityColumn,
     EntityEnumColumn,
@@ -30,7 +29,7 @@ import { FindOptionsWhere } from 'typeorm';
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'name', 'founded', 'managerId',
-        'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'
+        'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'
       ],
     },
     // Allow public access (no authentication required)
@@ -40,7 +39,7 @@ import { FindOptionsWhere } from 'typeorm';
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'name', 'founded', 'managerId',
-        'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'
+        'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }), fields: ['id'] },
@@ -48,14 +47,14 @@ import { FindOptionsWhere } from 'typeorm';
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can create teams
-      fields: ['name', 'founded', 'managerId', 'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'],
+      fields: ['name', 'founded', 'managerId', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can update teams
-      fields: ['name', 'founded', 'managerId', 'playerIds', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'],
+      fields: ['name', 'founded', 'managerId', 'logoUrl', 'website', 'city', 'country', 'gender', 'type', 'parentId', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Team> => ({ id: -1 }) },
   },
@@ -89,13 +88,6 @@ export class Team extends BaseDbEntity {
     @ApiProperty()
     @ManyToOne(() => Manager, manager => manager.teams, {lazy: true})
     manager?: Promise<Manager>;
-
-    @OptionalEntityColumn({db: {type: "int", array: true}})
-    playerIds?: number[]
-
-    @ApiProperty()
-    @ManyToMany(() => Player, player => player.teams, {lazy: true})
-    players?: Promise<Player[]>
 
     @OptionalEntityColumn({db: {type: "varchar"}})
     logoUrl?: string;

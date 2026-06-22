@@ -67,6 +67,17 @@ export async function syncFixtureHighlights(fixtureId: number): Promise<{ messag
     return data;
 }
 
+export async function syncBulkHighlights(options?: {
+    fixtureIds?: number[];
+    lookbackHours?: number;
+}): Promise<{ message: string; queued: number }> {
+    const { data } = await axios.post<{ message: string; queued: number }>(
+        '/fixtures/highlights/sync-bulk',
+        options ?? {},
+    );
+    return data;
+}
+
 export function useFixtureHighlights(fixtureId: number | undefined) {
     return useQuery({
         queryKey: ['fixture-highlights', fixtureId],

@@ -5,6 +5,10 @@ import { UserGame, MatchEvent } from '../pages/logs.page';
 import { UiCard, UiH3, UiBody, UiButton } from '../components/ui';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { isNavigablePlayerId, playerPageTransition } from '../shared/playerNavigation';
+import { useTranslation } from '../i18n/useTranslation';
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
+import { fetchMyAttendanceAdvancedStats } from '../shared/api/advancedStats.api';
+import { useQuery } from '@tanstack/react-query';
 
 interface PlayerStats {
     rank: number;
@@ -80,6 +84,15 @@ function cardDisciplineKind(ev: MatchEvent): 'yellow' | 'red' | null {
 }
 
 const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
+    const { t } = useTranslation();
+    const { attendanceAdvancedStatsEnabled } = usePlatformFeaturesStore();
+
+    const { data: advancedAttendanceStats } = useQuery({
+        queryKey: ['attendanceAdvancedStats'],
+        queryFn: fetchMyAttendanceAdvancedStats,
+        enabled: attendanceAdvancedStatsEnabled && loggedFixtures.length > 0,
+        staleTime: 60_000,
+    });
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<{ name: string; id: string; category: string } | null>(null);
     const [teamModalOpen, setTeamModalOpen] = useState(false);
@@ -189,7 +202,7 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
             assists: Record<string, { count: number; id: string }>;
             yellowCards: Record<string, { count: number; id: string }>;
             redCards: Record<string, { count: number; id: string }>;
-            venues: Record<string, number>;
+            venues: Record<string, { count: number; stadiumId?: number }>;
             teams: Record<string, { count: number; id: string }>;
             competitions: Record<string, { count: number; id: string }>;
         } = {
@@ -205,7 +218,14 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
         loggedFixtures.forEach((fixture) => {
             // Count venues
             if (fixture.venue) {
-                stats.venues[fixture.venue] = (stats.venues[fixture.venue] || 0) + 1;
+                const existing = stats.venues[fixture.venue];
+                stats.venues[fixture.venue] = {
+                    count: (existing?.count ?? 0) + 1,
+                    stadiumId:
+                        fixture.stadiumId != null && Number.isFinite(fixture.stadiumId)
+                            ? fixture.stadiumId
+                            : existing?.stadiumId,
+                };
             }
             
             if (typeof fixture.competitionId === 'number' && fixture.competitionName) {
@@ -365,17 +385,20 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
             };
         };
 
-        const formatVenueStats = (data: Record<string, number>, title: string): StatCategory => {
+        const formatVenueStats = (data: Record<string, { count: number; stadiumId?: number }>, title: string): StatCategory => {
             const sorted = Object.entries(data)
-                .sort((a, b) => b[1] - a[1])
+                .sort((a, b) => b[1].count - a[1].count)
                 .slice(0, STATS_LEADERBOARD_CAP)
-                .map(([name, value], index) => ({
+                .map(([name, entry], index) => ({
                     rank: index + 1,
                     name,
-                    id: `venue-${name.toLowerCase().replace(/\s+/g, '-')}`, // Generate venue ID
+                    id:
+                        entry.stadiumId != null
+                            ? String(entry.stadiumId)
+                            : `venue-${name.toLowerCase().replace(/\s+/g, '-')}`,
                     team: '',
                     crest: '',
-                    value,
+                    value: entry.count,
                 }));
 
             return {
@@ -478,12 +501,13 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
     };
 
     const handleViewStadium = (venueId: string) => {
-        // Navigate to matches page - you can add venue filtering later
-        // Alternatively, create a /venue/:id route if needed
-        navigateWithTransition(`/matches?venue=${encodeURIComponent(venueId)}`, {
-            transitionType: 'loading',
-            duration: 1200
-        });
+        const numericId = Number.parseInt(venueId, 10);
+        if (Number.isFinite(numericId) && numericId > 0) {
+            navigateWithTransition(`/stadium/${numericId}`, {
+                transitionType: 'loading',
+                duration: 1200,
+            });
+        }
         setVenueModalOpen(false);
     };
 
@@ -824,6 +848,37 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                               );
                           })
                         : null}
+
+                    {attendanceAdvancedStatsEnabled ? (
+                        <Stack gap="sm" mt="md">
+                            <Title order={4} c="var(--modern-text-primary)">
+                                {t('logs.advancedStatsSection')}
+                            </Title>
+                            {(advancedAttendanceStats?.leaderboards?.length ?? 0) > 0 ? (
+                                advancedAttendanceStats!.leaderboards.map((board) => (
+                                    <Stack key={board.metric} gap="xs">
+                                        <Text fw={600} size="sm">
+                                            {board.title}
+                                        </Text>
+                                        {board.entries.map((entry) => (
+                                            <Group key={`${board.metric}-${entry.playerId}`} justify="space-between">
+                                                <Text size="sm">
+                                                    {entry.rank}. {entry.name}
+                                                </Text>
+                                                <Text size="sm" fw={600}>
+                                                    {entry.value}
+                                                </Text>
+                                            </Group>
+                                        ))}
+                                    </Stack>
+                                ))
+                            ) : (
+                                <Text size="sm" c="dimmed" px="xs">
+                                    {t('logs.advancedStatsComingSoon')}
+                                </Text>
+                            )}
+                        </Stack>
+                    ) : null}
                 </Stack>
             </ScrollArea>
 
@@ -1239,6 +1294,10 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                         <Group justify="flex-end" gap="md">
                             <UiButton
                                 variant="primary"
+                                disabled={
+                                    !Number.isFinite(Number.parseInt(selectedVenue.id, 10)) ||
+                                    Number.parseInt(selectedVenue.id, 10) <= 0
+                                }
                                 onClick={() => handleViewStadium(selectedVenue.id)}
                                 leftSection={<IconExternalLink size={16} />}
                             >

@@ -28,7 +28,13 @@ import {
 import { getSubscriptionEntitlements } from '../../shared/api/tracker.api';
 import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
 
-const FEATURE_FLAG_KEYS = new Set(['ads_enabled', 'marketplace_enabled']);
+const FEATURE_FLAG_KEYS = new Set([
+    'ads_enabled',
+    'marketplace_enabled',
+    'player_advanced_stats_enabled',
+    'attendance_stats_enabled',
+    'attendance_advanced_stats_enabled',
+]);
 
 type RowDraft = {
     valueDraft: string | number | boolean;

@@ -23,6 +23,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useTranslation } from '../i18n/useTranslation';
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 import { notify } from '../shared/notify';
 import { ModernButton, ModernCard, ModernH2, ModernBody, ModernCaption } from '../components/modern';
 import {
@@ -138,6 +139,7 @@ function PendingRequestRow({
 export function FriendsPage() {
     const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
+    const { attendanceAdvancedStatsEnabled } = usePlatformFeaturesStore();
     const queryClient = useQueryClient();
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState<PublicUserSummary[]>([]);
@@ -350,16 +352,18 @@ export function FriendsPage() {
                                                     </Stack>
                                                 </Group>
                                                 <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
-                                                    <ModernButton
-                                                        size="sm"
-                                                        variant="outline"
-                                                        leftSection={<IconChartBar size={16} />}
-                                                        onClick={() =>
-                                                            navigateWithTransition(`/friends/compare/${f.id}`)
-                                                        }
-                                                    >
-                                                        {t('friends.compare')}
-                                                    </ModernButton>
+                                                    {attendanceAdvancedStatsEnabled ? (
+                                                        <ModernButton
+                                                            size="sm"
+                                                            variant="outline"
+                                                            leftSection={<IconChartBar size={16} />}
+                                                            onClick={() =>
+                                                                navigateWithTransition(`/friends/compare/${f.id}`)
+                                                            }
+                                                        >
+                                                            {t('friends.compare')}
+                                                        </ModernButton>
+                                                    ) : null}
                                                     <ActionIcon
                                                         variant="subtle"
                                                         color="red"

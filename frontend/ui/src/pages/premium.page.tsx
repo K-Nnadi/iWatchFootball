@@ -20,6 +20,7 @@ import {
     UiPageContainer,
 } from '../components/ui';
 import { useTranslation } from '../i18n';
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 import {
     createPremiumCheckout,
     extractApiErrorMessage,
@@ -40,6 +41,7 @@ function formatRenewalDate(iso?: string): string | null {
 
 export function PremiumPage() {
     const { t } = useTranslation();
+    const { attendanceAdvancedStatsEnabled } = usePlatformFeaturesStore();
     const queryClient = useQueryClient();
     const [searchParams, setSearchParams] = useSearchParams();
     const [actionLoading, setActionLoading] = useState(false);
@@ -64,13 +66,16 @@ export function PremiumPage() {
     }, [queryClient, searchParams, setSearchParams, t]);
 
     const features = useMemo(
-        () => [
-            { icon: IconAdOff, label: t('premium.featureAdFree') },
-            { icon: IconHistory, label: t('premium.featureManualLogs') },
-            { icon: IconChartBar, label: t('premium.featureFullHistory') },
-            { icon: IconUsers, label: t('premium.featureCompare') },
-        ],
-        [t],
+        () =>
+            [
+                { icon: IconAdOff, label: t('premium.featureAdFree') },
+                { icon: IconHistory, label: t('premium.featureManualLogs') },
+                { icon: IconChartBar, label: t('premium.featureFullHistory') },
+                attendanceAdvancedStatsEnabled
+                    ? { icon: IconUsers, label: t('premium.featureCompare') }
+                    : null,
+            ].filter(Boolean) as { icon: typeof IconAdOff; label: string }[],
+        [attendanceAdvancedStatsEnabled, t],
     );
 
     const renewalLabel = formatRenewalDate(entitlements?.currentPeriodEnd);

@@ -1,3 +1,5 @@
+import type { PlayerMatchRow, PlayerSeasonSummary } from '../../shared/api/playerMatches.api';
+
 export interface PlayerTrait {
     label: string;
     pct: number;
@@ -53,6 +55,15 @@ export interface RecentMatch {
     assists: number;
     minutes: number;
     rating: number;
+    fixtureId?: number;
+}
+
+export interface UpcomingFixture {
+    date: string;
+    opponent: string;
+    opponentCode?: string;
+    home: boolean;
+    fixtureId?: number;
 }
 
 export interface HighlightStat {
@@ -92,6 +103,7 @@ export interface PlayerViewModel {
     career: CareerRow[];
     season: SeasonSummary;
     recentMatches: RecentMatch[];
+    upcomingFixtures: UpcomingFixture[];
     shotMap: ShotMapData;
     performance: StatCategory[];
 }
@@ -307,6 +319,7 @@ export const MOCK_PLAYERS: PlayerViewModel[] = [
             redCards: 0,
         },
         recentMatches: HAA_RECENT,
+        upcomingFixtures: [],
         transferHistory: [
             { year: 2020, valueM: 60 },
             { year: 2022, valueM: 150 },
@@ -357,6 +370,7 @@ export const MOCK_PLAYERS: PlayerViewModel[] = [
             redCards: 0,
         },
         recentMatches: KDB_RECENT,
+        upcomingFixtures: [],
         transferHistory: [
             { year: 2018, valueM: 100 },
             { year: 2020, valueM: 120 },
@@ -406,6 +420,7 @@ export const MOCK_PLAYERS: PlayerViewModel[] = [
             redCards: 0,
         },
         recentMatches: DIAS_RECENT,
+        upcomingFixtures: [],
         transferHistory: [
             { year: 2020, valueM: 68 },
             { year: 2022, valueM: 90 },
@@ -482,6 +497,7 @@ export function buildApiPlayerViewModel(
         clubTeam,
         season,
         recentMatches: [],
+        upcomingFixtures: [],
         transferHistory: [],
         career: clubTeam
             ? [
@@ -496,5 +512,81 @@ export function buildApiPlayerViewModel(
                   },
               ]
             : [],
+    });
+}
+
+function formatMatchDateLabel(iso: string): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
+
+function opponentCode(name: string): string {
+    const cleaned = name.replace(/[^a-zA-Z\s]/g, '').trim();
+    const parts = cleaned.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+        return parts
+            .slice(0, 3)
+            .map((p) => p[0])
+            .join('')
+            .toUpperCase();
+    }
+    return cleaned.slice(0, 3).toUpperCase() || 'OPP';
+}
+
+function estimateMatchRating(row: PlayerMatchRow): number {
+    const base = row.isStarting ? 6.6 : 6.3;
+    return Number(Math.min(10, base + row.goals * 0.75 + row.assists * 0.45).toFixed(1));
+}
+
+export function mapPlayerMatchToRecent(row: PlayerMatchRow): RecentMatch {
+    const teamScore = row.home ? row.homeScore : row.awayScore;
+    const oppScore = row.home ? row.awayScore : row.homeScore;
+    const score =
+        teamScore != null && oppScore != null ? `${teamScore}-${oppScore}` : '—';
+
+    return {
+        date: formatMatchDateLabel(row.date),
+        opponent: row.opponentName,
+        opponentCode: opponentCode(row.opponentName),
+        home: row.home,
+        result: row.result ?? 'D',
+        score,
+        goals: row.goals,
+        assists: row.assists,
+        minutes: row.minutes,
+        rating: estimateMatchRating(row),
+        fixtureId: row.fixtureId,
+    };
+}
+
+export function mapPlayerFixtureToUpcoming(row: PlayerMatchRow): UpcomingFixture {
+    return {
+        date: formatMatchDateLabel(row.date),
+        opponent: row.opponentName,
+        opponentCode: opponentCode(row.opponentName),
+        home: row.home,
+        fixtureId: row.fixtureId,
+    };
+}
+
+export function mergePlayerMatchesIntoViewModel(
+    base: PlayerViewModel,
+    season: PlayerSeasonSummary,
+    results: PlayerMatchRow[],
+    fixtures: PlayerMatchRow[],
+): PlayerViewModel {
+    const { traits, performance, shotMap, highlights, ...rest } = base;
+    const mergedSeason = {
+        ...rest.season,
+        ...season,
+        competition: season.competition || rest.season.competition,
+    };
+
+    return assemblePlayer({
+        ...rest,
+        season: mergedSeason,
+        recentMatches: results.map(mapPlayerMatchToRecent),
+        upcomingFixtures: fixtures.map(mapPlayerFixtureToUpcoming),
     });
 }

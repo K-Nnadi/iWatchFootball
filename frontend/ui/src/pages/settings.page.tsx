@@ -62,9 +62,11 @@ import {
     useTrackerPrivacy,
     type TrackerVisibility,
 } from '../shared/api/tracker.api';
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
 
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
+    const { attendanceAdvancedStatsEnabled } = usePlatformFeaturesStore();
     const { isLoggedIn, logout, user, mergeUser } = useAuthStore();
     const { t } = useTranslation();
     const setLocale = useI18nStore((s) => s.setLocale);
@@ -695,6 +697,8 @@ export function SettingsPage() {
                                 </Box>
 
                                 <Box>
+                                    {attendanceAdvancedStatsEnabled ? (
+                                    <>
                                     <Text fw={600} mb="xs" style={{ color: 'var(--modern-text-primary)' }}>
                                         Tracker privacy
                                     </Text>
@@ -727,6 +731,8 @@ export function SettingsPage() {
                                             Save tracker privacy
                                         </UiButton>
                                     </Stack>
+                                    </>
+                                    ) : null}
                                 </Box>
                             </Stack>
 

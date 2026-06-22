@@ -9,6 +9,9 @@ import {Stadium} from '../../modules/stadium/stadium.entity';
 import {CompetitionType} from '../../enums/competition.enum';
 import {FixtureStage, FixtureStatus} from '../../enums/fixture.enum';
 import {StatsBombHttpService} from './statsbomb-http.service';
+import {PlayerFixtureStatService} from '../../modules/playerFixtureStat/player-fixture-stat.service';
+import type {StatsBombEventForRollup} from '../../modules/playerFixtureStat/player-fixture-stat.service';
+import {FixtureTeamStatService} from '../../modules/fixtureTeamStat/fixtureTeamStat.service';
 import {CompetitionService} from '../../modules/competition/competition.module';
 import {SeasonService} from '../../modules/season/season.module';
 import {TeamService} from '../../modules/team/team.module';
@@ -27,6 +30,7 @@ import {TeamType} from "../../enums/team.enum";
 import {PositionType} from "../../enums/position.enum";
 import {CardType} from "../../enums/card.enum";
 import {deepMergeEntityMetadata} from '@iWatchFootball/base-tools/entity/entityMetadata';
+import { deriveStatsBombPenaltyShootout } from '../../../shared/fixture-result.util';
 
 // StatsBomb API Types
 interface StatsBombCompetition {
@@ -322,6 +326,8 @@ export class StatsBombAdapterService {
     private cardService: CardService,
     private substitutionService: SubstitutionService,
     private readonly httpService: StatsBombHttpService,
+    private readonly playerFixtureStatService: PlayerFixtureStatService,
+    private readonly fixtureTeamStatService: FixtureTeamStatService,
     @InjectRepository(Goal) private readonly goalRepository: Repository<Goal>,
     @InjectRepository(Card) private readonly cardRepository: Repository<Card>,
     @InjectRepository(Substitution)
@@ -1187,10 +1193,6 @@ export class StatsBombAdapterService {
 
       const localTeamId = await this.getLocalTeamId(teamId);
       const parsedDob = this.parsePlayerDob(playerData?.dob);
-      const existingTeamIds = Array.isArray(player?.teamIds) ? player.teamIds : [];
-      const mergedTeamIds = localTeamId
-        ? Array.from(new Set([...existingTeamIds, localTeamId]))
-        : existingTeamIds;
 
       if (!player) {
         // Get position ID (you might need to create positions first)
@@ -1215,7 +1217,6 @@ export class StatsBombAdapterService {
           dateOfBirth: parsedDob ?? new Date('1900-01-01'),
           positionIds,
           kitNumber: playerData.jersey_number || null,
-          teamIds: localTeamId ? [localTeamId] : [],
           metadata: {
             source: 'StatsBomb',
             statsbombId: playerData.player_id,
@@ -1252,7 +1253,6 @@ export class StatsBombAdapterService {
       } else {
         const updateData: any = {
           id: player.id,
-          teamIds: mergedTeamIds,
         };
 
         // Only update DOB when we have a valid real value.
@@ -1809,10 +1809,28 @@ export class StatsBombAdapterService {
           home.losses += 1;
           away.points += 3;
         } else {
-          home.draws += 1;
-          away.draws += 1;
-          home.points += 1;
-          away.points += 1;
+          const meta: Record<string, unknown> =
+            fixture?.metadata && typeof fixture.metadata === 'object'
+              ? (fixture.metadata as Record<string, unknown>)
+              : {};
+          const winnerTeamId =
+            typeof meta.winnerTeamId === 'number' ? meta.winnerTeamId : null;
+          const decidedByPenalties = meta.decidedBy === 'penalties';
+
+          if (decidedByPenalties && winnerTeamId === fixture.homeTeamId) {
+            home.wins += 1;
+            away.losses += 1;
+            home.points += 3;
+          } else if (decidedByPenalties && winnerTeamId === fixture.awayTeamId) {
+            away.wins += 1;
+            home.losses += 1;
+            away.points += 3;
+          } else {
+            home.draws += 1;
+            away.draws += 1;
+            home.points += 1;
+            away.points += 1;
+          }
         }
       }
 
@@ -2368,8 +2386,13 @@ export class StatsBombAdapterService {
         await this.refreshLineUpManagersForFixture(options.matchData, fixtureId);
       }
 
-      // Filter relevant events
-      const goalEvents = events.filter(e => e.type.name === 'Shot' && e.shot?.outcome?.name === 'Goal');
+      // Filter relevant events (period 5 = penalty shootout — not regulation goals)
+      const goalEvents = events.filter(
+        (e) =>
+          e.period !== 5 &&
+          e.type.name === 'Shot' &&
+          e.shot?.outcome?.name === 'Goal',
+      );
       const cardEvents = events.filter(
         (e) =>
           (e.type?.name === 'Foul Committed' && !!e.foul_committed?.card) ||
@@ -2445,6 +2468,33 @@ export class StatsBombAdapterService {
       
       // Process all events in parallel
       await Promise.allSettled(eventPromises);
+
+      await this.playerFixtureStatService.rebuildFromStatsBombEvents(
+        fixtureId,
+        events as StatsBombEventForRollup[],
+        (statsbombPlayerId, name) => {
+          const byName = playerMap.get(name);
+          if (byName?.id) return byName.id;
+          void statsbombPlayerId;
+          return null;
+        },
+      );
+
+      // Derive team-level aggregate stats from the player rollups just written.
+      // This fills fixtureTeamStat with source=derived so the match page can show
+      // total shots, xG, passes, etc. even without an API-Sports stats sync.
+      const [fxForTeamStat] = await this.fixtureService.getQuery({ where: { id: fixtureId } as any });
+      if (fxForTeamStat?.homeTeamId && fxForTeamStat?.awayTeamId) {
+        await this.fixtureTeamStatService.deriveFromPlayerFixtureStats(
+          fixtureId,
+          fxForTeamStat.homeTeamId,
+          fxForTeamStat.awayTeamId,
+        );
+      }
+
+      if (options?.matchData) {
+        await this.persistPenaltyShootoutFromEvents(fixtureId, events, options.matchData);
+      }
       
       this.logger.debug(
         `⚽ ${goalEvents.length} goals, 🟨🟥 ${cardEvents.length} cards, 🔄 ${substitutionEvents.length} subs, ` +
@@ -2719,6 +2769,35 @@ export class StatsBombAdapterService {
       this.logger.error(`Error fetching events for match ${matchId}:`, error);
       return [];
     }
+  }
+
+  /**
+   * Persist penalty-shootout winner and tally onto fixture metadata (StatsBomb period 5).
+   */
+  private async persistPenaltyShootoutFromEvents(
+    fixtureId: number,
+    events: StatsBombEvent[],
+    matchData: StatsBombMatch,
+  ): Promise<void> {
+    const [fixture] = await this.fixtureService.getQuery({ where: { id: fixtureId } as any });
+    if (!fixture?.homeTeamId || !fixture?.awayTeamId) return;
+
+    const resultFields = deriveStatsBombPenaltyShootout(
+      events,
+      matchData.home_team.home_team_id,
+      matchData.away_team.away_team_id,
+      fixture.homeTeamId,
+      fixture.awayTeamId,
+    );
+    if (resultFields.decidedBy !== 'penalties') return;
+
+    await this.fixtureService.update(fixtureId, {
+      id: fixtureId,
+      metadata: deepMergeEntityMetadata(
+        (fixture.metadata ?? {}) as Record<string, unknown>,
+        resultFields as Record<string, unknown>,
+      ) as any,
+    } as any);
   }
 
   /**

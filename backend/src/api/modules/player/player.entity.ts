@@ -1,5 +1,5 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, ManyToMany, OneToMany} from "typeorm";
+import {Entity, ManyToOne, OneToMany} from "typeorm";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Goal} from "../goal/goal.entity";
 import {Transfer} from "../transfer/transfer.entity";
@@ -23,7 +23,7 @@ import { FindOptionsWhere } from 'typeorm';
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'name', 'nickname', 'dateOfBirth', 'nationality',
-        'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'
+        'positionIds', 'bio', 'currentTeamId', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'
       ],
     },
     // Allow public access (no authentication required)
@@ -33,7 +33,7 @@ import { FindOptionsWhere } from 'typeorm';
       },
       fields: [
         'id', 'createdAt', 'updatedAt', 'name', 'nickname', 'dateOfBirth', 'nationality',
-        'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'
+        'positionIds', 'bio', 'currentTeamId', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }), fields: ['id'] },
@@ -41,14 +41,14 @@ import { FindOptionsWhere } from 'typeorm';
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can create players
-      fields: ['name', 'nickname', 'dateOfBirth', 'nationality', 'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'],
+      fields: ['name', 'nickname', 'dateOfBirth', 'nationality', 'positionIds', 'bio', 'currentTeamId', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
       // Only admin and moderator can update players
-      fields: ['name', 'nickname', 'dateOfBirth', 'nationality', 'positionIds', 'bio', 'teamIds', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'],
+      fields: ['name', 'nickname', 'dateOfBirth', 'nationality', 'positionIds', 'bio', 'currentTeamId', 'kitNumber', 'height', 'weight', 'photoUrl', 'metadata'],
     },
     default: { filter: (): FindOptionsWhere<Player> => ({ id: -1 }) },
   },
@@ -80,15 +80,15 @@ export class Player extends BaseDbEntity{
     @OptionalEntityColumn({db: {type: "varchar"}})
     bio?: string
 
-    @OptionalEntityColumn({db: {type: "int", array: true}})
-    teamIds?: number[]
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    currentTeamId?: number;
 
     @ApiPropertyOptional()
-    @ManyToMany(() => Team, team => team.players, {lazy: true})
-    teams?: Promise<Team[]>
+    @ManyToOne(() => Team, { lazy: true, nullable: true })
+    currentTeam?: Promise<Team>;
 
     @OptionalEntityColumn({db: {type: "int"}})
-    kitNumber?: number
+    kitNumber?: number;
 
     @OptionalEntityColumn({db: {type: "int"}})
     height?: number;
@@ -122,4 +122,4 @@ export class Player extends BaseDbEntity{
 
 
 
-export class CreatePlayerDTO extends PickType(Player, ["name", "nickname", "dateOfBirth", "nationality", "bio", "positionIds", "teamIds", "height", "weight", "kitNumber", "photoUrl", 'metadata' ] as const) {}
+export class CreatePlayerDTO extends PickType(Player, ["name", "nickname", "dateOfBirth", "nationality", "bio", "positionIds", "currentTeamId", "height", "weight", "kitNumber", "photoUrl", 'metadata' ] as const) {}

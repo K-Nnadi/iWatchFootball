@@ -2432,6 +2432,412 @@
         ]
       }
     },
+    "/fixture/{fixtureId}/team-stats": {
+      "get": {
+        "description": "Returns home and away team aggregate stats for the given fixture. Source is `api_sports` when synced from API-Sports `/fixtures/statistics`, or `derived` when aggregated from player-level StatsBomb rollups.",
+        "operationId": "FixtureTeamStatsController_getTeamStats",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get team stats for a fixture",
+        "tags": [
+          "Fixture"
+        ]
+      }
+    },
+    "/lineUp": {
+      "post": {
+        "operationId": "createLineUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLineUpDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineUp"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      },
+      "get": {
+        "operationId": "getAllLineUp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LineUp"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all LineUps",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/query": {
+      "get": {
+        "operationId": "getQueryLineUp",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LineUp"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all LineUps",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/count": {
+      "get": {
+        "operationId": "getCountLineUp",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of LineUps",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/{id}": {
+      "get": {
+        "operationId": "getOneLineUp",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineUp"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneLineUp",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LineUp"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneLineUp",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/upload": {
+      "post": {
+        "operationId": "uploadLineUp",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
+    "/lineUp/download/{filename}": {
+      "get": {
+        "operationId": "downloadLineUp",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to LineUp",
+        "tags": [
+          "lineUp"
+        ]
+      }
+    },
     "/fixtureReferee": {
       "post": {
         "operationId": "createFixtureReferee",
@@ -3956,387 +4362,6 @@
         ]
       }
     },
-    "/lineUp": {
-      "post": {
-        "operationId": "createLineUp",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateLineUpDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LineUp"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create LineUp",
-        "tags": [
-          "lineUp"
-        ]
-      },
-      "get": {
-        "operationId": "getAllLineUp",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LineUp"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all LineUps",
-        "tags": [
-          "lineUp"
-        ]
-      }
-    },
-    "/lineUp/query": {
-      "get": {
-        "operationId": "getQueryLineUp",
-        "parameters": [
-          {
-            "name": "skip",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to skip",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to take",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "loadEagerRelations",
-            "required": false,
-            "in": "query",
-            "description": "Load eager relations",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LineUp"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all LineUps",
-        "tags": [
-          "lineUp"
-        ]
-      }
-    },
-    "/lineUp/count": {
-      "get": {
-        "operationId": "getCountLineUp",
-        "parameters": [
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Total count of entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get count of LineUps",
-        "tags": [
-          "lineUp"
-        ]
-      }
-    },
-    "/lineUp/{id}": {
-      "get": {
-        "operationId": "getOneLineUp",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LineUp"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get one LineUp",
-        "tags": [
-          "lineUp"
-        ]
-      },
-      "patch": {
-        "operationId": "updateOneLineUp",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LineUp"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update one LineUp",
-        "tags": [
-          "lineUp"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteOneLineUp",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete one LineUp",
-        "tags": [
-          "lineUp"
-        ]
-      }
-    },
-    "/lineUp/upload": {
-      "post": {
-        "operationId": "uploadLineUp",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload a file for LineUp",
-        "tags": [
-          "lineUp"
-        ]
-      }
-    },
-    "/lineUp/download/{filename}": {
-      "get": {
-        "operationId": "downloadLineUp",
-        "parameters": [
-          {
-            "name": "filename",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Download file related to LineUp",
-        "tags": [
-          "lineUp"
-        ]
-      }
-    },
     "/log/my-history": {
       "get": {
         "operationId": "LogController_getMyHistory",
@@ -4373,6 +4398,29 @@
           }
         ],
         "summary": "Get match log history with freemium gating (verified limit for free users)",
+        "tags": [
+          "log"
+        ]
+      }
+    },
+    "/log/my-attendance-advanced-stats": {
+      "get": {
+        "operationId": "LogController_getMyAttendanceAdvancedStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Ranked leaderboards for xG, key passes, and related metrics"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Advanced attendance stat leaderboards across logged fixtures",
         "tags": [
           "log"
         ]
@@ -4897,6 +4945,15 @@
                       "type": "boolean"
                     },
                     "adsEnabled": {
+                      "type": "boolean"
+                    },
+                    "playerAdvancedStatsEnabled": {
+                      "type": "boolean"
+                    },
+                    "attendanceStatsEnabled": {
+                      "type": "boolean"
+                    },
+                    "attendanceAdvancedStatsEnabled": {
                       "type": "boolean"
                     }
                   }
@@ -5668,6 +5725,30 @@
           }
         ],
         "summary": "Download file related to Manager",
+        "tags": [
+          "manager"
+        ]
+      }
+    },
+    "/manager/{managerId}/profile": {
+      "get": {
+        "operationId": "ManagerProfileController_getManagerProfile",
+        "parameters": [
+          {
+            "name": "managerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated manager profile"
+          }
+        },
+        "summary": "Manager profile with career clubs and current team",
         "tags": [
           "manager"
         ]
@@ -9171,6 +9252,896 @@
         ]
       }
     },
+    "/player/{playerId}/matches": {
+      "get": {
+        "operationId": "PlayerProfileController_getPlayerMatches",
+        "parameters": [
+          {
+            "name": "playerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Match history grouped by results and fixtures"
+          }
+        },
+        "summary": "Recent results and upcoming fixtures for a player",
+        "tags": [
+          "player"
+        ]
+      }
+    },
+    "/player/{playerId}/advanced-stats": {
+      "get": {
+        "operationId": "PlayerProfileController_getPlayerAdvancedStats",
+        "parameters": [
+          {
+            "name": "playerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "seasonId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advanced stat categories with totals and per-90 values"
+          }
+        },
+        "summary": "Composed advanced performance stats for a player (xG, passing, possession, defending)",
+        "tags": [
+          "player"
+        ]
+      }
+    },
+    "/playerTeamStint": {
+      "post": {
+        "operationId": "createPlayerTeamStint",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlayerTeamStintDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerTeamStint"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create PlayerTeamStint",
+        "tags": [
+          "playerTeamStint"
+        ]
+      },
+      "get": {
+        "operationId": "getAllPlayerTeamStint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlayerTeamStint"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all PlayerTeamStints",
+        "tags": [
+          "playerTeamStint"
+        ]
+      }
+    },
+    "/playerTeamStint/query": {
+      "get": {
+        "operationId": "getQueryPlayerTeamStint",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlayerTeamStint"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all PlayerTeamStints",
+        "tags": [
+          "playerTeamStint"
+        ]
+      }
+    },
+    "/playerTeamStint/count": {
+      "get": {
+        "operationId": "getCountPlayerTeamStint",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of PlayerTeamStints",
+        "tags": [
+          "playerTeamStint"
+        ]
+      }
+    },
+    "/playerTeamStint/{id}": {
+      "get": {
+        "operationId": "getOnePlayerTeamStint",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerTeamStint"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one PlayerTeamStint",
+        "tags": [
+          "playerTeamStint"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOnePlayerTeamStint",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerTeamStint"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one PlayerTeamStint",
+        "tags": [
+          "playerTeamStint"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOnePlayerTeamStint",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one PlayerTeamStint",
+        "tags": [
+          "playerTeamStint"
+        ]
+      }
+    },
+    "/playerTeamStint/upload": {
+      "post": {
+        "operationId": "uploadPlayerTeamStint",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for PlayerTeamStint",
+        "tags": [
+          "playerTeamStint"
+        ]
+      }
+    },
+    "/playerTeamStint/download/{filename}": {
+      "get": {
+        "operationId": "downloadPlayerTeamStint",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to PlayerTeamStint",
+        "tags": [
+          "playerTeamStint"
+        ]
+      }
+    },
+    "/team/{teamId}/squad": {
+      "get": {
+        "operationId": "TeamSquadController_getTeamSquad",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "seasonId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "includeLoans",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Players in the squad"
+          }
+        },
+        "summary": "Current or season-scoped squad for a team",
+        "tags": [
+          "team"
+        ]
+      }
+    },
+    "/team/{teamId}/transfers": {
+      "get": {
+        "operationId": "TeamSquadController_getTeamTransfers",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transfer lists grouped by direction"
+          }
+        },
+        "summary": "Incoming and outgoing transfers for a team",
+        "tags": [
+          "team"
+        ]
+      }
+    },
+    "/transfer": {
+      "post": {
+        "operationId": "createTransfer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransferDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transfer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create Transfer",
+        "tags": [
+          "transfer"
+        ]
+      },
+      "get": {
+        "operationId": "getAllTransfer",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transfer"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Transfers",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/query": {
+      "get": {
+        "operationId": "getQueryTransfer",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Number of records to take",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "loadEagerRelations",
+            "required": false,
+            "in": "query",
+            "description": "Load eager relations",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transfer"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all Transfers",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/count": {
+      "get": {
+        "operationId": "getCountTransfer",
+        "parameters": [
+          {
+            "name": "withDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include soft deleted records",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "transaction",
+            "required": false,
+            "in": "query",
+            "description": "Use transaction",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "comment",
+            "required": false,
+            "in": "query",
+            "description": "Query comment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total count of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get count of Transfers",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/{id}": {
+      "get": {
+        "operationId": "getOneTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transfer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one Transfer",
+        "tags": [
+          "transfer"
+        ]
+      },
+      "patch": {
+        "operationId": "updateOneTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transfer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one Transfer",
+        "tags": [
+          "transfer"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteOneTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete one Transfer",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/upload": {
+      "post": {
+        "operationId": "uploadTransfer",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a file for Transfer",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfer/download/{filename}": {
+      "get": {
+        "operationId": "downloadTransfer",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download file related to Transfer",
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
     "/playerLineUp": {
       "post": {
         "operationId": "createPlayerLineUp",
@@ -11496,6 +12467,30 @@
         ]
       }
     },
+    "/stadium/{stadiumId}/profile": {
+      "get": {
+        "operationId": "StadiumProfileController_getStadiumProfile",
+        "parameters": [
+          {
+            "name": "stadiumId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated stadium profile"
+          }
+        },
+        "summary": "Stadium profile with home clubs, fixtures, and Wikipedia lore",
+        "tags": [
+          "stadium"
+        ]
+      }
+    },
     "/substitution": {
       "post": {
         "operationId": "createSubstitution",
@@ -13688,387 +14683,6 @@
         ]
       }
     },
-    "/transfer": {
-      "post": {
-        "operationId": "createTransfer",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTransferDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Transfer"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create Transfer",
-        "tags": [
-          "transfer"
-        ]
-      },
-      "get": {
-        "operationId": "getAllTransfer",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Transfer"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all Transfers",
-        "tags": [
-          "transfer"
-        ]
-      }
-    },
-    "/transfer/query": {
-      "get": {
-        "operationId": "getQueryTransfer",
-        "parameters": [
-          {
-            "name": "skip",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to skip",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": false,
-            "in": "query",
-            "description": "Number of records to take",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "loadEagerRelations",
-            "required": false,
-            "in": "query",
-            "description": "Load eager relations",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Transfer"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all Transfers",
-        "tags": [
-          "transfer"
-        ]
-      }
-    },
-    "/transfer/count": {
-      "get": {
-        "operationId": "getCountTransfer",
-        "parameters": [
-          {
-            "name": "withDeleted",
-            "required": false,
-            "in": "query",
-            "description": "Include soft deleted records",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "transaction",
-            "required": false,
-            "in": "query",
-            "description": "Use transaction",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "comment",
-            "required": false,
-            "in": "query",
-            "description": "Query comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Total count of entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get count of Transfers",
-        "tags": [
-          "transfer"
-        ]
-      }
-    },
-    "/transfer/{id}": {
-      "get": {
-        "operationId": "getOneTransfer",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Transfer"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get one Transfer",
-        "tags": [
-          "transfer"
-        ]
-      },
-      "patch": {
-        "operationId": "updateOneTransfer",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Transfer"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update one Transfer",
-        "tags": [
-          "transfer"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteOneTransfer",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete one Transfer",
-        "tags": [
-          "transfer"
-        ]
-      }
-    },
-    "/transfer/upload": {
-      "post": {
-        "operationId": "uploadTransfer",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload a file for Transfer",
-        "tags": [
-          "transfer"
-        ]
-      }
-    },
-    "/transfer/download/{filename}": {
-      "get": {
-        "operationId": "downloadTransfer",
-        "parameters": [
-          {
-            "name": "filename",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Download file related to Transfer",
-        "tags": [
-          "transfer"
-        ]
-      }
-    },
     "/trophy": {
       "post": {
         "operationId": "createTrophy",
@@ -16038,6 +16652,37 @@
           }
         ],
         "summary": "Countries from API-Sports",
+        "tags": [
+          "API-Sports"
+        ]
+      }
+    },
+    "/api-sports/sync/import/fixture-stats": {
+      "post": {
+        "description": "Calls GET /fixtures/statistics?fixture={apiId} and upserts one `fixtureTeamStat` row per team. The fixture must already have `metadata.providers.apisports.externalId` set (i.e. imported via the fixtures endpoint). Returns \"ok\", \"skipped\" (no api id), or \"no_data\".",
+        "operationId": "ApiSportsController_syncImportFixtureStats",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSyncFixtureStatsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "\"ok\" | \"skipped\" | \"no_data\""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync fixture statistics from API-Sports for one fixture",
         "tags": [
           "API-Sports"
         ]
@@ -18115,7 +18760,32 @@
             "description": "Sync triggered"
           }
         },
-        "summary": "Trigger highlight sync for a fixture (admin only)",
+        "summary": "Trigger highlight sync for a single fixture (admin only)",
+        "tags": [
+          "fixtures"
+        ]
+      }
+    },
+    "/fixtures/highlights/sync-bulk": {
+      "post": {
+        "operationId": "HighlightsController_syncBulkHighlights",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncBulkHighlightsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk sync triggered"
+          }
+        },
+        "summary": "Trigger highlight sync for multiple fixtures at once (admin only). Omit body to auto-detect all recently completed fixtures.",
         "tags": [
           "fixtures"
         ]
@@ -19224,6 +19894,109 @@
           "stage"
         ]
       },
+      "CreateLineUpDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "formation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "teamId",
+          "managerId"
+        ]
+      },
+      "LineUp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "managerId": {
+            "type": "number"
+          },
+          "formation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fixtureId",
+          "teamId",
+          "managerId"
+        ]
+      },
       "CreateFixtureRefereeDTO": {
         "type": "object",
         "properties": {
@@ -19688,109 +20461,6 @@
           "injuryType",
           "startDate",
           "status"
-        ]
-      },
-      "CreateLineUpDTO": {
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "type": "object",
-            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
-            "nullable": true,
-            "example": {
-              "source": "import",
-              "providers": {
-                "apisports": {
-                  "externalId": "42",
-                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
-                },
-                "statsbomb": {
-                  "externalId": "12345"
-                }
-              },
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "fixtureId": {
-            "type": "number"
-          },
-          "teamId": {
-            "type": "number"
-          },
-          "managerId": {
-            "type": "number"
-          },
-          "formation": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "fixtureId",
-          "teamId",
-          "managerId"
-        ]
-      },
-      "LineUp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
-            "nullable": true,
-            "example": {
-              "source": "import",
-              "providers": {
-                "apisports": {
-                  "externalId": "42",
-                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
-                },
-                "statsbomb": {
-                  "externalId": "12345"
-                }
-              },
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "fixtureId": {
-            "type": "number"
-          },
-          "teamId": {
-            "type": "number"
-          },
-          "managerId": {
-            "type": "number"
-          },
-          "formation": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "fixtureId",
-          "teamId",
-          "managerId"
         ]
       },
       "CreateLogDTO": {
@@ -21124,11 +21794,8 @@
           "bio": {
             "type": "string"
           },
-          "teamIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "currentTeamId": {
+            "type": "number"
           },
           "kitNumber": {
             "type": "number"
@@ -21212,13 +21879,10 @@
           "bio": {
             "type": "string"
           },
-          "teamIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "currentTeamId": {
+            "type": "number"
           },
-          "teams": {
+          "currentTeam": {
             "$ref": "#/components/schemas/Promise"
           },
           "kitNumber": {
@@ -21267,6 +21931,288 @@
           "ownGoals",
           "transfers",
           "trophies"
+        ]
+      },
+      "CreatePlayerTeamStintDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "type": "object"
+          },
+          "isCurrent": {
+            "type": "boolean"
+          },
+          "isLoan": {
+            "type": "boolean"
+          },
+          "kitNumber": {
+            "type": "number"
+          },
+          "seasonId": {
+            "type": "number"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "import",
+              "lineup",
+              "manual"
+            ]
+          }
+        },
+        "required": [
+          "playerId",
+          "teamId",
+          "isCurrent",
+          "isLoan",
+          "source"
+        ]
+      },
+      "PlayerTeamStint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "type": "object"
+          },
+          "isCurrent": {
+            "type": "boolean"
+          },
+          "isLoan": {
+            "type": "boolean"
+          },
+          "kitNumber": {
+            "type": "number"
+          },
+          "seasonId": {
+            "type": "number"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "import",
+              "lineup",
+              "manual"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "playerId",
+          "teamId",
+          "isCurrent",
+          "isLoan",
+          "source"
+        ]
+      },
+      "CreateTransferDTO": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "sourceTeamId": {
+            "type": "number"
+          },
+          "destinationTeamId": {
+            "type": "number"
+          },
+          "transferFee": {
+            "type": "number"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isLoan": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "playerId",
+          "sourceTeamId",
+          "destinationTeamId",
+          "transferFee"
+        ]
+      },
+      "Transfer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "playerId": {
+            "type": "number"
+          },
+          "player": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "sourceTeamId": {
+            "type": "number"
+          },
+          "sourceTeam": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "destinationTeamId": {
+            "type": "number"
+          },
+          "destinationTeam": {
+            "$ref": "#/components/schemas/Promise"
+          },
+          "transferFee": {
+            "type": "number"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isLoan": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "playerId",
+          "player",
+          "sourceTeamId",
+          "sourceTeam",
+          "destinationTeamId",
+          "destinationTeam",
+          "transferFee"
         ]
       },
       "CreatePlayerLineUpDTO": {
@@ -22171,15 +23117,6 @@
           "manager": {
             "$ref": "#/components/schemas/Promise"
           },
-          "playerIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "players": {
-            "$ref": "#/components/schemas/Promise"
-          },
           "logoUrl": {
             "type": "string"
           },
@@ -22229,7 +23166,6 @@
           "name",
           "teamCompetitionSeasons",
           "manager",
-          "players",
           "gender",
           "type",
           "homeFixtures",
@@ -22587,137 +23523,6 @@
         },
         "required": [
           "holderId"
-        ]
-      },
-      "CreateTransferDTO": {
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "type": "object",
-            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
-            "nullable": true,
-            "example": {
-              "source": "import",
-              "providers": {
-                "apisports": {
-                  "externalId": "42",
-                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
-                },
-                "statsbomb": {
-                  "externalId": "12345"
-                }
-              },
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "playerId": {
-            "type": "number"
-          },
-          "sourceTeamId": {
-            "type": "number"
-          },
-          "destinationTeamId": {
-            "type": "number"
-          },
-          "transferFee": {
-            "type": "number"
-          },
-          "date": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "isLoan": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "playerId",
-          "sourceTeamId",
-          "destinationTeamId",
-          "transferFee"
-        ]
-      },
-      "Transfer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
-            "nullable": true,
-            "example": {
-              "source": "import",
-              "providers": {
-                "apisports": {
-                  "externalId": "42",
-                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
-                },
-                "statsbomb": {
-                  "externalId": "12345"
-                }
-              },
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "playerId": {
-            "type": "number"
-          },
-          "player": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "sourceTeamId": {
-            "type": "number"
-          },
-          "sourceTeam": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "destinationTeamId": {
-            "type": "number"
-          },
-          "destinationTeam": {
-            "$ref": "#/components/schemas/Promise"
-          },
-          "transferFee": {
-            "type": "number"
-          },
-          "date": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "isLoan": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "playerId",
-          "player",
-          "sourceTeamId",
-          "sourceTeam",
-          "destinationTeamId",
-          "destinationTeam",
-          "transferFee"
         ]
       },
       "CreateTrophyDTO": {
@@ -23215,6 +24020,16 @@
             "type": "number",
             "default": 8,
             "description": "Ignored for primary-venue sync (single /teams call). Reserved for future use."
+          },
+          "syncStatsAfter": {
+            "type": "boolean",
+            "default": false,
+            "description": "After fixtures, call GET /fixtures/statistics for each imported fixture and upsert fixtureTeamStat. One request per fixture — guard spend with syncStatsMaxRequests."
+          },
+          "syncStatsMaxRequests": {
+            "type": "number",
+            "default": 20,
+            "description": "Max /fixtures/statistics requests when syncStatsAfter is true."
           }
         },
         "required": [
@@ -23299,6 +24114,18 @@
         },
         "required": [
           "teamApiId"
+        ]
+      },
+      "ApiSyncFixtureStatsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number",
+            "description": "Local fixture id to sync statistics for"
+          }
+        },
+        "required": [
+          "fixtureId"
         ]
       },
       "CreatePaymentSessionDto": {
@@ -24278,6 +25105,22 @@
           "async": {
             "type": "boolean",
             "description": "When Redis is configured, defaults true so Swagger returns immediately with bullJobId. Set false to run synchronously."
+          }
+        }
+      },
+      "SyncBulkHighlightsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureIds": {
+            "description": "Specific fixture IDs to sync. Omit to auto-detect all recently completed fixtures needing highlights.",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "lookbackHours": {
+            "type": "number",
+            "description": "How many hours back to look for fixtures needing highlights (default 48)"
           }
         }
       }

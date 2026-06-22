@@ -100,7 +100,7 @@ function LogEmptyState({ title, message }: { title: string; message: string }) {
 export function LogsPage() {
     const { t } = useTranslation();
     const { isLoggedIn, user } = useAuthStore();
-    const { marketplaceEnabled } = usePlatformFeaturesStore();
+    const { marketplaceEnabled, attendanceStatsEnabled } = usePlatformFeaturesStore();
     const { navigateWithTransition } = usePageTransition();
     const queryClient = useQueryClient();
 
@@ -800,7 +800,9 @@ export function LogsPage() {
                         >
                         <Tabs.List>
                             <Tabs.Tab value={'matches'}>{t('logs.tabMatches')}</Tabs.Tab>
-                            <Tabs.Tab value={'stats'}>{t('logs.tabStats')}</Tabs.Tab>
+                            {attendanceStatsEnabled ? (
+                                <Tabs.Tab value={'stats'}>{t('logs.tabStats')}</Tabs.Tab>
+                            ) : null}
                             <Tabs.Tab value={'tickets'}>
                                 <Group gap={6} wrap="nowrap" justify="center">
                                     <IconTicket size={16} style={{ flexShrink: 0 }} />
@@ -835,10 +837,15 @@ export function LogsPage() {
                             <UiCard density="compact" accent style={{ marginBottom: '1rem' }}>
                                 <Stack gap="sm">
                                     <UiBody>
-                                        {t('logs.upgradePrompt', {
-                                            total: trackerEntitlements.verifiedTotal,
-                                            limit: trackerEntitlements.freeVerifiedLimit,
-                                        })}
+                                        {attendanceStatsEnabled
+                                            ? t('logs.upgradePrompt', {
+                                                  total: trackerEntitlements.verifiedTotal,
+                                                  limit: trackerEntitlements.freeVerifiedLimit,
+                                              })
+                                            : t('logs.upgradePromptHistoryOnly', {
+                                                  total: trackerEntitlements.verifiedTotal,
+                                                  limit: trackerEntitlements.freeVerifiedLimit,
+                                              })}
                                     </UiBody>
                                     <UiButton loading={upgradeLoading} onClick={handleUpgradePremium}>{t('logs.upgradePremium')}</UiButton>
                                 </Stack>
@@ -893,6 +900,7 @@ export function LogsPage() {
                             </ScrollArea>
                             </Box>
                         </Tabs.Panel>
+                        {attendanceStatsEnabled ? (
                         <Tabs.Panel value={'stats'}>
                             <ScrollArea
                                 style={{ height: `${scrollAreaHeight}px` }}
@@ -903,11 +911,11 @@ export function LogsPage() {
                                 {filteredLoggedFixtures.length === 0 && !logsLoading ? (
                                     <LogEmptyState title={emptyLogTitle} message={emptyLogMessage} />
                                 ) : (
-                                    // <StatsTab loggedFixtures={filteredLoggedFixtures}/>
                                     <NewStatsTab loggedFixtures={filteredLoggedFixtures} />
                                 )}
                             </ScrollArea>
                         </Tabs.Panel>
+                        ) : null}
 
                         <Tabs.Panel value={'tickets'}>
                             <ScrollArea

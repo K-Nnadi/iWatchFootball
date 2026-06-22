@@ -1,0 +1,264 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--ui-bg-base);
+  padding-bottom: var(--ui-space-10);
+}
+
+.hero {
+  position: relative;
+  background: linear-gradient(145deg, #1e2433 0%, #252d42 45%, #1a2030 100%);
+  border-bottom: 3px solid var(--ui-accent);
+  padding: var(--ui-space-4) var(--ui-space-5) var(--ui-space-8);
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -10%;
+  top: -30%;
+  width: 55%;
+  height: 140%;
+  background: radial-gradient(ellipse, rgba(0, 200, 83, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroBody {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ui-space-5);
+  position: relative;
+  z-index: 1;
+}
+
+.heroPhotoFallback {
+  width: clamp(100px, 28vw, 140px);
+  height: clamp(120px, 32vw, 168px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ui-radius-md);
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  font-weight: 800;
+  font-size: 2.5rem;
+  color: var(--ui-accent);
+  flex-shrink: 0;
+}
+
+.heroMeta {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: var(--ui-space-2);
+}
+
+.roleLabel {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: var(--ui-space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.managerName {
+  margin: 0 0 var(--ui-space-2);
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ui-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.nickname {
+  display: block;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: var(--ui-space-3);
+}
+
+.teamLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ui-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.teamLink:hover {
+  opacity: 1;
+  color: var(--ui-accent);
+}
+
+.teamCrest {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.shell {
+  margin-top: var(--ui-space-4);
+  padding: 0 var(--ui-space-4);
+  max-width: var(--ui-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 48em) {
+  .shell {
+    padding: 0 var(--ui-space-8);
+  }
+}
+
+.highlightRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ui-space-4) var(--ui-space-2);
+  margin-bottom: var(--ui-space-5);
+  padding: var(--ui-space-4) var(--ui-space-3);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+}
+
+@media (min-width: 40em) {
+  .highlightRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.highlightCell {
+  padding: 0 var(--ui-space-1);
+  text-align: center;
+  min-width: 0;
+}
+
+.highlightValue {
+  display: block;
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--ui-text-primary);
+  line-height: 1.1;
+}
+
+.highlightLabel {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.sectionCard {
+  background: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  margin-bottom: var(--ui-space-5);
+}
+
+.mainTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--ui-divider);
+  margin-bottom: var(--ui-space-4);
+}
+
+.mainTab {
+  flex: 1;
+  padding: var(--ui-space-3) var(--ui-space-2);
+  border: none;
+  background: transparent;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.mainTabActive {
+  color: var(--ui-accent);
+  border-bottom-color: var(--ui-accent);
+}
+
+.careerRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--ui-space-3);
+  align-items: center;
+  padding: var(--ui-space-3) 0;
+  border-bottom: 1px solid var(--ui-divider);
+}
+
+.careerRow:last-child {
+  border-bottom: none;
+}
+
+.careerClubBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ui-text-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.careerClubBtn:hover {
+  color: var(--ui-accent);
+}
+
+.careerCrest {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.careerClubName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.careerDates {
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.currentBadge {
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: var(--ui-radius-full);
+  background: rgba(0, 200, 83, 0.12);
+  color: var(--ui-accent);
+  border: 1px solid rgba(0, 200, 83, 0.3);
+}
+
+.emptyNote {
+  font-size: 0.875rem;
+  color: var(--ui-text-muted);
+  text-align: center;
+  padding: var(--ui-space-6) 0;
+}

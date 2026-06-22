@@ -42,6 +42,13 @@ export class FixtureHighlightService extends CrudRepoAdapter<FixtureHighlight, C
     async markAsRemoved(id: number): Promise<void> {
         await this.entityRepo.update(id, { status: HighlightStatus.REMOVED });
     }
+
+    async markAllActiveRemovedForFixture(fixtureId: number): Promise<void> {
+        await this.entityRepo.update(
+            { fixtureId, status: HighlightStatus.ACTIVE },
+            { status: HighlightStatus.REMOVED },
+        );
+    }
 }
 
 @AuthedController('fixture-highlight')

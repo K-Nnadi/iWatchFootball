@@ -9,17 +9,27 @@ import { UserRole } from '../../../auth/types/security.types';
 import { PlatformConfigService } from './platformConfig.service';
 import { UpdatePlatformConfigDto } from './platformConfig.dto';
 import { MARKETPLACE_CONFIG, MARKETPLACE_DEFAULTS } from '../../complexModules/marketplace/marketplace.constants';
-import { ADS_CONFIG, ADS_DEFAULTS } from './platform-features.constants';
+import {
+    ADS_CONFIG,
+    ADS_DEFAULTS,
+} from './platform-features.constants';
+import { AdvancedStatsFeatureService } from './advanced-stats-feature.service';
 
 export interface PlatformFeatureFlags {
     marketplaceEnabled: boolean;
     adsEnabled: boolean;
+    playerAdvancedStatsEnabled: boolean;
+    attendanceStatsEnabled: boolean;
+    attendanceAdvancedStatsEnabled: boolean;
 }
 
 @AuthedController('platform-config')
 @ApiTags('platform-config')
 export class PlatformConfigController {
-    constructor(private readonly platformConfig: PlatformConfigService) {}
+    constructor(
+        private readonly platformConfig: PlatformConfigService,
+        private readonly advancedStatsFeature: AdvancedStatsFeatureService,
+    ) {}
 
     @Get('features')
     @Public()
@@ -30,15 +40,33 @@ export class PlatformConfigController {
             properties: {
                 marketplaceEnabled: { type: 'boolean' },
                 adsEnabled: { type: 'boolean' },
+                playerAdvancedStatsEnabled: { type: 'boolean' },
+                attendanceStatsEnabled: { type: 'boolean' },
+                attendanceAdvancedStatsEnabled: { type: 'boolean' },
             },
         },
     })
     async getFeatures(): Promise<PlatformFeatureFlags> {
-        const [marketplaceEnabled, adsEnabled] = await Promise.all([
+        const [
+            marketplaceEnabled,
+            adsEnabled,
+            playerAdvancedStatsEnabled,
+            attendanceStatsEnabled,
+            attendanceAdvancedStatsEnabled,
+        ] = await Promise.all([
             this.platformConfig.getBoolean(MARKETPLACE_CONFIG.ENABLED, MARKETPLACE_DEFAULTS.ENABLED),
             this.platformConfig.getBoolean(ADS_CONFIG.ENABLED, ADS_DEFAULTS.ENABLED),
+            this.advancedStatsFeature.isPlayerAdvancedStatsEnabled(),
+            this.advancedStatsFeature.isAttendanceStatsEnabled(),
+            this.advancedStatsFeature.isAttendanceAdvancedStatsEnabled(),
         ]);
-        return { marketplaceEnabled, adsEnabled };
+        return {
+            marketplaceEnabled,
+            adsEnabled,
+            playerAdvancedStatsEnabled,
+            attendanceStatsEnabled,
+            attendanceAdvancedStatsEnabled,
+        };
     }
 
     @Get()

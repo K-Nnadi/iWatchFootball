@@ -19,6 +19,12 @@ import {
   ENTITY_METADATA_PROVIDER,
 } from '@iWatchFootball/base-tools/entity/entityMetadata';
 import { FixtureStatus, FixtureStage } from '../../enums/fixture.enum';
+import { extractApiSportsFixtureResult } from '../../../shared/fixture-result.util';
+import { PlayerTeamStintService } from '../../modules/playerTeamStint/playerTeamStint.service';
+import { PlayerTeamStintSource } from '../../enums/playerTeamStint.enum';
+import { FixtureTeamStatService } from '../../modules/fixtureTeamStat/fixtureTeamStat.service';
+import { FixtureTeamStatSide } from '../../modules/fixtureTeamStat/fixtureTeamStat.entity';
+import type { ApiSportsFixtureStatisticsTeam } from './api-sports-fixture-statistics.types';
 
 const PROVIDER_KEY = ENTITY_METADATA_PROVIDER.APISPORTS;
 
@@ -96,6 +102,13 @@ export type ImportFixturesFromLeagueWindowOptions = {
   primaryVenuesMaxPages?: number;
   /** Hard cap on `/teams` requests when `syncPrimaryVenuesAfter` (default 8). */
   primaryVenuesMaxRequests?: number;
+  /**
+   * When true, after fixture upserts, call `GET /fixtures/statistics?fixture={id}` for each imported fixture
+   * and upsert `fixtureTeamStat`. One request per fixture — use `syncStatsMaxRequests` to limit quota spend.
+   */
+  syncStatsAfter?: boolean;
+  /** Max `/fixtures/statistics` requests when `syncStatsAfter` is true (default 20). */
+  syncStatsMaxRequests?: number;
 };
 
 export type SyncPrimaryVenuesFromTeamsOptions = {
@@ -142,6 +155,8 @@ export class ApiSportsAdapterService {
     private readonly fixtureService: FixtureService,
     private readonly stadiumService: StadiumService,
     private readonly teamStadiumService: TeamStadiumService,
+    private readonly playerTeamStintService: PlayerTeamStintService,
+    private readonly fixtureTeamStatService: FixtureTeamStatService,
   ) {}
 
   private getProviderExternalId(metadata: any): string | null {
@@ -326,6 +341,38 @@ export class ApiSportsAdapterService {
     return matches.sort((a, b) => score(b) - score(a))[0] ?? null;
   }
 
+  private async resolveLocalSeasonIdFromApiYear(apiSeasonYear: number): Promise<number | undefined> {
+    const seasons = await this.seasonService.getQuery({});
+    const match = seasons.find(
+      (s) => s.yearStart === apiSeasonYear || s.yearEnd === apiSeasonYear,
+    );
+    return match?.id;
+  }
+
+  private trackRosterPlayer(rosterByTeam: Map<number, number[]>, teamId: number, playerId: number): void {
+    const list = rosterByTeam.get(teamId) ?? [];
+    if (!list.includes(playerId)) list.push(playerId);
+    rosterByTeam.set(teamId, list);
+  }
+
+  private async linkImportedPlayerStint(
+    playerId: number,
+    localTeamId: number | undefined,
+    seasonId: number | undefined,
+    kitNumber?: number,
+    rosterByTeam?: Map<number, number[]>,
+  ): Promise<void> {
+    if (!localTeamId) return;
+    await this.playerTeamStintService.openStint({
+      playerId,
+      teamId: localTeamId,
+      source: PlayerTeamStintSource.IMPORT,
+      seasonId,
+      kitNumber,
+    });
+    if (rosterByTeam) this.trackRosterPlayer(rosterByTeam, localTeamId, playerId);
+  }
+
   private async attachApiSportsProviderToPlayer(
     player: any,
     apiPlayerId: number,
@@ -427,10 +474,16 @@ export class ApiSportsAdapterService {
   private async findExistingStanding(
     teamCompetitionSeasonId: number,
   ): Promise<any | null> {
-    const [row] = await this.competitionStandingService.getQuery({
+    const rows = await this.competitionStandingService.getQuery({
       where: { teamCompetitionSeasonId } as any,
     });
-    return row ?? null;
+    if (!rows.length) return null;
+    return rows.sort((a, b) => {
+      const aForm = a.form?.trim() ? 1 : 0;
+      const bForm = b.form?.trim() ? 1 : 0;
+      if (bForm !== aForm) return bForm - aForm;
+      return b.id - a.id;
+    })[0];
   }
 
   /** API-Football returns `standings` under `league` or at the root of `response[0]`. */
@@ -483,7 +536,7 @@ export class ApiSportsAdapterService {
    * Uses `/players?league=&season=&page=` (paged). Each page is one request.
    *
    * Dedup strategy:
-   * - If player exists with metadata.providers.apisports.externalId => update/link teamIds & profile fields.
+   * - If player exists with metadata.providers.apisports.externalId => update profile + open stint.
    * - Else strict match on (normalized name + DOB) => attach API-Sports provider id.
    * - Else create new player.
    */
@@ -508,6 +561,8 @@ export class ApiSportsAdapterService {
     let playersLinked = 0;
     let playersUpdated = 0;
     let skipped = 0;
+    const rosterByTeam = new Map<number, number[]>();
+    const seasonId = await this.resolveLocalSeasonIdFromApiYear(options.season);
 
     for (let page = 1; page <= maxPages; page += 1) {
       if (requests >= maxRequests) break;
@@ -575,7 +630,7 @@ export class ApiSportsAdapterService {
           const localTeam = apiTeamId
             ? await this.findLocalTeamByApiSportsId(Number(apiTeamId))
             : null;
-          const teamIds = localTeam?.id ? [localTeam.id] : undefined;
+          const localTeamId = localTeam?.id;
 
           const existingByApi = await this.findLocalPlayerByApiSportsId(apiPlayerId);
           if (existingByApi) {
@@ -586,7 +641,6 @@ export class ApiSportsAdapterService {
               height: existingByApi.height ?? heightCm,
               weight: existingByApi.weight ?? weightKg,
               photoUrl: existingByApi.photoUrl ?? p?.photo ?? undefined,
-              teamIds: existingByApi.teamIds ?? teamIds,
               nickname: existingByApi.nickname ?? (shortName && shortName !== existingByApi.name ? shortName : undefined),
               metadata: deepMergeEntityMetadata((existingByApi.metadata ?? {}) as Record<string, unknown>, {
                 source: String(existingByApi.metadata?.source ?? 'api-sports'),
@@ -597,6 +651,13 @@ export class ApiSportsAdapterService {
                 },
               } as Record<string, unknown>) as any,
             } as any);
+            await this.linkImportedPlayerStint(
+              existingByApi.id,
+              localTeamId,
+              seasonId,
+              undefined,
+              rosterByTeam,
+            );
             playersUpdated += 1;
             continue;
           }
@@ -608,9 +669,15 @@ export class ApiSportsAdapterService {
               height: existingByNameDob.height ?? heightCm,
               weight: existingByNameDob.weight ?? weightKg,
               photoUrl: existingByNameDob.photoUrl ?? p?.photo ?? undefined,
-              teamIds: existingByNameDob.teamIds ?? teamIds,
               nickname: existingByNameDob.nickname ?? (shortName && shortName !== existingByNameDob.name ? shortName : undefined),
             });
+            await this.linkImportedPlayerStint(
+              existingByNameDob.id,
+              localTeamId,
+              seasonId,
+              undefined,
+              rosterByTeam,
+            );
             playersLinked += 1;
             continue;
           }
@@ -630,21 +697,26 @@ export class ApiSportsAdapterService {
               height: placeholder.match.height ?? heightCm,
               weight: placeholder.match.weight ?? weightKg,
               photoUrl: placeholder.match.photoUrl ?? p?.photo ?? undefined,
-              teamIds: placeholder.match.teamIds ?? teamIds,
               nickname: placeholder.match.nickname ?? (shortName && shortName !== placeholder.match.name ? shortName : undefined),
             });
+            await this.linkImportedPlayerStint(
+              placeholder.match.id,
+              localTeamId,
+              seasonId,
+              undefined,
+              rosterByTeam,
+            );
             playersLinked += 1;
             continue;
           }
 
-          await this.playerService.create({
+          const created = await this.playerService.create({
             name,
             nickname: (shortName && shortName !== name ? shortName : (p?.nickname ?? undefined)),
             dateOfBirth: birth,
             nationality: String(nationality),
             positionIds: [], // required (NOT NULL in DB)
             bio: undefined,
-            teamIds,
             kitNumber: undefined,
             height: heightCm,
             weight: weightKg,
@@ -655,6 +727,13 @@ export class ApiSportsAdapterService {
               providers: { [PROVIDER_KEY]: { externalId: String(apiPlayerId) } },
             } as any,
           } as any);
+          await this.linkImportedPlayerStint(
+            created.id,
+            localTeamId,
+            seasonId,
+            undefined,
+            rosterByTeam,
+          );
           playersCreated += 1;
         } catch (e: any) {
           errors.push(`player row: ${e?.message ?? e}`);
@@ -671,6 +750,10 @@ export class ApiSportsAdapterService {
       ) {
         break;
       }
+    }
+
+    for (const [teamId, playerIds] of rosterByTeam) {
+      await this.playerTeamStintService.syncCurrentRosterFromImport(teamId, playerIds, seasonId);
     }
 
     this.logger.log(
@@ -793,14 +876,16 @@ export class ApiSportsAdapterService {
           teamCompetitionSeasonId,
         );
         if (existing) {
-          await this.competitionStandingService.update(existing.id, {
-            ...payload,
-            id: existing.id,
-            metadata: deepMergeEntityMetadata(
-              (existing.metadata ?? {}) as Record<string, unknown>,
-              standingMeta as Record<string, unknown>,
-            ) as any,
-          } as any);
+          await this.competitionStandingService.upsertByTeamCompetitionSeasonId(
+            teamCompetitionSeasonId,
+            {
+              ...payload,
+              metadata: deepMergeEntityMetadata(
+                (existing.metadata ?? {}) as Record<string, unknown>,
+                standingMeta as Record<string, unknown>,
+              ) as any,
+            } as CreateCompetitionStandingDTO,
+          );
         } else {
           await this.competitionStandingService.create(payload);
         }
@@ -999,7 +1084,7 @@ export class ApiSportsAdapterService {
           continue;
         }
         const transferFee = 0;
-        await this.transferService.create({
+        const transferRow = await this.transferService.create({
           playerId: localPlayer.id,
           sourceTeamId: source.id,
           destinationTeamId: dest.id,
@@ -1012,6 +1097,13 @@ export class ApiSportsAdapterService {
             lastSync: new Date().toISOString(),
           } as any,
         } as any);
+        await this.playerTeamStintService.applyTransfer({
+          playerId: localPlayer.id,
+          sourceTeamId: source.id,
+          destinationTeamId: dest.id,
+          date: transferRow.date,
+          isLoan,
+        });
         created += 1;
       }
     }
@@ -1318,6 +1410,62 @@ export class ApiSportsAdapterService {
 
 
   /** One stadium load shared per import batch; creates are keyed and serialized across parallel worker tasks. */
+  private parseVenueCapacity(venue: any): number | undefined {
+    const raw = venue?.capacity;
+    if (raw == null || raw === '') return undefined;
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? Math.round(n) : undefined;
+  }
+
+  private buildVenueMetadata(
+    venue: any,
+    vid: number | null,
+    existing?: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const prevApisports = (existing?.apisports as Record<string, unknown> | undefined) ?? {};
+    const apisports: Record<string, unknown> = {
+      ...prevApisports,
+      ...(vid != null ? { venueId: vid } : {}),
+    };
+    if (venue?.image != null && String(venue.image).trim() !== '') {
+      apisports.image = String(venue.image).trim();
+    }
+    if (venue?.address != null && String(venue.address).trim() !== '') {
+      apisports.address = String(venue.address).trim();
+    }
+    if (venue?.city != null && String(venue.city).trim() !== '') {
+      apisports.city = String(venue.city).trim();
+    }
+    if (venue?.capacity != null && venue.capacity !== '') {
+      apisports.capacity = venue.capacity;
+    }
+
+    const prevProviders = (existing?.providers as Record<string, unknown> | undefined) ?? {};
+    return {
+      ...(existing ?? {}),
+      source: existing?.source ?? 'api-sports',
+      apisports,
+      ...(vid != null
+        ? {
+            providers: {
+              ...prevProviders,
+              [PROVIDER_KEY]: { externalId: String(vid) },
+            },
+          }
+        : { providers: prevProviders }),
+    };
+  }
+
+  private async patchStadiumVenueFacts(stadiumId: number, venue: any, existingRow?: any): Promise<void> {
+    const capacity = this.parseVenueCapacity(venue);
+    const vid = venue?.id != null ? Number(venue.id) : null;
+    const mergedMetadata = this.buildVenueMetadata(venue, vid, existingRow?.metadata);
+    const patch: Record<string, unknown> = { id: stadiumId, metadata: mergedMetadata };
+    if (capacity != null) patch.capacity = capacity;
+    await this.stadiumService.update(stadiumId, patch as any);
+    if (existingRow) Object.assign(existingRow, patch);
+  }
+
   private async ensureStadiumFromApiVenueForImport(
     cache: StadiumImportCache,
     venue: any,
@@ -1344,6 +1492,7 @@ export class ApiSportsAdapterService {
         );
         if (byProv?.id != null) {
           stadiumId = byProv.id;
+          await this.patchStadiumVenueFacts(stadiumId, venue, byProv);
           return;
         }
       }
@@ -1351,18 +1500,18 @@ export class ApiSportsAdapterService {
         const byName = rows.find((s) => String(s?.name ?? '').trim() === vname);
         if (byName?.id != null) {
           stadiumId = byName.id;
+          await this.patchStadiumVenueFacts(stadiumId, venue, byName);
           return;
         }
       }
       const name = vname || 'Unknown venue';
+      const vidForCreate = vid != null && Number.isFinite(vid) ? vid : null;
+      const capacity = this.parseVenueCapacity(venue);
       const created = await this.stadiumService.create({
         name,
         country,
-        metadata: {
-          source: 'api-sports',
-          apisports: vid != null ? { venueId: vid } : {},
-          providers: vid != null ? { [PROVIDER_KEY]: { externalId: String(vid) } } : {},
-        } as any,
+        ...(capacity != null ? { capacity } : {}),
+        metadata: this.buildVenueMetadata(venue, vidForCreate),
       } as any);
       rows.push(created);
       stadiumId = created.id;
@@ -1544,14 +1693,17 @@ export class ApiSportsAdapterService {
 
       const existing = await this.findExistingStanding(teamCompetitionSeasonId);
       if (existing) {
-        await this.competitionStandingService.update(existing.id, {
-          ...payload,
-          id: existing.id,
-          metadata: deepMergeEntityMetadata(
-            (existing.metadata ?? {}) as Record<string, unknown>,
-            (payload.metadata ?? {}) as Record<string, unknown>,
-          ) as any,
-        } as any);
+        await this.competitionStandingService.upsertByTeamCompetitionSeasonId(
+          teamCompetitionSeasonId,
+          {
+            ...payload,
+            form: existing.form?.trim() || payload.form,
+            metadata: deepMergeEntityMetadata(
+              (existing.metadata ?? {}) as Record<string, unknown>,
+              (payload.metadata ?? {}) as Record<string, unknown>,
+            ) as any,
+          } as CreateCompetitionStandingDTO,
+        );
       } else {
         await this.competitionStandingService.create(payload);
       }
@@ -1616,6 +1768,7 @@ export class ApiSportsAdapterService {
       attendanceRaw != null && !Number.isNaN(Number(attendanceRaw)) ? Number(attendanceRaw) : undefined;
 
     const scorePair = this.extractApiSportsFixtureScores(row);
+    const resultFields = extractApiSportsFixtureResult(row, home.id, away.id);
 
     const meta = {
       source: 'api-sports',
@@ -1629,6 +1782,7 @@ export class ApiSportsAdapterService {
       score: row?.score,
       homeScore: scorePair.homeScore,
       awayScore: scorePair.awayScore,
+      ...resultFields,
     };
 
     const payload: any = {
@@ -1724,6 +1878,9 @@ export class ApiSportsAdapterService {
     primaryVenuesLinked: number;
     primaryVenuesSkipped: number;
     primaryVenuesApiRequests: number;
+    fixtureStatsOk: number;
+    fixtureStatsSkipped: number;
+    fixtureStatsRequests: number;
     errors: string[];
   }> {
     const errors: string[] = [];
@@ -1746,6 +1903,9 @@ export class ApiSportsAdapterService {
         primaryVenuesLinked: 0,
         primaryVenuesSkipped: 0,
         primaryVenuesApiRequests: 0,
+        fixtureStatsOk: 0,
+        fixtureStatsSkipped: 0,
+        fixtureStatsRequests: 0,
         errors: [`No local competition for API league ${options.leagueApiId}`],
       };
     }
@@ -1763,6 +1923,9 @@ export class ApiSportsAdapterService {
         primaryVenuesLinked: 0,
         primaryVenuesSkipped: 0,
         primaryVenuesApiRequests: 0,
+        fixtureStatsOk: 0,
+        fixtureStatsSkipped: 0,
+        fixtureStatsRequests: 0,
         errors: [
           `No local season for ${options.seasonYear}-${options.seasonYear + 1}; import leagues/seasons first`,
         ],
@@ -1930,12 +2093,34 @@ export class ApiSportsAdapterService {
       }
     }
 
+    let fixtureStatsOk = 0;
+    let fixtureStatsSkipped = 0;
+    let fixtureStatsRequests = 0;
+    if (options.syncStatsAfter === true) {
+      const maxStatsReq = options.syncStatsMaxRequests ?? 20;
+      const allUpsertedIds = Array.from(ctx.fixtureByApisportsExternalId.values()).map((f) => f.id as number);
+      for (const localFixtureId of allUpsertedIds) {
+        if (fixtureStatsRequests >= maxStatsReq) break;
+        fixtureStatsRequests++;
+        try {
+          const result = await this.syncFixtureStats(localFixtureId);
+          if (result === 'ok') fixtureStatsOk++;
+          else fixtureStatsSkipped++;
+        } catch (e) {
+          errors.push(`fixtureStats ${localFixtureId}: ${String(e)}`);
+        }
+      }
+    }
+
     this.logger.log(
       `importFixturesFromLeagueWindow: league ${options.leagueApiId} ${options.from}–${options.to} — +${created} ~${updated} skipped ${skipped} (${apiRequests} fixture req, concurrency ${concurrency})` +
         (wantApi ? `, standings ${standingsProcessed} (${standingsApiRequests} req)` : '') +
         (wantLocal ? `, standingsRecomputed=${standingsRecomputed}` : '') +
         (options.syncPrimaryVenuesAfter === true
           ? `, primaryVenues ${primaryVenuesLinked} linked (${primaryVenuesApiRequests} /teams req)`
+          : '') +
+        (options.syncStatsAfter === true
+          ? `, fixtureStats ok=${fixtureStatsOk} skipped=${fixtureStatsSkipped} (${fixtureStatsRequests} req)`
           : ''),
     );
     return {
@@ -1949,11 +2134,85 @@ export class ApiSportsAdapterService {
       primaryVenuesLinked,
       primaryVenuesSkipped,
       primaryVenuesApiRequests,
+      fixtureStatsOk,
+      fixtureStatsSkipped,
+      fixtureStatsRequests,
       errors,
     };
   }
 
-  /** One league with `seasons[]` (year coverage for standings). */
+  /**
+   * Fetch `GET /fixtures/statistics?fixture={apiId}` and upsert one `fixtureTeamStat` row per team.
+   * The API-Sports fixture id is read from `metadata.providers.apisports.externalId`.
+   * Returns `'ok'`, `'skipped'` (no api id), or `'no_data'` (api returned nothing).
+   */
+  async syncFixtureStats(localFixtureId: number): Promise<'ok' | 'skipped' | 'no_data'> {
+    const [fixture] = await this.fixtureService.getQuery({ where: { id: localFixtureId } as any });
+    if (!fixture) return 'skipped';
+
+    const meta = fixture.metadata as Record<string, any> | null;
+    const apiId: number | undefined =
+      meta?.providers?.[PROVIDER_KEY]?.externalId != null
+        ? Number(meta.providers[PROVIDER_KEY].externalId)
+        : meta?.apisports?.fixtureId != null
+          ? Number(meta.apisports.fixtureId)
+          : undefined;
+
+    if (!apiId) {
+      this.logger.debug(`syncFixtureStats: fixture ${localFixtureId} has no API-Sports id`);
+      return 'skipped';
+    }
+
+    let raw: { response?: any[] };
+    try {
+      raw = await this.http.get('/fixtures/statistics', { fixture: apiId });
+    } catch (e) {
+      this.logger.warn(
+        `syncFixtureStats: GET /fixtures/statistics?fixture=${apiId} failed — ${String(e)}`,
+      );
+      return 'no_data';
+    }
+
+    const rows: ApiSportsFixtureStatisticsTeam[] = (raw?.response ?? []) as ApiSportsFixtureStatisticsTeam[];
+    if (rows.length === 0) {
+      this.logger.debug(`syncFixtureStats: no statistics for API-Sports fixture ${apiId}`);
+      return 'no_data';
+    }
+
+    const allTeams = await this.teamService.getQuery({});
+    const teamByExtId = new Map<string, any>();
+    for (const t of allTeams) {
+      const extId = (t.metadata as any)?.providers?.[PROVIDER_KEY]?.externalId;
+      if (extId != null) teamByExtId.set(String(extId), t);
+    }
+
+    const ops: Promise<void>[] = [];
+    for (const row of rows) {
+      const localTeam = teamByExtId.get(String(row.team.id));
+      if (!localTeam) {
+        this.logger.debug(
+          `syncFixtureStats: no local team for API-Sports team ${row.team.id} (${row.team.name})`,
+        );
+        continue;
+      }
+      const side =
+        fixture.homeTeamId === localTeam.id
+          ? FixtureTeamStatSide.HOME
+          : FixtureTeamStatSide.AWAY;
+      ops.push(
+        this.fixtureTeamStatService.upsertFromApiSportsStatistics(
+          localFixtureId,
+          localTeam.id,
+          side,
+          row.statistics,
+        ),
+      );
+    }
+
+    await Promise.all(ops);
+    return 'ok';
+  }
+
   async discoverLeagueByApiId(leagueId: number): Promise<any> {
     return this.http.get('/leagues', { id: leagueId });
   }

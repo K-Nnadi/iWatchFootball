@@ -1,7 +1,9 @@
 import React from 'react';
 import { Box, Paper, Title, Tabs, Text, SimpleGrid, UnstyledButton } from '@mantine/core';
+import { UserType } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { useTranslation } from '../../i18n/useTranslation';
 import { usePageTransition } from '../../hooks/usePageTransition';
+import { useAuthStore } from '../../shared/stores/auth.store';
 import { isNavigablePlayerId, playerPageTransition } from '../../shared/playerNavigation';
 import { FormationView } from "./formation";
 import { Lineup, MatchDetails, Player } from "./match.page";  // Verify import paths
@@ -19,6 +21,8 @@ interface TeamLineupsProps {
 
 export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }) => {
     const { t } = useTranslation();
+    const user = useAuthStore((s) => s.user);
+    const isStaff = user?.type === UserType.ADMIN || user?.type === UserType.MODERATOR;
     const isFuture = status === 'future';
 
 
@@ -128,7 +132,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             !matchDetails.homeLineup &&
                             !matchDetails.homePredictedLineup && (
                                 <Text size="sm" ta="center" c="dimmed">
-                                    {t('match.lineupUnavailable')}
+                                    {t(isStaff ? 'match.lineupUnavailableAdmin' : 'match.lineupUnavailable')}
                                 </Text>
                             )}
                         {matchDetails.homeLineup?.substitutes && !isFuture && (
@@ -155,7 +159,7 @@ export const TeamLineups: React.FC<TeamLineupsProps> = ({ matchDetails, status }
                             !matchDetails.awayLineup &&
                             !matchDetails.awayPredictedLineup && (
                                 <Text size="sm" ta="center" c="dimmed">
-                                    {t('match.lineupUnavailable')}
+                                    {t(isStaff ? 'match.lineupUnavailableAdmin' : 'match.lineupUnavailable')}
                                 </Text>
                             )}
                         {matchDetails.awayLineup?.substitutes && !isFuture && (

@@ -3,6 +3,7 @@ import {BullModule} from '@nestjs/bullmq';
 import {ScheduleModule} from '@nestjs/schedule';
 import {CONFIG, TYPEORM_CONFIG} from "@iWatchFootball/base-tools/config/config";
 import {PlayerModule} from "./api/modules/player/player.module";
+import {PlayerTeamStintModule} from "./api/modules/playerTeamStint/playerTeamStint.module";
 import {ManagerEmploymentModule} from "./api/modules/managerEmployment/managerEmployment.module";
 import {AddressModule} from "./api/modules/address/address.module";
 import {StadiumModule} from "./api/modules/stadium/stadium.module";
@@ -93,6 +94,7 @@ const Modules = [
     LoyaltySchemeModule,
     LoyaltyEventModule,
     PlayerModule,
+    PlayerTeamStintModule,
     PlayerLineUpModule,
     PositionModule,
     PredictionModule,

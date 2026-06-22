@@ -29,7 +29,7 @@ import {
 import { Link } from 'react-router-dom';
 import { ModernButton, ModernH2 } from '../../components/modern';
 import { notify } from '../../shared/notify';
-import { syncFixtureHighlights, useFixtureHighlightCount } from '../../shared/api/fixture-highlight.api';
+import { syncBulkHighlights, syncFixtureHighlights, useFixtureHighlightCount } from '../../shared/api/fixture-highlight.api';
 import { useNewsAggregatorControllerGetStatus, useNewsAggregatorControllerTriggerAggregation } from '@iWatchFootball/clients/controllers/news-aggregation';
 import { useGetCountNewsArticle } from '@iWatchFootball/clients/controllers/news-article';
 import {
@@ -114,6 +114,9 @@ export function AdminDashboardPage() {
 
     const [highlightFixtureId, setHighlightFixtureId] = useState<number | ''>('');
     const [highlightSyncing, setHighlightSyncing] = useState(false);
+    const [highlightBulkIds, setHighlightBulkIds] = useState('');
+    const [highlightLookback, setHighlightLookback] = useState(48);
+    const [highlightBulkSyncing, setHighlightBulkSyncing] = useState(false);
 
     const runBulkSync = () => {
         const dto: DataSyncRunDto = {
@@ -364,10 +367,12 @@ export function AdminDashboardPage() {
                             <Title order={4}>Match highlights</Title>
                         </Group>
                         <Text size="sm" c="dimmed">
-                            Fetch and store highlight metadata from YouTube for a completed fixture.
+                            Fetch and store highlight metadata from YouTube for completed fixtures.
                             Only embed URLs and thumbnails are saved — no video is downloaded.
                             The scheduler auto-runs 15 minutes after fixture completion when Redis is enabled.
                         </Text>
+
+                        <Divider label="Single fixture" labelPosition="left" />
                         <Group align="flex-end" gap="sm">
                             <NumberInput
                                 label="Fixture ID"
@@ -386,6 +391,7 @@ export function AdminDashboardPage() {
                                     try {
                                         const result = await syncFixtureHighlights(Number(highlightFixtureId));
                                         notify.success('Highlights', result.message);
+                                        void refetchHighlightCount();
                                     } catch {
                                         notify.error('Highlights sync failed', 'Check the fixture ID and YouTube API key.');
                                     } finally {
@@ -394,6 +400,52 @@ export function AdminDashboardPage() {
                                 }}
                             >
                                 Sync highlights
+                            </ModernButton>
+                        </Group>
+
+                        <Divider label="Bulk sync" labelPosition="left" />
+                        <Text size="xs" c="dimmed">
+                            Leave fixture IDs blank to auto-detect all recently completed fixtures without highlights.
+                        </Text>
+                        <Group align="flex-end" gap="sm" wrap="wrap">
+                            <TextInput
+                                label="Fixture IDs (comma-separated, optional)"
+                                placeholder="e.g. 101, 202, 303"
+                                value={highlightBulkIds}
+                                onChange={(e) => setHighlightBulkIds(e.currentTarget.value)}
+                                style={{ flex: 1, minWidth: 220 }}
+                            />
+                            <NumberInput
+                                label="Lookback (hours)"
+                                value={highlightLookback}
+                                onChange={(v) => setHighlightLookback(Number(v) || 48)}
+                                min={1}
+                                max={720}
+                                style={{ width: 140 }}
+                            />
+                            <ModernButton
+                                loading={highlightBulkSyncing}
+                                onClick={async () => {
+                                    setHighlightBulkSyncing(true);
+                                    try {
+                                        const fixtureIds = highlightBulkIds
+                                            .split(',')
+                                            .map((s) => parseInt(s.trim(), 10))
+                                            .filter((n) => !Number.isNaN(n));
+                                        const result = await syncBulkHighlights({
+                                            fixtureIds: fixtureIds.length > 0 ? fixtureIds : undefined,
+                                            lookbackHours: highlightLookback,
+                                        });
+                                        notify.success('Bulk highlights', result.message);
+                                        void refetchHighlightCount();
+                                    } catch {
+                                        notify.error('Bulk sync failed', 'Check the YouTube API key and backend logs.');
+                                    } finally {
+                                        setHighlightBulkSyncing(false);
+                                    }
+                                }}
+                            >
+                                Sync all
                             </ModernButton>
                         </Group>
                     </Stack>

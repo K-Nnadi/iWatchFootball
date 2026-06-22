@@ -17,6 +17,8 @@ import {TeamCompetitionSeasonModule} from "../../modules/teamCompetitionSeason/t
 import {LineUpModule} from "../../modules/lineUp/lineUp.module";
 import {PlayerLineUpModule} from "../../modules/playerLineUp/playerLineUp.module";
 import {ManagerModule} from "../../modules/manager/manager.module";
+import {PlayerFixtureStatModule} from '../../modules/playerFixtureStat/playerFixtureStat.module';
+import {FixtureTeamStatModule} from '../../modules/fixtureTeamStat/fixtureTeamStat.module';
 import {Card} from '../../modules/card/card.entity';
 import {Goal} from '../../modules/goal/goal.entity';
 import {Substitution} from '../../modules/substitution/substitution.entity';
@@ -37,7 +39,9 @@ import {Substitution} from '../../modules/substitution/substitution.entity';
         PositionModule,
         StadiumModule,
         CardModule,
-        SubstitutionModule
+        SubstitutionModule,
+        PlayerFixtureStatModule,
+        FixtureTeamStatModule,
     ],
     providers: [StatsBombAdapterService, StatsBombHttpService],
     controllers: [StatsBombController],

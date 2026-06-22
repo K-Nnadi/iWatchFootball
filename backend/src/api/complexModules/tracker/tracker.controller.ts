@@ -13,6 +13,7 @@ import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { SocialService } from '../../modules/social/social.service';
 import { TrackerCompareService } from './tracker-compare.service';
+import { AdvancedStatsFeatureService } from '../../modules/platformConfig/advanced-stats-feature.service';
 import { TrackerVisibility } from '../../enums/social.enum';
 import type { Request } from 'express';
 
@@ -36,6 +37,7 @@ export class TrackerController {
     constructor(
         private readonly socialService: SocialService,
         private readonly compareService: TrackerCompareService,
+        private readonly advancedStatsFeature: AdvancedStatsFeatureService,
     ) {}
 
     @Get('privacy')
@@ -67,6 +69,7 @@ export class TrackerController {
     ) {
         const viewerId = req.user?.id;
         if (!viewerId) throw new UnauthorizedException('Not authenticated');
+        await this.advancedStatsFeature.assertAttendanceAdvancedStatsEnabled();
         return this.compareService.getStatsForUser(viewerId, targetUserId);
     }
 
@@ -78,6 +81,7 @@ export class TrackerController {
     ) {
         const viewerId = req.user?.id;
         if (!viewerId) throw new UnauthorizedException('Not authenticated');
+        await this.advancedStatsFeature.assertAttendanceAdvancedStatsEnabled();
         return this.compareService.compare(viewerId, friendUserId);
     }
 }

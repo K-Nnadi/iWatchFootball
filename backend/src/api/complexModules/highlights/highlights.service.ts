@@ -56,19 +56,30 @@ export class HighlightsService {
             providers.map((provider) => provider.searchFixtureHighlights(ctx)),
         );
 
-        let saved = 0;
+        const allHighlights: Partial<FixtureHighlight>[] = [];
         for (const result of results) {
             if (result.status === 'rejected') {
                 this.logger.error(`Provider search failed: ${result.reason}`);
                 continue;
             }
-            for (const highlight of result.value) {
-                try {
-                    await this.highlightService.upsertByProviderVideoId(highlight);
-                    saved++;
-                } catch (err) {
-                    this.logger.error(`Failed to save highlight: ${err}`);
-                }
+            allHighlights.push(...result.value);
+        }
+
+        if (allHighlights.length === 0) {
+            this.logger.warn(`No highlights found for fixture ${fixtureId} — keeping existing highlights`);
+            return;
+        }
+
+        // Clear out stale highlights (wrong type, blocked, cartoons) before inserting the clean new set
+        await this.highlightService.markAllActiveRemovedForFixture(fixtureId);
+
+        let saved = 0;
+        for (const highlight of allHighlights) {
+            try {
+                await this.highlightService.upsertByProviderVideoId(highlight);
+                saved++;
+            } catch (err) {
+                this.logger.error(`Failed to save highlight: ${err}`);
             }
         }
 
@@ -98,6 +109,40 @@ export class HighlightsService {
         }
 
         this.logger.log(`Validation complete: ${removed} highlight(s) marked REMOVED`);
+    }
+
+    async syncBulkFixtureHighlights(options: {
+        fixtureIds?: number[];
+        lookbackHours?: number;
+        useQueue: boolean;
+        scheduler: { enqueueSync(id: number, delay: number): Promise<void> };
+    }): Promise<{ count: number }> {
+        const { fixtureIds, lookbackHours = 48, useQueue, scheduler } = options;
+
+        let ids: number[];
+
+        if (fixtureIds && fixtureIds.length > 0) {
+            ids = fixtureIds;
+            this.logger.log(`Bulk highlight sync requested for ${ids.length} explicit fixture(s)`);
+        } else {
+            const fixtures = await this.findFixturesNeedingHighlights(lookbackHours);
+            ids = fixtures.map((f) => f.id);
+            this.logger.log(`Auto-detected ${ids.length} fixture(s) needing highlights (last ${lookbackHours}h)`);
+        }
+
+        if (ids.length === 0) {
+            return { count: 0 };
+        }
+
+        for (const id of ids) {
+            if (useQueue) {
+                await scheduler.enqueueSync(id, 0);
+            } else {
+                await this.syncFixtureHighlights(id);
+            }
+        }
+
+        return { count: ids.length };
     }
 
     /** Find recently completed fixtures that have no active highlights yet */

@@ -11,6 +11,8 @@ import { Substitution } from '../substitution/substitution.entity';
 import { Player } from '../player/player.entity';
 import { FixtureTimelineService } from './fixture-timeline.service';
 import { FixtureTimelineController } from './fixture-timeline.controller';
+import { FixtureTeamStatModule } from '../fixtureTeamStat/fixtureTeamStat.module';
+import { FixtureTeamStatsController } from './fixture-team-stats.controller';
 
 
 @Injectable()
@@ -28,8 +30,11 @@ export class FixtureController extends CrudController<Fixture, CreateFixtureDTO>
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Fixture, Goal, Card, Substitution, Player])],
-  controllers: [FixtureController, FixtureTimelineController],
+  imports: [
+    TypeOrmModule.forFeature([Fixture, Goal, Card, Substitution, Player]),
+    FixtureTeamStatModule,
+  ],
+  controllers: [FixtureController, FixtureTimelineController, FixtureTeamStatsController],
   providers: [FixtureService, FixtureTimelineService],
   exports: [FixtureService]
 })

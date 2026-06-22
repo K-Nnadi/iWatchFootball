@@ -18,6 +18,8 @@ import {SeatSelectionPage} from "./pages/seatSelection.page";
 import {MatchPage} from "./pages/match/match.page";
 import {TeamPage} from "./pages/team/team.page";
 import {PlayerPage} from "./pages/player/player.page";
+import {ManagerPage} from "./pages/manager/manager.page";
+import {StadiumPage} from "./pages/stadium/stadium.page";
 import {NewsPage} from "./pages/news.page";
 import {NewsDetailPage} from "./pages/news/newsDetail.page";
 import {LicensesPage} from "./pages/licenses.page";
@@ -37,6 +39,7 @@ import { OnboardingGate } from "./components/auth/OnboardingGate";
 import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 import { RootEntry } from "./components/auth/RootEntry";
 import { MarketplaceFeatureRoute } from "./components/auth/MarketplaceFeatureRoute";
+import { AttendanceAdvancedStatsRoute } from "./components/auth/AttendanceAdvancedStatsRoute";
 import { FriendsPage } from "./pages/friends.page";
 import { CompareFriendPage } from "./pages/friendsCompare.page";
 import { AuthWelcomePage } from "./pages/auth/authWelcome.page";
@@ -88,7 +91,11 @@ const childrenRoutes = [
 const additionalRoutes = [
     {
         path: '/friends/compare/:userId',
-        element: <CompareFriendPage />
+        element: (
+            <AttendanceAdvancedStatsRoute>
+                <CompareFriendPage />
+            </AttendanceAdvancedStatsRoute>
+        ),
     },
     {
         path: '/competition/:id',
@@ -105,6 +112,14 @@ const additionalRoutes = [
     {
         path: '/player/:id',
         element: <PlayerPage />
+    },
+    {
+        path: '/manager/:id',
+        element: <ManagerPage />
+    },
+    {
+        path: '/stadium/:id',
+        element: <StadiumPage />
     },
     {
         path: '/news/:id',

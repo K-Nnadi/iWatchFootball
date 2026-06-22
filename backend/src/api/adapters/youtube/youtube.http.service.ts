@@ -23,6 +23,10 @@ export interface YouTubeVideoDetails {
     contentDetails: {
         duration: string; // ISO 8601 duration e.g. PT9M30S
     };
+    status: {
+        embeddable: boolean;
+        privacyStatus: string;
+    };
     snippet: {
         title: string;
         channelId: string;
@@ -79,7 +83,7 @@ export class YouTubeHttpService {
                 `${YOUTUBE_API_BASE_URL}/videos`,
                 {
                     params: {
-                        part: 'snippet,contentDetails',
+                        part: 'snippet,contentDetails,status',
                         id: videoIds.join(','),
                         key: getYouTubeApiKey(),
                     },

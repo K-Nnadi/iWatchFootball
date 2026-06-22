@@ -10,13 +10,19 @@ import { UiH2 } from '../../components/ui';
 import {
     MOCK_PLAYERS,
     buildApiPlayerViewModel,
+    mergePlayerMatchesIntoViewModel,
     type CareerRow,
     type HighlightStat,
     type PlayerViewModel,
     type RecentMatch,
     type StatCategory,
+    type UpcomingFixture,
 } from './playerPage.model';
 import classes from './player.page.module.css';
+import { usePlayerMatches } from '../../shared/api/playerMatches.api';
+import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
+import { fetchPlayerAdvancedStats } from '../../shared/api/advancedStats.api';
+import { useQuery } from '@tanstack/react-query';
 
 type MainTab = 'matches' | 'stats' | 'history';
 type MatchSegment = 'results' | 'fixtures';
@@ -46,6 +52,18 @@ function roleLabel(position: string, t: TranslateFn): string {
     if (/midfield|midfielder/.test(p)) return t('player.roleMidfielder');
     if (/striker|forward|wing/.test(p)) return t('player.roleForward');
     return position || t('player.rolePlayer');
+}
+
+function resultLabel(result: RecentMatch['result'], t: TranslateFn): string {
+    if (result === 'W') return t('teamPage.outcomeWin');
+    if (result === 'D') return t('teamPage.outcomeDraw');
+    return t('teamPage.outcomeLoss');
+}
+
+function resultCardClass(result: RecentMatch['result']): string {
+    if (result === 'W') return classes.matchCardWin;
+    if (result === 'D') return classes.matchCardDraw;
+    return classes.matchCardLoss;
 }
 
 function matchContribution(m: RecentMatch): string {
@@ -78,56 +96,145 @@ function HighlightRow({ stats, t }: { stats: HighlightStat[]; t: TranslateFn }) 
     );
 }
 
-function FormStrip({ matches, t }: { matches: RecentMatch[]; t: TranslateFn }) {
-    const form = matches.slice(0, 3);
-    if (form.length === 0) return null;
-
-    return (
-        <div className={classes.sectionCard}>
-            <h2 className={classes.sectionHeading}>{t('player.form')}</h2>
-            <div className={classes.formScroll}>
-                {form.map((m) => {
-                    const pts = m.goals * 4 + m.assists * 3 + (m.rating >= 7.5 ? 2 : 0);
-                    return (
-                        <div key={`${m.gameweek}-${m.opponent}`} className={classes.formCard}>
-                            <div className={classes.formGw}>{m.gameweek ?? m.date}</div>
-                            <div className={classes.formOpp}>
-                                {m.opponentCode ?? m.opponent.slice(0, 3).toUpperCase()}
-                            </div>
-                            <div className={classes.formVenue}>
-                                {m.home ? t('player.homeShort') : t('player.awayShort')}
-                            </div>
-                            <div className={classes.formPts}>{t('player.pts', { count: pts })}</div>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-    );
-}
-
-function MatchList({ matches, t }: { matches: RecentMatch[]; t: TranslateFn }) {
+function MatchList({
+    matches,
+    t,
+    onMatchClick,
+}: {
+    matches: RecentMatch[];
+    t: TranslateFn;
+    onMatchClick?: (fixtureId: number) => void;
+}) {
     if (matches.length === 0) {
         return <p className={classes.emptyNote}>{t('player.noRecentMatches')}</p>;
     }
 
     return (
-        <>
-            {matches.map((m) => (
-                <div key={`${m.date}-${m.opponent}`} className={classes.matchRow}>
-                    <span className={classes.matchGw}>{m.gameweek ?? m.date}</span>
-                    <div className={classes.matchOppBlock}>
-                        <div className={classes.matchOppName}>
-                            {m.opponentCode ?? m.opponent}
-                            <span> {m.home ? t('player.homeShort') : t('player.awayShort')}</span>
+        <div className={classes.matchGrid}>
+            {matches.map((m) => {
+                const hasContribution = m.goals > 0 || m.assists > 0;
+                return (
+                    <article
+                        key={`${m.fixtureId ?? m.date}-${m.opponent}`}
+                        className={`${classes.matchCard} ${resultCardClass(m.result)}`}
+                        role={m.fixtureId != null ? 'button' : undefined}
+                        tabIndex={m.fixtureId != null ? 0 : undefined}
+                        onClick={() => m.fixtureId != null && onMatchClick?.(m.fixtureId)}
+                        onKeyDown={(e) => {
+                            if (m.fixtureId != null && (e.key === 'Enter' || e.key === ' ')) {
+                                e.preventDefault();
+                                onMatchClick?.(m.fixtureId);
+                            }
+                        }}
+                    >
+                        <div className={classes.matchCardTop}>
+                            <span className={classes.matchCardDate}>{m.gameweek ?? m.date}</span>
+                            <span
+                                className={`${classes.matchVenueBadge} ${m.home ? classes.matchVenueHome : classes.matchVenueAway}`}
+                            >
+                                {m.home ? t('teamPage.home') : t('teamPage.away')}
+                            </span>
                         </div>
-                        <div className={classes.matchOppMeta}>{m.opponent}</div>
+
+                        <div className={classes.matchCardOppRow}>
+                            <div className={classes.matchOppAvatar}>{initials(m.opponent)}</div>
+                            <div className={classes.matchOppText}>
+                                <span className={classes.matchCardOppName}>{m.opponent}</span>
+                                <span className={classes.matchCardOppMeta}>
+                                    {m.opponentCode ?? m.opponent.slice(0, 3).toUpperCase()}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className={classes.matchCardScoreRow}>
+                            <span className={classes.matchCardScore}>{m.score}</span>
+                            <span className={`${classes.resultBadge} ${scorePillClass(m.result)}`}>
+                                {resultLabel(m.result, t)}
+                            </span>
+                        </div>
+
+                        <div className={classes.matchCardFooter}>
+                            <div className={classes.matchCardChips}>
+                                {m.goals > 0 && (
+                                    <span className={classes.statChipAccent}>
+                                        {m.goals} {t('player.goals').toLowerCase()}
+                                    </span>
+                                )}
+                                {m.assists > 0 && (
+                                    <span className={classes.statChipAccent}>
+                                        {m.assists} {t('player.assists').toLowerCase()}
+                                    </span>
+                                )}
+                                {m.minutes > 0 && (
+                                    <span className={classes.statChipMuted}>{m.minutes}&apos;</span>
+                                )}
+                            </div>
+                            <span
+                                className={`${classes.matchRating} ${hasContribution ? classes.matchRatingHot : ''}`}
+                                title={t('player.rating')}
+                            >
+                                {hasContribution ? matchContribution(m) : m.rating.toFixed(1)}
+                            </span>
+                        </div>
+                    </article>
+                );
+            })}
+        </div>
+    );
+}
+
+function FixtureList({
+    fixtures,
+    t,
+    onMatchClick,
+}: {
+    fixtures: UpcomingFixture[];
+    t: TranslateFn;
+    onMatchClick?: (fixtureId: number) => void;
+}) {
+    if (fixtures.length === 0) {
+        return <p className={classes.emptyNote}>{t('player.noUpcomingFixtures')}</p>;
+    }
+
+    return (
+        <div className={classes.matchGrid}>
+            {fixtures.map((f) => (
+                <article
+                    key={`${f.fixtureId ?? f.date}-${f.opponent}`}
+                    className={`${classes.matchCard} ${classes.matchCardUpcoming}`}
+                    role={f.fixtureId != null ? 'button' : undefined}
+                    tabIndex={f.fixtureId != null ? 0 : undefined}
+                    onClick={() => f.fixtureId != null && onMatchClick?.(f.fixtureId)}
+                    onKeyDown={(e) => {
+                        if (f.fixtureId != null && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault();
+                            onMatchClick?.(f.fixtureId);
+                        }
+                    }}
+                >
+                    <div className={classes.matchCardTop}>
+                        <span className={classes.matchCardDate}>{f.date}</span>
+                        <span className={classes.upcomingBadge}>{t('player.fixtures')}</span>
                     </div>
-                    <span className={`${classes.scorePill} ${scorePillClass(m.result)}`}>{m.score}</span>
-                    <span className={classes.contribBadge}>{matchContribution(m)}</span>
-                </div>
+                    <div className={classes.matchCardOppRow}>
+                        <div className={classes.matchOppAvatar}>{initials(f.opponent)}</div>
+                        <div className={classes.matchOppText}>
+                            <span className={classes.matchCardOppName}>{f.opponent}</span>
+                            <span className={classes.matchCardOppMeta}>
+                                {f.opponentCode ?? f.opponent.slice(0, 3).toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
+                    <div className={classes.matchCardScoreRow}>
+                        <span
+                            className={`${classes.matchVenueBadge} ${f.home ? classes.matchVenueHome : classes.matchVenueAway}`}
+                        >
+                            {f.home ? t('teamPage.home') : t('teamPage.away')}
+                        </span>
+                    </div>
+                </article>
             ))}
-        </>
+        </div>
     );
 }
 
@@ -228,6 +335,7 @@ export function PlayerPage() {
     const { id } = useParams<{ id: string }>();
     const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
+    const { playerAdvancedStatsEnabled } = usePlatformFeaturesStore();
     const [mainTab, setMainTab] = useState<MainTab>('matches');
     const [matchSegment, setMatchSegment] = useState<MatchSegment>('results');
 
@@ -240,14 +348,23 @@ export function PlayerPage() {
     });
 
     const firstTeamId = useMemo(() => {
-        const raw = apiPlayer?.teamIds?.[0];
+        const raw = apiPlayer?.currentTeamId;
         if (raw == null) return undefined;
         const n = Number.parseInt(String(raw), 10);
         return Number.isFinite(n) ? n : undefined;
-    }, [apiPlayer?.teamIds]);
+    }, [apiPlayer?.currentTeamId]);
 
     const { data: apiTeam } = useGetOneTeam(firstTeamId ?? 0, {
         query: { enabled: fetchFromApi && firstTeamId != null } as any,
+    });
+
+    const { data: matchesData } = usePlayerMatches(numericId, fetchFromApi);
+
+    const { data: advancedStatsData } = useQuery({
+        queryKey: ['playerAdvancedStats', numericId],
+        queryFn: () => fetchPlayerAdvancedStats(numericId),
+        enabled: fetchFromApi && playerAdvancedStatsEnabled && Number.isFinite(numericId) && numericId > 0,
+        staleTime: 60_000,
     });
 
     const player = useMemo((): PlayerViewModel | null => {
@@ -257,8 +374,19 @@ export function PlayerPage() {
             apiTeam && firstTeamId
                 ? { id: firstTeamId, name: apiTeam.name, crest: apiTeam.logoUrl }
                 : undefined;
-        return buildApiPlayerViewModel(apiPlayer, clubTeam);
-    }, [mockPlayer, apiPlayer, apiTeam, firstTeamId]);
+        const base = buildApiPlayerViewModel(apiPlayer, clubTeam);
+        if (!matchesData) return base;
+        return mergePlayerMatchesIntoViewModel(
+            base,
+            matchesData.season,
+            matchesData.results,
+            matchesData.fixtures,
+        );
+    }, [mockPlayer, apiPlayer, apiTeam, firstTeamId, matchesData]);
+
+    const openFixture = (fixtureId: number) => {
+        navigateWithTransition(`/match/${fixtureId}`, { transitionType: 'loading', duration: 900 });
+    };
 
     if (fetchFromApi && apiLoading) {
         return (
@@ -349,7 +477,6 @@ export function PlayerPage() {
 
             <div className={classes.shell}>
                 <HighlightRow stats={player.highlights} t={t} />
-                <FormStrip matches={player.recentMatches} t={t} />
 
                 <div className={classes.sectionCard}>
                     <div className={classes.mainTabs}>
@@ -384,9 +511,17 @@ export function PlayerPage() {
                                 </button>
                             </div>
                             {matchSegment === 'results' ? (
-                                <MatchList matches={player.recentMatches} t={t} />
+                                <MatchList
+                                    matches={player.recentMatches}
+                                    t={t}
+                                    onMatchClick={openFixture}
+                                />
                             ) : (
-                                <p className={classes.emptyNote}>{t('player.noUpcomingFixtures')}</p>
+                                <FixtureList
+                                    fixtures={player.upcomingFixtures}
+                                    t={t}
+                                    onMatchClick={openFixture}
+                                />
                             )}
                         </>
                     )}
@@ -430,11 +565,23 @@ export function PlayerPage() {
                                 </div>
                             </div>
 
-                            <SeasonStatGroups
-                                categories={player.performance}
-                                minutes={player.season.minutes}
-                                t={t}
-                            />
+                            {playerAdvancedStatsEnabled ? (
+                                <SeasonStatGroups
+                                    categories={
+                                        advancedStatsData?.hasRollupData
+                                            ? advancedStatsData.categories
+                                            : player.performance
+                                    }
+                                    minutes={
+                                        advancedStatsData?.hasRollupData
+                                            ? advancedStatsData.minutes
+                                            : player.season.minutes
+                                    }
+                                    t={t}
+                                />
+                            ) : (
+                                <p className={classes.emptyNote}>{t('player.advancedStatsDisabled')}</p>
+                            )}
                         </>
                     )}
 

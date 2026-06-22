@@ -175,16 +175,46 @@ export function CompetitionPage() {
         return teamsData.find(t => t.id === tcs?.teamId)?.name ?? `Team #${tcs?.teamId}`;
     };
 
+    const teamIdForStanding = (tcsId: number): number | undefined => {
+        const tcs = tcsForSeason.find(t => t.id === tcsId);
+        return tcs?.teamId;
+    };
+
+    const pickPreferredStanding = (a: CompetitionStanding, b: CompetitionStanding) => {
+        const aForm = a.form?.trim() ? 1 : 0;
+        const bForm = b.form?.trim() ? 1 : 0;
+        if (bForm !== aForm) return bForm > aForm ? b : a;
+        return b.id > a.id ? b : a;
+    };
+
+    const dedupedStandings = useMemo(() => {
+        const byTcs = new Map<number, CompetitionStanding>();
+        for (const row of standings) {
+            const existing = byTcs.get(row.teamCompetitionSeasonId);
+            byTcs.set(
+                row.teamCompetitionSeasonId,
+                existing ? pickPreferredStanding(existing, row) : row,
+            );
+        }
+
+        const byTeam = new Map<number, CompetitionStanding>();
+        for (const row of byTcs.values()) {
+            const teamId = teamIdForStanding(row.teamCompetitionSeasonId);
+            if (teamId == null) continue;
+            const existing = byTeam.get(teamId);
+            byTeam.set(teamId, existing ? pickPreferredStanding(existing, row) : row);
+        }
+
+        return [...byTeam.values()].sort((a, b) => a.position - b.position);
+    }, [standings, tcsForSeason]);
+
     // Fixtures for this competition + season
     const { data: fixtures = [], isLoading: isLoadingFixtures } = useGetQueryFixture(
         { where: { competitionId, seasonId: activeSeasonId ?? undefined }, take: 100, order: { date: 'ASC' } } as any,
         { query: { enabled: !!competitionId && !!activeSeasonId } as any }
     );
 
-    const sortedStandings = useMemo(
-        () => [...standings].sort((a, b) => a.position - b.position),
-        [standings]
-    );
+    const sortedStandings = dedupedStandings;
 
     const fixtureGroups = useMemo(() => {
         const groups: Record<string, FixtureRecord[]> = {};
@@ -289,7 +319,10 @@ export function CompetitionPage() {
                                     </Table.Tr>
                                 </Table.Thead>
                                 <Table.Tbody>
-                                    {sortedStandings.map(row => (
+                                    {sortedStandings.map(row => {
+                                        const teamId = teamIdForStanding(row.teamCompetitionSeasonId);
+                                        const label = teamName(row.teamCompetitionSeasonId);
+                                        return (
                                         <Table.Tr key={row.id}>
                                             <Table.Td>
                                                 <Group gap={4} wrap="nowrap">
@@ -299,7 +332,34 @@ export function CompetitionPage() {
                                                     {row.positionChange === 0 && <IconMinus size={12} color="var(--modern-text-secondary)" />}
                                                 </Group>
                                             </Table.Td>
-                                            <Table.Td><Text size="sm" fw={500}>{teamName(row.teamCompetitionSeasonId)}</Text></Table.Td>
+                                            <Table.Td>
+                                                {teamId != null ? (
+                                                    <Text
+                                                        component="button"
+                                                        type="button"
+                                                        size="sm"
+                                                        fw={500}
+                                                        onClick={() =>
+                                                            navigateWithTransition(`/team/${teamId}`, {
+                                                                transitionType: 'loading',
+                                                                duration: 900,
+                                                            })
+                                                        }
+                                                        style={{
+                                                            border: 'none',
+                                                            background: 'transparent',
+                                                            padding: 0,
+                                                            cursor: 'pointer',
+                                                            color: 'inherit',
+                                                            textAlign: 'left',
+                                                        }}
+                                                    >
+                                                        {label}
+                                                    </Text>
+                                                ) : (
+                                                    <Text size="sm" fw={500}>{label}</Text>
+                                                )}
+                                            </Table.Td>
                                             <Table.Td ta="center"><Text size="sm">{row.played}</Text></Table.Td>
                                             <Table.Td ta="center"><Text size="sm">{row.won}</Text></Table.Td>
                                             <Table.Td ta="center"><Text size="sm">{row.drawn}</Text></Table.Td>
@@ -325,7 +385,8 @@ export function CompetitionPage() {
                                                 ) : <Text size="xs" c="dimmed">—</Text>}
                                             </Table.Td>
                                         </Table.Tr>
-                                    ))}
+                                        );
+                                    })}
                                 </Table.Tbody>
                             </Table>
                         </ModernCard>

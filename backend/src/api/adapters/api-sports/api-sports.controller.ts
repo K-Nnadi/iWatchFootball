@@ -15,6 +15,7 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiProperty,
   ApiPropertyOptional,
   ApiQuery,
@@ -131,6 +132,20 @@ export class ApiSportsImportFixturesDto {
     description: 'Ignored for primary-venue sync (single /teams call). Reserved for future use.',
   })
   primaryVenuesMaxRequests?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'After fixtures, call GET /fixtures/statistics for each imported fixture and upsert fixtureTeamStat. ' +
+      'One request per fixture — guard spend with syncStatsMaxRequests.',
+  })
+  syncStatsAfter?: boolean;
+
+  @ApiPropertyOptional({
+    default: 20,
+    description: 'Max /fixtures/statistics requests when syncStatsAfter is true.',
+  })
+  syncStatsMaxRequests?: number;
 }
 
 export class ApiSportsSyncPrimaryVenuesDto {
@@ -227,7 +242,12 @@ export class ApiSportsImportLeaguesDto {
   maxStandingsRequests?: number;
 }
 
-/** Raw JSON from api-sports.io (shape varies by endpoint). */
+export class ApiSyncFixtureStatsDto {
+  @ApiProperty({ description: 'Local fixture id to sync statistics for' })
+  fixtureId!: number;
+}
+
+
 const apiSportsRawResponseSchema = {
   description: 'Raw API-Sports JSON (get, parameters, errors, results, paging, response, …)',
   schema: {
@@ -242,7 +262,9 @@ const apiSportsRawResponseSchema = {
 @Roles(UserRole.ADMIN)
 @Controller('api-sports')
 export class ApiSportsController {
-  constructor(private readonly apiSportsAdapterService: ApiSportsAdapterService) {}
+  constructor(
+    private readonly apiSportsAdapterService: ApiSportsAdapterService,
+  ) {}
 
   @Post('sync/import/leagues')
   @HttpCode(HttpStatus.OK)
@@ -337,6 +359,9 @@ export class ApiSportsController {
         body.primaryVenuesMaxPages != null ? Number(body.primaryVenuesMaxPages) : undefined,
       primaryVenuesMaxRequests:
         body.primaryVenuesMaxRequests != null ? Number(body.primaryVenuesMaxRequests) : undefined,
+      syncStatsAfter: body.syncStatsAfter === true,
+      syncStatsMaxRequests:
+        body.syncStatsMaxRequests != null ? Number(body.syncStatsMaxRequests) : undefined,
     });
   }
 
@@ -498,5 +523,20 @@ export class ApiSportsController {
   @ApiOkResponse(apiSportsRawResponseSchema)
   async discoverCountries(@Query() query: Record<string, string | undefined>) {
     return this.apiSportsAdapterService.discoverCountries(query);
+  }
+
+  @Post('sync/import/fixture-stats')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sync fixture statistics from API-Sports for one fixture',
+    description:
+      'Calls GET /fixtures/statistics?fixture={apiId} and upserts one `fixtureTeamStat` row per team. ' +
+      'The fixture must already have `metadata.providers.apisports.externalId` set ' +
+      '(i.e. imported via the fixtures endpoint). Returns "ok", "skipped" (no api id), or "no_data".',
+  })
+  @ApiBody({ type: ApiSyncFixtureStatsDto })
+  @ApiResponse({ status: 200, description: '"ok" | "skipped" | "no_data"' })
+  async syncImportFixtureStats(@Body() body: ApiSyncFixtureStatsDto) {
+    return this.apiSportsAdapterService.syncFixtureStats(Number(body.fixtureId));
   }
 }

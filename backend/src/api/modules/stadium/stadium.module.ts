@@ -6,6 +6,12 @@ import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";
 import {Repository} from "typeorm";
 import {Address} from "../address/address.entity";
+import { TeamStadium } from '../teamStadium/teamStadium.entity';
+import { Team } from '../team/team.entity';
+import { Fixture } from '../fixture/fixture.entity';
+import { StadiumProfileService } from './stadium-profile.service';
+import { StadiumProfileController } from './stadium-profile.controller';
+import { StadiumWikipediaService } from './stadium-wikipedia.service';
 
 
 @Injectable()
@@ -23,10 +29,10 @@ export class StadiumController extends CrudController<Stadium, CreateStadiumDTO>
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Stadium, Address])],
-  controllers: [StadiumController],
-  providers: [StadiumService],
-  exports: [StadiumService]
+  imports: [TypeOrmModule.forFeature([Stadium, Address, TeamStadium, Team, Fixture])],
+  controllers: [StadiumController, StadiumProfileController],
+  providers: [StadiumService, StadiumProfileService, StadiumWikipediaService],
+  exports: [StadiumService, StadiumProfileService]
 })
 
 

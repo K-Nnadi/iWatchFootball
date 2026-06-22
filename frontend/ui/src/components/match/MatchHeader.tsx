@@ -446,6 +446,17 @@ export function MatchHeader({
                         <Text
                             size="sm"
                             fw={550}
+                            component={matchDetails.stadiumId != null ? 'button' : 'span'}
+                            type={matchDetails.stadiumId != null ? 'button' : undefined}
+                            onClick={
+                                matchDetails.stadiumId != null
+                                    ? () =>
+                                          navigateWithTransition(`/stadium/${matchDetails.stadiumId}`, {
+                                              transitionType: 'loading',
+                                              duration: 900,
+                                          })
+                                    : undefined
+                            }
                             style={{
                                 color:
                                     colorScheme === 'dark'
@@ -456,6 +467,14 @@ export function MatchHeader({
                                 fontSize: 'clamp(0.6875rem, 1.5vw, 0.8125rem)',
                                 textAlign: 'center',
                                 maxWidth: 520,
+                                ...(matchDetails.stadiumId != null
+                                    ? {
+                                          border: 'none',
+                                          background: 'transparent',
+                                          padding: 0,
+                                          cursor: 'pointer',
+                                      }
+                                    : {}),
                             }}
                         >
                             {matchDetails.venue}

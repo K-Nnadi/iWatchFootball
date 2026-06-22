@@ -5,6 +5,10 @@ import {CrudController} from "@iWatchFootball/base-tools/crud/crud.controller";
 import {AuthedController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter";
 import {Repository} from "typeorm";
+import { ManagerEmployment } from '../managerEmployment/managerEmployment.entity';
+import { Team } from '../team/team.entity';
+import { ManagerProfileService } from './manager-profile.service';
+import { ManagerProfileController } from './manager-profile.controller';
 
 
 @Injectable()
@@ -22,10 +26,10 @@ export class ManagerController extends CrudController<Manager, CreateManagerDTO>
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Manager])],
-  controllers: [ManagerController],
-  providers: [ManagerService],
-  exports: [ManagerService]
+  imports: [TypeOrmModule.forFeature([Manager, ManagerEmployment, Team])],
+  controllers: [ManagerController, ManagerProfileController],
+  providers: [ManagerService, ManagerProfileService],
+  exports: [ManagerService, ManagerProfileService]
 })
 
 

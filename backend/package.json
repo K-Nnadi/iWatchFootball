@@ -14,8 +14,8 @@
     "clean:openapi": "node clean-openapi.js",
     "generate:client-gen": "npm run clean:openapi && orval --config ./orval.config.js && pnpm --filter @iWatchFootball/clients build",
     "migrate": "ts-node ./node_modules/typeorm/cli.js migration:generate src/shared/migrations/generatedCli  -d src/shared/ormconfig.ts",
-    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/shared/ormconfig.ts",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/shared/ormconfig.ts",
+    "migration:run": "node scripts/run-migrations.cjs",
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/shared/ormconfig.migrations.ts",
     "test": "echo \"No tests configured yet\" && exit 0"
   },
   "dependencies": {

@@ -1341,6 +1341,9 @@ q: string;
 export type PlatformConfigControllerGetFeatures200 = {
   marketplaceEnabled?: boolean;
   adsEnabled?: boolean;
+  playerAdvancedStatsEnabled?: boolean;
+  attendanceStatsEnabled?: boolean;
+  attendanceAdvancedStatsEnabled?: boolean;
 };
 
 export type GetCountLogParams = {
@@ -2767,8 +2770,6 @@ export interface Team {
   metadata?: TeamMetadata;
   name: string;
   parentId?: number;
-  playerIds?: string[];
-  players: Promise;
   teamCompetitionSeasons: string[];
   /** @nullable */
   teamStadiumLinks?: TeamTeamStadiumLinks;
@@ -3161,8 +3162,7 @@ export interface Player {
   ownGoals: Promise;
   photoUrl?: string;
   positionIds: string[];
-  teamIds?: string[];
-  teams?: Promise;
+  currentTeamId?: number;
   transfers: string[];
   /** @nullable */
   trophies: string[] | null;
@@ -3191,7 +3191,7 @@ export interface CreatePlayerDTO {
   nickname?: string;
   photoUrl?: string;
   positionIds: string[];
-  teamIds?: string[];
+  currentTeamId?: number;
   weight?: number;
 }
 
