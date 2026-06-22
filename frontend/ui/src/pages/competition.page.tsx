@@ -198,14 +198,14 @@ export function CompetitionPage() {
         }
 
         const byTeam = new Map<number, CompetitionStanding>();
-        for (const row of byTcs.values()) {
+        for (const row of Array.from(byTcs.values())) {
             const teamId = teamIdForStanding(row.teamCompetitionSeasonId);
             if (teamId == null) continue;
             const existing = byTeam.get(teamId);
             byTeam.set(teamId, existing ? pickPreferredStanding(existing, row) : row);
         }
 
-        return [...byTeam.values()].sort((a, b) => a.position - b.position);
+        return Array.from(byTeam.values()).sort((a, b) => a.position - b.position);
     }, [standings, tcsForSeason]);
 
     // Fixtures for this competition + season
@@ -371,7 +371,7 @@ export function CompetitionPage() {
                                             <Table.Td ta="center">
                                                 {row.form ? (
                                                     <Group gap={2} justify="center">
-                                                        {row.form.split('').map((r, i) => (
+                                                        {row.form.split('').map((r: string, i: number) => (
                                                             <Box key={i} style={{
                                                                 width: 16, height: 16, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                                 backgroundColor: r === 'W' ? 'var(--modern-lime)' : r === 'L' ? '#ff4d4d' : '#888',

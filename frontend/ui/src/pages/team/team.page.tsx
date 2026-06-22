@@ -648,7 +648,13 @@ export function TeamPage() {
         manager?.nationality,
     ]);
 
-    const groupedSquad = useMemo(() => (displayTeam ? groupSquadByPosition(displayTeam.squad) : {}), [displayTeam]);
+    const groupedSquad = useMemo(
+        () =>
+            displayTeam
+                ? groupSquadByPosition(displayTeam.squad)
+                : ({} as Record<SquadPositionGroup, DisplaySquadMember[]>),
+        [displayTeam],
+    );
 
     const squadGroupLabels = useMemo(
         (): Record<SquadPositionGroup, string> => ({
