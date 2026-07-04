@@ -380,6 +380,12 @@
     "featureFollowTeamsDesc": "Get instant notifications for goals, results, and news from all your favourite clubs and competitions.",
     "featureFriendsStats": "Friends & rivals",
     "featureFriendsStatsDesc": "Compare your match attendance and stats against friends. See who's the most dedicated fan.",
+    "featureTicketMarketplace": "Ticket marketplace",
+    "featureTicketMarketplaceDesc": "Buy and sell tickets safely with our verified peer-to-peer marketplace, including buyer protection.",
+    "featureLiveScores": "Live scores",
+    "featureLiveScoresDesc": "Real-time match updates, lineups, and key events from thousands of leagues around the world.",
+    "featureStadiumExplorer": "Stadium explorer",
+    "featureStadiumExplorerDesc": "Discover stadiums across the globe, read reviews from fans, and plan your next away trip.",
     "featureAttendance": "Attendance tracking",
     "featureAttendanceDesc": "Upload your match tickets to verify attendance and build your official lifelong match record."
   },

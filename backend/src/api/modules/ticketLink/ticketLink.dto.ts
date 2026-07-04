@@ -33,7 +33,7 @@ export class CreateTicketLinkDto {
     @ApiPropertyOptional({ description: 'Competition this link applies to' })
     competitionId?: number;
 
-    @IsUrl({ require_tls: true })
+    @IsUrl({ require_tld: true, protocols: ['https'] })
     @MaxLength(2048)
     @ApiProperty({ description: 'Target HTTPS URL' })
     url!: string;
@@ -125,7 +125,7 @@ export class UpdateTicketLinkDto {
     competitionId?: number;
 
     @IsOptional()
-    @IsUrl({ require_tls: true })
+    @IsUrl({ require_tld: true, protocols: ['https'] })
     @MaxLength(2048)
     @ApiPropertyOptional()
     url?: string;
