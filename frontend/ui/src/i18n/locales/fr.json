@@ -375,7 +375,13 @@
     "featureEasyTicketing": "Billetterie facile",
     "featureEasyTicketingDesc": "Obtenez des billets pour les grandes ligues via nos partenaires vérifiés.",
     "featureHighlights": "Résumés de match",
-    "featureHighlightsDesc": "Regardez les temps forts et résumés étendus des meilleurs matchs."
+    "featureHighlightsDesc": "Regardez les temps forts et résumés étendus des meilleurs matchs.",
+    "featureFollowTeams": "Follow your teams",
+    "featureFollowTeamsDesc": "Get instant notifications for goals, results, and news from all your favourite clubs and competitions.",
+    "featureFriendsStats": "Friends & rivals",
+    "featureFriendsStatsDesc": "Compare your match attendance and stats against friends. See who's the most dedicated fan.",
+    "featureAttendance": "Attendance tracking",
+    "featureAttendanceDesc": "Upload your match tickets to verify attendance and build your official lifelong match record."
   },
   "landing": {
     "heroEyebrow": "Pour les fans au stade",
