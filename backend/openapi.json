@@ -4955,6 +4955,36 @@
                     },
                     "attendanceAdvancedStatsEnabled": {
                       "type": "boolean"
+                    },
+                    "ticketLinksEnabled": {
+                      "type": "boolean"
+                    },
+                    "affiliateLinksEnabled": {
+                      "type": "boolean"
+                    },
+                    "matchdayAffiliatesEnabled": {
+                      "type": "boolean"
+                    },
+                    "hospitalityLinksEnabled": {
+                      "type": "boolean"
+                    },
+                    "sponsoredPlacementsEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketAlertsEnabled": {
+                      "type": "boolean"
+                    },
+                    "affiliateDisclosureEnabled": {
+                      "type": "boolean"
+                    },
+                    "attendanceTrackingEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketDocumentUploadEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketDemandEnabled": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -4971,6 +5001,47 @@
           }
         ],
         "summary": "Public platform feature flags for client UI",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
+    "/platform-config/fees": {
+      "get": {
+        "operationId": "PlatformConfigController_getFees",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "buyerFeeRate": {
+                      "type": "number",
+                      "description": "Buyer-side fee as a decimal (e.g. 0.10 = 10%)"
+                    },
+                    "sellerFeeRate": {
+                      "type": "number",
+                      "description": "Seller-side fee as a decimal (e.g. 0.05 = 5%)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Public marketplace fee structure (buyer fee, seller fee)",
         "tags": [
           "platform-config",
           "platform-config"
@@ -14526,6 +14597,1300 @@
         ]
       }
     },
+    "/ticket-link/query": {
+      "get": {
+        "operationId": "TicketLinkController_query",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "teamId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "competitionId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketLinkResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Query active ticket links by fixture, team, or competition",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      }
+    },
+    "/ticket-link/{id}": {
+      "get": {
+        "operationId": "TicketLinkController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLinkResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single ticket link by ID",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      },
+      "patch": {
+        "operationId": "TicketLinkController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTicketLinkDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLinkResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Update a ticket link",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      },
+      "delete": {
+        "operationId": "TicketLinkController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Delete a ticket link",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      }
+    },
+    "/ticket-link/{id}/click": {
+      "post": {
+        "operationId": "TicketLinkController_recordClick",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "source",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "WEB",
+                "MOBILE"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "fixtureId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record a click on a ticket link (anonymous or authed, fire-and-forget)",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      }
+    },
+    "/ticket-link": {
+      "post": {
+        "operationId": "TicketLinkController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketLinkDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLinkResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Create a new ticket link",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      },
+      "get": {
+        "operationId": "TicketLinkController_adminListAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketLinkResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) List all ticket links including expired ones",
+        "tags": [
+          "ticket-link",
+          "ticket-link"
+        ]
+      }
+    },
+    "/attendance": {
+      "post": {
+        "operationId": "AttendanceController_upsert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create or update an attendance declaration for a fixture",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/my": {
+      "get": {
+        "operationId": "AttendanceController_getMyAttendance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AttendanceResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's attendance records",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{fixtureId}/count": {
+      "get": {
+        "operationId": "AttendanceController_getCount",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceCountResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get aggregate attendance count for a fixture (public, no user data)",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{id}": {
+      "delete": {
+        "operationId": "AttendanceController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel attendance for a fixture",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{id}/upload": {
+      "post": {
+        "operationId": "AttendanceController_uploadDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a private ticket document (PDF or image, max 10 MB, owner only)",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{id}/document": {
+      "get": {
+        "operationId": "AttendanceController_getDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stream the private ticket document for own attendance record (owner only)",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/ticket-interest": {
+      "post": {
+        "operationId": "TicketInterestController_upsert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketInterestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketInterestResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register or update interest in attending a match",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/my": {
+      "get": {
+        "operationId": "TicketInterestController_getMyInterests",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketInterestResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's ticket interests",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/{id}": {
+      "delete": {
+        "operationId": "TicketInterestController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a ticket interest",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/{fixtureId}/demand": {
+      "get": {
+        "operationId": "TicketInterestController_getDemand",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandStatsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get public aggregate demand stats for a fixture (count only, no user data)",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/{fixtureId}/demand/admin": {
+      "get": {
+        "operationId": "TicketInterestController_getAdminDemand",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDemandStatsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Get detailed demand stats including avg max price",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/notify/{fixtureId}": {
+      "post": {
+        "operationId": "TicketInterestController_notifyInterested",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "notified": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Notify all interested users for a fixture that resale is now live",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/admin/snapshot": {
+      "get": {
+        "operationId": "AdminSnapshotController_getSnapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Snapshot counts grouped by domain"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Admin dashboard — extended DB snapshot across all feature areas",
+        "tags": [
+          "admin-snapshot",
+          "admin-snapshot"
+        ]
+      }
+    },
+    "/admin/affiliate-partners": {
+      "get": {
+        "operationId": "AffiliatePartnerController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AffiliatePartnerResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) List all affiliate partners",
+        "tags": [
+          "admin/affiliate-partners",
+          "admin-affiliate-partners"
+        ]
+      },
+      "post": {
+        "operationId": "AffiliatePartnerController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAffiliatePartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AffiliatePartnerResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Create an affiliate partner",
+        "tags": [
+          "admin/affiliate-partners",
+          "admin-affiliate-partners"
+        ]
+      }
+    },
+    "/admin/affiliate-partners/{id}": {
+      "get": {
+        "operationId": "AffiliatePartnerController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AffiliatePartnerResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Get a single affiliate partner",
+        "tags": [
+          "admin/affiliate-partners",
+          "admin-affiliate-partners"
+        ]
+      },
+      "patch": {
+        "operationId": "AffiliatePartnerController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAffiliatePartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AffiliatePartnerResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Update an affiliate partner",
+        "tags": [
+          "admin/affiliate-partners",
+          "admin-affiliate-partners"
+        ]
+      },
+      "delete": {
+        "operationId": "AffiliatePartnerController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Delete an affiliate partner",
+        "tags": [
+          "admin/affiliate-partners",
+          "admin-affiliate-partners"
+        ]
+      }
+    },
+    "/affiliate/postback": {
+      "post": {
+        "operationId": "AffiliateConversionController_postback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AffiliatePostbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Affiliate network postback — record a conversion",
+        "tags": [
+          "affiliate",
+          "affiliate"
+        ]
+      },
+      "get": {
+        "operationId": "AffiliateConversionController_postbackGet",
+        "parameters": [
+          {
+            "name": "ticketLinkId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "network",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "commissionAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Affiliate network postback (GET variant for networks that use query strings)",
+        "tags": [
+          "affiliate",
+          "affiliate"
+        ]
+      }
+    },
+    "/affiliate/conversions": {
+      "get": {
+        "operationId": "AffiliateConversionController_listRecent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) List recent affiliate conversions",
+        "tags": [
+          "affiliate",
+          "affiliate"
+        ]
+      }
+    },
+    "/admin/ticket-link-analytics/summary": {
+      "get": {
+        "operationId": "TicketLinkAnalyticsController_getSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLinkAnalyticsSummaryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Overall click + conversion summary",
+        "tags": [
+          "admin/ticket-link-analytics",
+          "admin-ticket-link-analytics"
+        ]
+      }
+    },
+    "/admin/ticket-link-analytics/by-link": {
+      "get": {
+        "operationId": "TicketLinkAnalyticsController_getByLink",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketLinkClicksByLinkDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Click counts grouped by ticket link",
+        "tags": [
+          "admin/ticket-link-analytics",
+          "admin-ticket-link-analytics"
+        ]
+      }
+    },
+    "/admin/ticket-link-analytics/by-fixture": {
+      "get": {
+        "operationId": "TicketLinkAnalyticsController_getByFixture",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketLinkClicksByFixtureDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Click counts grouped by fixture",
+        "tags": [
+          "admin/ticket-link-analytics",
+          "admin-ticket-link-analytics"
+        ]
+      }
+    },
     "/discount-code/validate/{code}": {
       "get": {
         "operationId": "DiscountCodeController_validate",
@@ -18286,6 +19651,54 @@
         ]
       }
     },
+    "/marketplace/listings/my-purchases": {
+      "get": {
+        "operationId": "MarketplaceListingController_getMyPurchases",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's purchases",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/pending-review": {
+      "get": {
+        "operationId": "MarketplaceListingController_getPendingReview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Get all listings pending review",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
     "/marketplace/listings/{id}": {
       "get": {
         "operationId": "MarketplaceListingController_getListing",
@@ -18356,6 +19769,359 @@
           }
         ],
         "summary": "Cancel an active listing (seller only). Ticket returned to seller.",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/submit": {
+      "post": {
+        "operationId": "MarketplaceListingController_submitForReview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit listing for admin review (DRAFT → PENDING_REVIEW)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/approve": {
+      "post": {
+        "operationId": "MarketplaceListingController_approveListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Approve a pending listing (PENDING_REVIEW → ACTIVE)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/reject": {
+      "post": {
+        "operationId": "MarketplaceListingController_rejectListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Reject a pending listing with a reason",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/upload-proof": {
+      "post": {
+        "operationId": "MarketplaceListingController_uploadProof",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload proof of ticket ownership (seller only, admin-reviewable)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/proof": {
+      "get": {
+        "operationId": "MarketplaceListingController_getProof",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Stream the proof document for a listing",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/request-purchase": {
+      "post": {
+        "operationId": "MarketplaceListingController_requestPurchase",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request to purchase an active listing (buyer)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/confirm-transfer": {
+      "post": {
+        "operationId": "MarketplaceListingController_confirmTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seller confirms they have sent the ticket",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/confirm-receipt": {
+      "post": {
+        "operationId": "MarketplaceListingController_confirmReceipt",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Buyer confirms they received the ticket",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/dispute": {
+      "post": {
+        "operationId": "MarketplaceListingController_raiseDispute",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "details"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Raise a dispute on a listing (buyer or seller)",
         "tags": [
           "marketplace",
           "marketplace"
@@ -20692,7 +22458,15 @@
             "type": "string",
             "enum": [
               "FRIEND_REQUEST_RECEIVED",
-              "FRIEND_REQUEST_ACCEPTED"
+              "FRIEND_REQUEST_ACCEPTED",
+              "TICKET_RESALE_AVAILABLE",
+              "LISTING_APPROVED",
+              "LISTING_REJECTED",
+              "PURCHASE_REQUESTED",
+              "TRANSFER_INITIATED",
+              "TRANSFER_CONFIRMED",
+              "DISPUTE_RAISED",
+              "MATCH_REMINDER"
             ]
           },
           "title": {
@@ -23523,6 +25297,757 @@
         },
         "required": [
           "holderId"
+        ]
+      },
+      "TicketLinkResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "competitionId": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "linkType": {
+            "type": "string",
+            "enum": [
+              "OFFICIAL_CLUB",
+              "COMPETITION",
+              "AWAY_FANS",
+              "TICKET_EXCHANGE",
+              "HOSPITALITY",
+              "HOSPITALITY_PARTNER",
+              "MEMBERSHIP",
+              "TRAVEL",
+              "PARKING",
+              "HOTEL",
+              "MERCHANDISE",
+              "STADIUM_TOUR",
+              "APPROVED_PARTNER",
+              "AFFILIATE"
+            ]
+          },
+          "linkCategory": {
+            "type": "string",
+            "enum": [
+              "TICKETS",
+              "HOSPITALITY",
+              "MEMBERSHIP",
+              "MATCHDAY_PLANNING",
+              "SPONSORED"
+            ]
+          },
+          "isAffiliate": {
+            "type": "boolean"
+          },
+          "isSponsored": {
+            "type": "boolean"
+          },
+          "sponsorLabel": {
+            "type": "string"
+          },
+          "badgeText": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "saleInfo": {
+            "type": "object",
+            "description": "On-sale dates and membership requirements"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "label",
+          "linkType",
+          "linkCategory",
+          "isAffiliate",
+          "isSponsored",
+          "priority",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateTicketLinkDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number",
+            "description": "Fixture this link applies to"
+          },
+          "teamId": {
+            "type": "number",
+            "description": "Team whose home matches this link applies to"
+          },
+          "competitionId": {
+            "type": "number",
+            "description": "Competition this link applies to"
+          },
+          "url": {
+            "type": "string",
+            "description": "Target HTTPS URL"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label for the CTA button"
+          },
+          "linkType": {
+            "type": "string",
+            "enum": [
+              "OFFICIAL_CLUB",
+              "COMPETITION",
+              "AWAY_FANS",
+              "TICKET_EXCHANGE",
+              "HOSPITALITY",
+              "HOSPITALITY_PARTNER",
+              "MEMBERSHIP",
+              "TRAVEL",
+              "PARKING",
+              "HOTEL",
+              "MERCHANDISE",
+              "STADIUM_TOUR",
+              "APPROVED_PARTNER",
+              "AFFILIATE"
+            ]
+          },
+          "linkCategory": {
+            "type": "string",
+            "enum": [
+              "TICKETS",
+              "HOSPITALITY",
+              "MEMBERSHIP",
+              "MATCHDAY_PLANNING",
+              "SPONSORED"
+            ],
+            "description": "Display group this link belongs to"
+          },
+          "isAffiliate": {
+            "type": "boolean"
+          },
+          "affiliateTag": {
+            "type": "string",
+            "description": "Affiliate tracking tag (server-side only, never returned to clients)"
+          },
+          "affiliateUrlFormat": {
+            "type": "string",
+            "enum": [
+              "QUERY_PARAM",
+              "PATH_SEGMENT",
+              "SUBID",
+              "REDIRECT_URL"
+            ]
+          },
+          "partnerId": {
+            "type": "number",
+            "description": "FK to AffiliatePartner for default tag/format inheritance"
+          },
+          "isSponsored": {
+            "type": "boolean",
+            "default": false
+          },
+          "sponsorLabel": {
+            "type": "string",
+            "description": "Sponsor attribution text"
+          },
+          "badgeText": {
+            "type": "string",
+            "description": "Badge text, e.g. \"Official\""
+          },
+          "priority": {
+            "type": "number",
+            "description": "Display priority (lower = shown first)",
+            "default": 0
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Auto-hide after this timestamp"
+          },
+          "saleInfo": {
+            "type": "object",
+            "description": "On-sale dates and membership requirements"
+          }
+        },
+        "required": [
+          "url",
+          "label",
+          "linkType",
+          "linkCategory",
+          "isAffiliate",
+          "isSponsored",
+          "priority"
+        ]
+      },
+      "UpdateTicketLinkDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "teamId": {
+            "type": "number"
+          },
+          "competitionId": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "linkType": {
+            "type": "string",
+            "enum": [
+              "OFFICIAL_CLUB",
+              "COMPETITION",
+              "AWAY_FANS",
+              "TICKET_EXCHANGE",
+              "HOSPITALITY",
+              "HOSPITALITY_PARTNER",
+              "MEMBERSHIP",
+              "TRAVEL",
+              "PARKING",
+              "HOTEL",
+              "MERCHANDISE",
+              "STADIUM_TOUR",
+              "APPROVED_PARTNER",
+              "AFFILIATE"
+            ]
+          },
+          "linkCategory": {
+            "type": "string",
+            "enum": [
+              "TICKETS",
+              "HOSPITALITY",
+              "MEMBERSHIP",
+              "MATCHDAY_PLANNING",
+              "SPONSORED"
+            ]
+          },
+          "isAffiliate": {
+            "type": "boolean"
+          },
+          "affiliateTag": {
+            "type": "string"
+          },
+          "affiliateUrlFormat": {
+            "type": "string",
+            "enum": [
+              "QUERY_PARAM",
+              "PATH_SEGMENT",
+              "SUBID",
+              "REDIRECT_URL"
+            ]
+          },
+          "partnerId": {
+            "type": "number"
+          },
+          "isSponsored": {
+            "type": "boolean"
+          },
+          "sponsorLabel": {
+            "type": "string"
+          },
+          "badgeText": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "saleInfo": {
+            "type": "object"
+          }
+        }
+      },
+      "UpsertAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number",
+            "description": "Fixture ID"
+          },
+          "hasTicket": {
+            "type": "boolean",
+            "description": "True if the user has/had a ticket"
+          },
+          "seatSection": {
+            "type": "string"
+          },
+          "seatBlock": {
+            "type": "string"
+          },
+          "seatRow": {
+            "type": "string"
+          },
+          "seatNumber": {
+            "type": "string"
+          },
+          "ticketProvider": {
+            "type": "string"
+          },
+          "purchaseDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "hasTicket"
+        ]
+      },
+      "AttendanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "hasTicket": {
+            "type": "boolean"
+          },
+          "seatSection": {
+            "type": "string"
+          },
+          "seatBlock": {
+            "type": "string"
+          },
+          "seatRow": {
+            "type": "string"
+          },
+          "seatNumber": {
+            "type": "string"
+          },
+          "ticketProvider": {
+            "type": "string"
+          },
+          "purchaseDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "hasDocument": {
+            "type": "boolean",
+            "description": "True if a private ticket document has been uploaded"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fixtureId",
+          "userId",
+          "hasTicket",
+          "hasDocument",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AttendanceCountResponseDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "goingCount": {
+            "type": "number",
+            "description": "Total users who have marked themselves as going"
+          },
+          "hasTicketCount": {
+            "type": "number",
+            "description": "Of those, how many have marked they have a ticket"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "goingCount",
+          "hasTicketCount"
+        ]
+      },
+      "CreateTicketInterestDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1
+          },
+          "maxPriceGbp": {
+            "type": "number",
+            "description": "Max price willing to pay (GBP)"
+          },
+          "preferredStand": {
+            "type": "string"
+          },
+          "wantsNotification": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "fixtureId",
+          "quantity",
+          "wantsNotification"
+        ]
+      },
+      "TicketInterestResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "maxPriceGbp": {
+            "type": "number"
+          },
+          "preferredStand": {
+            "type": "string"
+          },
+          "wantsNotification": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "NOTIFIED",
+              "CANCELLED"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fixtureId",
+          "quantity",
+          "wantsNotification",
+          "status",
+          "createdAt"
+        ]
+      },
+      "DemandStatsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "interestedCount": {
+            "type": "number"
+          },
+          "totalTicketsWanted": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "interestedCount",
+          "totalTicketsWanted"
+        ]
+      },
+      "AdminDemandStatsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "interestedCount": {
+            "type": "number"
+          },
+          "totalTicketsWanted": {
+            "type": "number"
+          },
+          "avgMaxPriceGbp": {
+            "type": "number",
+            "description": "Average max price across users who set one (admin only)"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "interestedCount",
+          "totalTicketsWanted"
+        ]
+      },
+      "AffiliatePartnerResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "defaultAffiliateTag": {
+            "type": "string"
+          },
+          "affiliateUrlFormat": {
+            "type": "string",
+            "enum": [
+              "QUERY_PARAM",
+              "PATH_SEGMENT",
+              "SUBID",
+              "REDIRECT_URL"
+            ]
+          },
+          "commissionRatePercent": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateAffiliatePartnerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string",
+            "description": "Affiliate network, e.g. \"Awin\""
+          },
+          "defaultAffiliateTag": {
+            "type": "string"
+          },
+          "affiliateUrlFormat": {
+            "type": "string",
+            "enum": [
+              "QUERY_PARAM",
+              "PATH_SEGMENT",
+              "SUBID",
+              "REDIRECT_URL"
+            ]
+          },
+          "commissionRatePercent": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "isActive"
+        ]
+      },
+      "UpdateAffiliatePartnerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "defaultAffiliateTag": {
+            "type": "string"
+          },
+          "affiliateUrlFormat": {
+            "type": "string",
+            "enum": [
+              "QUERY_PARAM",
+              "PATH_SEGMENT",
+              "SUBID",
+              "REDIRECT_URL"
+            ]
+          },
+          "commissionRatePercent": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "AffiliatePostbackDto": {
+        "type": "object",
+        "properties": {
+          "ticketLinkId": {
+            "type": "number",
+            "description": "ID of the ticket link that generated this conversion"
+          },
+          "network": {
+            "type": "string",
+            "description": "Affiliate network identifier, e.g. \"Awin\""
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "commissionAmount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticketLinkId",
+          "network"
+        ]
+      },
+      "TicketLinkAnalyticsSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalClicks": {
+            "type": "number",
+            "description": "Total clicks across all ticket links"
+          },
+          "clicksLast7Days": {
+            "type": "number",
+            "description": "Clicks in the last 7 days"
+          },
+          "clicksLast30Days": {
+            "type": "number",
+            "description": "Clicks in the last 30 days"
+          },
+          "totalConversions": {
+            "type": "number",
+            "description": "Total affiliate conversions recorded"
+          },
+          "activeLinks": {
+            "type": "number",
+            "description": "Total active ticket links"
+          },
+          "affiliateLinks": {
+            "type": "number",
+            "description": "Total affiliate links (active)"
+          }
+        },
+        "required": [
+          "totalClicks",
+          "clicksLast7Days",
+          "clicksLast30Days",
+          "totalConversions",
+          "activeLinks",
+          "affiliateLinks"
+        ]
+      },
+      "TicketLinkClicksByLinkDto": {
+        "type": "object",
+        "properties": {
+          "ticketLinkId": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          },
+          "totalClicks": {
+            "type": "number"
+          },
+          "clicksLast7Days": {
+            "type": "number"
+          },
+          "clicksLast30Days": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ticketLinkId",
+          "totalClicks",
+          "clicksLast7Days",
+          "clicksLast30Days"
+        ]
+      },
+      "TicketLinkClicksByFixtureDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number",
+            "description": "Fixture ID (null = team/competition-scoped links)"
+          },
+          "totalClicks": {
+            "type": "number",
+            "description": "Total clicks for this fixture"
+          }
+        },
+        "required": [
+          "totalClicks"
         ]
       },
       "CreateTrophyDTO": {

@@ -2,9 +2,11 @@ import {
   Badge,
   Button,
   Card,
+  Combobox,
   createTheme,
   Modal,
   Paper,
+  Popover,
   Tabs,
   Text,
   Title,
@@ -43,6 +45,12 @@ export const appTheme = createTheme({
   components: {
     Modal: Modal.extend({
       defaultProps: { zIndex: 1200 },
+    }),
+    Popover: Popover.extend({
+      defaultProps: { zIndex: 1300 },
+    }),
+    Combobox: Combobox.extend({
+      defaultProps: { zIndex: 1300 },
     }),
     Button: Button.extend({
       defaultProps: {

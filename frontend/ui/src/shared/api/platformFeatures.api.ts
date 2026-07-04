@@ -6,6 +6,16 @@ export interface PlatformFeatures {
     playerAdvancedStatsEnabled: boolean;
     attendanceStatsEnabled: boolean;
     attendanceAdvancedStatsEnabled: boolean;
+    ticketLinksEnabled: boolean;
+    affiliateLinksEnabled: boolean;
+    matchdayAffiliatesEnabled: boolean;
+    hospitalityLinksEnabled: boolean;
+    sponsoredPlacementsEnabled: boolean;
+    ticketAlertsEnabled: boolean;
+    affiliateDisclosureEnabled: boolean;
+    attendanceTrackingEnabled: boolean;
+    ticketDocumentUploadEnabled: boolean;
+    ticketDemandEnabled: boolean;
 }
 
 export async function getPlatformFeatures(): Promise<PlatformFeatures> {
@@ -16,5 +26,15 @@ export async function getPlatformFeatures(): Promise<PlatformFeatures> {
         playerAdvancedStatsEnabled: data.playerAdvancedStatsEnabled ?? true,
         attendanceStatsEnabled: data.attendanceStatsEnabled ?? true,
         attendanceAdvancedStatsEnabled: data.attendanceAdvancedStatsEnabled ?? true,
+        ticketLinksEnabled: data.ticketLinksEnabled ?? false,
+        affiliateLinksEnabled: data.affiliateLinksEnabled ?? false,
+        matchdayAffiliatesEnabled: data.matchdayAffiliatesEnabled ?? false,
+        hospitalityLinksEnabled: data.hospitalityLinksEnabled ?? false,
+        sponsoredPlacementsEnabled: data.sponsoredPlacementsEnabled ?? false,
+        ticketAlertsEnabled: data.ticketAlertsEnabled ?? false,
+        affiliateDisclosureEnabled: data.affiliateDisclosureEnabled ?? true,
+        attendanceTrackingEnabled: data.attendanceTrackingEnabled ?? false,
+        ticketDocumentUploadEnabled: data.ticketDocumentUploadEnabled ?? false,
+        ticketDemandEnabled: data.ticketDemandEnabled ?? false,
     };
 }

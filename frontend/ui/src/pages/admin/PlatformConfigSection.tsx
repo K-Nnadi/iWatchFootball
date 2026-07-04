@@ -34,6 +34,16 @@ const FEATURE_FLAG_KEYS = new Set([
     'player_advanced_stats_enabled',
     'attendance_stats_enabled',
     'attendance_advanced_stats_enabled',
+    'ticket_links_enabled',
+    'affiliate_links_enabled',
+    'matchday_affiliates_enabled',
+    'hospitality_links_enabled',
+    'sponsored_placements_enabled',
+    'ticket_alerts_enabled',
+    'affiliate_disclosure_enabled',
+    'attendance_tracking_enabled',
+    'ticket_document_upload_enabled',
+    'ticket_demand_enabled',
 ]);
 
 type RowDraft = {

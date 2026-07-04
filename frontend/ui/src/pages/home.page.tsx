@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     Avatar,
     Box,
@@ -12,15 +12,20 @@ import {
     Text,
     useMantineTheme
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { useMediaQuery, useInterval } from '@mantine/hooks';
 import {
     IconBell,
     IconClock,
     IconPlayerPlay,
     IconTicket,
-    IconVideo
+    IconVideo,
+    IconUsers,
+    IconBuildingStadium,
+    IconShoppingCart,
+    IconStar,
+    IconMap
 } from '@tabler/icons-react';
-import {Carousel} from '@mantine/carousel';
+import {Carousel, type Embla} from '@mantine/carousel';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import '../styles/homepage.css';
@@ -202,6 +207,14 @@ function TopNewsSection() {
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 150, threshold: 0.2 });
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
+    const [newsEmbla, setNewsEmbla] = useState<Embla | null>(null);
+    const [newsIsPaused, setNewsIsPaused] = useState(false);
+
+    useInterval(() => {
+        if (!newsIsPaused && newsEmbla) {
+            newsEmbla.scrollNext();
+        }
+    }, 3500, { autoInvoke: true });
 
     const { data: allArticles, isLoading } = useGetAllNewsArticle();
 
@@ -365,7 +378,11 @@ function TopNewsSection() {
 
                 {/* Top News Carousel */}
                 {(isLoading || topNews.length > 0) && (
-                    <Box style={{ position: 'relative', paddingBottom: '32px' }}>
+                    <Box
+                        style={{ position: 'relative', paddingBottom: '32px' }}
+                        onMouseEnter={() => setNewsIsPaused(true)}
+                        onMouseLeave={() => setNewsIsPaused(false)}
+                    >
                         <Carousel
                             slideSize={{base: '85%', sm: '50%', md: '25%'}}
                             slideGap="lg"
@@ -375,6 +392,7 @@ function TopNewsSection() {
                             loop
                             dragFree
                             height="100%"
+                            getEmblaApi={setNewsEmbla}
                             classNames={
                                 carouselClasses as {
                                     control?: string;
@@ -447,94 +465,99 @@ function FeaturesSection() {
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 200, threshold: 0.2 });
     const theme = useMantineTheme();
     const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md}px)`);
+
     const features = [
-        {
-            icon: IconBell,
-            title: t('home.featurePersonalisedStats'),
-            description: t('home.featurePersonalisedStatsDesc'),
-        },
-        {
-            icon: IconTicket,
-            title: t('home.featureEasyTicketing'),
-            description: t('home.featureEasyTicketingDesc'),
-        },
-        {
-            icon: IconVideo,
-            title: t('home.featureHighlights'),
-            description: t('home.featureHighlightsDesc'),
-        },
+        { icon: IconBell,            title: t('home.featurePersonalisedStats'),   description: t('home.featurePersonalisedStatsDesc') },
+        { icon: IconTicket,          title: t('home.featureEasyTicketing'),        description: t('home.featureEasyTicketingDesc') },
+        { icon: IconVideo,           title: t('home.featureHighlights'),           description: t('home.featureHighlightsDesc') },
+        { icon: IconStar,            title: t('home.featureFollowTeams'),          description: t('home.featureFollowTeamsDesc') },
+        { icon: IconUsers,           title: t('home.featureFriendsStats'),         description: t('home.featureFriendsStatsDesc') },
+        { icon: IconShoppingCart,    title: t('home.featureTicketMarketplace'),    description: t('home.featureTicketMarketplaceDesc') },
+        { icon: IconPlayerPlay,      title: t('home.featureLiveScores'),           description: t('home.featureLiveScoresDesc') },
+        { icon: IconBuildingStadium, title: t('home.featureStadiumExplorer'),      description: t('home.featureStadiumExplorerDesc') },
+        { icon: IconMap,             title: t('home.featureAttendance'),           description: t('home.featureAttendanceDesc') },
     ];
+
+    // Duplicate items so the seamless loop works (track is 2× wide, animate by -50%)
+    const tickerItems = [...features, ...features];
+
+    const cardWidth = isMobile ? 280 : 340;
+    const cardGap = 24;
 
     return (
         <Box
             ref={scrollAnimation.ref}
             className={scrollAnimation.className}
             py={{ base: '3rem', md: '6rem' }}
-            px={{ base: 'md', md: 0 }}
             style={{
                 backgroundColor: 'var(--modern-bg-secondary)',
                 color: 'var(--modern-text-primary)',
                 borderTop: '1px solid var(--modern-section-divider)',
                 position: 'relative',
-                overflowX: 'hidden',
+                overflow: 'hidden',
             }}
         >
-            {/* Subtle Background Pattern */}
             <Box
                 className="section-background-pattern"
                 style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    opacity: 0.03,
-                    pointerEvents: 'none',
-                    zIndex: 0,
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    opacity: 0.03, pointerEvents: 'none', zIndex: 0,
                 }}
             />
-            <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
-                <ModernH2 style={{
-                    textAlign: 'center', 
-                    marginBottom: isMobile ? '2rem' : '4rem',
-                    fontSize: 'clamp(1.25rem, 4vw, 2rem)'
-                }}>
-                    {t('home.whyChoosePrefix')}{' '}
-                    <span style={{color: 'var(--modern-lime)'}}>{t('home.whyChooseAccent')}</span>
-                    {t('home.whyChooseSuffix')}
-                </ModernH2>
 
-                <Grid gutter="xl" align="stretch">
-                    {features.map((feature, index) => (
-                        <Grid.Col key={index} span={{ base: 12, md: 4 }}>
-                            <ModernCard hover accent h="100%">
-                                <Stack align="center" gap="lg" p="xl" style={{ height: '100%' }}>
-                                    <Box
-                                        style={{
-                                            backgroundColor: 'var(--modern-lime)',
-                                            borderRadius: '50%',
-                                            width: '5rem',
-                                            height: '5rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        <feature.icon size={32} color="var(--modern-bg-primary)" stroke={2}/>
-                                    </Box>
-                                    <ModernH3 style={{textAlign: 'center'}}>
-                                        {feature.title}
-                                    </ModernH3>
-                                    <ModernBody style={{textAlign: 'center'}}>
-                                        {feature.description}
-                                    </ModernBody>
-                                </Stack>
-                            </ModernCard>
-                        </Grid.Col>
-                    ))}
-                </Grid>
-            </Container>
+            <Box style={{ position: 'relative', zIndex: 1 }}>
+                <Container size="xl" px={{ base: 'md', md: 'xl' }}>
+                    <ModernH2 style={{
+                        textAlign: 'center',
+                        marginBottom: isMobile ? '2rem' : '4rem',
+                        fontSize: 'clamp(1.25rem, 4vw, 2rem)',
+                    }}>
+                        {t('home.whyChoosePrefix')}{' '}
+                        <span style={{ color: 'var(--modern-lime)' }}>{t('home.whyChooseAccent')}</span>
+                        {t('home.whyChooseSuffix')}
+                    </ModernH2>
+                </Container>
+
+                <div className="features-ticker-wrapper">
+                    <div className="features-ticker-track">
+                        {tickerItems.map((feature, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    width: `${cardWidth}px`,
+                                    flexShrink: 0,
+                                    marginRight: `${cardGap}px`,
+                                }}
+                            >
+                                <ModernCard accent style={{ height: '280px' }}>
+                                    <Stack align="center" gap="lg" p="xl" style={{ height: '100%' }}>
+                                        <Box
+                                            style={{
+                                                backgroundColor: 'var(--modern-lime)',
+                                                borderRadius: '50%',
+                                                width: '4.5rem',
+                                                height: '4.5rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            <feature.icon size={28} color="var(--modern-bg-primary)" stroke={2} />
+                                        </Box>
+                                        <ModernH3 style={{ textAlign: 'center', fontSize: '1rem' }}>
+                                            {feature.title}
+                                        </ModernH3>
+                                        <ModernBody style={{ textAlign: 'center', fontSize: '0.875rem' }}>
+                                            {feature.description}
+                                        </ModernBody>
+                                    </Stack>
+                                </ModernCard>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </Box>
         </Box>
     );
 }

@@ -13,6 +13,10 @@ import {ScorePredictionCard} from '../../components/predictions';
 import {MatchHeader, MatchEventsSection, TeamFormSection, type MatchDetails, type TeamFormResult, getMatchStatus} from '../../components/match';
 import { MatchHighlightsSection } from '../../components/match/MatchHighlightsSection';
 import TeamLineups from "./teamLineup";
+import { TicketsMatchdayPanel } from '../../components/tickets/TicketsMatchdayPanel';
+import { ImGoingButton, AttendanceCount } from '../../components/attendance';
+import { LookingForTicketCTA } from '../../components/ticketDemand/LookingForTicketCTA';
+import { DemandCounter } from '../../components/ticketDemand/DemandCounter';
 import { MatchInsightPanel } from '../../components/match/MatchInsightPanel';
 import { useGetOneFixture } from '@iWatchFootball/clients/controllers/fixture';
 import { useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
@@ -346,6 +350,36 @@ export function MatchPage() {
                 showViewTicketsButton={true}
                 variant="full-width"
             />
+
+            {/* External Ticket Links (feature-gated) */}
+            {fetchFromApi && Number.isFinite(fixtureNumericId) && (
+                <Box
+                    px={{ base: 'md', md: 0 }}
+                    py={{ base: 'md', md: 'lg' }}
+                    style={{
+                        backgroundColor: 'var(--ui-bg-surface)',
+                        borderBottom: '1px solid var(--ui-border)',
+                    }}
+                >
+                    <Container size="xl" px={{ base: 'md', md: 'xl' }}>
+                        <Stack gap="sm">
+                            <TicketsMatchdayPanel
+                                fixtureId={fixtureNumericId}
+                                teamId={matchDetails.homeTeamId ?? undefined}
+                                competitionId={matchDetails.competitionId ?? undefined}
+                            />
+                            <Stack gap={4}>
+                                <AttendanceCount fixtureId={fixtureNumericId} />
+                                <DemandCounter fixtureId={fixtureNumericId} />
+                            </Stack>
+                            <Stack gap="xs" direction="row" align="center">
+                                <ImGoingButton fixtureId={fixtureNumericId} />
+                                <LookingForTicketCTA fixtureId={fixtureNumericId} />
+                            </Stack>
+                        </Stack>
+                    </Container>
+                </Box>
+            )}
 
             {/* Form & Prediction Section */}
             <Box

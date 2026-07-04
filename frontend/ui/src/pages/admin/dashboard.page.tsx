@@ -25,6 +25,10 @@ import {
     IconRefresh,
     IconSoccerField,
     IconVideo,
+    IconTicket,
+    IconUsers,
+    IconShoppingCart,
+    IconClick,
 } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { ModernButton, ModernH2 } from '../../components/modern';
@@ -42,12 +46,15 @@ import {
 } from '@iWatchFootball/clients/controllers/admin-data-sync';
 import type { DataSyncRunDto } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { PlatformConfigSection } from './PlatformConfigSection';
+import { useAdminSnapshot } from '../../shared/api/adminSnapshot.api';
 
-function StatTile({ label, value }: { label: string; value?: number }) {
+function StatTile({ label, value, accent }: { label: string; value?: number; accent?: string }) {
     return (
         <Paper p="md" radius="md" withBorder>
             <Text size="xs" c="dimmed" tt="uppercase" fw={600}>{label}</Text>
-            <Text size="xl" fw={700} mt={4}>{value ?? '—'}</Text>
+            <Text size="xl" fw={700} mt={4} style={accent ? { color: accent } : undefined}>
+                {value?.toLocaleString() ?? '—'}
+            </Text>
         </Paper>
     );
 }
@@ -56,6 +63,7 @@ export function AdminDashboardPage() {
     const { data: sbStatus, isLoading: sbLoading, refetch: refetchSbStatus } = useStatsBombControllerGetSyncStatus();
     const { data: newsCount, refetch: refetchNewsCount } = useGetCountNewsArticle();
     const { data: highlightCount, refetch: refetchHighlightCount } = useFixtureHighlightCount();
+    const { data: snapshot, refetch: refetchSnapshot } = useAdminSnapshot();
     const { data: newsStatusRaw, refetch: refetchNewsStatus } = useNewsAggregatorControllerGetStatus();
     const newsStatus = newsStatusRaw as { redisConfigured?: boolean; scheduler?: string } | undefined;
 
@@ -164,9 +172,20 @@ export function AdminDashboardPage() {
                             Data ingestion and platform administration. ADMIN role only.
                         </Text>
                     </Stack>
-                    <Button component={Link} to="/admin/discount-codes" variant="light" color="lime">
-                        Discount codes
-                    </Button>
+                    <Group gap="xs">
+                        <Button component={Link} to="/admin/discount-codes" variant="light" color="lime">
+                            Discount codes
+                        </Button>
+                        <Button component={Link} to="/admin/ticket-links" variant="light" color="teal">
+                            Ticket links
+                        </Button>
+                        <Button component={Link} to="/admin/affiliate-partners" variant="light" color="violet">
+                            Affiliate partners
+                        </Button>
+                        <Button component={Link} to="/admin/ticket-link-analytics" variant="light" color="orange">
+                            Link analytics
+                        </Button>
+                    </Group>
                 </Group>
 
                 <PlatformConfigSection />
@@ -186,6 +205,7 @@ export function AdminDashboardPage() {
                                 void refetchSbStatus();
                                 void refetchNewsCount();
                                 void refetchHighlightCount();
+                                void refetchSnapshot();
                             }}
                         >
                             Refresh
@@ -194,18 +214,81 @@ export function AdminDashboardPage() {
                     {sbLoading ? (
                         <Center py="md"><Loader size="sm" /></Center>
                     ) : (
-                        <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
-                            <StatTile label="Competitions" value={sbStatus?.competitions} />
-                            <StatTile label="Teams" value={sbStatus?.teams} />
-                            <StatTile label="Players" value={sbStatus?.players} />
-                            <StatTile label="Fixtures" value={sbStatus?.fixtures} />
-                            <StatTile label="Goals" value={sbStatus?.goals} />
-                            <StatTile label="Cards" value={sbStatus?.cards} />
-                            <StatTile label="Substitutions" value={sbStatus?.substitutions} />
-                            <StatTile label="Events" value={sbStatus?.events} />
-                            <StatTile label="News articles" value={newsCount} />
-                            <StatTile label="Highlights" value={highlightCount} />
-                        </SimpleGrid>
+                        <Stack gap="lg">
+                            {/* Core data */}
+                            <Stack gap="xs">
+                                <Group gap="xs">
+                                    <IconSoccerField size={14} color="var(--mantine-color-dimmed)" />
+                                    <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Core data</Text>
+                                </Group>
+                                <SimpleGrid cols={{ base: 2, sm: 5 }} spacing="sm">
+                                    <StatTile label="Competitions" value={sbStatus?.competitions} />
+                                    <StatTile label="Teams" value={sbStatus?.teams} />
+                                    <StatTile label="Players" value={sbStatus?.players} />
+                                    <StatTile label="News articles" value={newsCount} />
+                                    <StatTile label="Highlights" value={highlightCount} />
+                                </SimpleGrid>
+                            </Stack>
+
+                            {/* Fixtures */}
+                            <Stack gap="xs">
+                                <Group gap="xs">
+                                    <IconSoccerField size={14} color="var(--mantine-color-dimmed)" />
+                                    <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Fixtures</Text>
+                                </Group>
+                                <SimpleGrid cols={{ base: 2, sm: 5 }} spacing="sm">
+                                    <StatTile label="Total" value={snapshot?.fixtures.total} />
+                                    <StatTile label="Scheduled" value={snapshot?.fixtures.scheduled} accent="var(--mantine-color-blue-4)" />
+                                    <StatTile label="Live" value={snapshot?.fixtures.live} accent="var(--mantine-color-green-5)" />
+                                    <StatTile label="Completed" value={snapshot?.fixtures.completed} />
+                                    <StatTile label="Goals" value={sbStatus?.goals} />
+                                </SimpleGrid>
+                                <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
+                                    <StatTile label="Cards" value={sbStatus?.cards} />
+                                    <StatTile label="Substitutions" value={sbStatus?.substitutions} />
+                                    <StatTile label="Events" value={sbStatus?.events} />
+                                    <StatTile label="Postponed / Cancelled" value={snapshot?.fixtures.postponedOrCancelled} accent="var(--mantine-color-orange-4)" />
+                                </SimpleGrid>
+                            </Stack>
+
+                            {/* Ticket links */}
+                            <Stack gap="xs">
+                                <Group gap="xs">
+                                    <IconTicket size={14} color="var(--mantine-color-dimmed)" />
+                                    <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Ticket links</Text>
+                                </Group>
+                                <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
+                                    <StatTile label="Active links" value={snapshot?.ticketLinks.active} />
+                                    <StatTile label="Total clicks" value={snapshot?.ticketLinks.clicks} accent="var(--mantine-color-teal-4)" />
+                                </SimpleGrid>
+                            </Stack>
+
+                            {/* Attendance */}
+                            <Stack gap="xs">
+                                <Group gap="xs">
+                                    <IconUsers size={14} color="var(--mantine-color-dimmed)" />
+                                    <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Attendance</Text>
+                                </Group>
+                                <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
+                                    <StatTile label="Going" value={snapshot?.attendance.totalRecords} />
+                                    <StatTile label="With ticket" value={snapshot?.attendance.withTicket} accent="var(--mantine-color-green-4)" />
+                                    <StatTile label="Demand signals" value={snapshot?.community.ticketDemandSignals} accent="var(--mantine-color-yellow-4)" />
+                                </SimpleGrid>
+                            </Stack>
+
+                            {/* Marketplace */}
+                            <Stack gap="xs">
+                                <Group gap="xs">
+                                    <IconShoppingCart size={14} color="var(--mantine-color-dimmed)" />
+                                    <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Marketplace</Text>
+                                </Group>
+                                <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
+                                    <StatTile label="Active listings" value={snapshot?.marketplace.active} accent="var(--mantine-color-lime-4)" />
+                                    <StatTile label="Sold" value={snapshot?.marketplace.sold} accent="var(--mantine-color-green-5)" />
+                                    <StatTile label="Pending review" value={snapshot?.marketplace.pendingReview} accent="var(--mantine-color-orange-4)" />
+                                </SimpleGrid>
+                            </Stack>
+                        </Stack>
                     )}
                     {sbStatus?.lastSync && (
                         <Text size="xs" c="dimmed" mt="md">Last StatsBomb sync: {sbStatus.lastSync}</Text>

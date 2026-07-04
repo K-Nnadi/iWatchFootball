@@ -230,6 +230,7 @@ export function DiscountCodesAdminPage() {
                         ]}
                         value={form.type}
                         onChange={(v) => setForm((p) => ({ ...p, type: (v ?? 'PERCENTAGE') as DiscountType }))}
+                        comboboxProps={{ withinPortal: true }}
                         required
                     />
 
@@ -256,6 +257,7 @@ export function DiscountCodesAdminPage() {
                         placeholder="No expiry"
                         value={form.expiresAt}
                         onChange={(v) => setForm((p) => ({ ...p, expiresAt: v }))}
+                        popoverProps={{ withinPortal: true }}
                         clearable
                         minDate={new Date()}
                     />

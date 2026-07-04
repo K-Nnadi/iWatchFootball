@@ -32,6 +32,9 @@ import { MarketplaceCheckoutPage } from "./pages/marketplace/marketplaceCheckout
 import { MyListingsPage } from "./pages/marketplace/myListings.page";
 import { WalletPage } from "./pages/wallet.page";
 import { DiscountCodesAdminPage } from "./pages/admin/discountCodes.page";
+import { TicketLinksAdminPage } from "./pages/admin/ticketLinks.page";
+import { AffiliatePartnersAdminPage } from "./pages/admin/affiliatePartners.page";
+import { TicketLinkAnalyticsPage } from "./pages/admin/ticketLinkAnalytics.page";
 import { AdminDashboardPage } from "./pages/admin/dashboard.page";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import { RequireAdmin } from "./components/auth/RequireAdmin";
@@ -40,6 +43,11 @@ import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 import { RootEntry } from "./components/auth/RootEntry";
 import { MarketplaceFeatureRoute } from "./components/auth/MarketplaceFeatureRoute";
 import { AttendanceAdvancedStatsRoute } from "./components/auth/AttendanceAdvancedStatsRoute";
+import { AttendanceTrackingFeatureRoute } from "./components/auth/AttendanceTrackingFeatureRoute";
+import { TicketDemandFeatureRoute } from "./components/auth/TicketDemandFeatureRoute";
+import { AttendanceHistoryPage } from "./pages/attendance/attendance.page";
+import { MyInterestsPage } from "./pages/ticketInterests/myInterests.page";
+import { MyPurchasesPage } from "./pages/marketplace/myPurchases.page";
 import { FriendsPage } from "./pages/friends.page";
 import { CompareFriendPage } from "./pages/friendsCompare.page";
 import { AuthWelcomePage } from "./pages/auth/authWelcome.page";
@@ -72,10 +80,25 @@ const IWatchFootballElements: ElementMap = {
             <MyListingsPage/>
         </MarketplaceFeatureRoute>
     ),
+    'marketplace/my-purchases': (
+        <MarketplaceFeatureRoute>
+            <MyPurchasesPage/>
+        </MarketplaceFeatureRoute>
+    ),
     'marketplace/sell': (
         <MarketplaceFeatureRoute>
             <CreateListingPage/>
         </MarketplaceFeatureRoute>
+    ),
+    attendance: (
+        <AttendanceTrackingFeatureRoute>
+            <AttendanceHistoryPage />
+        </AttendanceTrackingFeatureRoute>
+    ),
+    'ticket-interests': (
+        <TicketDemandFeatureRoute>
+            <MyInterestsPage />
+        </TicketDemandFeatureRoute>
     ),
 }
 
@@ -207,6 +230,9 @@ const router = createBrowserRouter([
                                 children: [
                                     { path: '/admin', element: <AdminDashboardPage /> },
                                     { path: '/admin/discount-codes', element: <DiscountCodesAdminPage /> },
+                                    { path: '/admin/ticket-links', element: <TicketLinksAdminPage /> },
+                                    { path: '/admin/affiliate-partners', element: <AffiliatePartnersAdminPage /> },
+                                    { path: '/admin/ticket-link-analytics', element: <TicketLinkAnalyticsPage /> },
                                 ],
                             },
                         ],

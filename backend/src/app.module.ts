@@ -61,6 +61,13 @@ import {PlatformConfigModule} from "./api/modules/platformConfig/platformConfig.
 import {FixtureHighlightModule} from "./api/modules/fixtureHighlight/fixtureHighlight.module";
 import {HighlightsModule} from "./api/complexModules/highlights/highlights.module";
 import {RateLimitModule} from "./auth/rate-limit/rate-limit.module";
+import {TicketLinkModule} from "./api/modules/ticketLink/ticketLink.module";
+import {AttendanceRecordModule} from "./api/modules/attendanceRecord/attendanceRecord.module";
+import {AdminSnapshotModule} from "./api/modules/adminSnapshot/adminSnapshot.module";
+import {TicketInterestModule} from "./api/modules/ticketInterest/ticketInterest.module";
+import {AffiliatePartnerModule} from "./api/modules/affiliatePartner/affiliatePartner.module";
+import {AffiliateConversionModule} from "./api/modules/affiliateConversion/affiliateConversion.module";
+import {TicketLinkAnalyticsModule} from "./api/modules/ticketLinkAnalytics/ticketLinkAnalytics.module";
 import {RedisModule} from "./shared/redis/redis.module";
 import {buildBullConnection, isRedisEnabled} from "./shared/redis/redis.config";
 import {HealthModule} from "./health/health.module";
@@ -107,6 +114,13 @@ const Modules = [
     TeamStadiumModule,
     TicketModule,
     TicketHoldModule,
+    TicketLinkModule,
+    AttendanceRecordModule,
+    TicketInterestModule,
+    AdminSnapshotModule,
+    AffiliatePartnerModule,
+    AffiliateConversionModule,
+    TicketLinkAnalyticsModule,
     DiscountCodeModule,
     TransferModule,
     TrophyModule,

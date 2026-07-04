@@ -41,6 +41,7 @@ import { useGetQueryPosition } from '@iWatchFootball/clients/controllers/positio
 import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
 import { useTeamSquad, useTeamTransfers } from '../../shared/api/teamSquad.api';
+import { TicketLinkButton } from '../../components/tickets/TicketLinkButton';
 import {
     resolvePositionGroup,
     SQUAD_POSITION_GROUP_ORDER,
@@ -784,6 +785,9 @@ export function TeamPage() {
                         >
                             {team.name}
                         </Title>
+                        {fetchFromApi && Number.isFinite(teamIdNum) && (
+                            <TicketLinkButton teamId={teamIdNum} />
+                        )}
                         <Group gap="lg" wrap="wrap">
                             <Group gap="xs">
                                 <IconBuilding size={18} style={{ color: 'var(--modern-text-secondary)' }} />

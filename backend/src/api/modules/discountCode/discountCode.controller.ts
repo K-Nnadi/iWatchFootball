@@ -16,7 +16,7 @@ import { DiscountCodeService, CreateDiscountCodeDto } from './discountCode.servi
 import { DiscountType } from './discountCode.entity';
 import type { Request } from 'express';
 
-type AuthedRequest = Request & { user?: { id: number; role?: string } };
+type AuthedRequest = Request & { user?: { id: number; type?: string } };
 
 @AuthedController('discount-code')
 @ApiTags('discount-code')
@@ -39,7 +39,7 @@ export class DiscountCodeController {
     @Get()
     @ApiOperation({ summary: 'Admin: list all discount codes' })
     async findAll(@Req() req: AuthedRequest) {
-        if (req.user?.role !== 'admin') throw new UnauthorizedException('Admin only');
+        if (req.user?.type !== 'ADMIN') throw new UnauthorizedException('Admin only');
         return this.service.findAll();
     }
 
@@ -59,14 +59,14 @@ export class DiscountCodeController {
         },
     })
     async create(@Body() dto: CreateDiscountCodeDto, @Req() req: AuthedRequest) {
-        if (req.user?.role !== 'admin') throw new UnauthorizedException('Admin only');
+        if (req.user?.type !== 'ADMIN') throw new UnauthorizedException('Admin only');
         return this.service.create(dto);
     }
 
     @Patch(':id/toggle')
     @ApiOperation({ summary: 'Admin: toggle a discount code active/inactive' })
     async toggle(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
-        if (req.user?.role !== 'admin') throw new UnauthorizedException('Admin only');
+        if (req.user?.type !== 'ADMIN') throw new UnauthorizedException('Admin only');
         return this.service.toggleActive(id);
     }
 }

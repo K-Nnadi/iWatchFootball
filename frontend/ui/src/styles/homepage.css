@@ -237,6 +237,26 @@ a:focus-visible {
     }
 }
 
+/* Features ticker / continuous scroll */
+@keyframes featuresTicker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.features-ticker-track {
+    display: flex;
+    width: max-content;
+    animation: featuresTicker 55s linear infinite;
+    will-change: transform;
+}
+
+.features-ticker-wrapper {
+    overflow: hidden;
+    /* fade edges */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
 /* Smooth transitions for theme toggling - only for specific elements to prevent flickering */
 button, a, .mantine-Button-root, .mantine-NavLink-root {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;

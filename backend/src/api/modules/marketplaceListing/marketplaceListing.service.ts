@@ -5,6 +5,7 @@ import {
     Injectable,
     InternalServerErrorException,
     NotFoundException,
+    ServiceUnavailableException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -13,9 +14,14 @@ import { MarketplaceListing } from './marketplaceListing.entity';
 import { Fixture } from '../fixture/fixture.entity';
 import { Team } from '../team/team.entity';
 import { Ticket } from '../ticket/ticket.entity';
-import { MarketplaceListingStatus, TicketTransferReason } from '../../enums/marketplace.enum';
+import { DeliveryMethod, DisputeStatus, MarketplaceListingStatus, TicketTransferReason, TicketType } from '../../enums/marketplace.enum';
 import { TicketOwnershipHistoryService } from '../ticketOwnershipHistory/ticketOwnershipHistory.service';
 import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../enums/notification.enum';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 const EXPIRY_HOURS_BEFORE_KICKOFF = 24;
 
@@ -37,6 +43,7 @@ export class MarketplaceListingService {
         private readonly dataSource: DataSource,
         private readonly ownershipHistory: TicketOwnershipHistoryService,
         private readonly userTicketLog: UserTicketLogService,
+        private readonly notificationService: NotificationService,
     ) {}
 
     /** Adds fixtureLabel, fixtureDate (kick-off ISO), stadiumName onto each nested ticket for API consumers. */
@@ -275,6 +282,212 @@ export class MarketplaceListingService {
             .leftJoinAndSelect('l.ticket', 'ticket')
             .where('l.sellerId = :sellerId', { sellerId })
             .orderBy('l.createdAt', 'DESC')
+            .getMany();
+        await this.enrichListingsWithFixtureLabels(listings);
+        return listings;
+    }
+
+    async getBuyerPurchases(buyerId: number): Promise<MarketplaceListing[]> {
+        const listings = await this.repo
+            .createQueryBuilder('l')
+            .leftJoinAndSelect('l.ticket', 'ticket')
+            .where('l.buyerId = :buyerId', { buyerId })
+            .orderBy('l.createdAt', 'DESC')
+            .getMany();
+        await this.enrichListingsWithFixtureLabels(listings);
+        return listings;
+    }
+
+    async submitForReview(listingId: number, sellerId: number): Promise<MarketplaceListing> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.sellerId !== sellerId) throw new ForbiddenException('Not your listing');
+        if (listing.status !== MarketplaceListingStatus.DRAFT) {
+            throw new BadRequestException('Only DRAFT listings can be submitted for review');
+        }
+        listing.status = MarketplaceListingStatus.PENDING_REVIEW;
+        return this.repo.save(listing);
+    }
+
+    async adminApproveListing(listingId: number): Promise<MarketplaceListing> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.status !== MarketplaceListingStatus.PENDING_REVIEW) {
+            throw new BadRequestException('Only PENDING_REVIEW listings can be approved');
+        }
+        listing.status = MarketplaceListingStatus.ACTIVE;
+        const saved = await this.repo.save(listing);
+
+        await this.notificationService.createIfAllowed({
+            userId: listing.sellerId,
+            type: NotificationType.LISTING_APPROVED,
+            title: 'Your listing is live',
+            message: 'Your ticket listing has been approved and is now visible on the marketplace.',
+            metadata: { listingId: listing.id },
+        });
+
+        return saved;
+    }
+
+    async adminRejectListing(listingId: number, reason: string): Promise<MarketplaceListing> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.status !== MarketplaceListingStatus.PENDING_REVIEW) {
+            throw new BadRequestException('Only PENDING_REVIEW listings can be rejected');
+        }
+        listing.status = MarketplaceListingStatus.REJECTED;
+        listing.rejectionReason = reason;
+        const saved = await this.repo.save(listing);
+
+        // Return ticket to seller on rejection
+        await this.dataSource.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
+            listing.sellerId, listing.ticketId,
+        ]);
+        await this.ownershipHistory.record(this.dataSource.createQueryRunner().manager as never, {
+            ticketId: listing.ticketId,
+            fromUserId: undefined,
+            toUserId: listing.sellerId,
+            reason: TicketTransferReason.MARKETPLACE_REJECTED,
+            listingId: listing.id,
+        });
+
+        await this.notificationService.createIfAllowed({
+            userId: listing.sellerId,
+            type: NotificationType.LISTING_REJECTED,
+            title: 'Listing not approved',
+            message: `Your ticket listing was not approved. Reason: ${reason}`,
+            metadata: { listingId: listing.id },
+        });
+
+        return saved;
+    }
+
+    async uploadProofDocument(
+        listingId: number,
+        sellerId: number,
+        file: { originalname: string; buffer: Buffer; size: number },
+    ): Promise<void> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.sellerId !== sellerId) throw new ForbiddenException('Not your listing');
+        if (file.size > 10 * 1024 * 1024) throw new BadRequestException('File must be under 10 MB');
+
+        const baseDir = process.env.MARKETPLACE_DOCS_DIR ?? path.join(process.cwd(), 'uploads', 'marketplace-proof');
+        const dir = path.join(baseDir, String(listingId));
+        fs.mkdirSync(dir, { recursive: true });
+        const ext = path.extname(file.originalname).toLowerCase() || '.bin';
+        const filename = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${ext}`;
+        await fs.promises.writeFile(path.join(dir, filename), file.buffer);
+
+        listing.proofDocumentPath = path.join(String(listingId), filename);
+        await this.repo.save(listing);
+    }
+
+    async getAdminProofDocument(listingId: number): Promise<{ buffer: Buffer; ext: string }> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (!listing.proofDocumentPath) throw new NotFoundException('No proof document uploaded');
+
+        const baseDir = process.env.MARKETPLACE_DOCS_DIR ?? path.join(process.cwd(), 'uploads', 'marketplace-proof');
+        const fullPath = path.join(baseDir, listing.proofDocumentPath);
+        if (!fs.existsSync(fullPath)) throw new NotFoundException('Proof file not found on disk');
+        const buffer = await fs.promises.readFile(fullPath);
+        return { buffer, ext: path.extname(listing.proofDocumentPath).toLowerCase() };
+    }
+
+    async requestPurchase(listingId: number, buyerId: number): Promise<MarketplaceListing> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.status !== MarketplaceListingStatus.ACTIVE) {
+            throw new BadRequestException('Listing is not available for purchase');
+        }
+        if (listing.sellerId === buyerId) throw new BadRequestException('You cannot buy your own listing');
+
+        listing.buyerId = buyerId;
+        listing.status = MarketplaceListingStatus.SOLD;
+        const saved = await this.repo.save(listing);
+
+        await this.notificationService.createIfAllowed({
+            userId: listing.sellerId,
+            type: NotificationType.PURCHASE_REQUESTED,
+            title: 'Someone wants your ticket!',
+            message: 'A buyer has requested to purchase your ticket. Please initiate the transfer.',
+            metadata: { listingId: listing.id },
+        });
+
+        return saved;
+    }
+
+    async confirmTransfer(listingId: number, sellerId: number): Promise<MarketplaceListing> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.sellerId !== sellerId) throw new ForbiddenException('Not your listing');
+        if (listing.status !== MarketplaceListingStatus.SOLD) {
+            throw new BadRequestException('Listing is not in SOLD state');
+        }
+
+        listing.transferInitiatedAt = new Date();
+        const saved = await this.repo.save(listing);
+
+        if (listing.buyerId) {
+            await this.notificationService.createIfAllowed({
+                userId: listing.buyerId,
+                type: NotificationType.TRANSFER_INITIATED,
+                title: 'Seller has initiated ticket transfer',
+                message: 'The seller says they\'ve transferred the ticket. Please confirm receipt once you have it.',
+                metadata: { listingId: listing.id },
+            });
+        }
+
+        return saved;
+    }
+
+    async confirmReceipt(listingId: number, buyerId: number): Promise<MarketplaceListing> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.buyerId !== buyerId) throw new ForbiddenException('Not your purchase');
+        if (!listing.transferInitiatedAt) {
+            throw new BadRequestException('Seller has not yet confirmed the transfer');
+        }
+
+        listing.receiptConfirmedAt = new Date();
+        const saved = await this.repo.save(listing);
+
+        await this.notificationService.createIfAllowed({
+            userId: listing.sellerId,
+            type: NotificationType.TRANSFER_CONFIRMED,
+            title: 'Buyer confirmed receipt',
+            message: 'The buyer has confirmed they received the ticket. Your payout is being processed.',
+            metadata: { listingId: listing.id },
+        });
+
+        return saved;
+    }
+
+    async raiseDispute(listingId: number, userId: number, reason: string, details: string): Promise<{ ok: boolean }> {
+        const listing = await this.repo.findOne({ where: { id: listingId } });
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.sellerId !== userId && listing.buyerId !== userId) {
+            throw new ForbiddenException('You are not a party to this listing');
+        }
+
+        await this.notificationService.createIfAllowed({
+            userId: userId === listing.sellerId ? (listing.buyerId ?? userId) : listing.sellerId,
+            type: NotificationType.DISPUTE_RAISED,
+            title: 'A dispute has been raised',
+            message: `A dispute has been raised on listing #${listing.id}. Admin will review.`,
+            metadata: { listingId: listing.id, reason },
+        });
+
+        return { ok: true };
+    }
+
+    async getPendingReviewListings(): Promise<MarketplaceListing[]> {
+        const listings = await this.repo
+            .createQueryBuilder('l')
+            .leftJoinAndSelect('l.ticket', 'ticket')
+            .where('l.status = :status', { status: MarketplaceListingStatus.PENDING_REVIEW })
+            .orderBy('l.createdAt', 'ASC')
             .getMany();
         await this.enrichListingsWithFixtureLabels(listings);
         return listings;
