@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Group, Skeleton } from '@mantine/core';
 import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
 import { queryTicketLinks, type TicketLink } from '../../shared/api/ticketLink.api';
-import { TicketCard } from './TicketCard';
+import { TicketLinkCard as TicketCard } from './TicketLinkCard';
 import { ExternalLinkModal } from './ExternalLinkModal';
 
 interface TicketLinkButtonProps {

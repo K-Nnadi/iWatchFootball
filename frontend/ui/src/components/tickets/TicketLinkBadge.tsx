@@ -1,5 +1,6 @@
+import type { ComponentType } from 'react';
 import { Badge } from '@mantine/core';
-import { IconShield, IconStar, IconLink } from '@tabler/icons-react';
+import { IconShield, IconStar, IconLink, type IconProps } from '@tabler/icons-react';
 import type { TicketLinkType } from '../../shared/api/ticketLink.api';
 
 interface TicketLinkBadgeProps {
@@ -7,17 +8,21 @@ interface TicketLinkBadgeProps {
     badgeText?: string;
 }
 
-const BADGE_CONFIG: Record<TicketLinkType, { color: string; icon: React.FC<{ size: number }> }> = {
-    OFFICIAL_CLUB: { color: 'green', icon: IconShield },
-    COMPETITION: { color: 'blue', icon: IconStar },
-    APPROVED_PARTNER: { color: 'teal', icon: IconStar },
-    AFFILIATE: { color: 'gray', icon: IconLink },
+type TablerIcon = ComponentType<IconProps>;
+
+const BADGE_CONFIG: Partial<Record<TicketLinkType, { color: string; icon: TablerIcon }>> = {
+    OFFICIAL_CLUB:      { color: 'green', icon: IconShield as TablerIcon },
+    COMPETITION:        { color: 'blue',  icon: IconStar as TablerIcon },
+    APPROVED_PARTNER:   { color: 'teal',  icon: IconStar as TablerIcon },
+    AFFILIATE:          { color: 'gray',  icon: IconLink as TablerIcon },
 };
+
+const FALLBACK = { color: 'gray', icon: IconLink as TablerIcon };
 
 export function TicketLinkBadge({ linkType, badgeText }: TicketLinkBadgeProps) {
     if (!badgeText) return null;
 
-    const config = BADGE_CONFIG[linkType] ?? BADGE_CONFIG.AFFILIATE;
+    const config = BADGE_CONFIG[linkType] ?? FALLBACK;
     const Icon = config.icon;
 
     return (

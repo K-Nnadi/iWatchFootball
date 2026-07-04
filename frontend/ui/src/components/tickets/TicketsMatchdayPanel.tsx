@@ -18,7 +18,7 @@ import {
 } from '@tabler/icons-react';
 import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
 import { queryTicketLinks, type SaleInfo, type TicketLink } from '../../shared/api/ticketLink.api';
-import { TicketCard } from './TicketCard';
+import { TicketLinkCard as TicketCard } from './TicketLinkCard';
 import { ExternalLinkModal } from './ExternalLinkModal';
 
 interface TicketsMatchdayPanelProps {

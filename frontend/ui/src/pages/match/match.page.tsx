@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
     Container,
     Box,
+    Group,
     Stack,
     LoadingOverlay,
     Text,
@@ -372,10 +373,10 @@ export function MatchPage() {
                                 <AttendanceCount fixtureId={fixtureNumericId} />
                                 <DemandCounter fixtureId={fixtureNumericId} />
                             </Stack>
-                            <Stack gap="xs" direction="row" align="center">
+                            <Group gap="xs" align="center">
                                 <ImGoingButton fixtureId={fixtureNumericId} />
                                 <LookingForTicketCTA fixtureId={fixtureNumericId} />
-                            </Stack>
+                            </Group>
                         </Stack>
                     </Container>
                 </Box>
