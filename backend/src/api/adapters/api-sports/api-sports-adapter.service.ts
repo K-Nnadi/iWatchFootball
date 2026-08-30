@@ -111,6 +111,11 @@ export type ImportFixturesFromLeagueWindowOptions = {
   syncStatsMaxRequests?: number;
 };
 
+export type ImportLiveFixturesOptions = {
+  /** Max concurrent fixture upserts (default 16). */
+  fixtureUpsertConcurrency?: number;
+};
+
 export type SyncPrimaryVenuesFromTeamsOptions = {
   league: number;
   season: number;
@@ -1406,6 +1411,119 @@ export class ApiSportsAdapterService {
   /** Live fixtures in one call (`GET /fixtures?live=all`) — includes events per API-Football v3 behaviour. */
   async discoverLiveFixtures(): Promise<any> {
     return this.http.get('/fixtures', { live: 'all' } as any);
+  }
+
+  /**
+   * Persist all globally live fixtures from `GET /fixtures?live=all` (one API request).
+   * Skips rows when local competition/season/teams are not imported yet.
+   */
+  async importLiveFixtures(
+    options?: ImportLiveFixturesOptions,
+  ): Promise<{
+    created: number;
+    updated: number;
+    skipped: number;
+    apiRequests: number;
+    liveCount: number;
+    errors: string[];
+  }> {
+    const errors: string[] = [];
+    let created = 0;
+    let updated = 0;
+    let skipped = 0;
+    let apiRequests = 0;
+
+    let payload: any;
+    try {
+      payload = await this.discoverLiveFixtures();
+      apiRequests = 1;
+    } catch (e: any) {
+      errors.push(`live fixtures: ${e?.message ?? e}`);
+      return { created, updated, skipped, apiRequests, liveCount: 0, errors };
+    }
+
+    const rows = Array.isArray(payload?.response) ? payload.response : [];
+    if (rows.length === 0) {
+      return { created, updated, skipped, apiRequests, liveCount: 0, errors };
+    }
+
+    const groups = new Map<string, any[]>();
+    for (const row of rows) {
+      const leagueId = row?.league?.id;
+      const seasonYear = row?.league?.season;
+      if (leagueId == null || seasonYear == null) {
+        skipped += 1;
+        continue;
+      }
+      const key = `${Number(leagueId)}:${Number(seasonYear)}`;
+      const bucket = groups.get(key) ?? [];
+      bucket.push(row);
+      groups.set(key, bucket);
+    }
+
+    const concurrency = Math.max(
+      1,
+      Math.min(64, Math.floor(Number(options?.fixtureUpsertConcurrency ?? 16) || 16)),
+    );
+
+    for (const [key, groupRows] of groups) {
+      const [leagueApiIdStr, seasonYearStr] = key.split(':');
+      const leagueApiId = Number(leagueApiIdStr);
+      const seasonYear = Number(seasonYearStr);
+
+      const competition = await this.findCompetitionByApiSportsLeagueId(leagueApiId);
+      if (!competition?.id) {
+        skipped += groupRows.length;
+        continue;
+      }
+
+      const seasonRow = await this.findSeasonByYearBounds(seasonYear, seasonYear + 1);
+      if (!seasonRow?.id) {
+        skipped += groupRows.length;
+        continue;
+      }
+
+      const fixturesForSeason = await this.fixtureService.getQuery({
+        where: { competitionId: competition.id, seasonId: seasonRow.id } as any,
+      });
+      const fixtureByApisportsExternalId = new Map<string, any>();
+      for (const f of fixturesForSeason ?? []) {
+        const ext = this.getProviderExternalId(f?.metadata);
+        if (!ext) continue;
+        fixtureByApisportsExternalId.set(ext, f);
+      }
+
+      const ctx: ApiSportsFixtureImportContext = {
+        competitionId: competition.id,
+        seasonId: seasonRow.id,
+        fixtureByApisportsExternalId,
+        correlationPool: [...(fixturesForSeason ?? [])],
+        stadiumCache: { rows: null },
+        exclusiveTail: Promise.resolve(),
+      };
+
+      const rowOutcomes = new Array<'created' | 'updated' | 'skipped'>(groupRows.length).fill('skipped');
+      await this.runPool(groupRows, concurrency, async (row, ix) => {
+        try {
+          rowOutcomes[ix] = await this.upsertFixtureFromApiSportsRow(row, ctx);
+        } catch (e: any) {
+          errors.push(`live fixture row: ${e?.message ?? e}`);
+          rowOutcomes[ix] = 'skipped';
+        }
+      });
+
+      for (const outcome of rowOutcomes) {
+        if (outcome === 'created') created += 1;
+        else if (outcome === 'updated') updated += 1;
+        else skipped += 1;
+      }
+    }
+
+    this.logger.log(
+      `importLiveFixtures: ${rows.length} live upstream — +${created} ~${updated} skipped ${skipped} (${apiRequests} req)`,
+    );
+
+    return { created, updated, skipped, apiRequests, liveCount: rows.length, errors };
   }
 
 

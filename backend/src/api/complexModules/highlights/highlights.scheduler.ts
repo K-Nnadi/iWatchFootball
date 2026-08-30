@@ -103,4 +103,36 @@ export class HighlightsScheduler implements OnModuleInit {
         const delays = [FIFTEEN_MINUTES_MS, ONE_HOUR_MS, SIX_HOURS_MS, TWENTY_FOUR_HOURS_MS];
         return delays[attemptNumber - 1] ?? null;
     }
+
+    /** Daily dead-link cleanup for active highlights */
+    @Cron('0 4 * * *')
+    async scheduleHighlightValidation(): Promise<void> {
+        const jobId = `validate-highlights-${new Date().toISOString().slice(0, 10)}`;
+
+        if (!this.highlightsQueue) {
+            this.logger.log('Redis not configured — running highlight validation inline');
+            await this.highlightsService.validateHighlights();
+            return;
+        }
+
+        const existing = await this.highlightsQueue.getJob(jobId);
+        if (existing && !(await existing.isCompleted()) && !(await existing.isFailed())) {
+            this.logger.debug('Highlight validation already queued — skipping');
+            return;
+        }
+
+        await this.highlightsQueue.add(
+            'validate-highlights',
+            {},
+            {
+                jobId,
+                attempts: 2,
+                backoff: { type: 'exponential', delay: 60_000 },
+                removeOnComplete: { age: 86400, count: 30 },
+                removeOnFail: { age: 86400 },
+            },
+        );
+
+        this.logger.log('Scheduled daily highlight validation');
+    }
 }

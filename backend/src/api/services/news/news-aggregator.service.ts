@@ -5,6 +5,18 @@ import Parser from 'rss-parser';
 import { NewsArticle, CreateNewsArticleDTO } from '../../modules/newsArticle/newsArticle.entity';
 import { NEWS_FEEDS, NewsFeed } from './news-feeds.config';
 
+export type NewsItemOutcome = 'saved' | 'duplicate' | 'skipped' | 'failed';
+
+export type NewsAggregationStats = {
+  processed: number;
+  saved: number;
+  duplicates: number;
+  skipped: number;
+  failed: number;
+  /** @deprecated Use `failed` — kept for backward compatibility */
+  errors: number;
+};
+
 interface RSSItem {
   title?: string;
   link?: string;
@@ -178,16 +190,16 @@ export class NewsAggregatorService {
   /**
    * Process a single RSS item and save to database
    */
-  async processItem(item: RSSItem, feed: NewsFeed): Promise<NewsArticle | null> {
+  async processItem(item: RSSItem, feed: NewsFeed): Promise<NewsItemOutcome> {
     try {
       if (!item.title || !item.link) {
         this.logger.warn('Skipping item without title or link');
-        return null;
+        return 'skipped';
       }
 
       if (feed.urlIncludes && !item.link.includes(feed.urlIncludes)) {
         this.logger.debug(`Skipping non-matching item for ${feed.name}: ${item.link}`);
-        return null;
+        return 'skipped';
       }
 
       // Check if article already exists (by URL)
@@ -197,7 +209,7 @@ export class NewsAggregatorService {
 
       if (existing) {
         this.logger.debug(`Article already exists: ${item.title}`);
-        return existing;
+        return 'duplicate';
       }
 
       // Create new article
@@ -217,34 +229,57 @@ export class NewsAggregatorService {
       };
 
       const article = this.newsArticleRepository.create(articleData);
-      const saved = await this.newsArticleRepository.save(article);
+      await this.newsArticleRepository.save(article);
 
-      this.logger.log(`Saved new article: ${saved.title}`);
-      return saved;
+      this.logger.log(`Saved new article: ${article.title}`);
+      return 'saved';
     } catch (error) {
       // Handle unique constraint violation (duplicate URL)
       if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
         this.logger.debug(`Article already exists (duplicate URL): ${item.link}`);
-        return null;
+        return 'duplicate';
       }
 
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(`Error processing item: ${errorMessage}`, errorStack);
-      return null;
+      return 'failed';
+    }
+  }
+
+  private tallyOutcome(stats: NewsAggregationStats, outcome: NewsItemOutcome): void {
+    switch (outcome) {
+      case 'saved':
+        stats.saved += 1;
+        break;
+      case 'duplicate':
+        stats.duplicates += 1;
+        break;
+      case 'skipped':
+        stats.skipped += 1;
+        break;
+      case 'failed':
+        stats.failed += 1;
+        stats.errors += 1;
+        break;
     }
   }
 
   /**
    * Aggregate news from all enabled feeds
    */
-  async aggregateAllFeeds(): Promise<{ processed: number; saved: number; errors: number }> {
+  async aggregateAllFeeds(): Promise<NewsAggregationStats> {
     const feeds = NEWS_FEEDS.filter(feed => feed.enabled);
     this.logger.log(`Starting aggregation from ${feeds.length} feeds`);
 
-    let totalProcessed = 0;
-    let totalSaved = 0;
-    let totalErrors = 0;
+    const stats: NewsAggregationStats = {
+      processed: 0,
+      saved: 0,
+      duplicates: 0,
+      skipped: 0,
+      failed: 0,
+      errors: 0,
+    };
 
     // Process feeds in parallel batches to avoid overwhelming servers
     const batchSize = 5;
@@ -256,16 +291,12 @@ export class NewsAggregatorService {
       const batchResults = await Promise.allSettled(
         batch.map(async (feed) => {
           const items = await this.fetchFeed(feed);
-          totalProcessed += items.length;
+          stats.processed += items.length;
 
           // Process items sequentially to avoid database connection issues
           for (const item of items) {
-            const result = await this.processItem(item, feed);
-            if (result) {
-              totalSaved++;
-            } else {
-              totalErrors++;
-            }
+            const outcome = await this.processItem(item, feed);
+            this.tallyOutcome(stats, outcome);
           }
         })
       );
@@ -274,7 +305,8 @@ export class NewsAggregatorService {
       batchResults.forEach((result, index) => {
         if (result.status === 'rejected') {
           this.logger.error(`Error processing feed ${batch[index].name}: ${result.reason}`);
-          totalErrors++;
+          stats.failed += 1;
+          stats.errors += 1;
         }
       });
 
@@ -284,19 +316,17 @@ export class NewsAggregatorService {
       }
     }
 
-    this.logger.log(`Aggregation complete: ${totalProcessed} processed, ${totalSaved} saved, ${totalErrors} errors`);
+    this.logger.log(
+      `Aggregation complete: ${stats.processed} processed, ${stats.saved} saved, ${stats.duplicates} duplicates, ${stats.skipped} skipped, ${stats.failed} failed`,
+    );
     
-    return {
-      processed: totalProcessed,
-      saved: totalSaved,
-      errors: totalErrors,
-    };
+    return stats;
   }
 
   /**
    * Aggregate news from a single feed
    */
-  async aggregateFeed(feedName: string): Promise<{ processed: number; saved: number }> {
+  async aggregateFeed(feedName: string): Promise<NewsAggregationStats> {
     const feed = NEWS_FEEDS.find(f => f.name === feedName && f.enabled);
     
     if (!feed) {
@@ -304,19 +334,21 @@ export class NewsAggregatorService {
     }
 
     const items = await this.fetchFeed(feed);
-    let saved = 0;
+    const stats: NewsAggregationStats = {
+      processed: items.length,
+      saved: 0,
+      duplicates: 0,
+      skipped: 0,
+      failed: 0,
+      errors: 0,
+    };
 
     for (const item of items) {
-      const result = await this.processItem(item, feed);
-      if (result) {
-        saved++;
-      }
+      const outcome = await this.processItem(item, feed);
+      this.tallyOutcome(stats, outcome);
     }
 
-    return {
-      processed: items.length,
-      saved,
-    };
+    return stats;
   }
 }
 

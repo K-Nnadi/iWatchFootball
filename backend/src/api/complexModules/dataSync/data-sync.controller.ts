@@ -117,7 +117,8 @@ export class DataSyncController {
         'pipeline-run',
         { syncJobId: job.id },
         {
-          attempts: 1,
+          attempts: 3,
+          backoff: { type: 'exponential', delay: 30_000 },
           removeOnComplete: { age: 3600, count: 50 },
           removeOnFail: { age: 86400 },
         },

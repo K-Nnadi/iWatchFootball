@@ -15,8 +15,14 @@ export class HighlightsProcessor extends WorkerHost {
         super();
     }
 
-    async process(job: Job<SyncFixtureHighlightsJobPayload>): Promise<void> {
-        const { fixtureId } = job.data;
+    async process(job: Job<SyncFixtureHighlightsJobPayload | Record<string, never>>): Promise<void> {
+        if (job.name === 'validate-highlights') {
+            this.logger.log('Processing highlight validation job');
+            await this.highlightsService.validateHighlights();
+            return;
+        }
+
+        const { fixtureId } = job.data as SyncFixtureHighlightsJobPayload;
         this.logger.log(`Processing highlights job for fixture ${fixtureId} (attempt ${job.attemptsMade + 1})`);
 
         await this.highlightsService.syncFixtureHighlights(fixtureId);

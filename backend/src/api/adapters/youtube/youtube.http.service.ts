@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
-import { YOUTUBE_API_BASE_URL, getYouTubeApiKey } from './youtube.config';
+import {
+    YOUTUBE_API_BASE_URL,
+    YOUTUBE_QUOTA_COST,
+    getYouTubeApiKey,
+    getYouTubeDailyQuotaUnits,
+} from './youtube.config';
 
 export interface YouTubeSearchResult {
     id: { videoId: string };
@@ -43,11 +48,38 @@ export interface YouTubeVideoDetails {
 @Injectable()
 export class YouTubeHttpService {
     private readonly logger = new Logger(YouTubeHttpService.name);
+    private quotaUsed = 0;
+    private quotaDate = '';
+
+    private resetQuotaIfNewDay(): void {
+        const today = new Date().toISOString().slice(0, 10);
+        if (this.quotaDate !== today) {
+            this.quotaDate = today;
+            this.quotaUsed = 0;
+        }
+    }
+
+    private consumeQuota(units: number): boolean {
+        this.resetQuotaIfNewDay();
+        const budget = getYouTubeDailyQuotaUnits();
+        if (this.quotaUsed + units > budget) {
+            this.logger.warn(
+                `YouTube daily quota budget exhausted (${this.quotaUsed}/${budget} units used) — skipping request`,
+            );
+            return false;
+        }
+        this.quotaUsed += units;
+        return true;
+    }
 
     async searchVideos(
         query: string,
         options: { publishedAfter?: Date; publishedBefore?: Date; maxResults?: number } = {},
     ): Promise<YouTubeSearchResult[]> {
+        if (!this.consumeQuota(YOUTUBE_QUOTA_COST.search)) {
+            return [];
+        }
+
         const params: Record<string, string | number> = {
             part: 'snippet',
             q: query,
@@ -77,6 +109,9 @@ export class YouTubeHttpService {
 
     async getVideoDetails(videoIds: string[]): Promise<YouTubeVideoDetails[]> {
         if (videoIds.length === 0) return [];
+        if (!this.consumeQuota(YOUTUBE_QUOTA_COST.videos)) {
+            return [];
+        }
 
         try {
             const response = await axios.get<{ items: YouTubeVideoDetails[] }>(

@@ -31,7 +31,9 @@ export class NewsAggregatorProcessor extends WorkerHost {
         // Aggregate all feeds
         this.logger.log('Aggregating all feeds');
         const result = await this.newsAggregatorService.aggregateAllFeeds();
-        this.logger.log(`Aggregation complete: ${result.processed} processed, ${result.saved} saved, ${result.errors} errors`);
+        this.logger.log(
+          `Aggregation complete: ${result.processed} processed, ${result.saved} saved, ${result.duplicates} duplicates, ${result.skipped} skipped, ${result.failed} failed`,
+        );
         return result;
       }
     } catch (error) {

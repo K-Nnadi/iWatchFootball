@@ -60,6 +60,7 @@ import {NotificationModule} from "./api/modules/notification/notification.module
 import {PlatformConfigModule} from "./api/modules/platformConfig/platformConfig.module";
 import {FixtureHighlightModule} from "./api/modules/fixtureHighlight/fixtureHighlight.module";
 import {HighlightsModule} from "./api/complexModules/highlights/highlights.module";
+import {LiveFixtureSyncModule} from "./api/complexModules/liveFixtureSync/live-fixture-sync.module";
 import {RateLimitModule} from "./auth/rate-limit/rate-limit.module";
 import {TicketLinkModule} from "./api/modules/ticketLink/ticketLink.module";
 import {AttendanceRecordModule} from "./api/modules/attendanceRecord/attendanceRecord.module";
@@ -146,6 +147,7 @@ const ComplexModules = [
     DataSyncModule,
     TrackerModule,
     HighlightsModule,
+    LiveFixtureSyncModule,
 ];
 
 
