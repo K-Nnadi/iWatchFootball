@@ -120,8 +120,8 @@ export class Ticket extends BaseDbEntity {
     @OptionalEntityColumn({ db: { type: 'varchar', length: 20 } })
     seatNumber?: string;
 
-    @OptionalEntityColumn({db: {type: 'int'},})
-    userId?: number;
+    @OptionalEntityColumn({db: {type: 'int', nullable: true},})
+    userId?: number | null;
 
     @EntityRelation({
         type: RelationshipType.MANY_TO_ONE,

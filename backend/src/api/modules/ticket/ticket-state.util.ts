@@ -14,7 +14,7 @@ export function ticketListedState(listingId: number) {
     return {
         status: TicketStatus.LISTED,
         activeListingId: listingId,
-        userId: null as null,
+        userId: null,
     };
 }
 
