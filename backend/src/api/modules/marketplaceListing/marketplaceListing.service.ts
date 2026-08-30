@@ -15,10 +15,13 @@ import { Fixture } from '../fixture/fixture.entity';
 import { Team } from '../team/team.entity';
 import { Ticket } from '../ticket/ticket.entity';
 import { DeliveryMethod, DisputeStatus, MarketplaceListingStatus, TicketTransferReason, TicketType } from '../../enums/marketplace.enum';
+import { TicketStatus } from '../../enums/ticket.enum';
+import { ticketListedState } from '../ticket/ticket-state.util';
 import { TicketOwnershipHistoryService } from '../ticketOwnershipHistory/ticketOwnershipHistory.service';
 import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../enums/notification.enum';
+import { MarketplaceDispute } from '../marketplaceDispute/marketplaceDispute.entity';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
@@ -40,6 +43,8 @@ export class MarketplaceListingService {
         private readonly repo: Repository<MarketplaceListing>,
         @InjectRepository(Ticket)
         private readonly ticketRepo: Repository<Ticket>,
+        @InjectRepository(MarketplaceDispute)
+        private readonly disputeRepo: Repository<MarketplaceDispute>,
         private readonly dataSource: DataSource,
         private readonly ownershipHistory: TicketOwnershipHistoryService,
         private readonly userTicketLog: UserTicketLogService,
@@ -149,19 +154,17 @@ export class MarketplaceListingService {
                 );
             }
 
-            // Transfer ticket to platform custody
-            await manager.query(`UPDATE ticket SET "userId" = NULL WHERE id = $1`, [
-                params.ticketId,
-            ]);
-
             const listing = listingRepo.create({
                 ticketId: params.ticketId,
+                fixtureId: ticket.fixtureId,
                 sellerId: params.sellerId,
                 askPrice: params.askPrice,
                 status: MarketplaceListingStatus.ACTIVE,
                 expiresAt,
             });
             await listingRepo.save(listing);
+
+            await ticketRepo.update(params.ticketId, ticketListedState(listing.id));
 
             await this.ownershipHistory.record(manager, {
                 ticketId: params.ticketId,
@@ -210,11 +213,11 @@ export class MarketplaceListingService {
             listing.status = MarketplaceListingStatus.CANCELLED;
             await listingRepo.save(listing);
 
-            // Return ticket to seller
-            await manager.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
+            await manager.getRepository(Ticket).update(listing.ticketId, {
+                status: TicketStatus.AVAILABLE,
+                activeListingId: null,
                 userId,
-                listing.ticketId,
-            ]);
+            });
 
             await this.ownershipHistory.record(manager, {
                 ticketId: listing.ticketId,
@@ -339,10 +342,11 @@ export class MarketplaceListingService {
         listing.rejectionReason = reason;
         const saved = await this.repo.save(listing);
 
-        // Return ticket to seller on rejection
-        await this.dataSource.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
-            listing.sellerId, listing.ticketId,
-        ]);
+        await this.dataSource.getRepository(Ticket).update(listing.ticketId, {
+            status: TicketStatus.AVAILABLE,
+            activeListingId: null,
+            userId: listing.sellerId,
+        });
         await this.ownershipHistory.record(this.dataSource.createQueryRunner().manager as never, {
             ticketId: listing.ticketId,
             fromUserId: undefined,
@@ -471,12 +475,21 @@ export class MarketplaceListingService {
             throw new ForbiddenException('You are not a party to this listing');
         }
 
+        const dispute = this.disputeRepo.create({
+            listingId: listing.id,
+            raisedByUserId: userId,
+            reason,
+            details,
+            status: DisputeStatus.OPEN,
+        });
+        await this.disputeRepo.save(dispute);
+
         await this.notificationService.createIfAllowed({
             userId: userId === listing.sellerId ? (listing.buyerId ?? userId) : listing.sellerId,
             type: NotificationType.DISPUTE_RAISED,
             title: 'A dispute has been raised',
             message: `A dispute has been raised on listing #${listing.id}. Admin will review.`,
-            metadata: { listingId: listing.id, reason },
+            metadata: { listingId: listing.id, reason, disputeId: dispute.id },
         });
 
         return { ok: true };
@@ -521,11 +534,11 @@ export class MarketplaceListingService {
                 listing.status = MarketplaceListingStatus.EXPIRED;
                 await listingRepo.save(listing);
 
-                // Return ticket to seller
-                await manager.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
-                    listing.sellerId,
-                    listing.ticketId,
-                ]);
+                await manager.getRepository(Ticket).update(listing.ticketId, {
+                    status: TicketStatus.AVAILABLE,
+                    activeListingId: null,
+                    userId: listing.sellerId,
+                });
 
                 await this.ownershipHistory.record(manager, {
                     ticketId: listing.ticketId,

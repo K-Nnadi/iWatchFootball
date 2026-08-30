@@ -4,7 +4,8 @@ import {Team} from "../team/team.entity";
 import {Stadium} from "../stadium/stadium.entity";
 import {FixtureStage, FixtureStatus} from '../../enums/fixture.enum';
 import {LineUp} from "../lineUp/lineUp.entity";
-import {TeamCompetitionSeason} from "../teamCompetitionSeason/teamCompetitionSeason.entity";
+import {Competition} from "../competition/competition.entity";
+import {Season} from "../season/season.entity";
 import {Goal} from "../goal/goal.entity";
 import {Card} from "../card/card.entity";
 import {Substitution} from "../substitution/substitution.entity";
@@ -131,11 +132,19 @@ export class Fixture extends BaseDbEntity {
 
     @EntityRelation({
         type: RelationshipType.MANY_TO_ONE,
-        entity: () => TeamCompetitionSeason,
+        entity: () => Competition,
         joinOptions: {name: 'competitionId'},
-        description: 'Team competition season for this fixture'
+        description: 'Competition this fixture belongs to'
     })
-    teamCompetitionSeasons!: TeamCompetitionSeason;
+    competition?: Promise<Competition>;
+
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => Season,
+        joinOptions: {name: 'seasonId'},
+        description: 'Season this fixture belongs to'
+    })
+    season?: Promise<Season>;
 
     @EntityColumn({
         db: { type: 'int' },

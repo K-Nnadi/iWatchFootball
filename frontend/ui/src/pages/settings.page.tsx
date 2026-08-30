@@ -36,7 +36,7 @@ import { useAuthStore } from '../shared/stores/auth.store';
 import { notify } from '../shared/notify';
 import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetOneUser, useUpdateOneUser } from '@iWatchFootball/clients/controllers/user';
-import { useGetOneCommsPreference, useUpdateOneCommsPreference } from '@iWatchFootball/clients/controllers/comms-preference';
+import { useGetQueryCommsPreference, useUpdateOneCommsPreference } from '@iWatchFootball/clients/controllers/comms-preference';
 import {
     CommsPreferenceEmailNotifications,
     CommsPreferenceSmsNotifications,
@@ -236,10 +236,10 @@ export function SettingsPage() {
     const [newsletterEmails, setNewsletterEmails] = useState<NewsletterEmailsType>(CommsPreferenceNewsletterEmails.WEEKLY);
     const [matchReminders, setMatchReminders] = useState<MatchRemindersType>(CommsPreferenceMatchReminders.DAILY);
 
-    const { data: commsPreferenceData } = useGetOneCommsPreference(
-        user?.commsPreferenceId as number,
-        { query: { enabled: !!user?.commsPreferenceId } as any }
-    );
+    const { data: commsPreferences } = useGetQueryCommsPreference(undefined, {
+        query: { enabled: isLoggedIn && !!user?.id } as any,
+    });
+    const commsPreferenceData = commsPreferences?.[0];
 
     useEffect(() => {
         if (commsPreferenceData) {
@@ -270,9 +270,9 @@ export function SettingsPage() {
     });
 
     const handleSaveCommsPrefs = () => {
-        if (!commsPreferenceData || !user?.commsPreferenceId) return;
+        if (!commsPreferenceData?.id) return;
         updateCommsPrefMutation.mutate({
-            id: user.commsPreferenceId,
+            id: commsPreferenceData.id,
             data: {
                 ...commsPreferenceData,
                 emailNotifications,
@@ -361,9 +361,9 @@ export function SettingsPage() {
     }, [colorScheme]);
 
     function handleSave() {
-        if (isLoggedIn && user?.commsPreferenceId && commsPreferenceData) {
+        if (isLoggedIn && commsPreferenceData?.id) {
             updateCommsPrefMutation.mutate({
-                id: user.commsPreferenceId,
+                id: commsPreferenceData.id,
                 data: {
                     ...commsPreferenceData,
                     language,
@@ -796,7 +796,7 @@ export function SettingsPage() {
                             <Divider style={{ borderColor: 'var(--modern-border-color)' }} />
 
                             {/* Notification Preferences */}
-                            {user?.commsPreferenceId && (
+                            {commsPreferenceData && (
                                 <>
                                     <Box>
                                         <Group gap="sm" mb="md">
