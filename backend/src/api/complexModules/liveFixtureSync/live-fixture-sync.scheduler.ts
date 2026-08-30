@@ -2,7 +2,8 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { Cron } from '@nestjs/schedule';
-import { isLiveFixtureSyncEnabled, LIVE_FIXTURE_SYNC_CRON } from './live-fixture-sync.config';
+import { LiveFixtureSyncConfigService } from './live-fixture-sync-config.service';
+import { LIVE_FIXTURE_SYNC_CRON } from './live-fixture-sync.config';
 
 @Injectable()
 export class LiveFixtureSyncScheduler implements OnModuleInit {
@@ -11,6 +12,7 @@ export class LiveFixtureSyncScheduler implements OnModuleInit {
   constructor(
     @InjectQueue('live-fixture-sync')
     private readonly liveFixtureQueue: Queue,
+    private readonly config: LiveFixtureSyncConfigService,
   ) {}
 
   onModuleInit() {
@@ -19,7 +21,7 @@ export class LiveFixtureSyncScheduler implements OnModuleInit {
 
   @Cron(LIVE_FIXTURE_SYNC_CRON)
   async scheduleLiveFixtureSync(): Promise<void> {
-    if (!isLiveFixtureSyncEnabled()) {
+    if (!(await this.config.isScheduledSyncEnabled())) {
       return;
     }
 

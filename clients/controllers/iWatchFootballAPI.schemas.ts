@@ -1947,6 +1947,10 @@ export interface StatsBombPipelineOptionsDto {
   skipLineups?: boolean;
   skipPlayers?: boolean;
   skipStadiums?: boolean;
+  /** Skip competition-seasons with unchanged StatsBomb match_updated watermark (default true). */
+  incremental?: boolean;
+  /** Force full re-import of all competition-seasons. */
+  forceFull?: boolean;
 }
 
 export interface StreamFixtureInsightDto {
@@ -2394,6 +2398,10 @@ export interface StatsBombSyncOptionsDTO {
   skipStadiums?: boolean;
   /** Skip Starting XI events when syncing match events (formation / eleven from tactics block only). Independent of skipLineups. */
   skipStartingXi?: boolean;
+  /** Skip competition-seasons with unchanged StatsBomb match_updated watermark (default true). */
+  incremental?: boolean;
+  /** Force full re-import of all competition-seasons. */
+  forceFull?: boolean;
 }
 
 export type CreateUserDTOType = typeof CreateUserDTOType[keyof typeof CreateUserDTOType];

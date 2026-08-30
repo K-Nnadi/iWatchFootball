@@ -25,6 +25,7 @@ import {
     IconRefresh,
     IconSoccerField,
     IconVideo,
+    IconBroadcast,
     IconTicket,
     IconUsers,
     IconShoppingCart,
@@ -34,6 +35,10 @@ import { Link } from 'react-router-dom';
 import { ModernButton, ModernH2 } from '../../components/modern';
 import { notify } from '../../shared/notify';
 import { syncBulkHighlights, syncFixtureHighlights, useFixtureHighlightCount } from '../../shared/api/fixture-highlight.api';
+import {
+    triggerLiveFixtureSync,
+    useLiveFixtureSyncStatus,
+} from '../../shared/api/live-fixture-sync.api';
 import { useNewsAggregatorControllerGetStatus, useNewsAggregatorControllerTriggerAggregation } from '@iWatchFootball/clients/controllers/news-aggregation';
 import { useGetCountNewsArticle } from '@iWatchFootball/clients/controllers/news-article';
 import {
@@ -66,6 +71,10 @@ export function AdminDashboardPage() {
     const { data: snapshot, refetch: refetchSnapshot } = useAdminSnapshot();
     const { data: newsStatusRaw, refetch: refetchNewsStatus } = useNewsAggregatorControllerGetStatus();
     const newsStatus = newsStatusRaw as { redisConfigured?: boolean; scheduler?: string } | undefined;
+    const { data: liveSyncStatus, refetch: refetchLiveSyncStatus } = useLiveFixtureSyncStatus();
+
+    const [liveSyncRunning, setLiveSyncRunning] = useState(false);
+    const [lastLiveSyncResult, setLastLiveSyncResult] = useState<Record<string, unknown> | null>(null);
 
     const newsTrigger = useNewsAggregatorControllerTriggerAggregation({
         mutation: {
@@ -90,6 +99,8 @@ export function AdminDashboardPage() {
 
     const [sbSkipLineups, setSbSkipLineups] = useState(false);
     const [sbSkipPlayers, setSbSkipPlayers] = useState(false);
+    const [sbIncremental, setSbIncremental] = useState(true);
+    const [sbForceFull, setSbForceFull] = useState(false);
 
     const bulkSync = useDataSyncControllerRun({
         mutation: {
@@ -131,7 +142,12 @@ export function AdminDashboardPage() {
             async: bulkAsync,
             statsbomb: bulkStatsbomb,
             statsbombOptions: bulkStatsbomb
-                ? { skipLineups: sbSkipLineups, skipPlayers: sbSkipPlayers }
+                ? {
+                      skipLineups: sbSkipLineups,
+                      skipPlayers: sbSkipPlayers,
+                      incremental: sbIncremental,
+                      forceFull: sbForceFull,
+                  }
                 : undefined,
         };
 
@@ -206,6 +222,7 @@ export function AdminDashboardPage() {
                                 void refetchNewsCount();
                                 void refetchHighlightCount();
                                 void refetchSnapshot();
+                                void refetchLiveSyncStatus();
                             }}
                         >
                             Refresh
@@ -296,6 +313,75 @@ export function AdminDashboardPage() {
                 </Paper>
 
                 <Grid gutter="lg">
+                    {/* Live fixtures */}
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <Paper p="lg" radius="md" withBorder h="100%">
+                            <Stack gap="md" h="100%">
+                                <Group gap="xs">
+                                    <IconBroadcast size={20} />
+                                    <Title order={4}>Live fixture sync</Title>
+                                </Group>
+                                <Text size="sm" c="dimmed">
+                                    Polls API-Sports for all live matches, updates scores/status, and ingests goals,
+                                    cards, and substitutions into the timeline. Runs automatically every few minutes when
+                                    Redis and the platform flag are enabled.
+                                </Text>
+                                {liveSyncStatus && (
+                                    <Group gap="xs" wrap="wrap">
+                                        <Badge variant="light" color={liveSyncStatus.redisConfigured ? 'green' : 'gray'}>
+                                            Redis: {liveSyncStatus.redisConfigured ? 'on' : 'off'}
+                                        </Badge>
+                                        <Badge variant="light" color={liveSyncStatus.scheduledSyncEnabled ? 'green' : 'orange'}>
+                                            Scheduler: {liveSyncStatus.scheduledSyncEnabled ? 'on' : 'off'}
+                                        </Badge>
+                                        <Badge variant="light">Cron: {liveSyncStatus.cron}</Badge>
+                                    </Group>
+                                )}
+                                {!liveSyncStatus?.envAllowsSync && (
+                                    <Alert variant="light" color="orange" title="Environment override">
+                                        LIVE_FIXTURE_SYNC_ENABLED is off in server env — scheduled sync is disabled.
+                                    </Alert>
+                                )}
+                                <ModernButton
+                                    mt="auto"
+                                    loading={liveSyncRunning}
+                                    onClick={async () => {
+                                        setLiveSyncRunning(true);
+                                        try {
+                                            const result = await triggerLiveFixtureSync();
+                                            setLastLiveSyncResult(result as Record<string, unknown>);
+                                            if (result.async) {
+                                                notify.success('Live sync', `Queued job ${result.bullJobId ?? ''}`);
+                                            } else {
+                                                const ev = result.events;
+                                                notify.success(
+                                                    'Live sync',
+                                                    `${result.liveCount ?? 0} live — +${result.created ?? 0} created, ~${result.updated ?? 0} updated` +
+                                                        (ev
+                                                            ? `; events +${ev.goals}g +${ev.cards}c +${ev.substitutions}s`
+                                                            : ''),
+                                                );
+                                            }
+                                            void refetchLiveSyncStatus();
+                                            void refetchSnapshot();
+                                        } catch {
+                                            notify.error('Live sync failed', 'Check API-Sports key and backend logs.');
+                                        } finally {
+                                            setLiveSyncRunning(false);
+                                        }
+                                    }}
+                                >
+                                    Sync live fixtures now
+                                </ModernButton>
+                                {lastLiveSyncResult && (
+                                    <Box component="pre" style={{ fontSize: 11, overflow: 'auto', maxHeight: 120 }}>
+                                        {JSON.stringify(lastLiveSyncResult, null, 2)}
+                                    </Box>
+                                )}
+                            </Stack>
+                        </Paper>
+                    </Grid.Col>
+
                     {/* News RSS */}
                     <Grid.Col span={{ base: 12, md: 6 }}>
                         <Paper p="lg" radius="md" withBorder h="100%">
@@ -338,7 +424,22 @@ export function AdminDashboardPage() {
                                 </Group>
                                 <Text size="sm" c="dimmed">
                                     Sync competitions, teams, fixtures, lineups, and events from StatsBomb GitHub open data.
+                                    Incremental mode skips competition-seasons with unchanged upstream watermarks.
                                 </Text>
+                                <Switch
+                                    label="Incremental sync (skip unchanged seasons)"
+                                    checked={sbIncremental}
+                                    disabled={sbForceFull}
+                                    onChange={(e) => setSbIncremental(e.currentTarget.checked)}
+                                />
+                                <Switch
+                                    label="Force full re-import"
+                                    checked={sbForceFull}
+                                    onChange={(e) => {
+                                        setSbForceFull(e.currentTarget.checked);
+                                        if (e.currentTarget.checked) setSbIncremental(false);
+                                    }}
+                                />
                                 <Switch
                                     label="Skip lineups"
                                     checked={sbSkipLineups}
@@ -357,6 +458,8 @@ export function AdminDashboardPage() {
                                             data: {
                                                 skipLineups: sbSkipLineups,
                                                 skipPlayers: sbSkipPlayers,
+                                                incremental: sbForceFull ? false : sbIncremental,
+                                                forceFull: sbForceFull,
                                             },
                                         })
                                     }
@@ -393,6 +496,25 @@ export function AdminDashboardPage() {
                                 onChange={(e) => setBulkAsync(e.currentTarget.checked)}
                             />
                         </Group>
+
+                        {bulkStatsbomb && (
+                            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                                <Switch
+                                    label="StatsBomb incremental"
+                                    checked={sbIncremental}
+                                    disabled={sbForceFull}
+                                    onChange={(e) => setSbIncremental(e.currentTarget.checked)}
+                                />
+                                <Switch
+                                    label="StatsBomb force full"
+                                    checked={sbForceFull}
+                                    onChange={(e) => {
+                                        setSbForceFull(e.currentTarget.checked);
+                                        if (e.currentTarget.checked) setSbIncremental(false);
+                                    }}
+                                />
+                            </SimpleGrid>
+                        )}
 
                         {bulkApiSports && (
                             <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">

@@ -31,6 +31,7 @@ import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.s
 const FEATURE_FLAG_KEYS = new Set([
     'ads_enabled',
     'marketplace_enabled',
+    'live_fixture_sync_enabled',
     'player_advanced_stats_enabled',
     'attendance_stats_enabled',
     'attendance_advanced_stats_enabled',
