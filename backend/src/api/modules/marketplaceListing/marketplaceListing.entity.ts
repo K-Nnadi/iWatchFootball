@@ -12,6 +12,10 @@ export class MarketplaceListing extends BaseDbEntity {
     @ApiProperty()
     ticketId!: number;
 
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    @ApiPropertyOptional({ description: 'Denormalized from ticket for seat-dedup indexes' })
+    fixtureId?: number;
+
     /** Not lazy — lazy ManyToOne relations serialize as `{}` in JSON responses, stripping ticket scalars used by marketplace UIs */
     @ManyToOne(() => Ticket, { lazy: false })
     @JoinColumn({ name: 'ticketId' })

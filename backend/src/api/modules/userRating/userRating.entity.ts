@@ -14,6 +14,10 @@ export class UserRating extends BaseDbEntity {
     @ApiProperty({ description: 'Listing transaction ID' })
     listingId!: number;
 
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    @ApiPropertyOptional({ description: 'Completed marketplace transaction (canonical for ratings)' })
+    marketplaceTransactionId?: number;
+
     @EntityColumn({ db: { type: 'int' } })
     @ApiProperty({ description: 'User who submitted this rating' })
     raterUserId!: number;

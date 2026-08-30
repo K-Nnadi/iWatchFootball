@@ -68,6 +68,8 @@ import {TicketInterestModule} from "./api/modules/ticketInterest/ticketInterest.
 import {AffiliatePartnerModule} from "./api/modules/affiliatePartner/affiliatePartner.module";
 import {AffiliateConversionModule} from "./api/modules/affiliateConversion/affiliateConversion.module";
 import {TicketLinkAnalyticsModule} from "./api/modules/ticketLinkAnalytics/ticketLinkAnalytics.module";
+import {UserRatingModule} from "./api/modules/userRating/userRating.module";
+import {SchemaExtensionsModule} from "./api/modules/schemaExtensions/schemaExtensions.module";
 import {RedisModule} from "./shared/redis/redis.module";
 import {buildBullConnection, isRedisEnabled} from "./shared/redis/redis.config";
 import {HealthModule} from "./health/health.module";
@@ -121,6 +123,8 @@ const Modules = [
     AffiliatePartnerModule,
     AffiliateConversionModule,
     TicketLinkAnalyticsModule,
+    UserRatingModule,
+    SchemaExtensionsModule,
     DiscountCodeModule,
     TransferModule,
     TrophyModule,

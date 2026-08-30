@@ -339,14 +339,14 @@ Reference patterns already in use:
 
 | # | Item | Table | Constraint / index | Status |
 |---|------|-------|-------------------|--------|
-| P2-1 | Active interest uniqueness | `ticketInterest` | Partial unique on `(userId, fixtureId)` where `status = 'ACTIVE' AND deletedAt IS NULL` | - [ ] |
-| P2-2 | Postback deduplication | `affiliateConversion` | Unique `(network, orderId)` where `orderId IS NOT NULL` | - [ ] |
-| P2-3 | Friend request dedup | `userConnection` | Unique on normalized pair `(LEAST(requesterId, addresseeId), GREATEST(...))` where not deleted | - [ ] |
-| P2-4 | Active listing per ticket | `marketplaceListing` | Partial unique on `ticketId` where `status = 'ACTIVE' AND deletedAt IS NULL` | - [ ] |
-| P2-5 | Duplicate seat detection | `marketplaceListing` | Partial unique on `(ticket.fixtureId, seatSection, seatRow, seatNumber)` via join or denorm `fixtureId` on listing | - [ ] |
-| P2-6 | Click analytics index | `ticketLinkClick` | Index on `(fixtureId, createdAt)` where `deletedAt IS NULL` | - [ ] |
-| P2-7 | Hold race prevention | `ticketHold` | Partial unique on `(fixtureId, offerKey)` where `expiresAt > now()` | - [ ] |
-| P2-8 | FK additions | ticketing tables | FKs from `ticketInterest`, `attendanceRecord`, `ticketLinkClick`, `affiliateConversion`, `marketplaceListing` to parent tables | - [ ] |
+| P2-1 | Active interest uniqueness | `ticketInterest` | Partial unique on `(userId, fixtureId)` where `status = 'ACTIVE' AND deletedAt IS NULL` | - [x] |
+| P2-2 | Postback deduplication | `affiliateConversion` | Unique `(network, orderId)` where `orderId IS NOT NULL` | - [x] |
+| P2-3 | Friend request dedup | `userConnection` | Unique on normalized pair `(LEAST(requesterId, addresseeId), GREATEST(...))` where not deleted | - [x] |
+| P2-4 | Active listing per ticket | `marketplaceListing` | Partial unique on `ticketId` where `status = 'ACTIVE' AND deletedAt IS NULL` | - [x] |
+| P2-5 | Duplicate seat detection | `marketplaceListing` | Partial unique on `(ticket.fixtureId, seatSection, seatRow, seatNumber)` via join or denorm `fixtureId` on listing | - [x] |
+| P2-6 | Click analytics index | `ticketLinkClick` | Index on `(fixtureId, createdAt)` where `deletedAt IS NULL` | - [x] |
+| P2-7 | Hold race prevention | `ticketHold` | Partial unique on `(fixtureId, offerKey)` where `expiresAt > now()` | - [x] |
+| P2-8 | FK additions | ticketing tables | FKs from `ticketInterest`, `attendanceRecord`, `ticketLinkClick`, `affiliateConversion`, `marketplaceListing` to parent tables | - [x] |
 
 ---
 
@@ -429,7 +429,7 @@ Ordered by product phase from [`ticketing-system-design.md`](./ticketing-system-
 
 ### Phase 1 — Monetisation / ticket links
 
-- [ ] **P3-1. Extend `ticketLink` entity**
+- [x] **P3-1. Extend `ticketLink` entity**
 
 **Problem**
 
@@ -460,7 +460,7 @@ healthCheckError?: string;        // admin-facing, max 500 chars
 
 ---
 
-- [ ] **P3-2. Add `SponsoredPlacement` entity**
+- [x] **P3-2. Add `SponsoredPlacement` entity**
 
 **Problem**
 
@@ -490,7 +490,7 @@ Add when `sponsored_placements_enabled` flag is turned on and admin needs schedu
 
 ---
 
-- [ ] **P3-3. Analytics events (impressions / modal abandons)**
+- [x] **P3-3. Analytics events (impressions / modal abandons)**
 
 **Problem**
 
@@ -518,7 +518,7 @@ Prefer a single table with `eventType` over many narrow tables.
 
 ### Phase 2 — Attendance
 
-- [ ] **P3-4. Wire attendance ↔ log sync**
+- [x] **P3-4. Wire attendance ↔ log sync**
 
 No new table if P0-2 strategy is adopted. Implement service-layer sync rules documented in P0-2.
 
@@ -529,7 +529,7 @@ No new table if P0-2 strategy is adopted. Implement service-layer sync rules doc
 
 ---
 
-- [ ] **P3-5. Document upload (schema ready)**
+- [x] **P3-5. Document upload (schema ready)**
 
 [`attendanceRecord.documentPath`](../backend/src/api/modules/attendanceRecord/attendanceRecord.entity.ts) already exists. Ensure production uses object storage (GCS) path convention; no schema change needed unless adding virus-scan status or upload count column.
 
@@ -537,11 +537,11 @@ No new table if P0-2 strategy is adopted. Implement service-layer sync rules doc
 
 ### Phase 3 — Ticket demand
 
-- [ ] **P3-6. `ticketInterest` unique constraint**
+- [x] **P3-6. `ticketInterest` unique constraint**
 
 Same as **P2-1** — implement before enabling `ticket_demand_enabled`.
 
-- [ ] **P3-7. Auto-cancel interest on attendance**
+- [x] **P3-7. Auto-cancel interest on attendance**
 
 Service rule: when `attendanceRecord` is created for `(userId, fixtureId)`, set matching `ticketInterest.status = CANCELLED`. No new table.
 
@@ -554,7 +554,7 @@ Service rule: when `attendanceRecord` is created for `(userId, fixtureId)`, set 
 
 ### Phase 4 — Marketplace
 
-- [ ] **P3-8. Add `marketplaceDispute` entity**
+- [x] **P3-8. Add `marketplaceDispute` entity**
 
 **Problem**
 
@@ -579,7 +579,7 @@ export class MarketplaceDispute extends BaseDbEntity {
 
 ---
 
-- [ ] **P3-9. Link `userRating` to transaction**
+- [x] **P3-9. Link `userRating` to transaction**
 
 **Problem**
 
@@ -591,7 +591,7 @@ Add `marketplaceTransactionId?: number` FK; keep `listingId` for convenience. Un
 
 ---
 
-- [ ] **P3-10. Extend `paymentSession` for marketplace checkout**
+- [x] **P3-10. Extend `paymentSession` for marketplace checkout**
 
 **Problem**
 
@@ -616,7 +616,7 @@ Defer until the corresponding product phase is actively implemented. Listed here
 
 ### Phase 5 — Escrow, payments, trust
 
-- [ ] **P4-1. Seller profile / Stripe Connect**
+- [x] **P4-1. Seller profile / Stripe Connect**
 
 Add columns on `user` or new `sellerProfile` table:
 
@@ -626,7 +626,7 @@ stripeConnectOnboardingComplete: boolean;
 payoutsEnabled: boolean;
 ```
 
-- [ ] **P4-2. Escrow ledger**
+- [x] **P4-2. Escrow ledger**
 
 Do not overload `payment` or `credit`. New `escrowHold` / `payoutRecord` tables tied to `marketplaceTransaction`:
 
@@ -635,7 +635,7 @@ Do not overload `payment` or `credit`. New `escrowHold` / `payoutRecord` tables 
 { marketplaceTransactionId, amount, currency, status, heldAt, releasedAt?, refundedAt? }
 ```
 
-- [ ] **P4-3. Trust score materialization**
+- [x] **P4-3. Trust score materialization**
 
 Optional `userTrustScore` table (or computed view) aggregating `userRating` + dispute history — defer until rating volume exists.
 
@@ -643,7 +643,7 @@ Optional `userTrustScore` table (or computed view) aggregating `userRating` + di
 
 ### Phase 6 — Club transfer workflow
 
-- [ ] **P4-4. Encrypted buyer transfer details**
+- [x] **P4-4. Encrypted buyer transfer details**
 
 New table; never expose raw values in API:
 
@@ -657,7 +657,7 @@ export class MarketplaceTransferDetails extends BaseDbEntity {
 }
 ```
 
-- [ ] **P4-5. Club transfer guide content**
+- [x] **P4-5. Club transfer guide content**
 
 Could remain in `platformConfig` JSON or a `clubTransferGuide` table keyed by `teamId`.
 
@@ -665,7 +665,7 @@ Could remain in `platformConfig` JSON or a `clubTransferGuide` table keyed by `t
 
 ### Phase 7 — Official inventory / club rules
 
-- [ ] **P4-6. Ticketing provider sync state**
+- [x] **P4-6. Ticketing provider sync state**
 
 ```typescript
 @Entity('officialInventorySnapshot')
@@ -677,7 +677,7 @@ export class OfficialInventorySnapshot extends BaseDbEntity {
 }
 ```
 
-- [ ] **P4-7. Club ticket rules**
+- [x] **P4-7. Club ticket rules**
 
 ```typescript
 @Entity('clubTicketRule')
@@ -690,7 +690,7 @@ export class ClubTicketRule extends BaseDbEntity {
 }
 ```
 
-- [ ] **P4-8. Provider external ID mapping**
+- [x] **P4-8. Provider external ID mapping**
 
 Replace ad-hoc `metadata.providers` with a queryable join table:
 
@@ -710,7 +710,7 @@ export class EntityExternalId extends BaseDbEntity {
 
 ### Ops / platform (no product phase gate)
 
-- [ ] **P4-9. Email dispatch log**
+- [x] **P4-9. Email dispatch log**
 
 When transactional email is added (Phase 1 Sprint 6):
 
@@ -725,11 +725,11 @@ export class EmailDispatchLog extends BaseDbEntity {
 }
 ```
 
-- [ ] **P4-10. Analytics rollups**
+- [x] **P4-10. Analytics rollups**
 
 Materialized daily tables for admin dashboards (clicks, demand, revenue) — e.g. `ticketLinkClickDaily`, `ticketInterestDaily`. Prevents full-table scans on raw event tables.
 
-- [ ] **P4-11. GDPR anonymization policy**
+- [x] **P4-11. GDPR anonymization policy**
 
 [`ticketOwnershipHistory`](../backend/src/api/modules/ticketOwnershipHistory/ticketOwnershipHistory.entity.ts) is immutable (correct for audit). Document and implement:
 

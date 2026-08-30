@@ -6,6 +6,7 @@ import { TicketOwnershipHistoryModule } from '../ticketOwnershipHistory/ticketOw
 import { UserTicketLogModule } from '../userTicketLog/userTicketLog.module';
 import { MarketplaceFeatureModule } from '../../complexModules/marketplace/marketplace-feature.module';
 import { NotificationModule } from '../notification/notification.module';
+import { MarketplaceDispute } from '../marketplaceDispute/marketplaceDispute.entity';
 import { MarketplaceListing } from './marketplaceListing.entity';
 import { MarketplaceListingController } from './marketplaceListing.controller';
 import { MarketplaceListingService } from './marketplaceListing.service';
@@ -17,7 +18,7 @@ import { MarketplaceListingService } from './marketplaceListing.service';
         UserTicketLogModule,
         NotificationModule,
         MulterModule.register({}),
-        TypeOrmModule.forFeature([MarketplaceListing, Ticket]),
+        TypeOrmModule.forFeature([MarketplaceListing, Ticket, MarketplaceDispute]),
     ],
     controllers: [MarketplaceListingController],
     providers: [MarketplaceListingService],

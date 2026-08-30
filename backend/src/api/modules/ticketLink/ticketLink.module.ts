@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SponsoredPlacement } from '../sponsoredPlacement/sponsoredPlacement.entity';
 import { TicketLink } from './ticketLink.entity';
 import { TicketLinkClick } from './ticketLinkClick.entity';
 import { TicketLinkService } from './ticketLink.service';
@@ -8,7 +9,7 @@ import { TicketLinksFeatureModule } from '../../complexModules/ticketLinks/ticke
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([TicketLink, TicketLinkClick]),
+        TypeOrmModule.forFeature([TicketLink, TicketLinkClick, SponsoredPlacement]),
         TicketLinksFeatureModule,
     ],
     controllers: [TicketLinkController],

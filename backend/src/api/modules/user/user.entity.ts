@@ -6,6 +6,7 @@ import {
     EntityColumn,
     EntityEnumColumn,
     EntityRelation,
+    OptionalEntityColumn,
     RelationshipType
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
@@ -155,6 +156,10 @@ export class User extends BaseDbEntity {
 
     @EntityColumn({ db: { type: 'boolean', default: true } })
     shareVerifiedOnly!: boolean;
+
+    @OptionalEntityColumn({ db: { type: 'timestamptz' } })
+    @ApiPropertyOptional({ description: 'When the user account was anonymized for GDPR' })
+    anonymizedAt?: Date;
 }
 
 export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {

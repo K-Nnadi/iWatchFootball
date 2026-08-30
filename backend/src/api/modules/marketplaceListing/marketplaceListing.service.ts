@@ -21,6 +21,7 @@ import { TicketOwnershipHistoryService } from '../ticketOwnershipHistory/ticketO
 import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../enums/notification.enum';
+import { MarketplaceDispute } from '../marketplaceDispute/marketplaceDispute.entity';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
@@ -42,6 +43,8 @@ export class MarketplaceListingService {
         private readonly repo: Repository<MarketplaceListing>,
         @InjectRepository(Ticket)
         private readonly ticketRepo: Repository<Ticket>,
+        @InjectRepository(MarketplaceDispute)
+        private readonly disputeRepo: Repository<MarketplaceDispute>,
         private readonly dataSource: DataSource,
         private readonly ownershipHistory: TicketOwnershipHistoryService,
         private readonly userTicketLog: UserTicketLogService,
@@ -153,6 +156,7 @@ export class MarketplaceListingService {
 
             const listing = listingRepo.create({
                 ticketId: params.ticketId,
+                fixtureId: ticket.fixtureId,
                 sellerId: params.sellerId,
                 askPrice: params.askPrice,
                 status: MarketplaceListingStatus.ACTIVE,
@@ -471,12 +475,21 @@ export class MarketplaceListingService {
             throw new ForbiddenException('You are not a party to this listing');
         }
 
+        const dispute = this.disputeRepo.create({
+            listingId: listing.id,
+            raisedByUserId: userId,
+            reason,
+            details,
+            status: DisputeStatus.OPEN,
+        });
+        await this.disputeRepo.save(dispute);
+
         await this.notificationService.createIfAllowed({
             userId: userId === listing.sellerId ? (listing.buyerId ?? userId) : listing.sellerId,
             type: NotificationType.DISPUTE_RAISED,
             title: 'A dispute has been raised',
             message: `A dispute has been raised on listing #${listing.id}. Admin will review.`,
-            metadata: { listingId: listing.id, reason },
+            metadata: { listingId: listing.id, reason, disputeId: dispute.id },
         });
 
         return { ok: true };
