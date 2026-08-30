@@ -1,4 +1,4 @@
-1import { Entity } from 'typeorm';
+import { Entity } from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {
     EntityColumn,

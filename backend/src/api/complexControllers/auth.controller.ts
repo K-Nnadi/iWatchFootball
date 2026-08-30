@@ -304,7 +304,7 @@ export class AuthController {
                     register.securityAnswer,
                 );
 
-                const commsPreference = await this.commsPreferenceService.create({
+                await this.commsPreferenceService.create({
                     userId: user.id,
                     emailNotifications: CommunicationFrequency.DAILY,
                     inAppNotifications: CommunicationFrequency.IMMEDIATE,
@@ -316,17 +316,10 @@ export class AuthController {
                     language: Language.EN
                 });
 
-                if (commsPreference) {
-                    user = await this.userService.update(user.id, {
-                        id: user.id,
-                        commsPreferenceId: commsPreference.id
-                    });
-                }
+                await this.userAdPreferenceService.getOrCreate(user.id);
 
-                await this.userAdPreferenceService.getOrCreate(user!.id);
-
-                const freshUser = await this.userService.getOne(user!.id);
-                const tokenUser = freshUser ?? user!;
+                const freshUser = await this.userService.getOne(user.id);
+                const tokenUser = freshUser ?? user;
                 const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(tokenUser);
                 void response.code(200).send({ user: tokenUser, access_token: token });
             } catch (err) {
