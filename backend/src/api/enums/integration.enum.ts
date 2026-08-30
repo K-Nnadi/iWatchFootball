@@ -14,6 +14,7 @@ export enum IntegrationProvider {
     AZURE_OPENAI = 'azure_openai',
     API_SPORTS = 'api_sports',
     STATSBOMB = 'statsbomb',
+    SPORTMONKS = 'sportmonks',
     CUSTOM = 'custom',
 }
 

@@ -1,4 +1,4 @@
-import { Entity } from 'typeorm';
+1import { Entity } from 'typeorm';
 import { BaseDbEntity } from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {
     EntityColumn,
@@ -13,6 +13,7 @@ import { Team } from '../team/team.entity';
 
 export enum FixtureTeamStatSource {
     API_SPORTS = 'api_sports',
+    SPORTMONKS = 'sportmonks',
     DERIVED = 'derived',
     MANUAL = 'manual',
 }

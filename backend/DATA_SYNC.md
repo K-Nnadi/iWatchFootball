@@ -1,9 +1,22 @@
-# One-click data sync (StatsBomb + API-Sports)
+# One-click data sync (StatsBomb + API-Sports + SportMonks)
 
 Admin API under **`/admin/data-sync`** (JWT + **ADMIN** role):
 
-- **`POST /admin/data-sync/run`** — Runs StatsBomb (optional) then API-Sports imports under a single **`maxApiRequests`** budget. StatsBomb does **not** count toward that budget.
+- **`POST /admin/data-sync/run`** — Runs StatsBomb (optional), API-Sports imports, and/or SportMonks pipeline under configured request budgets. StatsBomb does **not** count toward API-Sports `maxApiRequests`.
 - **`GET /admin/data-sync/jobs/:id`** — Job row plus **`syncJobStep`** checkpoints (`status`, `cursor`, `resultSummary`).
+
+## SportMonks (direct adapter)
+
+Admin endpoints under **`/sportmonks`** (JWT + **ADMIN**):
+
+- **`GET /sportmonks/status`** — Whether `SPORTMONKS_API_TOKEN` is set.
+- **`POST /sportmonks/sync/import/leagues`** — Import leagues + current seasons.
+- **`POST /sportmonks/sync/standings`** — Standings for a local season (SportMonks season id in metadata).
+- **`POST /sportmonks/sync/import/fixtures`** — Fixtures for a date window.
+- **`POST /sportmonks/sync/fixture-details`** — Goals, cards, subs, lineups for one fixture.
+- **`POST /sportmonks/sync/run`** — Full pipeline (leagues → standings → fixtures → details).
+
+Set **`SPORTMONKS_API_TOKEN`** in `backend/.env`. Include a `sportmonks` block in **`POST /admin/data-sync/run`** to run the SportMonks step in the one-click job.
 
 ## Quotas and resume
 

@@ -2,7 +2,7 @@ import {ApiBody, ApiOkResponse, ApiOperation, ApiProperty, ApiPropertyOptional, 
 import {Body, Get, Module, Post, Response} from '@nestjs/common';
 import {FastifyReply} from 'fastify';
 import {createSigner} from 'fast-jwt';
-import {IsEmail, IsEnum, IsNotEmpty, IsOptional, MaxLength, MinLength} from 'class-validator';
+import {IsDateString, IsEmail, IsEnum, IsISO31661Alpha2, IsNotEmpty, IsOptional, MaxLength, MinLength} from 'class-validator';
 import {NoAuthController} from "@iWatchFootball/base-tools/decorators/controller.decorator";
 import {compare, hash} from "bcryptjs";
 import {User} from "../modules/user/user.entity";
@@ -16,6 +16,8 @@ import {UserRole} from "../../auth/types/security.types";
 import {SecurityQuestion} from "../enums/securityQuestion.enum";
 import {UserSecurityAnswerModule} from "../modules/userSecurityAnswer/userSecurityAnswer.module";
 import {UserSecurityAnswerService} from "../modules/userSecurityAnswer/userSecurityAnswer.service";
+import {UserAdPreferenceModule} from "../modules/userAdPreference/userAdPreference.module";
+import {UserAdPreferenceService} from "../modules/userAdPreference/userAdPreference.service";
 
 
 export class ValidateBody {
@@ -49,6 +51,16 @@ export class RegisterBody extends PickType(User, ['firstName', 'lastName', 'emai
     @MinLength(2)
     @MaxLength(128)
     securityAnswer!: string;
+
+    @ApiPropertyOptional({ description: 'Date of birth (YYYY-MM-DD) — used for age-gating adult content' })
+    @IsOptional()
+    @IsDateString()
+    dateOfBirth?: string;
+
+    @ApiPropertyOptional({ description: 'ISO 3166-1 alpha-2 country code, e.g. GB' })
+    @IsOptional()
+    @IsISO31661Alpha2()
+    country?: string;
 }
 
 export class ForgotPasswordChallengeBody {
@@ -113,6 +125,7 @@ export class AuthController {
         private userService: UserService,
         private commsPreferenceService: CommsPreferenceService,
         private userSecurityAnswerService: UserSecurityAnswerService,
+        private userAdPreferenceService: UserAdPreferenceService,
     ) {
     }
 
@@ -221,7 +234,7 @@ export class AuthController {
             user = users[0];
         } else if (auth.userName) {
             const users = await this.userService.getQuery({
-                where: {userName: auth.userName}
+                where: {userName: auth.userName},
             });
             user = users[0];
         }
@@ -277,7 +290,10 @@ export class AuthController {
         }
 
         let user = await this.userService.create({
-            ...registerUser, type: UserRole.USER,
+            ...registerUser,
+            type: UserRole.USER,
+            dateOfBirth: register.dateOfBirth,
+            country: register.country?.toUpperCase(),
         });
 
         if (user) {
@@ -287,38 +303,38 @@ export class AuthController {
                     register.securityQuestion,
                     register.securityAnswer,
                 );
-            } catch {
-                await this.userService.delete(user.id);
-                void response.code(400).send({ message: 'Invalid security answer' });
-                return;
-            }
 
-            const commsPreference = await this.commsPreferenceService.create({
-                userId: user.id,
-                emailNotifications: CommunicationFrequency.DAILY,
-                inAppNotifications: CommunicationFrequency.IMMEDIATE,
-                smsNotifications: CommunicationFrequency.NEVER,
-                pushNotifications: CommunicationFrequency.IMMEDIATE,
-                marketingEmails: CommunicationFrequency.WEEKLY,
-                newsletterEmails: CommunicationFrequency.WEEKLY,
-                matchReminders: CommunicationFrequency.DAILY,
-                language: Language.EN
-            });
-            
-            // Update user with commsPreferenceId
-            if (commsPreference) {
-                user = await this.userService.update(user.id, {
-                    id: user.id,
-                    commsPreferenceId: commsPreference.id
+                const commsPreference = await this.commsPreferenceService.create({
+                    userId: user.id,
+                    emailNotifications: CommunicationFrequency.DAILY,
+                    inAppNotifications: CommunicationFrequency.IMMEDIATE,
+                    smsNotifications: CommunicationFrequency.NEVER,
+                    pushNotifications: CommunicationFrequency.IMMEDIATE,
+                    marketingEmails: CommunicationFrequency.WEEKLY,
+                    newsletterEmails: CommunicationFrequency.WEEKLY,
+                    matchReminders: CommunicationFrequency.DAILY,
+                    language: Language.EN
                 });
-            }
 
-            const freshUser = await this.userService.getOne(user!.id);
-            const tokenUser = freshUser ?? user!;
-            const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(tokenUser);
-            void response.code(200).send({
-                user: tokenUser, access_token: token
-            });
+                if (commsPreference) {
+                    user = await this.userService.update(user.id, {
+                        id: user.id,
+                        commsPreferenceId: commsPreference.id
+                    });
+                }
+
+                await this.userAdPreferenceService.getOrCreate(user!.id);
+
+                const freshUser = await this.userService.getOne(user!.id);
+                const tokenUser = freshUser ?? user!;
+                const token = createSigner({key: process.env.JWT_SECRET, algorithm: 'HS256'})(tokenUser);
+                void response.code(200).send({ user: tokenUser, access_token: token });
+            } catch (err) {
+                // Roll back the user record so the same email/username can be used again
+                await this.userService.delete(user.id);
+                console.error('Registration failed, rolled back user:', err);
+                void response.code(500).send({ message: 'Registration failed. Please try again.' });
+            }
         } else {
             void response.code(400).send({message: 'Something went wrong..'});
         }
@@ -326,7 +342,7 @@ export class AuthController {
 }
 
 @Module({
-    imports: [UserModule, LogModule, CommsPreferenceModule, UserSecurityAnswerModule],
+    imports: [UserModule, LogModule, CommsPreferenceModule, UserSecurityAnswerModule, UserAdPreferenceModule],
     controllers: [AuthController]
 })
 export class AuthModule {

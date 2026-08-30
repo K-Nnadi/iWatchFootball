@@ -15891,6 +15891,107 @@
         ]
       }
     },
+    "/user/ad-preferences": {
+      "get": {
+        "operationId": "UserAdPreferenceController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user ad preferences",
+        "tags": [
+          "user/ad-preferences",
+          "user-ad-preferences"
+        ]
+      },
+      "patch": {
+        "operationId": "UserAdPreferenceController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchAdPreferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update current user ad preferences",
+        "tags": [
+          "user/ad-preferences",
+          "user-ad-preferences"
+        ]
+      }
+    },
+    "/user/ad-preferences/{userId}/self-exclude": {
+      "post": {
+        "operationId": "UserAdPreferenceController_selfExclude",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Apply self-exclusion for a user",
+        "tags": [
+          "user/ad-preferences",
+          "user-ad-preferences"
+        ]
+      }
+    },
     "/discount-code/validate/{code}": {
       "get": {
         "operationId": "DiscountCodeController_validate",
@@ -18050,6 +18151,198 @@
         "summary": "Sync fixture statistics from API-Sports for one fixture",
         "tags": [
           "API-Sports"
+        ]
+      }
+    },
+    "/sportmonks/leagues": {
+      "get": {
+        "description": "Use this to find league IDs for sync/run on free/single-league plans.",
+        "operationId": "SportMonksController_listLeagues",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List leagues available to your SportMonks token",
+        "tags": [
+          "SportMonks Adapter"
+        ]
+      }
+    },
+    "/sportmonks/status": {
+      "get": {
+        "operationId": "SportMonksController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "SportMonks adapter configuration status",
+        "tags": [
+          "SportMonks Adapter"
+        ]
+      }
+    },
+    "/sportmonks/sync/import/leagues": {
+      "post": {
+        "operationId": "SportMonksController_importLeagues",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SportMonksImportLeaguesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import leagues and seasons from SportMonks",
+        "tags": [
+          "SportMonks Adapter"
+        ]
+      }
+    },
+    "/sportmonks/sync/standings": {
+      "post": {
+        "operationId": "SportMonksController_syncStandings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SportMonksSyncStandingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync standings for a local season (SportMonks season id from metadata)",
+        "tags": [
+          "SportMonks Adapter"
+        ]
+      }
+    },
+    "/sportmonks/sync/import/fixtures": {
+      "post": {
+        "operationId": "SportMonksController_importFixtures",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SportMonksImportFixturesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import fixtures for a date window",
+        "tags": [
+          "SportMonks Adapter"
+        ]
+      }
+    },
+    "/sportmonks/sync/fixture-details": {
+      "post": {
+        "operationId": "SportMonksController_syncFixtureDetails",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SportMonksSyncFixtureDetailsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync goals, cards, substitutions and lineups for one fixture",
+        "tags": [
+          "SportMonks Adapter"
+        ]
+      }
+    },
+    "/sportmonks/sync/run": {
+      "post": {
+        "description": "Leagues → fixtures → standings → optional fixture details under maxApiRequests budget",
+        "operationId": "SportMonksController_runPipeline",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SportMonksRunPipelineDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pipeline summary with per-step counts"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Run full SportMonks pipeline",
+        "tags": [
+          "SportMonks Adapter"
         ]
       }
     },
@@ -25834,6 +26127,19 @@
           "name": {
             "type": "string"
           },
+          "partnerType": {
+            "type": "string",
+            "enum": [
+              "TICKETING",
+              "HOSPITALITY",
+              "TRAVEL",
+              "PARKING",
+              "HOTEL",
+              "MERCHANDISE",
+              "GAMBLING",
+              "OTHER"
+            ]
+          },
           "network": {
             "type": "string"
           },
@@ -25855,8 +26161,53 @@
           "isActive": {
             "type": "boolean"
           },
+          "campaignStartDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "campaignEndDate": {
+            "format": "date-time",
+            "type": "string"
+          },
           "notes": {
             "type": "string"
+          },
+          "minimumAge": {
+            "type": "number"
+          },
+          "allowedCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "blockedCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiresUserConsent": {
+            "type": "boolean"
+          },
+          "requiresRGMessage": {
+            "type": "boolean"
+          },
+          "disclosureText": {
+            "type": "string"
+          },
+          "allowedPlacements": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MATCH_PREVIEW",
+                "ODDS_TAB",
+                "STATS_SIDEBAR",
+                "PREDICTIONS_PAGE",
+                "NEWSLETTER"
+              ]
+            }
           },
           "createdAt": {
             "format": "date-time",
@@ -25870,7 +26221,10 @@
         "required": [
           "id",
           "name",
+          "partnerType",
           "isActive",
+          "requiresUserConsent",
+          "requiresRGMessage",
           "createdAt",
           "updatedAt"
         ]
@@ -25880,6 +26234,20 @@
         "properties": {
           "name": {
             "type": "string"
+          },
+          "partnerType": {
+            "type": "string",
+            "enum": [
+              "TICKETING",
+              "HOSPITALITY",
+              "TRAVEL",
+              "PARKING",
+              "HOTEL",
+              "MERCHANDISE",
+              "GAMBLING",
+              "OTHER"
+            ],
+            "default": "OTHER"
           },
           "network": {
             "type": "string",
@@ -25904,13 +26272,66 @@
             "type": "boolean",
             "default": true
           },
+          "campaignStartDate": {
+            "type": "string"
+          },
+          "campaignEndDate": {
+            "type": "string"
+          },
           "notes": {
             "type": "string"
+          },
+          "minimumAge": {
+            "type": "number",
+            "description": "Minimum user age (default 18 for gambling)"
+          },
+          "allowedCountries": {
+            "description": "ISO 3166-1 alpha-2 codes where allowed (empty = all)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "blockedCountries": {
+            "description": "ISO 3166-1 alpha-2 codes explicitly blocked",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiresUserConsent": {
+            "type": "boolean",
+            "default": false
+          },
+          "requiresRGMessage": {
+            "type": "boolean",
+            "default": false
+          },
+          "disclosureText": {
+            "type": "string",
+            "description": "Responsible gambling / disclosure text"
+          },
+          "allowedPlacements": {
+            "type": "array",
+            "description": "Allowed placement surfaces",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MATCH_PREVIEW",
+                "ODDS_TAB",
+                "STATS_SIDEBAR",
+                "PREDICTIONS_PAGE",
+                "NEWSLETTER"
+              ]
+            }
           }
         },
         "required": [
           "name",
-          "isActive"
+          "partnerType",
+          "isActive",
+          "requiresUserConsent",
+          "requiresRGMessage"
         ]
       },
       "UpdateAffiliatePartnerDto": {
@@ -25918,6 +26339,19 @@
         "properties": {
           "name": {
             "type": "string"
+          },
+          "partnerType": {
+            "type": "string",
+            "enum": [
+              "TICKETING",
+              "HOSPITALITY",
+              "TRAVEL",
+              "PARKING",
+              "HOTEL",
+              "MERCHANDISE",
+              "GAMBLING",
+              "OTHER"
+            ]
           },
           "network": {
             "type": "string"
@@ -25940,8 +26374,51 @@
           "isActive": {
             "type": "boolean"
           },
+          "campaignStartDate": {
+            "type": "string"
+          },
+          "campaignEndDate": {
+            "type": "string"
+          },
           "notes": {
             "type": "string"
+          },
+          "minimumAge": {
+            "type": "number"
+          },
+          "allowedCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "blockedCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiresUserConsent": {
+            "type": "boolean"
+          },
+          "requiresRGMessage": {
+            "type": "boolean"
+          },
+          "disclosureText": {
+            "type": "string"
+          },
+          "allowedPlacements": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MATCH_PREVIEW",
+                "ODDS_TAB",
+                "STATS_SIDEBAR",
+                "PREDICTIONS_PAGE",
+                "NEWSLETTER"
+              ]
+            }
           }
         }
       },
@@ -26048,6 +26525,18 @@
         },
         "required": [
           "totalClicks"
+        ]
+      },
+      "PatchAdPreferenceDto": {
+        "type": "object",
+        "properties": {
+          "showGamblingContent": {
+            "type": "boolean",
+            "description": "Opt in or out of gambling/betting ad content"
+          }
+        },
+        "required": [
+          "showGamblingContent"
         ]
       },
       "CreateTrophyDTO": {
@@ -26261,6 +26750,14 @@
           },
           "shareVerifiedOnly": {
             "type": "boolean"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth (YYYY-MM-DD) — used for age-gating adult content"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code, e.g. GB"
           }
         },
         "required": [
@@ -26320,6 +26817,14 @@
               "MODERATOR",
               "USER"
             ]
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth (YYYY-MM-DD) — used for age-gating adult content"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code, e.g. GB"
           }
         },
         "required": [
@@ -26653,6 +27158,146 @@
           "fixtureId"
         ]
       },
+      "SportMonksImportLeaguesDto": {
+        "type": "object",
+        "properties": {
+          "leagueIds": {
+            "example": [
+              8
+            ],
+            "description": "SportMonks league ids (8 = Premier League)",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "currentSeasonOnly": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "leagueIds"
+        ]
+      },
+      "SportMonksSyncStandingsDto": {
+        "type": "object",
+        "properties": {
+          "seasonId": {
+            "type": "number",
+            "description": "Local season id"
+          }
+        },
+        "required": [
+          "seasonId"
+        ]
+      },
+      "SportMonksImportFixturesDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "to": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "leagueId": {
+            "type": "number",
+            "description": "SportMonks league id filter"
+          },
+          "sportmonksSeasonId": {
+            "type": "number",
+            "description": "SportMonks season id filter"
+          },
+          "timezone": {
+            "type": "string",
+            "default": "UTC"
+          },
+          "maxPages": {
+            "type": "number",
+            "default": 20
+          },
+          "maxRequests": {
+            "type": "number",
+            "default": 30
+          },
+          "syncDetailsAfter": {
+            "type": "boolean",
+            "default": false
+          },
+          "syncDetailsMaxRequests": {
+            "type": "number",
+            "default": 20
+          },
+          "createMissingTeams": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "SportMonksSyncFixtureDetailsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number",
+            "description": "Local fixture id"
+          },
+          "sportmonksFixtureId": {
+            "type": "number",
+            "description": "SportMonks fixture id"
+          }
+        }
+      },
+      "SportMonksRunPipelineDto": {
+        "type": "object",
+        "properties": {
+          "leagueIds": {
+            "example": [
+              8
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "from": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "to": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "syncStandings": {
+            "type": "boolean",
+            "default": true
+          },
+          "syncFixtureDetails": {
+            "type": "boolean",
+            "default": true
+          },
+          "maxApiRequests": {
+            "type": "number",
+            "example": 100
+          },
+          "timezone": {
+            "type": "string",
+            "default": "UTC"
+          }
+        },
+        "required": [
+          "leagueIds",
+          "from",
+          "to",
+          "maxApiRequests"
+        ]
+      },
       "CreatePaymentSessionDto": {
         "type": "object",
         "properties": {
@@ -26722,6 +27367,7 @@
               "azure_openai",
               "api_sports",
               "statsbomb",
+              "sportmonks",
               "custom"
             ],
             "description": "Provider implementation key"
@@ -26822,6 +27468,7 @@
               "azure_openai",
               "api_sports",
               "statsbomb",
+              "sportmonks",
               "custom"
             ],
             "description": "Provider implementation key"
@@ -27364,6 +28011,14 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 128
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth (YYYY-MM-DD) — used for age-gating adult content"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code, e.g. GB"
           }
         },
         "required": [
@@ -27610,6 +28265,57 @@
           "maxApiRequests"
         ]
       },
+      "SportMonksPipelineDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "When false, the SportMonks block is skipped"
+          },
+          "leagueIds": {
+            "example": [
+              8
+            ],
+            "description": "SportMonks league ids (8 = Premier League, 2 = Champions League)",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "from": {
+            "type": "string",
+            "description": "Fixture import window start YYYY-MM-DD"
+          },
+          "to": {
+            "type": "string",
+            "description": "Fixture import window end YYYY-MM-DD"
+          },
+          "maxApiRequests": {
+            "type": "number",
+            "description": "Cap on SportMonks HTTP requests for this run",
+            "example": 100
+          },
+          "syncStandings": {
+            "type": "boolean",
+            "default": true
+          },
+          "syncFixtureDetails": {
+            "type": "boolean",
+            "default": true
+          },
+          "timezone": {
+            "type": "string",
+            "default": "UTC"
+          }
+        },
+        "required": [
+          "leagueIds",
+          "from",
+          "to",
+          "maxApiRequests"
+        ]
+      },
       "DataSyncRunDto": {
         "type": "object",
         "properties": {
@@ -27626,6 +28332,9 @@
           },
           "apiSports": {
             "$ref": "#/components/schemas/ApiSportsPipelineDto"
+          },
+          "sportmonks": {
+            "$ref": "#/components/schemas/SportMonksPipelineDto"
           },
           "async": {
             "type": "boolean",

@@ -7,6 +7,8 @@ import { usePageTransition } from '../../hooks/usePageTransition';
 import { useHeaderNavbarStore } from '../../shared/stores/headerNavbar.store';
 import { useCartStore } from '../../shared/stores/cart.store';
 import { usePlatformFeaturesStore } from '../../shared/stores/platformFeatures.store';
+import { useAuthStore } from '../../shared/stores/auth.store';
+import { UserType } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { UiButton } from '../ui';
 import { useTranslation } from '../../i18n';
 import classes from './styles/header.module.css';
@@ -51,6 +53,8 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
     const { navbarOpen, toggleNavbar } = useHeaderNavbarStore();
     const { items } = useCartStore();
     const { marketplaceEnabled } = usePlatformFeaturesStore();
+    const { user } = useAuthStore();
+    const isAdmin = user?.type === UserType.ADMIN;
     const { t } = useTranslation();
     const hasCartItems = items.length > 0;
     const goHome = () => navigateWithTransition(isLoggedIn ? '/home' : '/');
@@ -60,6 +64,7 @@ export function Header({ showHeader, isLoggedIn }: HeaderProps) {
         { page: 'matches', label: t('nav.matches') },
         ...(marketplaceEnabled ? [{ page: 'marketplace', label: t('nav.marketplace') }] : []),
         { page: 'logs', label: t('nav.logs') },
+        ...(isAdmin ? [{ page: 'admin', label: t('nav.admin') }] : []),
     ];
 
     return (

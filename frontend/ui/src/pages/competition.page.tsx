@@ -163,13 +163,21 @@ export function CompetitionPage() {
         [tcsAll, activeSeasonId]
     );
 
+    const standingTeamIds = useMemo(
+        () => [...new Set(tcsForSeason.map((t) => t.teamId).filter((id): id is number => id != null))],
+        [tcsForSeason],
+    );
+
     const { data: standings = [], isLoading: isLoadingStandings } = useCompetitionSeasonStandings(
         competitionId,
         activeSeasonId,
     );
 
-    // Teams lookup
-    const { data: teamsData = [] } = useGetQueryTeam({ take: 500 } as any);
+    // Teams for this competition season only (avoids missing names when global team list is paginated)
+    const { data: teamsData = [] } = useGetQueryTeam(
+        { where: { id: { $in: standingTeamIds.length ? standingTeamIds : [-1] } }, take: standingTeamIds.length || 1 } as any,
+        { query: { enabled: standingTeamIds.length > 0 } as any },
+    );
     const teamName = (tcsId: number) => {
         const tcs = tcsForSeason.find(t => t.id === tcsId);
         return teamsData.find(t => t.id === tcs?.teamId)?.name ?? `Team #${tcs?.teamId}`;

@@ -49,6 +49,7 @@ import {NewsArticleModule} from "./api/modules/newsArticle/newsArticle.module";
 import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {ApiSportsAdapterModule} from "./api/adapters/api-sports/api-sports-adapter.module";
+import {SportMonksAdapterModule} from "./api/adapters/sportmonks/sportmonks-adapter.module";
 import {DataSeedingModule} from "./api/complexControllers/dataSeeding.controller";
 import {InsightsModule} from "./api/complexModules/insights/insights.module";
 import {DataSyncModule} from "./api/complexModules/dataSync/data-sync.module";
@@ -68,6 +69,7 @@ import {TicketInterestModule} from "./api/modules/ticketInterest/ticketInterest.
 import {AffiliatePartnerModule} from "./api/modules/affiliatePartner/affiliatePartner.module";
 import {AffiliateConversionModule} from "./api/modules/affiliateConversion/affiliateConversion.module";
 import {TicketLinkAnalyticsModule} from "./api/modules/ticketLinkAnalytics/ticketLinkAnalytics.module";
+import {UserAdPreferenceModule} from "./api/modules/userAdPreference/userAdPreference.module";
 import {RedisModule} from "./shared/redis/redis.module";
 import {buildBullConnection, isRedisEnabled} from "./shared/redis/redis.config";
 import {HealthModule} from "./health/health.module";
@@ -121,12 +123,14 @@ const Modules = [
     AffiliatePartnerModule,
     AffiliateConversionModule,
     TicketLinkAnalyticsModule,
+    UserAdPreferenceModule,
     DiscountCodeModule,
     TransferModule,
     TrophyModule,
     UserModule,
     StatsBombAdapterModule,
     ApiSportsAdapterModule,
+    SportMonksAdapterModule,
     UserSubscriptionModule,
     PaymentsIntegrationModule,
     IntegrationModule,

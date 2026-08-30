@@ -160,7 +160,15 @@ export class User extends BaseDbEntity {
 
     @EntityColumn({ db: { type: 'boolean', default: true } })
     shareVerifiedOnly!: boolean;
+
+    @OptionalEntityColumn({ db: { type: 'date' } })
+    @ApiPropertyOptional({ description: 'Date of birth (YYYY-MM-DD) — used for age-gating adult content' })
+    dateOfBirth?: string;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 2 } })
+    @ApiPropertyOptional({ description: 'ISO 3166-1 alpha-2 country code, e.g. GB' })
+    country?: string;
 }
 
-export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {
+export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "dateOfBirth", "country", "metadata"] as const) {
 }

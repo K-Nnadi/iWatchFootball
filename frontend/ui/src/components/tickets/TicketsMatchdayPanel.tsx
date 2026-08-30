@@ -5,6 +5,7 @@ import {
     Box,
     Group,
     Popover,
+    SimpleGrid,
     Skeleton,
     Stack,
     Text,
@@ -191,7 +192,10 @@ export function TicketsMatchdayPanel({ fixtureId, teamId, competitionId }: Ticke
                     <SaleInfoCard saleInfo={saleInfoLink.saleInfo} label={saleInfoLink.label} />
                 )}
 
-                <Group gap="sm" wrap="wrap" align="stretch">
+                <SimpleGrid
+                    cols={{ base: 1, xs: 2, sm: 3 }}
+                    spacing="sm"
+                >
                     {visibleLinks.map((link) => (
                         <TicketCard
                             key={link.id}
@@ -202,36 +206,23 @@ export function TicketsMatchdayPanel({ fixtureId, teamId, competitionId }: Ticke
                             onClick={() => setSelectedLink(link)}
                         />
                     ))}
-                </Group>
+                </SimpleGrid>
 
                 <Box style={{ borderTop: '1px solid var(--ui-divider)', paddingTop: '0.5rem' }}>
-                    <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs">
-                        {(hasAnyAffiliate && affiliateDisclosureEnabled) ? (
-                            <Group gap={6} align="flex-start" wrap="nowrap" style={{ flex: 1 }}>
-                                <IconAlertCircle
-                                    size={12}
-                                    style={{ color: 'var(--ui-text-muted)', flexShrink: 0, marginTop: 2 }}
-                                />
-                                <Text size="xs" style={{ color: 'var(--ui-text-muted)', lineHeight: 1.5 }}>
-                                    Tickets are sold by the club, competition, venue, or approved partner. I Watch Football
-                                    does not sell tickets or guarantee availability. Some links earn us a small commission
-                                    at no extra cost to you.
-                                </Text>
-                            </Group>
-                        ) : (
-                            <Group gap={6} align="flex-start" wrap="nowrap" style={{ flex: 1 }}>
-                                <IconAlertCircle
-                                    size={12}
-                                    style={{ color: 'var(--ui-text-muted)', flexShrink: 0, marginTop: 2 }}
-                                />
-                                <Text size="xs" style={{ color: 'var(--ui-text-muted)', lineHeight: 1.5 }}>
-                                    Tickets are sold by the club, competition, venue, or approved partner. I Watch Football
-                                    does not sell tickets or guarantee availability.
-                                </Text>
-                            </Group>
-                        )}
+                    <Stack gap={4}>
+                        <Group gap={6} align="flex-start" wrap="nowrap">
+                            <IconAlertCircle
+                                size={12}
+                                style={{ color: 'var(--ui-text-muted)', flexShrink: 0, marginTop: 2 }}
+                            />
+                            <Text size="xs" style={{ color: 'var(--ui-text-muted)', lineHeight: 1.5 }}>
+                                {hasAnyAffiliate && affiliateDisclosureEnabled
+                                    ? 'Tickets are sold by the club, competition, venue, or approved partner. I Watch Football does not sell tickets or guarantee availability. Some links earn us a small commission at no extra cost to you.'
+                                    : 'Tickets are sold by the club, competition, venue, or approved partner. I Watch Football does not sell tickets or guarantee availability.'}
+                            </Text>
+                        </Group>
                         {hasBadges && <BadgeLegendTooltip />}
-                    </Group>
+                    </Stack>
                 </Box>
             </Stack>
 
