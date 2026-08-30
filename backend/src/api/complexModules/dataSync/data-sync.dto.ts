@@ -26,6 +26,12 @@ export class StatsBombPipelineOptionsDto {
 
   @ApiPropertyOptional()
   skipLineups?: boolean;
+
+  @ApiPropertyOptional({ default: true, description: 'Skip unchanged competition-seasons (StatsBomb match_updated watermark)' })
+  incremental?: boolean;
+
+  @ApiPropertyOptional({ default: false, description: 'Force full re-sync of all StatsBomb competition-seasons' })
+  forceFull?: boolean;
 }
 
 export class ApiSportsLeaguesPipelineDto {

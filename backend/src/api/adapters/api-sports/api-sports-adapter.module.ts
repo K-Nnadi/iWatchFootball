@@ -14,6 +14,9 @@ import { FixtureModule } from '../../modules/fixture/fixture.module';
 import { StadiumModule } from '../../modules/stadium/stadium.module';
 import { TeamStadiumModule } from '../../modules/teamStadium/teamStadium.module';
 import { FixtureTeamStatModule } from '../../modules/fixtureTeamStat/fixtureTeamStat.module';
+import { GoalModule } from '../../modules/goal/goal.module';
+import { CardModule } from '../../modules/card/card.module';
+import { SubstitutionModule } from '../../modules/substitution/substitution.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { FixtureTeamStatModule } from '../../modules/fixtureTeamStat/fixtureTeam
     FixtureModule,
     StadiumModule,
     FixtureTeamStatModule,
+    GoalModule,
+    CardModule,
+    SubstitutionModule,
   ],
   providers: [ApiSportsHttpService, ApiSportsAdapterService],
   controllers: [ApiSportsController],

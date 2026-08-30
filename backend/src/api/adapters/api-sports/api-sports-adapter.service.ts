@@ -25,6 +25,14 @@ import { PlayerTeamStintSource } from '../../enums/playerTeamStint.enum';
 import { FixtureTeamStatService } from '../../modules/fixtureTeamStat/fixtureTeamStat.service';
 import { FixtureTeamStatSide } from '../../modules/fixtureTeamStat/fixtureTeamStat.entity';
 import type { ApiSportsFixtureStatisticsTeam } from './api-sports-fixture-statistics.types';
+import type {
+  ApiSportsFixtureEvent,
+  ApiSportsFixtureEventsSyncResult,
+} from './api-sports-fixture-events.types';
+import { GoalService } from '../../modules/goal/goal.module';
+import { CardService } from '../../modules/card/card.module';
+import { SubstitutionService } from '../../modules/substitution/substitution.module';
+import { CardType } from '../../enums/card.enum';
 
 const PROVIDER_KEY = ENTITY_METADATA_PROVIDER.APISPORTS;
 
@@ -114,6 +122,10 @@ export type ImportFixturesFromLeagueWindowOptions = {
 export type ImportLiveFixturesOptions = {
   /** Max concurrent fixture upserts (default 16). */
   fixtureUpsertConcurrency?: number;
+  /** When true (default), persist embedded `events` into goal/card/substitution tables. */
+  syncEvents?: boolean;
+  /** Max extra `/fixtures/events` calls when live row has no embedded events (default 5). */
+  maxEventFetchRequests?: number;
 };
 
 export type SyncPrimaryVenuesFromTeamsOptions = {
@@ -162,6 +174,9 @@ export class ApiSportsAdapterService {
     private readonly teamStadiumService: TeamStadiumService,
     private readonly playerTeamStintService: PlayerTeamStintService,
     private readonly fixtureTeamStatService: FixtureTeamStatService,
+    private readonly goalService: GoalService,
+    private readonly cardService: CardService,
+    private readonly substitutionService: SubstitutionService,
   ) {}
 
   private getProviderExternalId(metadata: any): string | null {
@@ -1426,12 +1441,33 @@ export class ApiSportsAdapterService {
     apiRequests: number;
     liveCount: number;
     errors: string[];
+    events: ApiSportsFixtureEventsSyncResult & { eventApiRequests: number };
   }> {
     const errors: string[] = [];
     let created = 0;
     let updated = 0;
     let skipped = 0;
     let apiRequests = 0;
+    let eventApiRequests = 0;
+    const events: ApiSportsFixtureEventsSyncResult = {
+      goals: 0,
+      cards: 0,
+      substitutions: 0,
+      skipped: 0,
+    };
+    const syncEvents = options?.syncEvents !== false;
+    const maxEventFetchRequests = Math.max(0, Number(options?.maxEventFetchRequests ?? 5) || 5);
+    let eventFetchBudget = maxEventFetchRequests;
+
+    const emptyResult = () => ({
+      created,
+      updated,
+      skipped,
+      apiRequests,
+      liveCount: 0,
+      errors,
+      events: { ...events, eventApiRequests },
+    });
 
     let payload: any;
     try {
@@ -1439,12 +1475,12 @@ export class ApiSportsAdapterService {
       apiRequests = 1;
     } catch (e: any) {
       errors.push(`live fixtures: ${e?.message ?? e}`);
-      return { created, updated, skipped, apiRequests, liveCount: 0, errors };
+      return emptyResult();
     }
 
     const rows = Array.isArray(payload?.response) ? payload.response : [];
     if (rows.length === 0) {
-      return { created, updated, skipped, apiRequests, liveCount: 0, errors };
+      return emptyResult();
     }
 
     const groups = new Map<string, any[]>();
@@ -1503,9 +1539,41 @@ export class ApiSportsAdapterService {
       };
 
       const rowOutcomes = new Array<'created' | 'updated' | 'skipped'>(groupRows.length).fill('skipped');
+      const eventOutcomes: ApiSportsFixtureEventsSyncResult[] = [];
       await this.runPool(groupRows, concurrency, async (row, ix) => {
         try {
           rowOutcomes[ix] = await this.upsertFixtureFromApiSportsRow(row, ctx);
+          if (!syncEvents) return;
+
+          const apiFixtureId = row?.fixture?.id != null ? Number(row.fixture.id) : null;
+          if (!apiFixtureId) return;
+
+          const localFixture = ctx.fixtureByApisportsExternalId.get(String(apiFixtureId));
+          if (!localFixture?.id) return;
+
+          let eventRows: ApiSportsFixtureEvent[] = Array.isArray(row.events) ? row.events : [];
+          if (eventRows.length === 0 && eventFetchBudget > 0) {
+            const statusShort = String(row?.fixture?.status?.short ?? '').toUpperCase();
+            const liveLike = ['LIVE', '1H', '2H', 'HT', 'ET', 'BT', 'P', 'INT'].includes(statusShort);
+            if (liveLike) {
+              try {
+                const fetched = await this.discoverFixtureEvents(apiFixtureId);
+                eventApiRequests += 1;
+                eventFetchBudget -= 1;
+                eventRows = Array.isArray(fetched?.response) ? fetched.response : [];
+              } catch (e: any) {
+                errors.push(`fixture ${apiFixtureId} events: ${e?.message ?? e}`);
+              }
+            }
+          }
+
+          if (eventRows.length === 0) return;
+
+          eventOutcomes[ix] = await this.syncApiSportsEventsForFixture(
+            localFixture.id,
+            apiFixtureId,
+            eventRows,
+          );
         } catch (e: any) {
           errors.push(`live fixture row: ${e?.message ?? e}`);
           rowOutcomes[ix] = 'skipped';
@@ -1517,13 +1585,256 @@ export class ApiSportsAdapterService {
         else if (outcome === 'updated') updated += 1;
         else skipped += 1;
       }
+
+      for (const ev of eventOutcomes) {
+        if (!ev) continue;
+        events.goals += ev.goals;
+        events.cards += ev.cards;
+        events.substitutions += ev.substitutions;
+        events.skipped += ev.skipped;
+      }
     }
 
+    apiRequests += eventApiRequests;
+
     this.logger.log(
-      `importLiveFixtures: ${rows.length} live upstream — +${created} ~${updated} skipped ${skipped} (${apiRequests} req)`,
+      `importLiveFixtures: ${rows.length} live upstream — +${created} ~${updated} skipped ${skipped} (${apiRequests} req); events +${events.goals}g +${events.cards}c +${events.substitutions}s`,
     );
 
-    return { created, updated, skipped, apiRequests, liveCount: rows.length, errors };
+    return {
+      created,
+      updated,
+      skipped,
+      apiRequests,
+      liveCount: rows.length,
+      errors,
+      events: { ...events, eventApiRequests },
+    };
+  }
+
+  /** Proxies `GET /fixtures/events?fixture=` for a single match. */
+  async discoverFixtureEvents(fixtureApiId: number): Promise<any> {
+    return this.http.get('/fixtures/events', { fixture: String(fixtureApiId) } as any);
+  }
+
+  /** Persist API-Sports timeline incidents into local goal/card/substitution tables. */
+  async syncApiSportsEventsForFixture(
+    localFixtureId: number,
+    fixtureApiId: number,
+    rawEvents: ApiSportsFixtureEvent[],
+  ): Promise<ApiSportsFixtureEventsSyncResult> {
+    const result: ApiSportsFixtureEventsSyncResult = {
+      goals: 0,
+      cards: 0,
+      substitutions: 0,
+      skipped: 0,
+    };
+
+    for (const event of rawEvents) {
+      const type = String(event.type ?? '').toLowerCase();
+      try {
+        if (type === 'goal') {
+          const ok = await this.syncApiSportsGoal(localFixtureId, fixtureApiId, event);
+          if (ok) result.goals += 1;
+          else result.skipped += 1;
+        } else if (type === 'card') {
+          const ok = await this.syncApiSportsCard(localFixtureId, fixtureApiId, event);
+          if (ok) result.cards += 1;
+          else result.skipped += 1;
+        } else if (type === 'subst') {
+          const ok = await this.syncApiSportsSubstitution(localFixtureId, fixtureApiId, event);
+          if (ok) result.substitutions += 1;
+          else result.skipped += 1;
+        }
+      } catch (e: any) {
+        result.skipped += 1;
+        this.logger.debug(
+          `Skipped API-Sports event for fixture ${localFixtureId}: ${e?.message ?? e}`,
+        );
+      }
+    }
+
+    const [fixture] = await this.fixtureService.getQuery({ where: { id: localFixtureId } as any });
+    if (fixture?.id) {
+      await this.fixtureService.update(localFixtureId, {
+        id: localFixtureId,
+        metadata: deepMergeEntityMetadata((fixture.metadata ?? {}) as Record<string, unknown>, {
+          apisports: {
+            eventsLastSyncedAt: new Date().toISOString(),
+            eventsCount: rawEvents.length,
+          },
+        }) as any,
+      } as any);
+    }
+
+    return result;
+  }
+
+  private apiSportsEventExternalId(
+    fixtureApiId: number,
+    event: ApiSportsFixtureEvent,
+  ): string {
+    const elapsed = event.time?.elapsed ?? 0;
+    const extra = event.time?.extra ?? 0;
+    const type = event.type ?? 'unknown';
+    const playerId = event.player?.id ?? 0;
+    const detail = event.detail ?? '';
+    return `${fixtureApiId}:${elapsed}:${extra}:${type}:${playerId}:${detail}`;
+  }
+
+  private async findIncidentByApiSportsExternalId(
+    kind: 'goal' | 'card' | 'substitution',
+    externalId: string,
+    fixtureId: number,
+  ): Promise<any | null> {
+    let rows: any[] = [];
+    if (kind === 'goal') {
+      rows = await this.goalService.getQuery({ where: { fixtureId } as any });
+    } else if (kind === 'card') {
+      rows = await this.cardService.getQuery({ where: { fixtureId } as any });
+    } else {
+      rows = await this.substitutionService.getQuery({ where: { fixtureId } as any });
+    }
+    return (
+      rows.find((row: any) => {
+        const ext = row?.metadata?.providers?.[PROVIDER_KEY]?.externalId;
+        return ext != null && String(ext) === externalId;
+      }) ?? null
+    );
+  }
+
+  private eventMinute(event: ApiSportsFixtureEvent): number {
+    const elapsed = Number(event.time?.elapsed ?? 0);
+    const extra = Number(event.time?.extra ?? 0);
+    if (!Number.isFinite(elapsed)) return 0;
+    if (extra > 0) return elapsed + extra;
+    return elapsed;
+  }
+
+  private mapApiSportsCardType(detail: string | undefined): CardType | null {
+    const d = String(detail ?? '').toLowerCase();
+    if (!d) return null;
+    if (d.includes('red')) return CardType.RED;
+    if (d.includes('yellow')) return CardType.YELLOW;
+    return null;
+  }
+
+  private async syncApiSportsGoal(
+    localFixtureId: number,
+    fixtureApiId: number,
+    event: ApiSportsFixtureEvent,
+  ): Promise<boolean> {
+    const externalId = this.apiSportsEventExternalId(fixtureApiId, event);
+    if (await this.findIncidentByApiSportsExternalId('goal', externalId, localFixtureId)) {
+      return true;
+    }
+
+    const scorerApiId = event.player?.id != null ? Number(event.player.id) : null;
+    if (!scorerApiId) return false;
+
+    const scorer = await this.findLocalPlayerByApiSportsId(scorerApiId);
+    const teamApiId = event.team?.id != null ? Number(event.team.id) : null;
+    const team = teamApiId ? await this.findLocalTeamByApiSportsId(teamApiId) : null;
+    if (!scorer?.id || !team?.id) return false;
+
+    let assistantId: number | undefined;
+    const assistApiId = event.assist?.id != null ? Number(event.assist.id) : null;
+    if (assistApiId) {
+      const assistant = await this.findLocalPlayerByApiSportsId(assistApiId);
+      assistantId = assistant?.id;
+    }
+
+    const detail = String(event.detail ?? '');
+    await this.goalService.create({
+      fixtureId: localFixtureId,
+      scorerId: scorer.id,
+      assistantId,
+      teamId: team.id,
+      minute: this.eventMinute(event),
+      penalty: detail.toLowerCase().includes('penalty'),
+      ownGoal: detail.toLowerCase().includes('own goal'),
+      metadata: {
+        source: 'api-sports',
+        detail,
+        providers: { [PROVIDER_KEY]: { externalId } },
+        lastSync: new Date().toISOString(),
+      },
+    } as any);
+
+    return true;
+  }
+
+  private async syncApiSportsCard(
+    localFixtureId: number,
+    fixtureApiId: number,
+    event: ApiSportsFixtureEvent,
+  ): Promise<boolean> {
+    const externalId = this.apiSportsEventExternalId(fixtureApiId, event);
+    if (await this.findIncidentByApiSportsExternalId('card', externalId, localFixtureId)) {
+      return true;
+    }
+
+    const playerApiId = event.player?.id != null ? Number(event.player.id) : null;
+    if (!playerApiId) return false;
+
+    const player = await this.findLocalPlayerByApiSportsId(playerApiId);
+    const teamApiId = event.team?.id != null ? Number(event.team.id) : null;
+    const team = teamApiId ? await this.findLocalTeamByApiSportsId(teamApiId) : null;
+    const cardType = this.mapApiSportsCardType(event.detail);
+    if (!player?.id || !team?.id || !cardType) return false;
+
+    await this.cardService.create({
+      fixtureId: localFixtureId,
+      playerId: player.id,
+      teamId: team.id,
+      type: cardType,
+      minute: this.eventMinute(event),
+      metadata: {
+        source: 'api-sports',
+        detail: event.detail,
+        providers: { [PROVIDER_KEY]: { externalId } },
+        lastSync: new Date().toISOString(),
+      },
+    } as any);
+
+    return true;
+  }
+
+  private async syncApiSportsSubstitution(
+    localFixtureId: number,
+    fixtureApiId: number,
+    event: ApiSportsFixtureEvent,
+  ): Promise<boolean> {
+    const externalId = this.apiSportsEventExternalId(fixtureApiId, event);
+    if (await this.findIncidentByApiSportsExternalId('substitution', externalId, localFixtureId)) {
+      return true;
+    }
+
+    const playerOutApiId = event.player?.id != null ? Number(event.player.id) : null;
+    const playerInApiId = event.assist?.id != null ? Number(event.assist.id) : null;
+    if (!playerOutApiId || !playerInApiId) return false;
+
+    const playerOut = await this.findLocalPlayerByApiSportsId(playerOutApiId);
+    const playerIn = await this.findLocalPlayerByApiSportsId(playerInApiId);
+    const teamApiId = event.team?.id != null ? Number(event.team.id) : null;
+    const team = teamApiId ? await this.findLocalTeamByApiSportsId(teamApiId) : null;
+    if (!playerOut?.id || !playerIn?.id || !team?.id) return false;
+
+    await this.substitutionService.create({
+      fixtureId: localFixtureId,
+      playerOutId: playerOut.id,
+      playerInId: playerIn.id,
+      teamId: team.id,
+      minute: this.eventMinute(event),
+      metadata: {
+        source: 'api-sports',
+        detail: event.detail,
+        providers: { [PROVIDER_KEY]: { externalId } },
+        lastSync: new Date().toISOString(),
+      },
+    } as any);
+
+    return true;
   }
 
 

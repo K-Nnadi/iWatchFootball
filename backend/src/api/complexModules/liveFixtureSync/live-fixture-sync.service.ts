@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ApiSportsAdapterService } from '../../adapters/api-sports/api-sports-adapter.service';
 
+import { ApiSportsFixtureEventsSyncResult } from '../../adapters/api-sports/api-sports-fixture-events.types';
+
 export type LiveFixtureSyncResult = {
   created: number;
   updated: number;
@@ -8,6 +10,7 @@ export type LiveFixtureSyncResult = {
   apiRequests: number;
   liveCount: number;
   errors: string[];
+  events: ApiSportsFixtureEventsSyncResult & { eventApiRequests: number };
 };
 
 @Injectable()
@@ -26,7 +29,7 @@ export class LiveFixtureSyncService {
       this.logger.warn(`Live fixture sync completed with ${result.errors.length} error(s)`);
     } else {
       this.logger.log(
-        `Live fixture sync complete: ${result.liveCount} live, +${result.created} created, ~${result.updated} updated`,
+        `Live fixture sync complete: ${result.liveCount} live, +${result.created} created, ~${result.updated} updated; events +${result.events.goals}g +${result.events.cards}c +${result.events.substitutions}s`,
       );
     }
 

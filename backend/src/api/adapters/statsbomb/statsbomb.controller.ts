@@ -23,8 +23,7 @@ export class StatsBombSyncOptionsDTO {
   skipStadiums?: boolean;
 
   @ApiPropertyOptional({
-    description:
-      'Skip StatsBomb lineups/{match}.json merge (no PlayerLineUp rows from squad file; substitutes missing unless filled elsewhere). When false, starters + bench are synced with isStarting from start_reason.',
+    description: 'Skip StatsBomb lineups/{match}.json merge',
     default: false,
   })
   skipLineups?: boolean;
@@ -35,6 +34,18 @@ export class StatsBombSyncOptionsDTO {
     default: false,
   })
   skipStartingXi?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'When true (default), skip competition-seasons with unchanged StatsBomb match_updated watermark.',
+    default: true,
+  })
+  incremental?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Re-sync all competition-seasons regardless of watermarks.',
+    default: false,
+  })
+  forceFull?: boolean;
 }
 
 @ApiTags('StatsBomb Adapter')

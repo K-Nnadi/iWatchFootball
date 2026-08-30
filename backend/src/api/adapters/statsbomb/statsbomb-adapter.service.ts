@@ -345,9 +345,16 @@ export class StatsBombAdapterService {
     skipStadiums?: boolean;
     skipLineups?: boolean;
     skipStartingXi?: boolean;
+    /** When true (default), skip competition-seasons whose upstream match_updated watermark is unchanged. */
+    incremental?: boolean;
+    /** When true, re-process all competition-seasons regardless of watermarks. */
+    forceFull?: boolean;
   }): Promise<void> {
+    const incremental = options?.forceFull ? false : options?.incremental !== false;
     try {
-      this.logger.log('🚀 Starting StatsBomb data synchronization...');
+      this.logger.log(
+        `🚀 Starting StatsBomb data synchronization${incremental ? ' (incremental)' : ' (full)'}...`,
+      );
 
       // Reset caches for this run
       this.cachedTeams = null;
@@ -364,13 +371,13 @@ export class StatsBombAdapterService {
       // Step 2: Fetch and sync teams and players
       this.logger.log('👥 Step 2: Syncing teams and players...');
       if (!options?.skipPlayers) {
-        await this.syncTeamsAndPlayers();
+        await this.syncTeamsAndPlayers({ incremental });
       }
       
       // Step 3: Fetch and sync fixtures
       this.logger.log('⚽ Step 3: Syncing fixtures...');
       if (!options?.skipFixtures) {
-        await this.syncFixtures(options);
+        await this.syncFixtures({ ...options, incremental });
       }
       
       // Step 4: Fetch and sync events (goals, etc.)
@@ -380,6 +387,7 @@ export class StatsBombAdapterService {
         skipGoals: options?.skipGoals,
         skipStartingXi: options?.skipStartingXi,
         skipLineups: options?.skipLineups,
+        incremental,
       });
       
       this.logger.log('✅ StatsBomb data synchronization completed successfully');
@@ -712,6 +720,33 @@ export class StatsBombAdapterService {
     );
   }
 
+  private async shouldSyncStatsBombCompetitionSeason(
+    comp: StatsBombCompetition,
+    incremental: boolean,
+  ): Promise<boolean> {
+    if (!incremental) return true;
+    const season = await this.findSeasonByStatsBombSeasonId(comp.season_id);
+    if (!season) return true;
+    const syncedWatermark = season.metadata?.statsbombSyncedMatchUpdated as string | undefined;
+    if (!syncedWatermark || !comp.match_updated) return true;
+    return comp.match_updated > syncedWatermark;
+  }
+
+  private async markStatsBombCompetitionSeasonSynced(comp: StatsBombCompetition): Promise<void> {
+    const season = await this.findSeasonByStatsBombSeasonId(comp.season_id);
+    if (!season?.id) return;
+    await this.seasonService.update(season.id, {
+      id: season.id,
+      metadata: deepMergeEntityMetadata((season.metadata ?? {}) as Record<string, unknown>, {
+        statsbombMatchUpdated: comp.match_updated,
+        statsbombMatchAvailable: comp.match_available,
+        statsbombSyncedMatchUpdated: comp.match_updated,
+        statsbombLastSyncedAt: new Date().toISOString(),
+      }) as any,
+    } as any);
+    this.cachedSeasons = null;
+  }
+
   /**
    * Sync competitions to database
    */
@@ -754,6 +789,18 @@ export class StatsBombAdapterService {
             }
           });
           this.logger.log(`Created competition: ${comp.competition_name}`);
+        } else {
+          await this.competitionService.update(competition.id, {
+            id: competition.id,
+            metadata: deepMergeEntityMetadata(
+              (competition.metadata ?? {}) as Record<string, unknown>,
+              {
+                matchUpdated: comp.match_updated,
+                matchAvailable: comp.match_available,
+                lastSync: new Date().toISOString(),
+              },
+            ) as any,
+          } as any);
         }
 
         // Create season if it doesn't exist
@@ -783,6 +830,17 @@ export class StatsBombAdapterService {
             }
           });
           this.logger.log(`Created season: ${seasonYear}/${seasonYear + 1}`);
+        } else if (season?.id) {
+          await this.seasonService.update(season.id, {
+            id: season.id,
+            metadata: deepMergeEntityMetadata((season.metadata ?? {}) as Record<string, unknown>, {
+              statsbombMatchUpdated: comp.match_updated,
+              statsbombMatchAvailable: comp.match_available,
+              seasonName: comp.season_name,
+              lastSync: new Date().toISOString(),
+            }) as any,
+          } as any);
+          this.cachedSeasons = null;
         }
       } catch (error) {
         this.logger.warn(`Error syncing competition ${comp.competition_name}:`, error);
@@ -793,12 +851,19 @@ export class StatsBombAdapterService {
   /**
    * Sync teams and players from StatsBomb data
    */
-  async syncTeamsAndPlayers(): Promise<void> {
+  async syncTeamsAndPlayers(options?: { incremental?: boolean }): Promise<void> {
     this.logger.log('Syncing teams and players...');
     
     const competitions = await this.fetchCompetitions();
+    const incremental = options?.incremental !== false;
     
     for (const comp of competitions) {
+      if (!(await this.shouldSyncStatsBombCompetitionSeason(comp, incremental))) {
+        this.logger.debug(
+          `Skipping teams/players for ${comp.competition_name} ${comp.season_name} (unchanged watermark)`,
+        );
+        continue;
+      }
       try {
         // Fetch matches for this competition/season
         const matches = await this.fetchMatches(comp.competition_id, comp.season_id);
@@ -1477,12 +1542,21 @@ export class StatsBombAdapterService {
   /**
    * Sync fixtures to database
    */
-  private async syncFixtures(options?: { skipLineups?: boolean; skipStadiums?: boolean }): Promise<void> {
+  private async syncFixtures(
+    options?: { skipLineups?: boolean; skipStadiums?: boolean; incremental?: boolean },
+  ): Promise<void> {
     this.logger.log('Syncing fixtures...');
     
     const competitions = await this.fetchCompetitions();
+    const incremental = options?.incremental !== false;
     
     for (const comp of competitions) {
+      if (!(await this.shouldSyncStatsBombCompetitionSeason(comp, incremental))) {
+        this.logger.debug(
+          `Skipping fixtures for ${comp.competition_name} ${comp.season_name} (unchanged watermark)`,
+        );
+        continue;
+      }
       try {
         const matches = await this.fetchMatches(comp.competition_id, comp.season_id);
         
@@ -2282,16 +2356,24 @@ export class StatsBombAdapterService {
     skipGoals?: boolean;
     skipStartingXi?: boolean;
     skipLineups?: boolean;
+    incremental?: boolean;
   }): Promise<void> {
     this.logger.log('🎯 Syncing events...');
     
     const competitions = await this.fetchCompetitions();
+    const incremental = options?.incremental !== false;
     this.logger.log(`📊 Found ${competitions.length} competitions for events sync`);
     
     let totalEventsProcessed = 0;
     let totalGoalsCreated = 0;
     
     for (const comp of competitions) {
+      if (!(await this.shouldSyncStatsBombCompetitionSeason(comp, incremental))) {
+        this.logger.debug(
+          `Skipping events for ${comp.competition_name} ${comp.season_name} (unchanged watermark)`,
+        );
+        continue;
+      }
       try {
         this.logger.log(`🏆 Processing events for competition: ${comp.competition_name}`);
         const matches = await this.fetchMatches(comp.competition_id, comp.season_id);
@@ -2330,6 +2412,8 @@ export class StatsBombAdapterService {
             }
           });
         }
+
+        await this.markStatsBombCompetitionSeasonSynced(comp);
       } catch (error) {
         this.logger.warn(`Error syncing events for competition ${comp.competition_name}:`, error);
       }
