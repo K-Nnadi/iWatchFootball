@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+    Alert,
     Badge,
     Button,
     Container,
@@ -11,7 +12,7 @@ import {
     Text,
     Title,
 } from '@mantine/core';
-import { IconArrowLeft, IconEyeOff, IconLock, IconTrophy, IconUserOff } from '@tabler/icons-react';
+import { IconArrowLeft, IconEyeOff, IconInfoCircle, IconLock, IconTrophy, IconUserOff } from '@tabler/icons-react';
 import { useParams } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
 import {
@@ -249,6 +250,26 @@ export function CompareFriendPage() {
                         {compare.friend.firstName} {compare.friend.lastName}
                     </Text>
                 </Stack>
+
+                {(compare.me.shareVerifiedOnly || compare.friend.shareVerifiedOnly) && (
+                    <Alert
+                        variant="light"
+                        color="blue"
+                        icon={<IconInfoCircle size={18} />}
+                        title="Stats based on verified matches"
+                    >
+                        <Text size="sm">
+                            {compare.me.shareVerifiedOnly && compare.friend.shareVerifiedOnly
+                                ? 'Both you and your friend have "Only share verified match logs" enabled. Stats only include matches with uploaded ticket proof.'
+                                : compare.me.shareVerifiedOnly
+                                  ? 'You have "Only share verified match logs" enabled. Your stats only include matches with uploaded ticket proof.'
+                                  : `@${compare.friend.userName} has "Only share verified match logs" enabled. Their stats only include verified matches.`}
+                        </Text>
+                        <Text size="xs" c="dimmed" mt="xs">
+                            You can change this in Settings → Privacy.
+                        </Text>
+                    </Alert>
+                )}
 
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                     {metrics.map((key) => (

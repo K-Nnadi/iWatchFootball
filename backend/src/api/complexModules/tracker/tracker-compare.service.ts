@@ -14,8 +14,8 @@ export type CompareMetricKey =
 export type CompareWinners = Partial<Record<CompareMetricKey, 'me' | 'friend' | 'tie'>>;
 
 export type CompareResult = {
-    me: PublicUserSummary & { stats: TrackerSummary };
-    friend: PublicUserSummary & { stats: TrackerSummary };
+    me: PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
+    friend: PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
     winners: CompareWinners;
     overlap: {
         count: number;
@@ -54,8 +54,8 @@ export class TrackerCompareService {
         ]);
 
         return {
-            me: { ...this.toPublicSummary(me), stats: myStats },
-            friend: { ...this.toPublicSummary(friend), stats: friendStats },
+            me: { ...this.toPublicSummary(me), stats: myStats, shareVerifiedOnly: meVerifiedOnly },
+            friend: { ...this.toPublicSummary(friend), stats: friendStats, shareVerifiedOnly: friendVerifiedOnly },
             winners: this.computeWinners(myStats, friendStats),
             overlap: {
                 count: overlapFixtures.length,

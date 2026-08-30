@@ -155,8 +155,8 @@ export interface OverlapFixture {
 }
 
 export interface CompareResult {
-    me: PublicUserSummary & { stats: TrackerSummary };
-    friend: PublicUserSummary & { stats: TrackerSummary };
+    me: PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
+    friend: PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
     winners: Partial<Record<keyof TrackerSummary, 'me' | 'friend' | 'tie'>>;
     overlap: { count: number; fixtures: OverlapFixture[] };
     requiresPremium: boolean;
