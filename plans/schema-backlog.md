@@ -95,7 +95,7 @@ These are correctness issues that will compound as data volume and import paths 
 
 ### P0-1. Fix `fixture.competitionId` modeling
 
-- [ ] **Implement**
+- [x] **Implement**
 
 **Problem**
 
@@ -143,7 +143,7 @@ Choose one model and migrate:
 
 ### P0-2. Define `log` vs `attendanceRecord` strategy
 
-- [ ] **Implement**
+- [x] **Implement**
 
 **Problem**
 
@@ -166,16 +166,16 @@ Without a documented strategy, "X fans going" counts, premium tracker limits, an
 - **`attendanceRecord`** = source of truth for Phase 2+ user-declared attendance ("I'm going", seat info, documents).
 - **`log`** = verified-attendance projection for the tracker (auto-created/updated on platform ticket purchase via `LogService.upsertVerifiedAttendance()`).
 
-**Sync rules to implement in service layer (document now, code in P3 Phase 2):**
+**Sync rules implemented in service layer (P0-2):**
 
-| Event | Action |
-|-------|--------|
-| User marks "I'm going" | Upsert `attendanceRecord` only |
-| User buys ticket (primary or resale) | Upsert `log` with `isVerified: true`; optionally upsert `attendanceRecord` with `hasTicket: true` |
-| User cancels attendance | Soft-delete `attendanceRecord`; do not delete verified `log` |
-| Aggregate "fans going" count | Count from `attendanceRecord` (not `log`) |
-| Tracker freemium limit | Count unverified `log` rows (existing behaviour) |
-| Phase 3: auto-cancel interest | On `attendanceRecord` create, cancel active `ticketInterest` |
+| Event | Action | Status |
+|-------|--------|--------|
+| User marks "I'm going" | Upsert `attendanceRecord` only | Done |
+| User buys ticket (primary or resale) | Upsert `log` with `isVerified: true`; sync `attendanceRecord` with `hasTicket: true` | Done — `LogService.upsertVerifiedAttendance()` |
+| User cancels attendance | Soft-delete `attendanceRecord`; do not delete verified `log` | Done — existing `AttendanceService.cancel()` |
+| Aggregate "fans going" count | Count from `attendanceRecord` (not `log`) | Done — `AttendanceService.getCount()` |
+| Tracker freemium limit | Count unverified `log` rows (existing behaviour) | Unchanged |
+| Phase 3: auto-cancel interest | On `attendanceRecord` create, cancel active `ticketInterest` | Done — `AttendanceService.upsert()` |
 
 Do **not** add a third attendance table.
 
@@ -189,7 +189,7 @@ Do **not** add a third attendance table.
 
 ### P0-3. Fix `user` ↔ `commsPreference` relationship
 
-- [ ] **Implement**
+- [x] **Implement**
 
 **Problem**
 

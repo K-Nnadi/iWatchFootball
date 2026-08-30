@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 import { AttendanceRecord } from './attendanceRecord.entity';
 import { AttendanceService, AttendanceStorageService } from './attendanceRecord.service';
+import { TicketInterestModule } from '../ticketInterest/ticketInterest.module';
 import { AttendanceController } from './attendanceRecord.controller';
 import { AttendanceTrackingFeatureModule } from '../../complexModules/attendanceTracking/attendance-tracking-feature.module';
 
@@ -11,6 +12,7 @@ import { AttendanceTrackingFeatureModule } from '../../complexModules/attendance
         TypeOrmModule.forFeature([AttendanceRecord]),
         MulterModule.register({ storage: undefined }), // memory storage (buffer in req.file)
         AttendanceTrackingFeatureModule,
+        TicketInterestModule,
     ],
     controllers: [AttendanceController],
     providers: [AttendanceService, AttendanceStorageService],

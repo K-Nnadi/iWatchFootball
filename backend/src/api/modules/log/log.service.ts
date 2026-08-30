@@ -4,6 +4,7 @@ import { EntityManager, Repository } from 'typeorm';
 import { CreateLogDTO, Log } from './log.entity';
 import { CrudRepoAdapter } from '@iWatchFootball/base-tools/crud/crud.repo.adapter';
 import { TrackerEntitlementService, TrackerEntitlements } from '../../complexModules/tracker/tracker-entitlement.service';
+import { AttendanceRecord } from '../attendanceRecord/attendanceRecord.entity';
 
 export interface LogHistoryResponse {
     logs: Log[];
@@ -21,6 +22,8 @@ export class LogService extends CrudRepoAdapter<Log, CreateLogDTO> {
 
     /**
      * Upsert a verified attendance log when the user buys a ticket (primary or resale).
+     * Also syncs attendanceRecord (hasTicket=true) — attendanceRecord is the source of
+     * truth for "fans going" counts; log remains the tracker verified-attendance projection.
      * Idempotent per (userId, fixtureId).
      */
     async upsertVerifiedAttendance(
@@ -40,13 +43,49 @@ export class LogService extends CrudRepoAdapter<Log, CreateLogDTO> {
                 };
                 await logRepo.save(existing);
             }
+        } else {
+            await logRepo.save(
+                logRepo.create({
+                    userId,
+                    fixtureId,
+                    isVerified: true,
+                    metadata: { verifiedSource: source },
+                }),
+            );
+        }
+
+        await this.syncVerifiedAttendanceRecord(manager, userId, fixtureId, source);
+    }
+
+    /** Mirror verified ticket purchase into attendanceRecord (P0-2 sync rule). */
+    private async syncVerifiedAttendanceRecord(
+        manager: EntityManager,
+        userId: number,
+        fixtureId: number,
+        source: { ticketId?: number; paymentId?: number; type?: string },
+    ): Promise<void> {
+        const attendanceRepo = manager.getRepository(AttendanceRecord);
+        let record = await attendanceRepo.findOne({
+            where: { userId, fixtureId },
+            withDeleted: true,
+        });
+
+        if (record) {
+            record.deletedAt = null;
+            record.hasTicket = true;
+            record.metadata = {
+                ...(record.metadata ?? {}),
+                verifiedSource: source,
+            };
+            await attendanceRepo.save(record);
             return;
         }
-        await logRepo.save(
-            logRepo.create({
+
+        await attendanceRepo.save(
+            attendanceRepo.create({
                 userId,
                 fixtureId,
-                isVerified: true,
+                hasTicket: true,
                 metadata: { verifiedSource: source },
             }),
         );

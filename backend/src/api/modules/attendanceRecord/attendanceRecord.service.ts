@@ -17,6 +17,7 @@ import {
     AttendanceResponseDto,
     UpsertAttendanceDto,
 } from './attendanceRecord.dto';
+import { TicketInterestService } from '../ticketInterest/ticketInterest.service';
 
 const ALLOWED_MIME_TYPES = new Set([
     'application/pdf',
@@ -74,6 +75,7 @@ export class AttendanceService {
         @InjectRepository(AttendanceRecord)
         private readonly repo: Repository<AttendanceRecord>,
         private readonly storage: AttendanceStorageService,
+        private readonly ticketInterestService: TicketInterestService,
     ) {}
 
     async upsert(userId: number, dto: UpsertAttendanceDto): Promise<AttendanceResponseDto> {
@@ -118,6 +120,8 @@ export class AttendanceService {
                 }),
             );
         }
+
+        await this.ticketInterestService.autoCancelForFixture(userId, dto.fixtureId);
 
         return this.toDto(record);
     }

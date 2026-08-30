@@ -293,7 +293,7 @@ export class AuthController {
                 return;
             }
 
-            const commsPreference = await this.commsPreferenceService.create({
+            await this.commsPreferenceService.create({
                 userId: user.id,
                 emailNotifications: CommunicationFrequency.DAILY,
                 inAppNotifications: CommunicationFrequency.IMMEDIATE,
@@ -304,14 +304,6 @@ export class AuthController {
                 matchReminders: CommunicationFrequency.DAILY,
                 language: Language.EN
             });
-            
-            // Update user with commsPreferenceId
-            if (commsPreference) {
-                user = await this.userService.update(user.id, {
-                    id: user.id,
-                    commsPreferenceId: commsPreference.id
-                });
-            }
 
             const freshUser = await this.userService.getOne(user!.id);
             const tokenUser = freshUser ?? user!;

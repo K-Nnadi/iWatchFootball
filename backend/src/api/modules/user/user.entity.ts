@@ -1,12 +1,11 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, JoinColumn, OneToMany} from "typeorm";
+import {Entity, OneToMany, OneToOne} from "typeorm";
 import {UserType} from "../../enums/user.enum";
 import {Log} from "../log/log.entity";
 import {
     EntityColumn,
     EntityEnumColumn,
     EntityRelation,
-    OptionalEntityColumn,
     RelationshipType
 } from "@iWatchFootball/base-tools/decorators/entity.decorator";
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
@@ -122,12 +121,8 @@ export class User extends BaseDbEntity {
     @OneToMany(() => Prediction, prediction => prediction.fixture, {lazy: true})
     predictions?: Promise<Prediction[]>;
 
-    @OptionalEntityColumn({db: {type: "int"}})
-    commsPreferenceId?: number;
-
     @ApiPropertyOptional()
-    @OneToMany(() => CommsPreference, commsPreference => commsPreference.user, {lazy: true})
-    @JoinColumn({ name: 'commsPreferenceId' })
+    @OneToOne(() => CommsPreference, (commsPreference) => commsPreference.user, { lazy: true })
     commsPreference?: Promise<CommsPreference>;
 
     @EntityRelation({
