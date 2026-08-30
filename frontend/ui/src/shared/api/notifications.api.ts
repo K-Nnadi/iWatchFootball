@@ -1,6 +1,19 @@
 import axios from 'axios';
 
-export type NotificationType = 'FRIEND_REQUEST_RECEIVED' | 'FRIEND_REQUEST_ACCEPTED';
+export type NotificationType =
+    | 'FRIEND_REQUEST_RECEIVED'
+    | 'FRIEND_REQUEST_ACCEPTED'
+    | 'TICKET_RESALE_AVAILABLE'
+    | 'LISTING_APPROVED'
+    | 'LISTING_REJECTED'
+    | 'PURCHASE_REQUESTED'
+    | 'TRANSFER_INITIATED'
+    | 'TRANSFER_CONFIRMED'
+    | 'DISPUTE_RAISED'
+    | 'MATCH_REMINDER'
+    | 'MATCH_CANCELLED'
+    | 'MATCH_POSTPONED'
+    | 'MATCH_SUSPENDED';
 
 export interface UserNotificationItem {
     id: number;
@@ -14,6 +27,10 @@ export interface UserNotificationItem {
         connectionId?: number;
         actorUserId?: number;
         actorUserName?: string;
+        fixtureId?: number;
+        listingId?: number;
+        previousStatus?: string;
+        nextStatus?: string;
     };
 }
 

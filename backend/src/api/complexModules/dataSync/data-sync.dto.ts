@@ -6,6 +6,7 @@ export const SYNC_STEP = {
   API_PLAYERS: 'api_players',
   API_FIXTURES: 'api_fixtures',
   API_ENRICH: 'api_enrich',
+  SPORTMONKS: 'sportmonks',
 } as const;
 
 export class StatsBombPipelineOptionsDto {
@@ -131,6 +132,42 @@ export class ApiSportsPipelineDto {
   enrich?: ApiSportsEnrichPipelineDto;
 }
 
+export class SportMonksPipelineDto {
+  @ApiPropertyOptional({
+    default: true,
+    description: 'When false, the SportMonks block is skipped',
+  })
+  enabled?: boolean;
+
+  @ApiProperty({
+    type: [Number],
+    example: [8],
+    description: 'SportMonks league ids (8 = Premier League, 2 = Champions League)',
+  })
+  leagueIds!: number[];
+
+  @ApiProperty({ description: 'Fixture import window start YYYY-MM-DD' })
+  from!: string;
+
+  @ApiProperty({ description: 'Fixture import window end YYYY-MM-DD' })
+  to!: string;
+
+  @ApiProperty({
+    description: 'Cap on SportMonks HTTP requests for this run',
+    example: 100,
+  })
+  maxApiRequests!: number;
+
+  @ApiPropertyOptional({ default: true })
+  syncStandings?: boolean;
+
+  @ApiPropertyOptional({ default: true })
+  syncFixtureDetails?: boolean;
+
+  @ApiPropertyOptional({ default: 'UTC' })
+  timezone?: string;
+}
+
 export class DataSyncRunDto {
   @ApiPropertyOptional({ description: 'Continue a previous job (uses stored preset + step cursors)' })
   resumeJobId?: number;
@@ -144,6 +181,9 @@ export class DataSyncRunDto {
   @ApiPropertyOptional({ type: ApiSportsPipelineDto })
   apiSports?: ApiSportsPipelineDto;
 
+  @ApiPropertyOptional({ type: SportMonksPipelineDto })
+  sportmonks?: SportMonksPipelineDto;
+
   @ApiPropertyOptional({
     description:
       'When Redis is configured, defaults true so Swagger returns immediately with bullJobId. Set false to run synchronously.',
@@ -155,6 +195,10 @@ export function isApiSportsPipelineEnabled(dto: DataSyncRunDto): boolean {
   return dto.apiSports != null && dto.apiSports.enabled !== false;
 }
 
+export function isSportMonksPipelineEnabled(dto: DataSyncRunDto): boolean {
+  return dto.sportmonks != null && dto.sportmonks.enabled !== false;
+}
+
 export function buildDataSyncStepKeys(dto: DataSyncRunDto): string[] {
   const keys: string[] = [];
   if (dto.statsbomb) keys.push(SYNC_STEP.STATS_BOMB);
@@ -163,6 +207,9 @@ export function buildDataSyncStepKeys(dto: DataSyncRunDto): string[] {
     keys.push(SYNC_STEP.API_PLAYERS);
     keys.push(SYNC_STEP.API_FIXTURES);
     if (dto.apiSports?.enrich) keys.push(SYNC_STEP.API_ENRICH);
+  }
+  if (isSportMonksPipelineEnabled(dto)) {
+    keys.push(SYNC_STEP.SPORTMONKS);
   }
   return keys;
 }

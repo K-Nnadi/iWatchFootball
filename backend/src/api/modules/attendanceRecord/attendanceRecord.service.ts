@@ -7,7 +7,7 @@ import {
     UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
@@ -17,6 +17,8 @@ import {
     AttendanceResponseDto,
     UpsertAttendanceDto,
 } from './attendanceRecord.dto';
+import { TicketInterestService } from '../ticketInterest/ticketInterest.service';
+import { FixtureInvalidationReason } from '../../enums/fixture.enum';
 
 const ALLOWED_MIME_TYPES = new Set([
     'application/pdf',
@@ -74,6 +76,7 @@ export class AttendanceService {
         @InjectRepository(AttendanceRecord)
         private readonly repo: Repository<AttendanceRecord>,
         private readonly storage: AttendanceStorageService,
+        private readonly ticketInterestService: TicketInterestService,
     ) {}
 
     async upsert(userId: number, dto: UpsertAttendanceDto): Promise<AttendanceResponseDto> {
@@ -119,7 +122,34 @@ export class AttendanceService {
             );
         }
 
+        await this.ticketInterestService.autoCancelForFixture(userId, dto.fixtureId);
+
         return this.toDto(record);
+    }
+
+    /**
+     * Flag attendance for a postponed/cancelled/suspended fixture. Does not delete the row.
+     * Returns user ids whose reason actually changed (for notifications).
+     */
+    async flagForFixtureLifecycle(
+        fixtureId: number,
+        reason: FixtureInvalidationReason,
+    ): Promise<{ userIds: number[]; flagged: number }> {
+        const records = await this.repo.find({ where: { fixtureId } });
+        const now = new Date();
+        const userIds: number[] = [];
+
+        for (const record of records) {
+            if (record.fixtureInvalidationReason === reason) {
+                continue;
+            }
+            record.fixtureInvalidatedAt = now;
+            record.fixtureInvalidationReason = reason;
+            await this.repo.save(record);
+            userIds.push(record.userId);
+        }
+
+        return { userIds, flagged: userIds.length };
     }
 
     async getMyAttendance(userId: number): Promise<AttendanceResponseDto[]> {
@@ -132,8 +162,8 @@ export class AttendanceService {
 
     async getCount(fixtureId: number): Promise<AttendanceCountResponseDto> {
         const [goingCount, hasTicketCount] = await Promise.all([
-            this.repo.count({ where: { fixtureId } }),
-            this.repo.count({ where: { fixtureId, hasTicket: true } }),
+            this.repo.count({ where: { fixtureId, fixtureInvalidatedAt: IsNull() } }),
+            this.repo.count({ where: { fixtureId, hasTicket: true, fixtureInvalidatedAt: IsNull() } }),
         ]);
         return { fixtureId, goingCount, hasTicketCount };
     }
@@ -207,6 +237,8 @@ export class AttendanceService {
             purchaseDate: record.purchaseDate,
             notes: record.notes,
             hasDocument: !!record.documentPath,
+            fixtureInvalidatedAt: record.fixtureInvalidatedAt,
+            fixtureInvalidationReason: record.fixtureInvalidationReason,
             createdAt: record.createdAt,
             updatedAt: record.updatedAt,
         };

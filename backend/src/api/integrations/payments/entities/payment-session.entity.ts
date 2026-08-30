@@ -17,6 +17,8 @@ export interface PaymentSessionCheckoutContext {
     category: string;
     discountCodeId?: number;
     paymentProcessorId?: number;
+    listingId?: number;
+    marketplaceTransactionId?: number;
 }
 
 @Entity('paymentSession')
@@ -56,6 +58,14 @@ export class PaymentSession extends BaseDbEntity {
 
     @OptionalEntityColumn({ db: { type: 'int' } })
     paymentId?: number;
+
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    @ApiPropertyOptional()
+    listingId?: number;
+
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    @ApiPropertyOptional()
+    marketplaceTransactionId?: number;
 
     @OptionalEntityColumn({ db: { type: 'timestamptz' } })
     fulfilledAt?: Date;

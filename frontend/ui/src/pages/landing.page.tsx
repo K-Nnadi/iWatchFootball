@@ -1,9 +1,13 @@
-import { useMemo } from 'react';
 import {
     IconChartBar,
     IconHistory,
     IconMapPin,
     IconTicket,
+    IconUsers,
+    IconBell,
+    IconBuildingStadium,
+    IconRoute,
+    IconArchive,
 } from '@tabler/icons-react';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
@@ -23,32 +27,19 @@ export function LandingPage() {
     const storyAnim = useScrollAnimation({ animationType: 'fadeUp', delay: 100, threshold: 0.15 });
     const ctaAnim = useScrollAnimation({ animationType: 'scale', delay: 80, threshold: 0.2 });
 
-    const pillars = useMemo(
-        () => [
-            {
-                icon: IconHistory,
-                title: t('landing.pillarHistoryTitle'),
-                body: t('landing.pillarHistoryBody'),
-            },
-            {
-                icon: IconChartBar,
-                title: t('landing.pillarInsightsTitle'),
-                body: t('landing.pillarInsightsBody'),
-            },
-            marketplaceEnabled
-                ? {
-                      icon: IconTicket,
-                      title: t('landing.pillarTicketsTitle'),
-                      body: t('landing.pillarTicketsBody'),
-                  }
-                : {
-                      icon: IconMapPin,
-                      title: t('landing.pillarAttendanceTitle'),
-                      body: t('landing.pillarAttendanceBody'),
-                  },
-        ],
-        [t, marketplaceEnabled],
-    );
+    const pillars = [
+        { icon: IconHistory,         title: t('landing.pillarHistoryTitle'),     body: t('landing.pillarHistoryBody') },
+        { icon: IconChartBar,        title: t('landing.pillarInsightsTitle'),     body: t('landing.pillarInsightsBody') },
+        { icon: IconMapPin,          title: t('landing.pillarAttendanceTitle'),   body: t('landing.pillarAttendanceBody') },
+        { icon: IconTicket,          title: t('landing.pillarTicketsTitle'),       body: t('landing.pillarTicketsBody') },
+        { icon: IconUsers,           title: t('landing.pillarFriendsTitle'),       body: t('landing.pillarFriendsBody') },
+        { icon: IconBell,            title: t('landing.pillarFollowTitle'),        body: t('landing.pillarFollowBody') },
+        { icon: IconBuildingStadium, title: t('landing.pillarStadiumsTitle'),      body: t('landing.pillarStadiumsBody') },
+        { icon: IconRoute,           title: t('landing.pillarAwayTitle'),          body: t('landing.pillarAwayBody') },
+        { icon: IconArchive,         title: t('landing.pillarTicketHistoryTitle'), body: t('landing.pillarTicketHistoryBody') },
+    ];
+
+    const tickerItems = [...pillars, ...pillars];
 
     return (
         <div className={classes.page}>
@@ -98,9 +89,11 @@ export function LandingPage() {
                         <h2 className={classes.sectionTitle}>{t('landing.pillarsTitle')}</h2>
                         <p className={classes.sectionSubtitle}>{t('landing.pillarsSubtitle')}</p>
                     </div>
-                    <div className={classes.pillarGrid}>
-                        {pillars.map((pillar) => (
-                            <article key={pillar.title} className={classes.pillarCard}>
+                </div>
+                <div className={classes.tickerWrapper}>
+                    <div className={classes.tickerTrack}>
+                        {tickerItems.map((pillar, i) => (
+                            <article key={i} className={classes.tickerCard}>
                                 <span className={classes.pillarIcon} aria-hidden>
                                     <pillar.icon size={22} stroke={2.2} />
                                 </span>

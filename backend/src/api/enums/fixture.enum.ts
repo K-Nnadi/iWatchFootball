@@ -6,6 +6,14 @@ export enum FixtureStatus {
     SUSPENDED = 'Suspended',
     LIVE = 'Live'
 }
+
+/** Reason stored on attendance when a fixture will not go ahead as scheduled. */
+export enum FixtureInvalidationReason {
+    POSTPONED = 'POSTPONED',
+    CANCELLED = 'CANCELLED',
+    SUSPENDED = 'SUSPENDED',
+}
+
 export enum FixtureStage {
     FINAL = 'Final',
     SEMI_FINAL = 'Semi Final',

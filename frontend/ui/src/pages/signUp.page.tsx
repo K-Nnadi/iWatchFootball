@@ -8,17 +8,21 @@ import {
 	PasswordInput,
 	Alert,
 	Select,
+	Divider,
 } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useEffect, useMemo, useState } from "react";
 import { usePageTransition } from "../hooks/usePageTransition";
 import { UiButton } from "../components/ui";
 import { useRegister, type RegisterMutationResult } from "@iWatchFootball/clients/controllers/auth";
+import type { RegisterBody } from "@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas";
 import { useAuthStore } from "../shared/stores/auth.store";
 import { notify } from "../shared/notify";
 import { getSecurityQuestions } from "../shared/api/authRecovery.api";
 import { SECURITY_QUESTION_VALUES, type SecurityQuestion } from "../shared/securityQuestion";
 import { useTranslation } from "../i18n";
+import { COUNTRY_OPTIONS } from "../shared/constants/countries";
 
 const specialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const upperCase = /[A-Z]/;
@@ -52,6 +56,11 @@ export function SignUpPage() {
 		[questions, t],
 	);
 
+	const countryOptions = useMemo(
+		() => COUNTRY_OPTIONS.map((c) => ({ value: c.value, label: c.label })),
+		[],
+	);
+
 	const registerMutation = useRegister({
 		mutation: {
 			onSuccess: (data: RegisterMutationResult) => {
@@ -79,6 +88,8 @@ export function SignUpPage() {
 			password: '',
 			securityQuestion: '' as SecurityQuestion | '',
 			securityAnswer: '',
+			dateOfBirth: null as Date | null,
+			country: '' as string,
 		},
 		validate: {
 			firstName: (value: string) => (value.trim() ? null : t('auth.firstNameRequired')),
@@ -103,18 +114,36 @@ export function SignUpPage() {
 	});
 
 	const formSubmit = (values: typeof form.values) => {
-		registerMutation.mutate({
-			data: {
-				email: values.email.toLowerCase(),
-				firstName: values.firstName,
-				lastName: values.lastName,
-				userName: values.userName,
-				password: values.password,
-				securityQuestion: values.securityQuestion,
-				securityAnswer: values.securityAnswer.trim(),
-			},
-		});
+		const payload: RegisterBody & { dateOfBirth?: string; country?: string } = {
+			email: values.email.toLowerCase(),
+			firstName: values.firstName,
+			lastName: values.lastName,
+			userName: values.userName,
+			password: values.password,
+			securityQuestion: values.securityQuestion,
+			securityAnswer: values.securityAnswer.trim(),
+		};
+
+		if (values.dateOfBirth) {
+			const d = values.dateOfBirth;
+			const yyyy = d.getFullYear();
+			const mm = String(d.getMonth() + 1).padStart(2, '0');
+			const dd = String(d.getDate()).padStart(2, '0');
+			payload.dateOfBirth = `${yyyy}-${mm}-${dd}`;
+		}
+
+		if (values.country) {
+			payload.country = values.country;
+		}
+
+		registerMutation.mutate({ data: payload });
 	};
+
+	const maxDob = useMemo(() => {
+		const d = new Date();
+		d.setFullYear(d.getFullYear() - 13); // minimum 13 years old
+		return d;
+	}, []);
 
 	return (
 		<Container size={420} my={40}>
@@ -143,6 +172,34 @@ export function SignUpPage() {
 
 					<Text size="sm" mb="xs">{t('auth.password')}</Text>
 					<PasswordInput size="md" placeholder={t('auth.passwordPlaceholder')} mb="md" {...form.getInputProps('password')} />
+
+					<Divider my="md" label="Optional profile info" labelPosition="center" />
+
+					<Text size="sm" mb="xs">{t('auth.dateOfBirth')}</Text>
+					<DateInput
+						size="md"
+						placeholder={t('auth.dateOfBirthPlaceholder')}
+						maxDate={maxDob}
+						valueFormat="YYYY-MM-DD"
+						clearable
+						mb="xs"
+						{...form.getInputProps('dateOfBirth')}
+					/>
+					<Text size="xs" c="dimmed" mb="md">{t('auth.dateOfBirthHint')}</Text>
+
+					<Text size="sm" mb="xs">{t('auth.country')}</Text>
+					<Select
+						size="md"
+						placeholder={t('auth.countryPlaceholder')}
+						data={countryOptions}
+						searchable
+						clearable
+						mb="xs"
+						{...form.getInputProps('country')}
+					/>
+					<Text size="xs" c="dimmed" mb="md">{t('auth.countryHint')}</Text>
+
+					<Divider my="md" label="Account recovery" labelPosition="center" />
 
 					<Text size="sm" mb="xs">{t('auth.securityQuestionLabel')}</Text>
 					<Select

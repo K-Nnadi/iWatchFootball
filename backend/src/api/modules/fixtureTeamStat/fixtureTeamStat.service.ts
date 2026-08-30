@@ -96,6 +96,53 @@ export class FixtureTeamStatService {
         await this.statRepo.upsert(input as any, ['fixtureId', 'teamId']);
     }
 
+    /** Map SportMonks team-level statistics (player_id null) to columns and upsert. */
+    async upsertFromSportMonksStatistics(
+        fixtureId: number,
+        teamId: number,
+        side: FixtureTeamStatSide,
+        stats: Array<{ type_id?: number; data?: { value?: number | string } }>,
+    ): Promise<void> {
+        const val = (typeId: number): number | undefined => {
+            const row = stats.find((s) => s.type_id === typeId);
+            if (row?.data?.value == null) return undefined;
+            const raw = String(row.data.value).replace('%', '').trim();
+            const n = Number(raw);
+            return Number.isFinite(n) ? n : undefined;
+        };
+
+        const input: FixtureTeamStatInput = {
+            fixtureId,
+            teamId,
+            side,
+            source: FixtureTeamStatSource.SPORTMONKS,
+            possession: val(45),
+            shotsTotal: val(41),
+            shotsOnTarget: val(42),
+            shotsOffTarget: val(43),
+            shotsBlocked: val(44),
+            shotsInsideBox: val(52),
+            shotsOutsideBox: val(53),
+            corners: val(34),
+            fouls: val(56),
+            offsides: val(51),
+            yellowCards: val(84),
+            redCards: val(85),
+            goalkeeperSaves: val(57),
+            passesTotal: val(80),
+            passesAccurate: val(81),
+            passAccuracyPct: val(116),
+            xg: val(580),
+        };
+
+        const hasAny = Object.entries(input).some(
+            ([k, v]) => !['fixtureId', 'teamId', 'side', 'source'].includes(k) && v != null,
+        );
+        if (!hasAny) return;
+
+        await this.statRepo.upsert(input as any, ['fixtureId', 'teamId']);
+    }
+
     /**
      * Derive team-level stats by summing `playerFixtureStat` rows per team.
      * Resolves player→team assignment via the `playerLineup` / `lineUp` tables.

@@ -1,5 +1,5 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Entity, JoinColumn, OneToMany} from "typeorm";
+import {Entity, OneToMany, OneToOne} from "typeorm";
 import {UserType} from "../../enums/user.enum";
 import {Log} from "../log/log.entity";
 import {
@@ -122,12 +122,8 @@ export class User extends BaseDbEntity {
     @OneToMany(() => Prediction, prediction => prediction.fixture, {lazy: true})
     predictions?: Promise<Prediction[]>;
 
-    @OptionalEntityColumn({db: {type: "int"}})
-    commsPreferenceId?: number;
-
     @ApiPropertyOptional()
-    @OneToMany(() => CommsPreference, commsPreference => commsPreference.user, {lazy: true})
-    @JoinColumn({ name: 'commsPreferenceId' })
+    @OneToOne(() => CommsPreference, (commsPreference) => commsPreference.user, { lazy: true })
     commsPreference?: Promise<CommsPreference>;
 
     @EntityRelation({
@@ -160,7 +156,19 @@ export class User extends BaseDbEntity {
 
     @EntityColumn({ db: { type: 'boolean', default: true } })
     shareVerifiedOnly!: boolean;
+
+    @OptionalEntityColumn({ db: { type: 'date' } })
+    @ApiPropertyOptional({ description: 'Date of birth (YYYY-MM-DD) — used for age-gating adult content' })
+    dateOfBirth?: string;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 2 } })
+    @ApiPropertyOptional({ description: 'ISO 3166-1 alpha-2 country code, e.g. GB' })
+    country?: string;
+
+    @OptionalEntityColumn({ db: { type: 'timestamptz' } })
+    @ApiPropertyOptional({ description: 'When the user account was anonymized for GDPR' })
+    anonymizedAt?: Date;
 }
 
-export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "metadata"] as const) {
+export class CreateUserDTO extends PickType(User, ["firstName", "lastName", "userName", "email", "type", "dateOfBirth", "country", "metadata"] as const) {
 }

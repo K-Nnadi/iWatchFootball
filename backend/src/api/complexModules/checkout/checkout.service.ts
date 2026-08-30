@@ -14,6 +14,7 @@ import { TransactionType } from '../../enums/transaction.enum';
 import { TicketOwnershipHistoryService } from '../../modules/ticketOwnershipHistory/ticketOwnershipHistory.service';
 import { UserTicketLogService } from '../../modules/userTicketLog/userTicketLog.service';
 import { TicketTransferReason } from '../../enums/marketplace.enum';
+import { TicketSource, TicketStatus } from '../../enums/ticket.enum';
 import { DiscountCodeService } from '../../modules/discountCode/discountCode.service';
 import { LoyaltyService } from '../loyalty/loyalty.service';
 import { assertAndDeductCredit } from '../../modules/credit/creditSpend.util';
@@ -221,6 +222,8 @@ export class CheckoutService {
                     fixtureId: params.fixtureId,
                     userId: params.userId,
                     paymentId: isPlatformCredit ? undefined : paymentId,
+                    status: TicketStatus.AVAILABLE,
+                    source: TicketSource.PRIMARY,
                     metadata: { offerKey: params.offerKey, seatIndex: i },
                 });
                 await ticketRepo.save(ticket);

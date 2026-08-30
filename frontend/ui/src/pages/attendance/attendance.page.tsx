@@ -74,6 +74,15 @@ export function AttendanceHistoryPage() {
                         <IconCalendarCheck size={16} color="var(--mantine-color-green-5)" />
                         <Text size="sm" fw={600}>Fixture #{record.fixtureId}</Text>
                         <Text size="xs" c="dimmed">{formatDate(record.createdAt)}</Text>
+                        {record.fixtureInvalidationReason === 'CANCELLED' && (
+                            <Badge size="xs" color="red">Match cancelled</Badge>
+                        )}
+                        {record.fixtureInvalidationReason === 'POSTPONED' && (
+                            <Badge size="xs" color="orange">Match postponed</Badge>
+                        )}
+                        {record.fixtureInvalidationReason === 'SUSPENDED' && (
+                            <Badge size="xs" color="orange">Match suspended</Badge>
+                        )}
                     </Group>
 
                     <Group gap="xs" mt={4} wrap="wrap">

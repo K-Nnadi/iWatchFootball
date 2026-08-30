@@ -6,6 +6,10 @@ import { AuthedController } from '@iWatchFootball/base-tools/decorators/controll
 import { CrudRepoAdapter } from '@iWatchFootball/base-tools/crud/crud.repo.adapter';
 import { Repository } from 'typeorm';
 
+/**
+ * Payment processor registry for checkout UI (name, slug, logo, enabled).
+ * PSP credentials belong in the `integration` module — not here.
+ */
 @Injectable()
 export class PaymentProcessorService extends CrudRepoAdapter<PaymentProcessor, CreatePaymentProcessorDTO> {
     constructor(@InjectRepository(PaymentProcessor) private entityRepo: Repository<PaymentProcessor>) {

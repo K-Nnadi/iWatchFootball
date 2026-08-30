@@ -57,13 +57,15 @@ export function TicketLinkCard({ label, badgeText, linkType, isSponsored, onClic
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem 1rem',
+                gap: '0.625rem',
+                padding: '0.625rem 0.875rem',
                 background: hovered ? 'var(--ui-bg-hover)' : 'var(--ui-bg-elevated)',
                 border: `1px solid ${hovered ? accent : 'var(--ui-border-strong)'}`,
                 borderRadius: 'var(--ui-radius-md)',
                 transition: 'all 0.18s ease',
                 cursor: 'pointer',
+                width: '100%',
+                boxSizing: 'border-box',
                 boxShadow: hovered
                     ? `0 0 0 1px ${accent}22, 0 4px 16px rgba(0,0,0,0.3)`
                     : '0 2px 8px rgba(0,0,0,0.2)',

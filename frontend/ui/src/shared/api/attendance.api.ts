@@ -13,6 +13,8 @@ export interface AttendanceRecord {
     purchaseDate?: string;
     notes?: string;
     hasDocument: boolean;
+    fixtureInvalidatedAt?: string;
+    fixtureInvalidationReason?: 'POSTPONED' | 'CANCELLED' | 'SUSPENDED';
     createdAt: string;
     updatedAt: string;
 }

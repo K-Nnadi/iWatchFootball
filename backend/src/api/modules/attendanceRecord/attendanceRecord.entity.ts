@@ -5,6 +5,7 @@ import {
     OptionalEntityColumn,
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { FixtureInvalidationReason } from '../../enums/fixture.enum';
 
 @Entity('attendanceRecord')
 export class AttendanceRecord extends BaseDbEntity {
@@ -51,4 +52,13 @@ export class AttendanceRecord extends BaseDbEntity {
     /** Storage path for uploaded ticket document. Never returned to clients; signed URL generated on demand. */
     @OptionalEntityColumn({ db: { type: 'varchar', length: 1000 } })
     documentPath?: string;
+
+    /** Set when the fixture is postponed/cancelled/suspended. Record is kept (not deleted). */
+    @OptionalEntityColumn({ db: { type: 'timestamptz' } })
+    @ApiPropertyOptional({ description: 'When the fixture was postponed, cancelled, or suspended' })
+    fixtureInvalidatedAt?: Date;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 20 } })
+    @ApiPropertyOptional({ enum: FixtureInvalidationReason })
+    fixtureInvalidationReason?: FixtureInvalidationReason;
 }

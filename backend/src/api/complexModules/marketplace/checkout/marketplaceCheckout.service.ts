@@ -24,6 +24,7 @@ import { LoyaltyService } from '../../loyalty/loyalty.service';
 import { assertAndDeductCredit } from '../../../modules/credit/creditSpend.util';
 import { LogService } from '../../../modules/log/log.service';
 import { Ticket } from '../../../modules/ticket/ticket.entity';
+import { ticketAfterResalePurchase } from '../../../modules/ticket/ticket-state.util';
 import { MARKETPLACE_CONFIG, MARKETPLACE_DEFAULTS } from '../marketplace.constants';
 
 const HOLD_MINUTES_CONFIG_KEY = 'ticket_hold_minutes';
@@ -205,10 +206,7 @@ export class MarketplaceCheckoutService {
             }
 
             // Transfer ticket ownership to buyer
-            await manager.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
-                params.buyerId,
-                listing.ticketId,
-            ]);
+            await manager.getRepository(Ticket).update(listing.ticketId, ticketAfterResalePurchase(params.buyerId));
 
             // Mark listing as SOLD
             listing.status = MarketplaceListingStatus.SOLD;

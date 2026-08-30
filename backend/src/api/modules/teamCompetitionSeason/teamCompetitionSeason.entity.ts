@@ -1,10 +1,9 @@
 import {ApiProperty, ApiPropertyOptional, PickType} from "@nestjs/swagger";
-import {Column, Entity, ManyToOne, OneToMany} from 'typeorm';
+import {Column, Entity, ManyToOne} from 'typeorm';
 import {BaseDbEntity} from "@iWatchFootball/base-tools/entity/baseDb.entity";
 import {Team} from "../team/team.entity";
 import {Competition} from "../competition/competition.entity";
 import {Season} from "../season/season.entity";
-import {Fixture} from "../fixture/fixture.entity";
 import {EntityColumn, OptionalEntityColumn} from "@iWatchFootball/base-tools/decorators/entity.decorator";
 
 
@@ -31,9 +30,6 @@ export class TeamCompetitionSeason extends BaseDbEntity {
     @ManyToOne(() => Season, season => season.teamCompetitionSeasons, {lazy: true})
     season!: Promise<Season>;
 
-    @ApiProperty()
-    @OneToMany(() => Fixture, fixture => fixture.teamCompetitionSeasons, {lazy: true})
-    fixtures?: Promise<Fixture[]>;
 }
 
 export class CreateTeamCompetitionSeasonDTO extends PickType(TeamCompetitionSeason, [

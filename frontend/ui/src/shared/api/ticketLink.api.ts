@@ -128,27 +128,64 @@ export async function adminDeleteTicketLink(id: number): Promise<void> {
 
 // ─── Affiliate Partner API ───────────────────────────────────────────────────
 
+export type PartnerType =
+    | 'TICKETING'
+    | 'HOSPITALITY'
+    | 'TRAVEL'
+    | 'PARKING'
+    | 'HOTEL'
+    | 'MERCHANDISE'
+    | 'GAMBLING'
+    | 'OTHER';
+
+export type PlacementType =
+    | 'MATCH_PREVIEW'
+    | 'ODDS_TAB'
+    | 'STATS_SIDEBAR'
+    | 'PREDICTIONS_PAGE'
+    | 'NEWSLETTER';
+
 export interface AffiliatePartner {
     id: number;
     name: string;
+    partnerType: PartnerType;
     network?: string;
     defaultAffiliateTag?: string;
     affiliateUrlFormat?: AffiliateUrlFormat;
     commissionRatePercent?: number;
     isActive: boolean;
+    campaignStartDate?: string;
+    campaignEndDate?: string;
     notes?: string;
+    minimumAge?: number;
+    allowedCountries?: string[];
+    blockedCountries?: string[];
+    requiresUserConsent: boolean;
+    requiresRGMessage: boolean;
+    disclosureText?: string;
+    allowedPlacements?: PlacementType[];
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateAffiliatePartnerPayload {
     name: string;
+    partnerType?: PartnerType;
     network?: string;
     defaultAffiliateTag?: string;
     affiliateUrlFormat?: AffiliateUrlFormat;
     commissionRatePercent?: number;
     isActive?: boolean;
+    campaignStartDate?: string;
+    campaignEndDate?: string;
     notes?: string;
+    minimumAge?: number;
+    allowedCountries?: string[];
+    blockedCountries?: string[];
+    requiresUserConsent?: boolean;
+    requiresRGMessage?: boolean;
+    disclosureText?: string;
+    allowedPlacements?: PlacementType[];
 }
 
 export async function adminListAffiliatePartners(): Promise<AffiliatePartner[]> {

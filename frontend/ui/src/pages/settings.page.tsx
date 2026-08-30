@@ -36,7 +36,7 @@ import { useAuthStore } from '../shared/stores/auth.store';
 import { notify } from '../shared/notify';
 import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetOneUser, useUpdateOneUser } from '@iWatchFootball/clients/controllers/user';
-import { useGetOneCommsPreference, useUpdateOneCommsPreference } from '@iWatchFootball/clients/controllers/comms-preference';
+import { useGetQueryCommsPreference, useUpdateOneCommsPreference } from '@iWatchFootball/clients/controllers/comms-preference';
 import {
     CommsPreferenceEmailNotifications,
     CommsPreferenceSmsNotifications,
@@ -63,6 +63,7 @@ import {
     type TrackerVisibility,
 } from '../shared/api/tracker.api';
 import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
+import { useAdPreferences, useUpdateAdPreferences } from '../shared/api/adPreferences.api';
 
 export function SettingsPage() {
     const { navigateWithTransition } = usePageTransition();
@@ -95,6 +96,10 @@ export function SettingsPage() {
     const [trackerVisibility, setTrackerVisibility] = useState<TrackerVisibility>('PRIVATE');
     const [shareVerifiedOnly, setShareVerifiedOnly] = useState(true);
     const [savingTrackerPrivacy, setSavingTrackerPrivacy] = useState(false);
+    const [showGamblingContent, setShowGamblingContent] = useState(false);
+
+    const { data: adPrefs } = useAdPreferences(isLoggedIn && !!user?.id);
+    const updateAdPrefMutation = useUpdateAdPreferences();
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const locale = useI18nStore((s) => s.locale);
 
@@ -115,6 +120,23 @@ export function SettingsPage() {
         setTrackerVisibility(trackerPrivacy.trackerVisibility);
         setShareVerifiedOnly(trackerPrivacy.shareVerifiedOnly);
     }, [trackerPrivacy]);
+
+    useEffect(() => {
+        if (adPrefs) {
+            setShowGamblingContent(adPrefs.showGamblingContent);
+        }
+    }, [adPrefs]);
+
+    const handleGamblingToggle = (checked: boolean) => {
+        setShowGamblingContent(checked);
+        updateAdPrefMutation.mutate(
+            { showGamblingContent: checked },
+            {
+                onSuccess: () => notify.success('Preferences saved', ''),
+                onError: () => notify.error('Could not save', 'Please try again'),
+            },
+        );
+    };
 
     const handleSaveTrackerPrivacy = async () => {
         setSavingTrackerPrivacy(true);
@@ -214,10 +236,10 @@ export function SettingsPage() {
     const [newsletterEmails, setNewsletterEmails] = useState<NewsletterEmailsType>(CommsPreferenceNewsletterEmails.WEEKLY);
     const [matchReminders, setMatchReminders] = useState<MatchRemindersType>(CommsPreferenceMatchReminders.DAILY);
 
-    const { data: commsPreferenceData } = useGetOneCommsPreference(
-        user?.commsPreferenceId as number,
-        { query: { enabled: !!user?.commsPreferenceId } as any }
-    );
+    const { data: commsPreferences } = useGetQueryCommsPreference(undefined, {
+        query: { enabled: isLoggedIn && !!user?.id } as any,
+    });
+    const commsPreferenceData = commsPreferences?.[0];
 
     useEffect(() => {
         if (commsPreferenceData) {
@@ -248,9 +270,9 @@ export function SettingsPage() {
     });
 
     const handleSaveCommsPrefs = () => {
-        if (!commsPreferenceData || !user?.commsPreferenceId) return;
+        if (!commsPreferenceData?.id) return;
         updateCommsPrefMutation.mutate({
-            id: user.commsPreferenceId,
+            id: commsPreferenceData.id,
             data: {
                 ...commsPreferenceData,
                 emailNotifications,
@@ -339,9 +361,9 @@ export function SettingsPage() {
     }, [colorScheme]);
 
     function handleSave() {
-        if (isLoggedIn && user?.commsPreferenceId && commsPreferenceData) {
+        if (isLoggedIn && commsPreferenceData?.id) {
             updateCommsPrefMutation.mutate({
-                id: user.commsPreferenceId,
+                id: commsPreferenceData.id,
                 data: {
                     ...commsPreferenceData,
                     language,
@@ -738,8 +760,43 @@ export function SettingsPage() {
 
                             <Divider style={{ borderColor: 'var(--modern-border-color)' }} />
 
+                            {/* Ad Preferences */}
+                            <Box>
+                                <Text fw={600} mb="xs" style={{ color: 'var(--modern-text-primary)' }}>
+                                    Ad preferences
+                                </Text>
+                                <Text size="xs" c="dimmed" mb="sm">
+                                    Control the types of ads you see on I Watch Football.
+                                </Text>
+                                <Stack gap="xs">
+                                    <Group justify="space-between" align="flex-start">
+                                        <Box style={{ flex: 1 }}>
+                                            <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
+                                                Show betting &amp; gambling content
+                                            </Text>
+                                            <Text size="xs" c="dimmed">
+                                                18+ only. Enable to see sponsored odds, promotions and betting partner content.
+                                                You can turn this off at any time.
+                                            </Text>
+                                        </Box>
+                                        <Switch
+                                            checked={showGamblingContent}
+                                            disabled={adPrefs?.selfExcluded || updateAdPrefMutation.isPending}
+                                            onChange={(e) => handleGamblingToggle(e.currentTarget.checked)}
+                                        />
+                                    </Group>
+                                    {adPrefs?.selfExcluded && (
+                                        <Text size="xs" c="red">
+                                            Self-exclusion is active on your account. Gambling content is permanently disabled.
+                                        </Text>
+                                    )}
+                                </Stack>
+                            </Box>
+
+                            <Divider style={{ borderColor: 'var(--modern-border-color)' }} />
+
                             {/* Notification Preferences */}
-                            {user?.commsPreferenceId && (
+                            {commsPreferenceData && (
                                 <>
                                     <Box>
                                         <Group gap="sm" mb="md">

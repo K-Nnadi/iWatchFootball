@@ -4,7 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { TicketInterest } from './ticketInterest.entity';
 import { TicketInterestStatus } from '../../enums/ticketInterest.enum';
 import {
@@ -69,6 +69,22 @@ export class TicketInterestService {
         if (interest.userId !== userId) throw new ForbiddenException('Not your interest record');
         interest.status = TicketInterestStatus.CANCELLED;
         await this.repo.save(interest);
+    }
+
+    /** Cancel all open interest for a postponed/cancelled/suspended fixture. */
+    async cancelAllForFixture(fixtureId: number): Promise<{ userIds: number[]; cancelled: number }> {
+        const interests = await this.repo.find({
+            where: {
+                fixtureId,
+                status: In([TicketInterestStatus.ACTIVE, TicketInterestStatus.NOTIFIED]),
+            },
+        });
+        const userIds = [...new Set(interests.map((i) => i.userId))];
+        for (const interest of interests) {
+            interest.status = TicketInterestStatus.CANCELLED;
+            await this.repo.save(interest);
+        }
+        return { userIds, cancelled: interests.length };
     }
 
     /** Auto-cancel a user's active interest when they mark attendance for the same fixture. */

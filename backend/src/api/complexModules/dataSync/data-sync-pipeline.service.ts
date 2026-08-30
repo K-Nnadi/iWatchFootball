@@ -4,6 +4,7 @@ import { SyncJobService } from './sync-job.service';
 import { DataSyncRunDto, isApiSportsPipelineEnabled, SYNC_STEP } from './data-sync.dto';
 import { StatsBombAdapterService } from '../../adapters/statsbomb/statsbomb-adapter.service';
 import { ApiSportsAdapterService } from '../../adapters/api-sports/api-sports-adapter.service';
+import { SportMonksAdapterService } from '../../adapters/sportmonks/sportmonks-adapter.service';
 
 @Injectable()
 export class DataSyncPipelineService {
@@ -13,6 +14,7 @@ export class DataSyncPipelineService {
     private readonly syncJobService: SyncJobService,
     private readonly statsBombAdapterService: StatsBombAdapterService,
     private readonly apiSportsAdapterService: ApiSportsAdapterService,
+    private readonly sportMonksAdapterService: SportMonksAdapterService,
   ) {}
 
   async execute(jobId: number): Promise<{
@@ -79,6 +81,9 @@ export class DataSyncPipelineService {
             case SYNC_STEP.API_ENRICH:
               remaining = await this.runApiEnrich(jobId, dto, step, remaining, stepSummaries);
               break;
+            case SYNC_STEP.SPORTMONKS:
+              await this.runSportMonks(jobId, dto, step, stepSummaries);
+              break;
             default:
               await this.syncJobService.patchStep(step.id, {
                 status: 'skipped',
@@ -102,7 +107,7 @@ export class DataSyncPipelineService {
   }
 
   private isBudgetedApiStep(stepKey: string, dto: DataSyncRunDto): boolean {
-    if (stepKey === SYNC_STEP.STATS_BOMB) return false;
+    if (stepKey === SYNC_STEP.STATS_BOMB || stepKey === SYNC_STEP.SPORTMONKS) return false;
     return isApiSportsPipelineEnabled(dto);
   }
 
@@ -346,5 +351,37 @@ export class DataSyncPipelineService {
     stepSummaries[step.stepKey] = summary;
     await this.syncJobService.patchStep(step.id, { status: 'completed', resultSummary: summary });
     return remaining;
+  }
+
+  private async runSportMonks(
+    jobId: number,
+    dto: DataSyncRunDto,
+    step: SyncJobStep,
+    stepSummaries: Record<string, Record<string, unknown>>,
+  ): Promise<void> {
+    const sm = dto.sportmonks;
+    if (!sm?.leagueIds?.length || !sm.from || !sm.to) {
+      const summary = { skipped: true, reason: 'leagueIds, from, and to required' };
+      stepSummaries[step.stepKey] = summary;
+      await this.syncJobService.patchStep(step.id, { status: 'completed', resultSummary: summary });
+      return;
+    }
+
+    const budget = Math.max(0, Number(sm.maxApiRequests) || 0);
+    const result = await this.sportMonksAdapterService.runPipeline({
+      leagueIds: sm.leagueIds,
+      from: sm.from,
+      to: sm.to,
+      syncStandings: sm.syncStandings,
+      syncFixtureDetails: sm.syncFixtureDetails,
+      maxApiRequests: budget,
+      timezone: sm.timezone,
+    });
+
+    const remaining = Number(result.apiRequestsRemaining ?? 0);
+    const used = Math.max(0, budget - remaining);
+    await this.syncJobService.addApiRequests(jobId, used);
+    stepSummaries[step.stepKey] = result;
+    await this.syncJobService.patchStep(step.id, { status: 'completed', resultSummary: result as any });
   }
 }

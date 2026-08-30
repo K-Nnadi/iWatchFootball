@@ -346,6 +346,20 @@ Frontend: `TicketsMatchdayPanel` reads all relevant flags from the Zustand store
 
 ## Phase 2: User Ticket Ownership / Attendance Preparation
 
+### Seat and ticket data ownership (P1)
+
+One `ticket` row = **one seat**. Seat identity is split by context:
+
+| Table | Role |
+| ----- | ---- |
+| `ticket` | Canonical seat fields for platform inventory (primary purchase or resale custody) |
+| `marketplaceListing` | Listing-specific presentation, ask price, delivery, proof; row/number hidden until purchase |
+| `attendanceRecord` | User-declared private attendance; may describe external (off-platform) tickets |
+
+`marketplaceListing.quantity` must stay **1** until a future `listingTicket` join table supports multi-seat listings.
+
+See also: [`schema-backlog.md`](./schema-backlog.md) P1-2.
+
 ### Product Goal
 
 Let users declare they are attending a match and optionally store their seat details and ticket proof privately.

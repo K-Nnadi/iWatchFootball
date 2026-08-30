@@ -8,6 +8,7 @@ import {
     MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { FixtureInvalidationReason } from '../../enums/fixture.enum';
 
 export class UpsertAttendanceDto {
     @IsInt()
@@ -98,6 +99,12 @@ export class AttendanceResponseDto {
 
     @ApiProperty({ description: 'True if a private ticket document has been uploaded' })
     hasDocument!: boolean;
+
+    @ApiPropertyOptional({ description: 'When the fixture was postponed, cancelled, or suspended' })
+    fixtureInvalidatedAt?: Date;
+
+    @ApiPropertyOptional({ enum: FixtureInvalidationReason })
+    fixtureInvalidationReason?: FixtureInvalidationReason;
 
     @ApiProperty()
     createdAt!: Date;

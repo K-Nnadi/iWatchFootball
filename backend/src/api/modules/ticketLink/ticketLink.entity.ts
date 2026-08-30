@@ -4,9 +4,12 @@ import {
     EntityColumn,
     EntityEnumColumn,
     OptionalEntityColumn,
+    EntityRelation,
+    RelationshipType,
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AffiliateUrlFormat, TicketLinkCategory, TicketLinkType } from '../../enums/ticketLink.enum';
+import { AffiliatePartner } from '../affiliatePartner/affiliatePartner.entity';
 
 /** Structured on-sale info stored as JSONB — manually maintained by admin. */
 export interface SaleInfo {
@@ -65,6 +68,34 @@ export class TicketLink extends BaseDbEntity {
     @OptionalEntityColumn({ db: { type: 'int' } })
     @ApiPropertyOptional({ description: 'Optional reference to an affiliate partner registry entry' })
     partnerId?: number;
+
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => AffiliatePartner,
+        joinOptions: { name: 'partnerId' },
+        description: 'Affiliate partner registry entry',
+    })
+    partner?: AffiliatePartner;
+
+    @EntityColumn({ db: { type: 'boolean', default: false } })
+    @ApiProperty({ description: 'Whether this link is from an officially verified source' })
+    isVerifiedOfficial!: boolean;
+
+    @EntityColumn({ db: { type: 'boolean', default: true } })
+    @ApiProperty({ description: 'Admin soft-disable without delete' })
+    isActive!: boolean;
+
+    @EntityColumn({ db: { type: 'boolean', default: true } })
+    @ApiProperty({ description: 'Set false by nightly health check when URL is unreachable' })
+    isHealthy!: boolean;
+
+    @OptionalEntityColumn({ db: { type: 'timestamptz' } })
+    @ApiPropertyOptional()
+    lastHealthCheckAt?: Date;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 500 } })
+    @ApiPropertyOptional({ description: 'Admin-facing health check error message' })
+    healthCheckError?: string;
 
     @EntityColumn({ db: { type: 'boolean', default: false } })
     @ApiProperty({ description: 'Whether this is a paid sponsored placement' })
