@@ -746,7 +746,20 @@ Track these alongside schema work — they span multiple tables and phases.
 - [ ] **Data retention / archival** — `ticketLinkClick`, `userNotification`, `aiUsageEvent`, `syncJob` grow unbounded; plan TTL or rollup-and-purge jobs
 - [ ] **Multi-currency** — `paymentSession.currency`, `marketplaceListing.askPrice`, and affiliate `commissionAmount` assume GBP today; add currency column consistently before international expansion
 - [ ] **Idempotency** — `paymentSession.idempotencyKey` exists; extend pattern to affiliate postbacks, notification fan-out, listing approval → bulk demand notify
-- [ ] **Fixture lifecycle cascades** — postponed/cancelled fixtures should update `ticketInterest`, `attendanceRecord` (flag, not delete), `marketplaceListing` (expire), `ticketHold` (release) — document state machine per table
+- [x] **Fixture lifecycle cascades** — postponed/cancelled fixtures should update `ticketInterest`, `attendanceRecord` (flag, not delete), `marketplaceListing` (expire), `ticketHold` (release) — document state machine per table
+
+**State machine** (implemented in [`fixture-lifecycle.service.ts`](../backend/src/api/complexModules/fixtureLifecycle/fixture-lifecycle.service.ts); hooked from `FixtureService.update`, which all adapters use):
+
+| Fixture status change | `ticketInterest` | `attendanceRecord` | `marketplaceListing` | `ticketHold` |
+|-----------------------|------------------|--------------------|----------------------|--------------|
+| → `Postponed` / `Cancelled` / `Suspended` | Cancel `ACTIVE` and `NOTIFIED` | Set `fixtureInvalidatedAt` + reason; **do not delete** | Expire `ACTIVE` / `DRAFT` / `PENDING_REVIEW`; return ticket to seller | Soft-delete all holds for the fixture |
+| Same abandoned status again | No-op (idempotent) | No-op if reason unchanged | No-op | No-op |
+| `Postponed` → `Cancelled` (or other abandoned switch) | Already cancelled | Update reason; notify again | Already expired | Already released |
+| → `Scheduled` / `Live` / `Completed` | No cascade | No cascade | No cascade | No cascade |
+| Reschedule (`Postponed` → `Scheduled`) | **Do not** auto-restore | **Do not** clear the flag | **Do not** relist | n/a |
+
+In-flight `SOLD` marketplace listings are left alone (transfer / dispute continues). "Fans going" counts exclude flagged attendance rows. Affected users get an in-app notification (`MATCH_POSTPONED` / `MATCH_CANCELLED` / `MATCH_SUSPENDED`).
+
 - [ ] **External vs platform ticket ownership** — Phase 1 is link-out only; `attendanceRecord.hasTicket` + `ticketProvider` describe off-platform tickets; do not conflate with `ticket.userId` (platform inventory)
 - [ ] **Soft-delete cascade behaviour** — many tables use `deletedAt`; ensure unique partial indexes exist everywhere uniqueness is required (pattern established in P0/P2 migrations)
 - [ ] **Premium alert comms** — [`commsPreference`](../backend/src/api/modules/commsPreference/commsPreference.entity.ts) has generic channels; add ticket-alert-specific preference or document use of `metadata` / `matchReminders` field for ticket on-sale alerts

@@ -2838,6 +2838,1568 @@
         ]
       }
     },
+    "/ticket-interest": {
+      "post": {
+        "operationId": "TicketInterestController_upsert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketInterestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketInterestResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register or update interest in attending a match",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/my": {
+      "get": {
+        "operationId": "TicketInterestController_getMyInterests",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketInterestResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's ticket interests",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/{id}": {
+      "delete": {
+        "operationId": "TicketInterestController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a ticket interest",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/{fixtureId}/demand": {
+      "get": {
+        "operationId": "TicketInterestController_getDemand",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandStatsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get public aggregate demand stats for a fixture (count only, no user data)",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/{fixtureId}/demand/admin": {
+      "get": {
+        "operationId": "TicketInterestController_getAdminDemand",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDemandStatsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Get detailed demand stats including avg max price",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/ticket-interest/notify/{fixtureId}": {
+      "post": {
+        "operationId": "TicketInterestController_notifyInterested",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "notified": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Notify all interested users for a fixture that resale is now live",
+        "tags": [
+          "ticket-interest",
+          "ticket-interest"
+        ]
+      }
+    },
+    "/platform-config/features": {
+      "get": {
+        "operationId": "PlatformConfigController_getFeatures",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "marketplaceEnabled": {
+                      "type": "boolean"
+                    },
+                    "adsEnabled": {
+                      "type": "boolean"
+                    },
+                    "playerAdvancedStatsEnabled": {
+                      "type": "boolean"
+                    },
+                    "attendanceStatsEnabled": {
+                      "type": "boolean"
+                    },
+                    "attendanceAdvancedStatsEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketLinksEnabled": {
+                      "type": "boolean"
+                    },
+                    "affiliateLinksEnabled": {
+                      "type": "boolean"
+                    },
+                    "matchdayAffiliatesEnabled": {
+                      "type": "boolean"
+                    },
+                    "hospitalityLinksEnabled": {
+                      "type": "boolean"
+                    },
+                    "sponsoredPlacementsEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketAlertsEnabled": {
+                      "type": "boolean"
+                    },
+                    "affiliateDisclosureEnabled": {
+                      "type": "boolean"
+                    },
+                    "attendanceTrackingEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketDocumentUploadEnabled": {
+                      "type": "boolean"
+                    },
+                    "ticketDemandEnabled": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Public platform feature flags for client UI",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
+    "/platform-config/fees": {
+      "get": {
+        "operationId": "PlatformConfigController_getFees",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "buyerFeeRate": {
+                      "type": "number",
+                      "description": "Buyer-side fee as a decimal (e.g. 0.10 = 10%)"
+                    },
+                    "sellerFeeRate": {
+                      "type": "number",
+                      "description": "Seller-side fee as a decimal (e.g. 0.05 = 5%)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Public marketplace fee structure (buyer fee, seller fee)",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
+    "/platform-config": {
+      "get": {
+        "operationId": "PlatformConfigController_listAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all platform config entries (admin only)",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
+    "/platform-config/{key}": {
+      "patch": {
+        "operationId": "PlatformConfigController_updateConfig",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlatformConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a platform config value (admin only)",
+        "tags": [
+          "platform-config",
+          "platform-config"
+        ]
+      }
+    },
+    "/notifications": {
+      "get": {
+        "operationId": "NotificationController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserNotification"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List recent in-app notifications",
+        "tags": [
+          "notifications",
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationController_unreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unread notification count",
+        "tags": [
+          "notifications",
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationController_markRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark one notification as read",
+        "tags": [
+          "notifications",
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/read-all": {
+      "post": {
+        "operationId": "NotificationController_markAllRead",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "notifications",
+          "notifications"
+        ]
+      }
+    },
+    "/attendance": {
+      "post": {
+        "operationId": "AttendanceController_upsert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create or update an attendance declaration for a fixture",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/my": {
+      "get": {
+        "operationId": "AttendanceController_getMyAttendance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AttendanceResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's attendance records",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{fixtureId}/count": {
+      "get": {
+        "operationId": "AttendanceController_getCount",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceCountResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get aggregate attendance count for a fixture (public, no user data)",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{id}": {
+      "delete": {
+        "operationId": "AttendanceController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel attendance for a fixture",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{id}/upload": {
+      "post": {
+        "operationId": "AttendanceController_uploadDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a private ticket document (PDF or image, max 10 MB, owner only)",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/attendance/{id}/document": {
+      "get": {
+        "operationId": "AttendanceController_getDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stream the private ticket document for own attendance record (owner only)",
+        "tags": [
+          "attendance",
+          "attendance"
+        ]
+      }
+    },
+    "/marketplace/listings": {
+      "get": {
+        "operationId": "MarketplaceListingController_getListings",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "team",
+            "required": false,
+            "in": "query",
+            "description": "Filter listings whose fixture involves a team matching this substring (home or away, case-insensitive)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Browse active marketplace listings",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      },
+      "post": {
+        "operationId": "MarketplaceListingController_createListing",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateListingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List an owned ticket for resale",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/my": {
+      "get": {
+        "operationId": "MarketplaceListingController_getMyListings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's own listings",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/my-purchases": {
+      "get": {
+        "operationId": "MarketplaceListingController_getMyPurchases",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the authenticated user's purchases",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/pending-review": {
+      "get": {
+        "operationId": "MarketplaceListingController_getPendingReview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Get all listings pending review",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}": {
+      "get": {
+        "operationId": "MarketplaceListingController_getListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single marketplace listing by id",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      },
+      "delete": {
+        "operationId": "MarketplaceListingController_cancelListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel an active listing (seller only). Ticket returned to seller.",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/submit": {
+      "post": {
+        "operationId": "MarketplaceListingController_submitForReview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit listing for admin review (DRAFT → PENDING_REVIEW)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/approve": {
+      "post": {
+        "operationId": "MarketplaceListingController_approveListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Approve a pending listing (PENDING_REVIEW → ACTIVE)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/reject": {
+      "post": {
+        "operationId": "MarketplaceListingController_rejectListing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Reject a pending listing with a reason",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/upload-proof": {
+      "post": {
+        "operationId": "MarketplaceListingController_uploadProof",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload proof of ticket ownership (seller only, admin-reviewable)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/proof": {
+      "get": {
+        "operationId": "MarketplaceListingController_getProof",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "(Admin) Stream the proof document for a listing",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/request-purchase": {
+      "post": {
+        "operationId": "MarketplaceListingController_requestPurchase",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request to purchase an active listing (buyer)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/confirm-transfer": {
+      "post": {
+        "operationId": "MarketplaceListingController_confirmTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seller confirms they have sent the ticket",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/confirm-receipt": {
+      "post": {
+        "operationId": "MarketplaceListingController_confirmReceipt",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Buyer confirms they received the ticket",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/marketplace/listings/{id}/dispute": {
+      "post": {
+        "operationId": "MarketplaceListingController_raiseDispute",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "details"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Raise a dispute on a listing (buyer or seller)",
+        "tags": [
+          "marketplace",
+          "marketplace"
+        ]
+      }
+    },
+    "/user-ticket-log/my": {
+      "get": {
+        "operationId": "UserTicketLogController_getMyLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserTicketLog"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all tickets currently in the logged-in user's wallet",
+        "tags": [
+          "user-ticket-log",
+          "user-ticket-log"
+        ]
+      }
+    },
+    "/ticket-hold/acquire": {
+      "post": {
+        "operationId": "TicketHoldController_acquire",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcquireTicketHoldDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reserve a listing exclusively until expiry or checkout",
+        "tags": [
+          "ticket-hold",
+          "ticket-hold"
+        ]
+      }
+    },
+    "/ticket-hold/release": {
+      "post": {
+        "operationId": "TicketHoldController_release",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseTicketHoldDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel reservation (timeout or user abandoned)",
+        "tags": [
+          "ticket-hold",
+          "ticket-hold"
+        ]
+      }
+    },
+    "/ticket-hold/verify": {
+      "get": {
+        "operationId": "TicketHoldController_verify",
+        "parameters": [
+          {
+            "name": "fixtureId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offerKey",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "holderId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check reservation is still valid during checkout",
+        "tags": [
+          "ticket-hold",
+          "ticket-hold"
+        ]
+      }
+    },
     "/fixtureReferee": {
       "post": {
         "operationId": "createFixtureReferee",
@@ -4929,192 +6491,6 @@
         ]
       }
     },
-    "/platform-config/features": {
-      "get": {
-        "operationId": "PlatformConfigController_getFeatures",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "marketplaceEnabled": {
-                      "type": "boolean"
-                    },
-                    "adsEnabled": {
-                      "type": "boolean"
-                    },
-                    "playerAdvancedStatsEnabled": {
-                      "type": "boolean"
-                    },
-                    "attendanceStatsEnabled": {
-                      "type": "boolean"
-                    },
-                    "attendanceAdvancedStatsEnabled": {
-                      "type": "boolean"
-                    },
-                    "ticketLinksEnabled": {
-                      "type": "boolean"
-                    },
-                    "affiliateLinksEnabled": {
-                      "type": "boolean"
-                    },
-                    "matchdayAffiliatesEnabled": {
-                      "type": "boolean"
-                    },
-                    "hospitalityLinksEnabled": {
-                      "type": "boolean"
-                    },
-                    "sponsoredPlacementsEnabled": {
-                      "type": "boolean"
-                    },
-                    "ticketAlertsEnabled": {
-                      "type": "boolean"
-                    },
-                    "affiliateDisclosureEnabled": {
-                      "type": "boolean"
-                    },
-                    "attendanceTrackingEnabled": {
-                      "type": "boolean"
-                    },
-                    "ticketDocumentUploadEnabled": {
-                      "type": "boolean"
-                    },
-                    "ticketDemandEnabled": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Public platform feature flags for client UI",
-        "tags": [
-          "platform-config",
-          "platform-config"
-        ]
-      }
-    },
-    "/platform-config/fees": {
-      "get": {
-        "operationId": "PlatformConfigController_getFees",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "buyerFeeRate": {
-                      "type": "number",
-                      "description": "Buyer-side fee as a decimal (e.g. 0.10 = 10%)"
-                    },
-                    "sellerFeeRate": {
-                      "type": "number",
-                      "description": "Seller-side fee as a decimal (e.g. 0.05 = 5%)"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Public marketplace fee structure (buyer fee, seller fee)",
-        "tags": [
-          "platform-config",
-          "platform-config"
-        ]
-      }
-    },
-    "/platform-config": {
-      "get": {
-        "operationId": "PlatformConfigController_listAll",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List all platform config entries (admin only)",
-        "tags": [
-          "platform-config",
-          "platform-config"
-        ]
-      }
-    },
-    "/platform-config/{key}": {
-      "patch": {
-        "operationId": "PlatformConfigController_updateConfig",
-        "parameters": [
-          {
-            "name": "key",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePlatformConfigDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update a platform config value (admin only)",
-        "tags": [
-          "platform-config",
-          "platform-config"
-        ]
-      }
-    },
     "/social/friends": {
       "get": {
         "operationId": "SocialController_listFriends",
@@ -5302,121 +6678,6 @@
         "tags": [
           "social",
           "social"
-        ]
-      }
-    },
-    "/notifications": {
-      "get": {
-        "operationId": "NotificationController_list",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserNotification"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List recent in-app notifications",
-        "tags": [
-          "notifications",
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/unread-count": {
-      "get": {
-        "operationId": "NotificationController_unreadCount",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Unread notification count",
-        "tags": [
-          "notifications",
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/read": {
-      "patch": {
-        "operationId": "NotificationController_markRead",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark one notification as read",
-        "tags": [
-          "notifications",
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/read-all": {
-      "post": {
-        "operationId": "NotificationController_markAllRead",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark all notifications as read",
-        "tags": [
-          "notifications",
-          "notifications"
         ]
       }
     },
@@ -14467,136 +15728,6 @@
         ]
       }
     },
-    "/ticket-hold/acquire": {
-      "post": {
-        "operationId": "TicketHoldController_acquire",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcquireTicketHoldDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "expiresAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Reserve a listing exclusively until expiry or checkout",
-        "tags": [
-          "ticket-hold",
-          "ticket-hold"
-        ]
-      }
-    },
-    "/ticket-hold/release": {
-      "post": {
-        "operationId": "TicketHoldController_release",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReleaseTicketHoldDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Cancel reservation (timeout or user abandoned)",
-        "tags": [
-          "ticket-hold",
-          "ticket-hold"
-        ]
-      }
-    },
-    "/ticket-hold/verify": {
-      "get": {
-        "operationId": "TicketHoldController_verify",
-        "parameters": [
-          {
-            "name": "fixtureId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "offerKey",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "holderId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Check reservation is still valid during checkout",
-        "tags": [
-          "ticket-hold",
-          "ticket-hold"
-        ]
-      }
-    },
     "/ticket-link/query": {
       "get": {
         "operationId": "TicketLinkController_query",
@@ -14922,500 +16053,6 @@
         "tags": [
           "ticket-link",
           "ticket-link"
-        ]
-      }
-    },
-    "/attendance": {
-      "post": {
-        "operationId": "AttendanceController_upsert",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create or update an attendance declaration for a fixture",
-        "tags": [
-          "attendance",
-          "attendance"
-        ]
-      }
-    },
-    "/attendance/my": {
-      "get": {
-        "operationId": "AttendanceController_getMyAttendance",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AttendanceResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get the authenticated user's attendance records",
-        "tags": [
-          "attendance",
-          "attendance"
-        ]
-      }
-    },
-    "/attendance/{fixtureId}/count": {
-      "get": {
-        "operationId": "AttendanceController_getCount",
-        "parameters": [
-          {
-            "name": "fixtureId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceCountResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get aggregate attendance count for a fixture (public, no user data)",
-        "tags": [
-          "attendance",
-          "attendance"
-        ]
-      }
-    },
-    "/attendance/{id}": {
-      "delete": {
-        "operationId": "AttendanceController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Cancel attendance for a fixture",
-        "tags": [
-          "attendance",
-          "attendance"
-        ]
-      }
-    },
-    "/attendance/{id}/upload": {
-      "post": {
-        "operationId": "AttendanceController_uploadDocument",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload a private ticket document (PDF or image, max 10 MB, owner only)",
-        "tags": [
-          "attendance",
-          "attendance"
-        ]
-      }
-    },
-    "/attendance/{id}/document": {
-      "get": {
-        "operationId": "AttendanceController_getDocument",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Stream the private ticket document for own attendance record (owner only)",
-        "tags": [
-          "attendance",
-          "attendance"
-        ]
-      }
-    },
-    "/ticket-interest": {
-      "post": {
-        "operationId": "TicketInterestController_upsert",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTicketInterestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TicketInterestResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Register or update interest in attending a match",
-        "tags": [
-          "ticket-interest",
-          "ticket-interest"
-        ]
-      }
-    },
-    "/ticket-interest/my": {
-      "get": {
-        "operationId": "TicketInterestController_getMyInterests",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TicketInterestResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get the authenticated user's ticket interests",
-        "tags": [
-          "ticket-interest",
-          "ticket-interest"
-        ]
-      }
-    },
-    "/ticket-interest/{id}": {
-      "delete": {
-        "operationId": "TicketInterestController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Cancel a ticket interest",
-        "tags": [
-          "ticket-interest",
-          "ticket-interest"
-        ]
-      }
-    },
-    "/ticket-interest/{fixtureId}/demand": {
-      "get": {
-        "operationId": "TicketInterestController_getDemand",
-        "parameters": [
-          {
-            "name": "fixtureId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DemandStatsDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get public aggregate demand stats for a fixture (count only, no user data)",
-        "tags": [
-          "ticket-interest",
-          "ticket-interest"
-        ]
-      }
-    },
-    "/ticket-interest/{fixtureId}/demand/admin": {
-      "get": {
-        "operationId": "TicketInterestController_getAdminDemand",
-        "parameters": [
-          {
-            "name": "fixtureId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminDemandStatsDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "(Admin) Get detailed demand stats including avg max price",
-        "tags": [
-          "ticket-interest",
-          "ticket-interest"
-        ]
-      }
-    },
-    "/ticket-interest/notify/{fixtureId}": {
-      "post": {
-        "operationId": "TicketInterestController_notifyInterested",
-        "parameters": [
-          {
-            "name": "fixtureId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "notified": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "(Admin) Notify all interested users for a fixture that resale is now live",
-        "tags": [
-          "ticket-interest",
-          "ticket-interest"
         ]
       }
     },
@@ -15888,6 +16525,80 @@
         "tags": [
           "admin/ticket-link-analytics",
           "admin-ticket-link-analytics"
+        ]
+      }
+    },
+    "/ratings": {
+      "post": {
+        "operationId": "UserRatingController_submitRating",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRatingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit a post-transaction rating",
+        "tags": [
+          "ratings",
+          "ratings"
+        ]
+      }
+    },
+    "/ratings/{userId}/summary": {
+      "get": {
+        "operationId": "UserRatingController_getTrustSummary",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserTrustSummaryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get public trust score summary for a user",
+        "tags": [
+          "ratings",
+          "ratings"
         ]
       }
     },
@@ -19107,40 +19818,6 @@
         ]
       }
     },
-    "/user-ticket-log/my": {
-      "get": {
-        "operationId": "UserTicketLogController_getMyLogs",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserTicketLog"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all tickets currently in the logged-in user's wallet",
-        "tags": [
-          "user-ticket-log",
-          "user-ticket-log"
-        ]
-      }
-    },
     "/fixture-highlight": {
       "post": {
         "operationId": "createFixtureHighlight",
@@ -19815,609 +20492,6 @@
         "summary": "Seed players data",
         "tags": [
           "dataSeeding"
-        ]
-      }
-    },
-    "/marketplace/listings": {
-      "get": {
-        "operationId": "MarketplaceListingController_getListings",
-        "parameters": [
-          {
-            "name": "fixtureId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxPrice",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "team",
-            "required": false,
-            "in": "query",
-            "description": "Filter listings whose fixture involves a team matching this substring (home or away, case-insensitive)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "total": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Browse active marketplace listings",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      },
-      "post": {
-        "operationId": "MarketplaceListingController_createListing",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateListingDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List an owned ticket for resale",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/my": {
-      "get": {
-        "operationId": "MarketplaceListingController_getMyListings",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get the authenticated user's own listings",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/my-purchases": {
-      "get": {
-        "operationId": "MarketplaceListingController_getMyPurchases",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get the authenticated user's purchases",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/pending-review": {
-      "get": {
-        "operationId": "MarketplaceListingController_getPendingReview",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "(Admin) Get all listings pending review",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}": {
-      "get": {
-        "operationId": "MarketplaceListingController_getListing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get a single marketplace listing by id",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      },
-      "delete": {
-        "operationId": "MarketplaceListingController_cancelListing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Cancel an active listing (seller only). Ticket returned to seller.",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/submit": {
-      "post": {
-        "operationId": "MarketplaceListingController_submitForReview",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Submit listing for admin review (DRAFT → PENDING_REVIEW)",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/approve": {
-      "post": {
-        "operationId": "MarketplaceListingController_approveListing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "(Admin) Approve a pending listing (PENDING_REVIEW → ACTIVE)",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/reject": {
-      "post": {
-        "operationId": "MarketplaceListingController_rejectListing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "reason": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "reason"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "(Admin) Reject a pending listing with a reason",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/upload-proof": {
-      "post": {
-        "operationId": "MarketplaceListingController_uploadProof",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload proof of ticket ownership (seller only, admin-reviewable)",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/proof": {
-      "get": {
-        "operationId": "MarketplaceListingController_getProof",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "(Admin) Stream the proof document for a listing",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/request-purchase": {
-      "post": {
-        "operationId": "MarketplaceListingController_requestPurchase",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Request to purchase an active listing (buyer)",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/confirm-transfer": {
-      "post": {
-        "operationId": "MarketplaceListingController_confirmTransfer",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Seller confirms they have sent the ticket",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/confirm-receipt": {
-      "post": {
-        "operationId": "MarketplaceListingController_confirmReceipt",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Buyer confirms they received the ticket",
-        "tags": [
-          "marketplace",
-          "marketplace"
-        ]
-      }
-    },
-    "/marketplace/listings/{id}/dispute": {
-      "post": {
-        "operationId": "MarketplaceListingController_raiseDispute",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "reason": {
-                    "type": "string"
-                  },
-                  "details": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "reason",
-                  "details"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Raise a dispute on a listing (buyer or seller)",
-        "tags": [
-          "marketplace",
-          "marketplace"
         ]
       }
     },
@@ -22056,6 +22130,500 @@
           "managerId"
         ]
       },
+      "CreateTicketInterestDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1
+          },
+          "maxPriceGbp": {
+            "type": "number",
+            "description": "Max price willing to pay (GBP)"
+          },
+          "preferredStand": {
+            "type": "string"
+          },
+          "wantsNotification": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "fixtureId",
+          "quantity",
+          "wantsNotification"
+        ]
+      },
+      "TicketInterestResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "maxPriceGbp": {
+            "type": "number"
+          },
+          "preferredStand": {
+            "type": "string"
+          },
+          "wantsNotification": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "NOTIFIED",
+              "CANCELLED"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fixtureId",
+          "quantity",
+          "wantsNotification",
+          "status",
+          "createdAt"
+        ]
+      },
+      "DemandStatsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "interestedCount": {
+            "type": "number"
+          },
+          "totalTicketsWanted": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "interestedCount",
+          "totalTicketsWanted"
+        ]
+      },
+      "AdminDemandStatsDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "interestedCount": {
+            "type": "number"
+          },
+          "totalTicketsWanted": {
+            "type": "number"
+          },
+          "avgMaxPriceGbp": {
+            "type": "number",
+            "description": "Average max price across users who set one (admin only)"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "interestedCount",
+          "totalTicketsWanted"
+        ]
+      },
+      "UpdatePlatformConfigDto": {
+        "type": "object",
+        "properties": {
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "number",
+              "string",
+              "boolean",
+              "array",
+              "json"
+            ],
+            "description": "Discriminator — indicates which value field holds the data"
+          },
+          "numberValue": {
+            "type": "number",
+            "description": "Populated when valueType is number"
+          },
+          "stringValue": {
+            "type": "string",
+            "description": "Populated when valueType is string"
+          },
+          "booleanValue": {
+            "type": "boolean",
+            "description": "Populated when valueType is boolean"
+          },
+          "arrayValue": {
+            "description": "Populated when valueType is array",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "jsonValue": {
+            "type": "object",
+            "description": "Populated when valueType is json"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description (optional update)"
+          }
+        },
+        "required": [
+          "valueType"
+        ]
+      },
+      "UserNotification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "userId": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "FRIEND_REQUEST_RECEIVED",
+              "FRIEND_REQUEST_ACCEPTED",
+              "TICKET_RESALE_AVAILABLE",
+              "LISTING_APPROVED",
+              "LISTING_REJECTED",
+              "PURCHASE_REQUESTED",
+              "TRANSFER_INITIATED",
+              "TRANSFER_CONFIRMED",
+              "DISPUTE_RAISED",
+              "MATCH_REMINDER",
+              "MATCH_CANCELLED",
+              "MATCH_POSTPONED",
+              "MATCH_SUSPENDED"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "readAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "type",
+          "title",
+          "message"
+        ]
+      },
+      "UpsertAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number",
+            "description": "Fixture ID"
+          },
+          "hasTicket": {
+            "type": "boolean",
+            "description": "True if the user has/had a ticket"
+          },
+          "seatSection": {
+            "type": "string"
+          },
+          "seatBlock": {
+            "type": "string"
+          },
+          "seatRow": {
+            "type": "string"
+          },
+          "seatNumber": {
+            "type": "string"
+          },
+          "ticketProvider": {
+            "type": "string"
+          },
+          "purchaseDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "hasTicket"
+        ]
+      },
+      "AttendanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "fixtureId": {
+            "type": "number"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "hasTicket": {
+            "type": "boolean"
+          },
+          "seatSection": {
+            "type": "string"
+          },
+          "seatBlock": {
+            "type": "string"
+          },
+          "seatRow": {
+            "type": "string"
+          },
+          "seatNumber": {
+            "type": "string"
+          },
+          "ticketProvider": {
+            "type": "string"
+          },
+          "purchaseDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "hasDocument": {
+            "type": "boolean",
+            "description": "True if a private ticket document has been uploaded"
+          },
+          "fixtureInvalidatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the fixture was postponed, cancelled, or suspended"
+          },
+          "fixtureInvalidationReason": {
+            "type": "string",
+            "enum": [
+              "POSTPONED",
+              "CANCELLED",
+              "SUSPENDED"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fixtureId",
+          "userId",
+          "hasTicket",
+          "hasDocument",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AttendanceCountResponseDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "goingCount": {
+            "type": "number",
+            "description": "Total users who have marked themselves as going"
+          },
+          "hasTicketCount": {
+            "type": "number",
+            "description": "Of those, how many have marked they have a ticket"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "goingCount",
+          "hasTicketCount"
+        ]
+      },
+      "CreateListingDto": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "number",
+            "description": "ID of the ticket to list for resale"
+          },
+          "askPrice": {
+            "type": "number",
+            "description": "Asking price set by the seller",
+            "minimum": 0.01
+          }
+        },
+        "required": [
+          "ticketId",
+          "askPrice"
+        ]
+      },
+      "UserTicketLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
+            "nullable": true,
+            "example": {
+              "source": "import",
+              "providers": {
+                "apisports": {
+                  "externalId": "42",
+                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
+                },
+                "statsbomb": {
+                  "externalId": "12345"
+                }
+              },
+              "tags": [
+                "premier-league",
+                "2024"
+              ]
+            }
+          },
+          "userId": {
+            "type": "number",
+            "description": "Owner user id"
+          },
+          "ticketId": {
+            "type": "number",
+            "description": "Ticket id"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the ticket is currently in the user's wallet. False when listed for sale."
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "ticketId",
+          "active"
+        ]
+      },
+      "AcquireTicketHoldDto": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "number"
+          },
+          "offerKey": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "holderId": {
+            "type": "string",
+            "description": "Client-generated UUID for this browser session"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "holdMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60
+          }
+        },
+        "required": [
+          "fixtureId",
+          "offerKey",
+          "holderId",
+          "quantity"
+        ]
+      },
+      "ReleaseTicketHoldDto": {
+        "type": "object",
+        "properties": {
+          "holderId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "holderId"
+        ]
+      },
       "CreateFixtureRefereeDTO": {
         "type": "object",
         "properties": {
@@ -22647,52 +23215,6 @@
           }
         }
       },
-      "UpdatePlatformConfigDto": {
-        "type": "object",
-        "properties": {
-          "valueType": {
-            "type": "string",
-            "enum": [
-              "number",
-              "string",
-              "boolean",
-              "array",
-              "json"
-            ],
-            "description": "Discriminator — indicates which value field holds the data"
-          },
-          "numberValue": {
-            "type": "number",
-            "description": "Populated when valueType is number"
-          },
-          "stringValue": {
-            "type": "string",
-            "description": "Populated when valueType is string"
-          },
-          "booleanValue": {
-            "type": "boolean",
-            "description": "Populated when valueType is boolean"
-          },
-          "arrayValue": {
-            "description": "Populated when valueType is array",
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          },
-          "jsonValue": {
-            "type": "object",
-            "description": "Populated when valueType is json"
-          },
-          "description": {
-            "type": "string",
-            "description": "Human-readable description (optional update)"
-          }
-        },
-        "required": [
-          "valueType"
-        ]
-      },
       "SendFriendRequestDto": {
         "type": "object",
         "properties": {
@@ -22703,83 +23225,6 @@
             "type": "string"
           }
         }
-      },
-      "UserNotification": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
-            "nullable": true,
-            "example": {
-              "source": "import",
-              "providers": {
-                "apisports": {
-                  "externalId": "42",
-                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
-                },
-                "statsbomb": {
-                  "externalId": "12345"
-                }
-              },
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "userId": {
-            "type": "number"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "FRIEND_REQUEST_RECEIVED",
-              "FRIEND_REQUEST_ACCEPTED",
-              "TICKET_RESALE_AVAILABLE",
-              "LISTING_APPROVED",
-              "LISTING_REJECTED",
-              "PURCHASE_REQUESTED",
-              "TRANSFER_INITIATED",
-              "TRANSFER_CONFIRMED",
-              "DISPUTE_RAISED",
-              "MATCH_REMINDER"
-            ]
-          },
-          "title": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "readAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "userId",
-          "type",
-          "title",
-          "message"
-        ]
       },
       "CreateManagerDTO": {
         "type": "object",
@@ -23379,11 +23824,6 @@
               "BANK_TRANSFER",
               "CRYPTO"
             ]
-          },
-          "apiKey": {
-            "type": "string",
-            "description": "Deprecated — use integration.config for PSP credentials",
-            "example": "sk_live_..."
           },
           "enabled": {
             "type": "boolean",
@@ -25337,9 +25777,6 @@
           },
           "season": {
             "$ref": "#/components/schemas/Promise"
-          },
-          "fixtures": {
-            "$ref": "#/components/schemas/Promise"
           }
         },
         "required": [
@@ -25348,8 +25785,7 @@
           "competitionId",
           "competition",
           "seasonId",
-          "season",
-          "fixtures"
+          "season"
         ]
       },
       "CreateTeamStadiumDTO": {
@@ -25474,8 +25910,40 @@
           "fixtureId": {
             "type": "number"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "AVAILABLE",
+              "LISTED",
+              "SOLD",
+              "TRANSFERRED"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "PRIMARY",
+              "RESALE",
+              "EXTERNAL"
+            ]
+          },
+          "activeListingId": {
+            "type": "object"
+          },
+          "seatSection": {
+            "type": "string"
+          },
+          "seatBlock": {
+            "type": "string"
+          },
+          "seatRow": {
+            "type": "string"
+          },
+          "seatNumber": {
+            "type": "string"
+          },
           "userId": {
-            "type": "number"
+            "type": "object"
           },
           "paymentId": {
             "type": "number"
@@ -25484,7 +25952,9 @@
         "required": [
           "category",
           "price",
-          "fixtureId"
+          "fixtureId",
+          "status",
+          "source"
         ]
       },
       "Ticket": {
@@ -25536,8 +26006,40 @@
           "fixtureId": {
             "type": "number"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "AVAILABLE",
+              "LISTED",
+              "SOLD",
+              "TRANSFERRED"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "PRIMARY",
+              "RESALE",
+              "EXTERNAL"
+            ]
+          },
+          "activeListingId": {
+            "type": "object"
+          },
+          "seatSection": {
+            "type": "string"
+          },
+          "seatBlock": {
+            "type": "string"
+          },
+          "seatRow": {
+            "type": "string"
+          },
+          "seatNumber": {
+            "type": "string"
+          },
           "userId": {
-            "type": "number"
+            "type": "object"
           },
           "paymentId": {
             "type": "number"
@@ -25547,49 +26049,9 @@
           "id",
           "category",
           "price",
-          "fixtureId"
-        ]
-      },
-      "AcquireTicketHoldDto": {
-        "type": "object",
-        "properties": {
-          "fixtureId": {
-            "type": "number"
-          },
-          "offerKey": {
-            "type": "string",
-            "maxLength": 512
-          },
-          "holderId": {
-            "type": "string",
-            "description": "Client-generated UUID for this browser session"
-          },
-          "quantity": {
-            "type": "number",
-            "minimum": 1
-          },
-          "holdMinutes": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 60
-          }
-        },
-        "required": [
           "fixtureId",
-          "offerKey",
-          "holderId",
-          "quantity"
-        ]
-      },
-      "ReleaseTicketHoldDto": {
-        "type": "object",
-        "properties": {
-          "holderId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "holderId"
+          "status",
+          "source"
         ]
       },
       "TicketLinkResponseDto": {
@@ -25882,241 +26344,6 @@
             "type": "object"
           }
         }
-      },
-      "UpsertAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "fixtureId": {
-            "type": "number",
-            "description": "Fixture ID"
-          },
-          "hasTicket": {
-            "type": "boolean",
-            "description": "True if the user has/had a ticket"
-          },
-          "seatSection": {
-            "type": "string"
-          },
-          "seatBlock": {
-            "type": "string"
-          },
-          "seatRow": {
-            "type": "string"
-          },
-          "seatNumber": {
-            "type": "string"
-          },
-          "ticketProvider": {
-            "type": "string"
-          },
-          "purchaseDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "fixtureId",
-          "hasTicket"
-        ]
-      },
-      "AttendanceResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "fixtureId": {
-            "type": "number"
-          },
-          "userId": {
-            "type": "number"
-          },
-          "hasTicket": {
-            "type": "boolean"
-          },
-          "seatSection": {
-            "type": "string"
-          },
-          "seatBlock": {
-            "type": "string"
-          },
-          "seatRow": {
-            "type": "string"
-          },
-          "seatNumber": {
-            "type": "string"
-          },
-          "ticketProvider": {
-            "type": "string"
-          },
-          "purchaseDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "hasDocument": {
-            "type": "boolean",
-            "description": "True if a private ticket document has been uploaded"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "fixtureId",
-          "userId",
-          "hasTicket",
-          "hasDocument",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "AttendanceCountResponseDto": {
-        "type": "object",
-        "properties": {
-          "fixtureId": {
-            "type": "number"
-          },
-          "goingCount": {
-            "type": "number",
-            "description": "Total users who have marked themselves as going"
-          },
-          "hasTicketCount": {
-            "type": "number",
-            "description": "Of those, how many have marked they have a ticket"
-          }
-        },
-        "required": [
-          "fixtureId",
-          "goingCount",
-          "hasTicketCount"
-        ]
-      },
-      "CreateTicketInterestDto": {
-        "type": "object",
-        "properties": {
-          "fixtureId": {
-            "type": "number"
-          },
-          "quantity": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 4,
-            "default": 1
-          },
-          "maxPriceGbp": {
-            "type": "number",
-            "description": "Max price willing to pay (GBP)"
-          },
-          "preferredStand": {
-            "type": "string"
-          },
-          "wantsNotification": {
-            "type": "boolean",
-            "default": true
-          }
-        },
-        "required": [
-          "fixtureId",
-          "quantity",
-          "wantsNotification"
-        ]
-      },
-      "TicketInterestResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "fixtureId": {
-            "type": "number"
-          },
-          "quantity": {
-            "type": "number"
-          },
-          "maxPriceGbp": {
-            "type": "number"
-          },
-          "preferredStand": {
-            "type": "string"
-          },
-          "wantsNotification": {
-            "type": "boolean"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "NOTIFIED",
-              "CANCELLED"
-            ]
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "fixtureId",
-          "quantity",
-          "wantsNotification",
-          "status",
-          "createdAt"
-        ]
-      },
-      "DemandStatsDto": {
-        "type": "object",
-        "properties": {
-          "fixtureId": {
-            "type": "number"
-          },
-          "interestedCount": {
-            "type": "number"
-          },
-          "totalTicketsWanted": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "fixtureId",
-          "interestedCount",
-          "totalTicketsWanted"
-        ]
-      },
-      "AdminDemandStatsDto": {
-        "type": "object",
-        "properties": {
-          "fixtureId": {
-            "type": "number"
-          },
-          "interestedCount": {
-            "type": "number"
-          },
-          "totalTicketsWanted": {
-            "type": "number"
-          },
-          "avgMaxPriceGbp": {
-            "type": "number",
-            "description": "Average max price across users who set one (admin only)"
-          }
-        },
-        "required": [
-          "fixtureId",
-          "interestedCount",
-          "totalTicketsWanted"
-        ]
       },
       "AffiliatePartnerResponseDto": {
         "type": "object",
@@ -26527,6 +26754,66 @@
           "totalClicks"
         ]
       },
+      "CreateRatingDto": {
+        "type": "object",
+        "properties": {
+          "listingId": {
+            "type": "number",
+            "description": "Listing ID this rating is for"
+          },
+          "targetUserId": {
+            "type": "number",
+            "description": "User being rated"
+          },
+          "raterRole": {
+            "type": "string",
+            "enum": [
+              "BUYER",
+              "SELLER"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "comment": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "listingId",
+          "targetUserId",
+          "raterRole",
+          "score"
+        ]
+      },
+      "UserTrustSummaryDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number"
+          },
+          "averageRating": {
+            "type": "number",
+            "description": "Average rating across all transactions (1–5)"
+          },
+          "totalTransactions": {
+            "type": "number",
+            "description": "Number of completed transactions"
+          },
+          "trustScore": {
+            "type": "number",
+            "description": "Trust score (0–100) based on ratings and history"
+          }
+        },
+        "required": [
+          "userId",
+          "averageRating",
+          "totalTransactions",
+          "trustScore"
+        ]
+      },
       "PatchAdPreferenceDto": {
         "type": "object",
         "properties": {
@@ -26724,9 +27011,6 @@
           "predictions": {
             "$ref": "#/components/schemas/Promise"
           },
-          "commsPreferenceId": {
-            "type": "number"
-          },
           "commsPreference": {
             "$ref": "#/components/schemas/Promise"
           },
@@ -26758,6 +27042,11 @@
           "country": {
             "type": "string",
             "description": "ISO 3166-1 alpha-2 country code, e.g. GB"
+          },
+          "anonymizedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the user account was anonymized for GDPR"
           }
         },
         "required": [
@@ -27625,66 +27914,6 @@
           "userId"
         ]
       },
-      "UserTicketLog": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Extensible JSON. Multiple external APIs: nest each under `providers.<slug>` (e.g. apisports, statsbomb) with `externalId` where applicable; merge per slug, not the whole object. Legacy top-level vendor fields may exist on older rows.",
-            "nullable": true,
-            "example": {
-              "source": "import",
-              "providers": {
-                "apisports": {
-                  "externalId": "42",
-                  "lastImportedAt": "2024-08-01T12:00:00.000Z"
-                },
-                "statsbomb": {
-                  "externalId": "12345"
-                }
-              },
-              "tags": [
-                "premier-league",
-                "2024"
-              ]
-            }
-          },
-          "userId": {
-            "type": "number",
-            "description": "Owner user id"
-          },
-          "ticketId": {
-            "type": "number",
-            "description": "Ticket id"
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Whether the ticket is currently in the user's wallet. False when listed for sale."
-          }
-        },
-        "required": [
-          "id",
-          "userId",
-          "ticketId",
-          "active"
-        ]
-      },
       "CreateFixtureHighlightDTO": {
         "type": "object",
         "properties": {
@@ -28029,24 +28258,6 @@
           "password",
           "securityQuestion",
           "securityAnswer"
-        ]
-      },
-      "CreateListingDto": {
-        "type": "object",
-        "properties": {
-          "ticketId": {
-            "type": "number",
-            "description": "ID of the ticket to list for resale"
-          },
-          "askPrice": {
-            "type": "number",
-            "description": "Asking price set by the seller",
-            "minimum": 0.01
-          }
-        },
-        "required": [
-          "ticketId",
-          "askPrice"
         ]
       },
       "ConfirmMarketplacePurchaseDto": {

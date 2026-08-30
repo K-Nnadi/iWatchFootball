@@ -164,7 +164,7 @@ export function CompetitionPage() {
     );
 
     const standingTeamIds = useMemo(
-        () => [...new Set(tcsForSeason.map((t) => t.teamId).filter((id): id is number => id != null))],
+        () => Array.from(new Set(tcsForSeason.map((t) => t.teamId).filter((id): id is number => id != null))),
         [tcsForSeason],
     );
 

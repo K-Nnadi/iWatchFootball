@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePageTransition } from "../hooks/usePageTransition";
 import { UiButton } from "../components/ui";
 import { useRegister, type RegisterMutationResult } from "@iWatchFootball/clients/controllers/auth";
+import type { RegisterBody } from "@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas";
 import { useAuthStore } from "../shared/stores/auth.store";
 import { notify } from "../shared/notify";
 import { getSecurityQuestions } from "../shared/api/authRecovery.api";
@@ -113,7 +114,7 @@ export function SignUpPage() {
 	});
 
 	const formSubmit = (values: typeof form.values) => {
-		const payload: Record<string, unknown> = {
+		const payload: RegisterBody & { dateOfBirth?: string; country?: string } = {
 			email: values.email.toLowerCase(),
 			firstName: values.firstName,
 			lastName: values.lastName,
@@ -124,7 +125,6 @@ export function SignUpPage() {
 		};
 
 		if (values.dateOfBirth) {
-			// Format as YYYY-MM-DD
 			const d = values.dateOfBirth;
 			const yyyy = d.getFullYear();
 			const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -136,7 +136,7 @@ export function SignUpPage() {
 			payload.country = values.country;
 		}
 
-		registerMutation.mutate({ data: payload as Parameters<typeof registerMutation.mutate>[0]['data'] });
+		registerMutation.mutate({ data: payload });
 	};
 
 	const maxDob = useMemo(() => {

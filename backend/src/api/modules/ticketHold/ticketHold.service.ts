@@ -98,6 +98,12 @@ export class TicketHoldService {
         }
     }
 
+    /** Soft-delete every hold for a fixture (postponed/cancelled/suspended). */
+    async releaseAllForFixture(fixtureId: number): Promise<number> {
+        const result = await this.repo.softDelete({ fixtureId });
+        return result.affected ?? 0;
+    }
+
     async verify(params: {
         fixtureId: number;
         offerKey: string;

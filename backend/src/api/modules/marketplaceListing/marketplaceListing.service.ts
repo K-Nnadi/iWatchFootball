@@ -8,7 +8,7 @@ import {
     ServiceUnavailableException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MarketplaceListing } from './marketplaceListing.entity';
 import { Fixture } from '../fixture/fixture.entity';
@@ -531,26 +531,68 @@ export class MarketplaceListingService {
                 .getMany();
 
             for (const listing of stale) {
-                listing.status = MarketplaceListingStatus.EXPIRED;
-                await listingRepo.save(listing);
-
-                await manager.getRepository(Ticket).update(listing.ticketId, {
-                    status: TicketStatus.AVAILABLE,
-                    activeListingId: null,
-                    userId: listing.sellerId,
-                });
-
-                await this.ownershipHistory.record(manager, {
-                    ticketId: listing.ticketId,
-                    fromUserId: undefined,
-                    toUserId: listing.sellerId,
-                    reason: TicketTransferReason.MARKETPLACE_EXPIRED,
-                    listingId: listing.id,
-                });
-
-                // Ticket returned to seller on expiry — reactivate in their wallet
-                await this.userTicketLog.upsert(manager, listing.sellerId, listing.ticketId);
+                await this.expireOneListing(manager, listing);
             }
         });
+    }
+
+    /**
+     * Expire open listings for a postponed/cancelled/suspended fixture.
+     * In-flight SOLD listings are left alone (buyer/seller transfer continues; admin handles disputes).
+     */
+    async expireListingsForFixture(fixtureId: number): Promise<{ sellerIds: number[]; expired: number }> {
+        const sellerIds: number[] = [];
+        let expired = 0;
+
+        await this.dataSource.transaction(async (manager) => {
+            const listingRepo = manager.getRepository(MarketplaceListing);
+            const listings = await listingRepo
+                .createQueryBuilder('l')
+                .where('l.status IN (:...statuses)', {
+                    statuses: [
+                        MarketplaceListingStatus.ACTIVE,
+                        MarketplaceListingStatus.DRAFT,
+                        MarketplaceListingStatus.PENDING_REVIEW,
+                    ],
+                })
+                .andWhere(
+                    '(l.fixtureId = :fixtureId OR EXISTS (SELECT 1 FROM ticket t WHERE t.id = l."ticketId" AND t."fixtureId" = :fixtureId))',
+                    { fixtureId },
+                )
+                .getMany();
+
+            for (const listing of listings) {
+                await this.expireOneListing(manager, listing);
+                sellerIds.push(listing.sellerId);
+                expired += 1;
+            }
+        });
+
+        return { sellerIds: [...new Set(sellerIds)], expired };
+    }
+
+    private async expireOneListing(
+        manager: EntityManager,
+        listing: MarketplaceListing,
+    ): Promise<void> {
+        const listingRepo = manager.getRepository(MarketplaceListing);
+        listing.status = MarketplaceListingStatus.EXPIRED;
+        await listingRepo.save(listing);
+
+        await manager.getRepository(Ticket).update(listing.ticketId, {
+            status: TicketStatus.AVAILABLE,
+            activeListingId: null,
+            userId: listing.sellerId,
+        });
+
+        await this.ownershipHistory.record(manager, {
+            ticketId: listing.ticketId,
+            fromUserId: undefined,
+            toUserId: listing.sellerId,
+            reason: TicketTransferReason.MARKETPLACE_EXPIRED,
+            listingId: listing.id,
+        });
+
+        await this.userTicketLog.upsert(manager, listing.sellerId, listing.ticketId);
     }
 }
