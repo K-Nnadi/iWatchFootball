@@ -1,7 +1,5 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { IntegrationService } from '../../../modules/integration/integration.service';
-import { IntegrationKind } from '../../../enums/integration.enum';
-import { PaymentProcessorService } from '../../../modules/paymentProcessor/paymentProcessor.module';
 
 export interface StripeCredentials {
     secretKey: string;
@@ -9,12 +7,10 @@ export interface StripeCredentials {
     webhookSecret: string;
 }
 
+/** Stripe credentials from integration.config only (never paymentProcessor.apiKey). */
 @Injectable()
 export class StripeCredentialsService {
-    constructor(
-        private readonly integrationService: IntegrationService,
-        private readonly paymentProcessorService: PaymentProcessorService,
-    ) {}
+    constructor(private readonly integrationService: IntegrationService) {}
 
     async getSecretKey(): Promise<string> {
         const config = await this.getConfig();
@@ -34,18 +30,11 @@ export class StripeCredentialsService {
         const fromConfig = this.integrationService.getConfigString(config, 'publishableKey');
         if (fromConfig) return fromConfig;
 
-        const processor = await this.paymentProcessorService.findBySlug('stripe');
-        const fromMeta =
-            processor?.metadata && typeof processor.metadata.publishableKey === 'string'
-                ? processor.metadata.publishableKey
-                : undefined;
-        if (fromMeta) return fromMeta;
-
         const fromEnv = process.env.STRIPE_PUBLISHABLE_KEY?.trim();
         if (fromEnv) return fromEnv;
 
         throw new ServiceUnavailableException(
-            'Stripe publishableKey not configured (integration.config, processor metadata, or STRIPE_PUBLISHABLE_KEY)',
+            'Stripe publishableKey not configured (integration.config or STRIPE_PUBLISHABLE_KEY)',
         );
     }
 

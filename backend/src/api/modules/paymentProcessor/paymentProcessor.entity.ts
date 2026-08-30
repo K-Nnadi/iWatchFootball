@@ -12,6 +12,14 @@ import { OperationType, createRoleGroup, UserRole } from '../../../auth/types/se
 import { RequestWithUser } from '../../../auth/types/auth.types';
 import { FindOptionsWhere } from 'typeorm';
 
+/**
+ * Checkout UI registry for payment processors (display name, slug, logo, enabled).
+ *
+ * **Do not store PSP credentials here.** All secrets and webhook keys belong in
+ * the `integration` table (`integration.config` for slug `stripe-primary`).
+ *
+ * @deprecated apiKey column — cleared by migration; never write new secrets to this table.
+ */
 @Entity('paymentProcessor')
 @SecurityFeature<PaymentProcessor>({
     base: {
@@ -26,7 +34,6 @@ import { FindOptionsWhere } from 'typeorm';
                 'name',
                 'slug',
                 'type',
-                'apiKey',
                 'enabled',
                 'logoUrl',
                 'metadata',
@@ -42,13 +49,13 @@ import { FindOptionsWhere } from 'typeorm';
     },
     [OperationType.CREATE]: {
         [createRoleGroup(UserRole.ADMIN)]: {
-            fields: ['name', 'slug', 'type', 'apiKey', 'enabled', 'logoUrl', 'metadata'],
+            fields: ['name', 'slug', 'type', 'enabled', 'logoUrl', 'metadata'],
         },
         default: { filter: (): FindOptionsWhere<PaymentProcessor> => ({ id: -1 }) },
     },
     [OperationType.UPDATE]: {
         [createRoleGroup(UserRole.ADMIN)]: {
-            fields: ['name', 'slug', 'type', 'apiKey', 'enabled', 'logoUrl', 'metadata'],
+            fields: ['name', 'slug', 'type', 'enabled', 'logoUrl', 'metadata'],
         },
         default: { filter: (): FindOptionsWhere<PaymentProcessor> => ({ id: -1 }) },
     },
@@ -114,7 +121,6 @@ export class CreatePaymentProcessorDTO extends PickType(PaymentProcessor, [
     'name',
     'slug',
     'type',
-    'apiKey',
     'enabled',
     'logoUrl',
     'metadata',

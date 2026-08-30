@@ -48,7 +48,11 @@ export class MarketplaceListing extends BaseDbEntity {
     deliveryMethod?: DeliveryMethod;
 
     @OptionalEntityColumn({ db: { type: 'int', default: 1 } })
-    @ApiPropertyOptional({ description: 'Number of tickets in this listing', default: 1 })
+    @ApiPropertyOptional({
+        description:
+            'Number of tickets in this listing. Must remain 1 until a listingTicket join table exists (one ticket row = one seat).',
+        default: 1,
+    })
     quantity?: number;
 
     @OptionalEntityColumn({ db: { type: 'varchar', length: 300 } })

@@ -226,9 +226,9 @@ Implement after P0. These reduce long-term maintenance burden without blocking e
 
 ### P1-1. `paymentProcessor` → `integration` deprecation path
 
-- [ ] **Document deprecation in code comments**
-- [ ] **Migrate Stripe secrets to `integration.config` only**
-- [ ] **Reduce `paymentProcessor` to display/registry**
+- [x] **Document deprecation in code comments**
+- [x] **Migrate Stripe secrets to `integration.config` only**
+- [x] **Reduce `paymentProcessor` to display/registry**
 
 **Problem**
 
@@ -254,8 +254,8 @@ Two config stores for payment providers:
 
 ### P1-2. Clarify seat data ownership
 
-- [ ] **Document decision in this file and in ticketing design**
-- [ ] **Implement chosen rule in entities**
+- [x] **Document decision in this file and in ticketing design**
+- [x] **Implement chosen rule in entities**
 
 **Problem**
 
@@ -284,8 +284,8 @@ Document the chosen rule before adding seat columns to `ticket`.
 
 ### P1-3. Extend `ticket` entity (minimal)
 
-- [ ] **Add columns + migration**
-- [ ] **Update marketplace / checkout services**
+- [x] **Add columns + migration**
+- [x] **Update marketplace / checkout services**
 
 **Problem**
 

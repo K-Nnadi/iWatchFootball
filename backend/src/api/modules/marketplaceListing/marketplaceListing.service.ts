@@ -15,6 +15,8 @@ import { Fixture } from '../fixture/fixture.entity';
 import { Team } from '../team/team.entity';
 import { Ticket } from '../ticket/ticket.entity';
 import { DeliveryMethod, DisputeStatus, MarketplaceListingStatus, TicketTransferReason, TicketType } from '../../enums/marketplace.enum';
+import { TicketStatus } from '../../enums/ticket.enum';
+import { ticketListedState } from '../ticket/ticket-state.util';
 import { TicketOwnershipHistoryService } from '../ticketOwnershipHistory/ticketOwnershipHistory.service';
 import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
 import { NotificationService } from '../notification/notification.service';
@@ -149,11 +151,6 @@ export class MarketplaceListingService {
                 );
             }
 
-            // Transfer ticket to platform custody
-            await manager.query(`UPDATE ticket SET "userId" = NULL WHERE id = $1`, [
-                params.ticketId,
-            ]);
-
             const listing = listingRepo.create({
                 ticketId: params.ticketId,
                 sellerId: params.sellerId,
@@ -162,6 +159,8 @@ export class MarketplaceListingService {
                 expiresAt,
             });
             await listingRepo.save(listing);
+
+            await ticketRepo.update(params.ticketId, ticketListedState(listing.id));
 
             await this.ownershipHistory.record(manager, {
                 ticketId: params.ticketId,
@@ -210,11 +209,11 @@ export class MarketplaceListingService {
             listing.status = MarketplaceListingStatus.CANCELLED;
             await listingRepo.save(listing);
 
-            // Return ticket to seller
-            await manager.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
+            await manager.getRepository(Ticket).update(listing.ticketId, {
+                status: TicketStatus.AVAILABLE,
+                activeListingId: null,
                 userId,
-                listing.ticketId,
-            ]);
+            });
 
             await this.ownershipHistory.record(manager, {
                 ticketId: listing.ticketId,
@@ -339,10 +338,11 @@ export class MarketplaceListingService {
         listing.rejectionReason = reason;
         const saved = await this.repo.save(listing);
 
-        // Return ticket to seller on rejection
-        await this.dataSource.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
-            listing.sellerId, listing.ticketId,
-        ]);
+        await this.dataSource.getRepository(Ticket).update(listing.ticketId, {
+            status: TicketStatus.AVAILABLE,
+            activeListingId: null,
+            userId: listing.sellerId,
+        });
         await this.ownershipHistory.record(this.dataSource.createQueryRunner().manager as never, {
             ticketId: listing.ticketId,
             fromUserId: undefined,
@@ -521,11 +521,11 @@ export class MarketplaceListingService {
                 listing.status = MarketplaceListingStatus.EXPIRED;
                 await listingRepo.save(listing);
 
-                // Return ticket to seller
-                await manager.query(`UPDATE ticket SET "userId" = $1 WHERE id = $2`, [
-                    listing.sellerId,
-                    listing.ticketId,
-                ]);
+                await manager.getRepository(Ticket).update(listing.ticketId, {
+                    status: TicketStatus.AVAILABLE,
+                    activeListingId: null,
+                    userId: listing.sellerId,
+                });
 
                 await this.ownershipHistory.record(manager, {
                     ticketId: listing.ticketId,

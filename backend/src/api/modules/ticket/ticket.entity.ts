@@ -3,8 +3,9 @@ import {BaseDbEntity} from '@iWatchFootball/base-tools/entity/baseDb.entity';
 import {Fixture} from "../fixture/fixture.entity";
 import {Payment} from "../payment/payment.entity";
 import {User} from '../user/user.entity';
+import {MarketplaceListing} from '../marketplaceListing/marketplaceListing.entity';
 import {
-    EntityColumn, EntityRelation,
+    EntityColumn, EntityEnumColumn, EntityRelation,
     OptionalEntityColumn, RelationshipType,
 } from '@iWatchFootball/base-tools/decorators/entity.decorator';
 import {PickType} from '@nestjs/swagger';
@@ -12,48 +13,55 @@ import { SecurityFeature } from "../../../auth/decorators/security-feature.decor
 import { OperationType, createRoleGroup, UserRole } from "../../../auth/types/security.types";
 import { RequestWithUser } from "../../../auth/types/auth.types";
 import { FindOptionsWhere } from 'typeorm';
+import { TicketSource, TicketStatus } from '../../enums/ticket.enum';
 
+/**
+ * Platform inventory ticket — **one row = one seat**.
+ * Seat identity for owned inventory lives here; see plans/schema-backlog.md P1-2.
+ */
 @Entity('ticket')
 @SecurityFeature<Ticket>({
   base: {
-    // READ operations - Public access for tickets (no authentication required)
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER)]: {
-      filter: (req: RequestWithUser): FindOptionsWhere<Ticket> => {
-        // All users (including unauthenticated) can see all tickets
-        return {};
-      },
+      filter: (): FindOptionsWhere<Ticket> => ({}),
       fields: [
-        'id', 'createdAt', 'updatedAt', 'category', 'price', 'fixtureId', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'category', 'price', 'fixtureId',
+        'status', 'source', 'activeListingId',
+        'seatSection', 'seatBlock', 'metadata'
       ],
     },
-    // Allow public access (no authentication required)
     'public': {
-      filter: (): FindOptionsWhere<Ticket> => {
-        return {};
-      },
+      filter: (): FindOptionsWhere<Ticket> => ({}),
       fields: [
-        'id', 'createdAt', 'updatedAt', 'category', 'price', 'fixtureId', 'metadata'
+        'id', 'createdAt', 'updatedAt', 'category', 'price', 'fixtureId',
+        'status', 'source', 'activeListingId',
+        'seatSection', 'seatBlock', 'metadata'
       ],
     },
     default: { filter: (): FindOptionsWhere<Ticket> => ({ id: -1 }), fields: ['id'] },
   },
   [OperationType.CREATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can create tickets
-      fields: ['category', 'price', 'fixtureId', 'userId', 'paymentId', 'metadata'],
+      fields: [
+        'category', 'price', 'fixtureId', 'userId', 'paymentId',
+        'status', 'source', 'activeListingId',
+        'seatSection', 'seatBlock', 'seatRow', 'seatNumber', 'metadata',
+      ],
     },
     default: { filter: (): FindOptionsWhere<Ticket> => ({ id: -1 }) },
   },
   [OperationType.UPDATE]: {
     [createRoleGroup(UserRole.ADMIN, UserRole.MODERATOR)]: {
-      // Only admin and moderator can update tickets
-      fields: ['category', 'price', 'fixtureId', 'userId', 'paymentId', 'metadata'],
+      fields: [
+        'category', 'price', 'fixtureId', 'userId', 'paymentId',
+        'status', 'source', 'activeListingId',
+        'seatSection', 'seatBlock', 'seatRow', 'seatNumber', 'metadata',
+      ],
     },
     default: { filter: (): FindOptionsWhere<Ticket> => ({ id: -1 }) },
   },
   [OperationType.DELETE]: {
     [createRoleGroup(UserRole.ADMIN)]: {
-      // Only admin can delete tickets
       fields: [],
     },
     default: { filter: (): FindOptionsWhere<Ticket> => ({ id: -1 }) },
@@ -66,9 +74,6 @@ export class Ticket extends BaseDbEntity {
     @EntityColumn({db: {type: 'decimal', precision: 10, scale: 2},})
     price!: number;
 
-    /**
-     * The fixture this ticket is valid for
-     */
     @EntityColumn({db: {type: 'int'},})
     fixtureId!: number;
 
@@ -80,9 +85,41 @@ export class Ticket extends BaseDbEntity {
     })
     fixture!: Fixture;
 
-    /**
-     * Optional user who has purchased this ticket
-     */
+    @EntityEnumColumn({
+        db: { enum: TicketStatus, default: TicketStatus.AVAILABLE },
+        api: { enum: TicketStatus },
+    })
+    status!: TicketStatus;
+
+    @EntityEnumColumn({
+        db: { enum: TicketSource, default: TicketSource.PRIMARY },
+        api: { enum: TicketSource },
+    })
+    source!: TicketSource;
+
+    @OptionalEntityColumn({ db: { type: 'int' } })
+    activeListingId?: number | null;
+
+    @EntityRelation({
+        type: RelationshipType.MANY_TO_ONE,
+        entity: () => MarketplaceListing,
+        joinOptions: { name: 'activeListingId' },
+        description: 'Active marketplace listing when status is LISTED',
+    })
+    activeListing?: MarketplaceListing;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 100 } })
+    seatSection?: string;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 50 } })
+    seatBlock?: string;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 20 } })
+    seatRow?: string;
+
+    @OptionalEntityColumn({ db: { type: 'varchar', length: 20 } })
+    seatNumber?: string;
+
     @OptionalEntityColumn({db: {type: 'int'},})
     userId?: number;
 
@@ -94,9 +131,6 @@ export class Ticket extends BaseDbEntity {
     })
     user?: User;
 
-    /**
-     * Optional Payment information if ticket is purchased
-     */
     @OptionalEntityColumn({
         db: {type: 'int'}
     })
@@ -117,5 +151,12 @@ export class CreateTicketDTO extends PickType(Ticket, [
     'fixtureId',
     'userId',
     'paymentId',
+    'status',
+    'source',
+    'activeListingId',
+    'seatSection',
+    'seatBlock',
+    'seatRow',
+    'seatNumber',
     'metadata'
 ] as const) {}
