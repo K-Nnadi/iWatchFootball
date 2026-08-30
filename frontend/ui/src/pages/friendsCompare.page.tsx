@@ -11,7 +11,7 @@ import {
     Text,
     Title,
 } from '@mantine/core';
-import { IconArrowLeft, IconLock, IconTrophy } from '@tabler/icons-react';
+import { IconArrowLeft, IconEyeOff, IconLock, IconTrophy, IconUserOff } from '@tabler/icons-react';
 import { useParams } from 'react-router-dom';
 import { usePageTransition } from '../hooks/usePageTransition';
 import {
@@ -190,10 +190,37 @@ export function CompareFriendPage() {
     }
 
     if (error || !compare) {
+        const isPrivacyError = error?.toLowerCase().includes('private');
+        const isNotFriendsError = error?.toLowerCase().includes('friends only') || 
+            error?.toLowerCase().includes('accepted friends');
+        
+        let title = 'Unable to compare';
+        let helpText = 'Something went wrong while loading the comparison.';
+        let ErrorIcon = IconUserOff;
+        
+        if (isPrivacyError) {
+            title = 'Stats are private';
+            helpText = 'This user has chosen to keep their tracker stats private. You can ask them to change their privacy settings if they want to compare.';
+            ErrorIcon = IconEyeOff;
+        } else if (isNotFriendsError) {
+            title = 'Not friends yet';
+            helpText = 'You can only compare stats with accepted friends. Make sure your friend request has been accepted.';
+            ErrorIcon = IconUserOff;
+        }
+
         return (
-            <Container py="xl">
-                <Stack gap="md">
-                    <Text c="red">{error ?? 'Could not load comparison'}</Text>
+            <Container size="sm" py="xl">
+                <Stack gap="md" align="center">
+                    <ErrorIcon size={48} stroke={1.2} color="var(--mantine-color-gray-6)" />
+                    <Title order={3}>{title}</Title>
+                    <Text c="dimmed" ta="center" maw={400}>
+                        {helpText}
+                    </Text>
+                    {error && !isPrivacyError && !isNotFriendsError && (
+                        <Text size="sm" c="red" ta="center">
+                            {error}
+                        </Text>
+                    )}
                     <Button variant="subtle" onClick={() => navigateWithTransition('/friends')}>
                         Back to friends
                     </Button>
