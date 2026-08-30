@@ -162,6 +162,16 @@ export interface CompareResult {
     requiresPremium: boolean;
 }
 
+export type CompareUserStats = PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
+
+export interface MultiCompareResult {
+    users: CompareUserStats[];
+    winners: Record<keyof TrackerSummary, number | null>;
+    requiresPremium: boolean;
+}
+
+export const MAX_MULTI_COMPARE_USERS = 5;
+
 export interface TrackerPrivacySettings {
     trackerVisibility: TrackerVisibility;
     shareVerifiedOnly: boolean;
@@ -215,5 +225,10 @@ export function useTrackerPrivacy(enabled = true) {
 
 export async function compareWithFriend(friendUserId: number): Promise<CompareResult> {
     const { data } = await axios.get<CompareResult>(`/tracker/compare/${friendUserId}`);
+    return data;
+}
+
+export async function compareWithMultipleFriends(friendUserIds: number[]): Promise<MultiCompareResult> {
+    const { data } = await axios.post<MultiCompareResult>('/tracker/compare-multi', { friendUserIds });
     return data;
 }

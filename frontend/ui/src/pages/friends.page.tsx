@@ -15,6 +15,7 @@ import {
     IconChartBar,
     IconCheck,
     IconClock,
+    IconScale,
     IconTrash,
     IconUserPlus,
     IconUsers,
@@ -222,13 +223,26 @@ export function FriendsPage() {
     return (
         <Container size="md" py="xl">
             <Stack gap="lg">
-                <Group gap="sm">
-                    <IconUsers size={28} color="var(--modern-lime)" />
-                    <ModernH2>{t('friends.title')}</ModernH2>
+                <Group justify="space-between" align="flex-start" wrap="wrap">
+                    <Stack gap="xs">
+                        <Group gap="sm">
+                            <IconUsers size={28} color="var(--modern-lime)" />
+                            <ModernH2>{t('friends.title')}</ModernH2>
+                        </Group>
+                        <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
+                            {t('friends.description')}
+                        </ModernBody>
+                    </Stack>
+                    {attendanceAdvancedStatsEnabled && (data?.friends.length ?? 0) > 0 && (
+                        <ModernButton
+                            variant="outline"
+                            leftSection={<IconScale size={18} />}
+                            onClick={() => navigateWithTransition('/friends/compare-multi')}
+                        >
+                            Compare multiple
+                        </ModernButton>
+                    )}
                 </Group>
-                <ModernBody style={{ color: 'var(--modern-text-secondary)' }}>
-                    {t('friends.description')}
-                </ModernBody>
 
                 <ModernCard padding="md">
                     <Stack gap="sm">

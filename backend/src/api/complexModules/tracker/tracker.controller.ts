@@ -4,15 +4,16 @@ import {
     Param,
     ParseIntPipe,
     Patch,
+    Post,
     Req,
     UnauthorizedException,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { AuthedController } from '@iWatchFootball/base-tools/decorators/controller.decorator';
-import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { SocialService } from '../../modules/social/social.service';
-import { TrackerCompareService } from './tracker-compare.service';
+import { TrackerCompareService, MAX_MULTI_COMPARE_USERS } from './tracker-compare.service';
 import { AdvancedStatsFeatureService } from '../../modules/platformConfig/advanced-stats-feature.service';
 import { TrackerVisibility } from '../../enums/social.enum';
 import type { Request } from 'express';
@@ -29,6 +30,15 @@ export class UpdateTrackerPrivacyDto {
     @IsOptional()
     @IsBoolean()
     shareVerifiedOnly?: boolean;
+}
+
+export class MultiCompareDto {
+    @ApiProperty({ type: [Number], description: 'Array of friend user IDs to compare with' })
+    @IsArray()
+    @ArrayMinSize(1)
+    @ArrayMaxSize(MAX_MULTI_COMPARE_USERS - 1)
+    @IsInt({ each: true })
+    friendUserIds!: number[];
 }
 
 @AuthedController('tracker')
@@ -83,5 +93,18 @@ export class TrackerController {
         if (!viewerId) throw new UnauthorizedException('Not authenticated');
         await this.advancedStatsFeature.assertAttendanceAdvancedStatsEnabled();
         return this.compareService.compare(viewerId, friendUserId);
+    }
+
+    @Post('compare-multi')
+    @ApiOperation({ summary: 'Compare tracker stats with multiple friends (premium)' })
+    @ApiBody({ type: MultiCompareDto })
+    async compareMulti(
+        @Req() req: AuthedRequest,
+        @Body() body: MultiCompareDto,
+    ) {
+        const viewerId = req.user?.id;
+        if (!viewerId) throw new UnauthorizedException('Not authenticated');
+        await this.advancedStatsFeature.assertAttendanceAdvancedStatsEnabled();
+        return this.compareService.compareMulti(viewerId, body.friendUserIds);
     }
 }

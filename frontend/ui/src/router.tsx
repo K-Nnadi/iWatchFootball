@@ -50,6 +50,7 @@ import { MyInterestsPage } from "./pages/ticketInterests/myInterests.page";
 import { MyPurchasesPage } from "./pages/marketplace/myPurchases.page";
 import { FriendsPage } from "./pages/friends.page";
 import { CompareFriendPage } from "./pages/friendsCompare.page";
+import { MultiCompareFriendsPage } from "./pages/friendsMultiCompare.page";
 import { AuthWelcomePage } from "./pages/auth/authWelcome.page";
 import { OnboardingPage } from "./pages/onboarding/onboarding.page";
 import { LegalDocumentPage } from "./pages/legal/legalDocument.page";
@@ -117,6 +118,14 @@ const additionalRoutes = [
         element: (
             <AttendanceAdvancedStatsRoute>
                 <CompareFriendPage />
+            </AttendanceAdvancedStatsRoute>
+        ),
+    },
+    {
+        path: '/friends/compare-multi',
+        element: (
+            <AttendanceAdvancedStatsRoute>
+                <MultiCompareFriendsPage />
             </AttendanceAdvancedStatsRoute>
         ),
     },
