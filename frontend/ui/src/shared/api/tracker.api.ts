@@ -155,12 +155,22 @@ export interface OverlapFixture {
 }
 
 export interface CompareResult {
-    me: PublicUserSummary & { stats: TrackerSummary };
-    friend: PublicUserSummary & { stats: TrackerSummary };
+    me: PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
+    friend: PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
     winners: Partial<Record<keyof TrackerSummary, 'me' | 'friend' | 'tie'>>;
     overlap: { count: number; fixtures: OverlapFixture[] };
     requiresPremium: boolean;
 }
+
+export type CompareUserStats = PublicUserSummary & { stats: TrackerSummary; shareVerifiedOnly: boolean };
+
+export interface MultiCompareResult {
+    users: CompareUserStats[];
+    winners: Record<keyof TrackerSummary, number | null>;
+    requiresPremium: boolean;
+}
+
+export const MAX_MULTI_COMPARE_USERS = 5;
 
 export interface TrackerPrivacySettings {
     trackerVisibility: TrackerVisibility;
@@ -215,5 +225,10 @@ export function useTrackerPrivacy(enabled = true) {
 
 export async function compareWithFriend(friendUserId: number): Promise<CompareResult> {
     const { data } = await axios.get<CompareResult>(`/tracker/compare/${friendUserId}`);
+    return data;
+}
+
+export async function compareWithMultipleFriends(friendUserIds: number[]): Promise<MultiCompareResult> {
+    const { data } = await axios.post<MultiCompareResult>('/tracker/compare-multi', { friendUserIds });
     return data;
 }
