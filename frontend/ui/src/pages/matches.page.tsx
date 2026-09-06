@@ -1,8 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Box, LoadingOverlay, Stack } from '@mantine/core';
+import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
+import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
+import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
+import type { Competition, Fixture, Team } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { MatchToolbar } from '../components/filters/MatchToolbar';
 import { formatMatchShortDate, useTranslation } from '../i18n';
+import { resolveFixtureScores } from '../shared/fixtureScores';
 import {
     UiBody,
     UiCard,
@@ -12,45 +17,36 @@ import {
     UiPageContainer,
     type MatchRowData,
 } from '../components/ui';
+import {
+    buildDeprecatedMockMatches,
+    deprecatedMockTeamCrests,
+    isDeprecatedMatchMocksEnabled,
+} from './matches/deprecatedMockMatches';
 
-interface TodayMatch {
+type DayMatch = {
     id: string;
     competitionName: string;
     homeTeam: string;
     awayTeam: string;
     date: string;
-    venue: string;
+    homeLogo?: string;
+    awayLogo?: string;
     homeScore?: number;
     awayScore?: number;
     hasTickets?: boolean;
     isLive?: boolean;
-}
-
-const teamCrests: Record<string, string> = {
-    'Team A': 'https://logos-world.net/wp-content/uploads/2020/06/Arsenal-Logo.png',
-    'Team B': 'https://logos-world.net/wp-content/uploads/2020/06/Chelsea-Logo.png',
-    'Team C': 'https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png',
-    'Team D': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-United-Logo.png',
-    'Team E': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png',
-    'Team F': 'https://logos-world.net/wp-content/uploads/2020/06/Tottenham-Logo.png',
-    'Team G': 'https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png',
-    'Team H': 'https://logos-world.net/wp-content/uploads/2020/06/Barcelona-Logo.png',
-    'Team I': 'https://logos-world.net/wp-content/uploads/2020/06/Bayern-Munich-Logo.png',
-    'Team J': 'https://logos-world.net/wp-content/uploads/2020/06/PSG-Logo.png',
-    'Team K': 'https://logos-world.net/wp-content/uploads/2020/06/Juventus-Logo.png',
-    'Team L': 'https://logos-world.net/wp-content/uploads/2020/06/AC-Milan-Logo.png',
 };
 
-function isFinishedMatch(m: TodayMatch): boolean {
+function isFinishedMatch(m: DayMatch): boolean {
     if (m.isLive) return false;
     return m.homeScore != null && m.awayScore != null;
 }
 
-function ticketsAvailable(m: TodayMatch): boolean {
+function ticketsAvailable(m: DayMatch): boolean {
     return !!m.hasTickets && !isFinishedMatch(m);
 }
 
-function toMatchRowData(m: TodayMatch): MatchRowData {
+function toMatchRowData(m: DayMatch): MatchRowData {
     const kickoff = new Date(m.date).toLocaleTimeString(undefined, {
         hour: '2-digit',
         minute: '2-digit',
@@ -63,8 +59,8 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
             awayTeam: m.awayTeam,
             homeScore: m.homeScore,
             awayScore: m.awayScore,
-            homeLogo: teamCrests[m.homeTeam],
-            awayLogo: teamCrests[m.awayTeam],
+            homeLogo: m.homeLogo,
+            awayLogo: m.awayLogo,
             time: 'LIVE',
             isLive: true,
             hasTickets: ticketsAvailable(m),
@@ -78,8 +74,8 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
             awayTeam: m.awayTeam,
             homeScore: m.homeScore,
             awayScore: m.awayScore,
-            homeLogo: teamCrests[m.homeTeam],
-            awayLogo: teamCrests[m.awayTeam],
+            homeLogo: m.homeLogo,
+            awayLogo: m.awayLogo,
             time: 'FT',
             isLive: false,
             hasTickets: false,
@@ -90,19 +86,56 @@ function toMatchRowData(m: TodayMatch): MatchRowData {
         id: m.id,
         homeTeam: m.homeTeam,
         awayTeam: m.awayTeam,
-        homeLogo: teamCrests[m.homeTeam],
-        awayLogo: teamCrests[m.awayTeam],
+        homeLogo: m.homeLogo,
+        awayLogo: m.awayLogo,
         time: kickoff,
         isLive: false,
         hasTickets: ticketsAvailable(m),
     };
 }
 
+function dayRangeIso(day: Date): { from: string; to: string } {
+    const from = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, 0, 0, 0);
+    const to = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999);
+    return { from: from.toISOString(), to: to.toISOString() };
+}
+
+function uniqueIds(values: Array<number | undefined>): number[] {
+    return [...new Set(values.filter((id): id is number => typeof id === 'number'))];
+}
+
+function mapApiFixtures(
+    fixtures: Fixture[],
+    teams: Team[],
+    competitions: Competition[],
+): DayMatch[] {
+    const teamById = new Map(teams.map((t) => [t.id, t]));
+    const competitionById = new Map(competitions.map((c) => [c.id, c]));
+
+    return fixtures.map((fix) => {
+        const home = typeof fix.homeTeamId === 'number' ? teamById.get(fix.homeTeamId) : undefined;
+        const away = typeof fix.awayTeamId === 'number' ? teamById.get(fix.awayTeamId) : undefined;
+        const competition = competitionById.get(fix.competitionId);
+        const scores = resolveFixtureScores(fix);
+        return {
+            id: String(fix.id),
+            competitionName: competition?.name?.trim() || 'Competition',
+            homeTeam: home?.name?.trim() || (fix.homeTeamId != null ? `Team ${fix.homeTeamId}` : 'Home'),
+            awayTeam: away?.name?.trim() || (fix.awayTeamId != null ? `Team ${fix.awayTeamId}` : 'Away'),
+            date: fix.date,
+            homeLogo: home?.logoUrl,
+            awayLogo: away?.logoUrl,
+            homeScore: scores?.home,
+            awayScore: scores?.away,
+            isLive: fix.status === 'Live',
+        };
+    });
+}
+
 export function MatchesPage() {
     const { navigateWithTransition } = usePageTransition();
     const { t } = useTranslation();
-    const [matches, setMatches] = useState<TodayMatch[]>([]);
-    const [loading, setLoading] = useState(true);
+    const useDeprecatedMocks = isDeprecatedMatchMocksEnabled();
     const [showLive, setShowLive] = useState(false);
     const [showAvailableTickets, setShowAvailableTickets] = useState(false);
     const [teamSearch, setTeamSearch] = useState('');
@@ -134,7 +167,69 @@ export function MatchesPage() {
         return arr;
     }, [currentStartDate, windowSize]);
 
-    const selectedDateKey = dates[selectedDateIndex]?.toDateString() ?? '';
+    const selectedDate = dates[selectedDateIndex];
+    const { from, to } = useMemo(
+        () => (selectedDate ? dayRangeIso(selectedDate) : { from: '', to: '' }),
+        [selectedDate],
+    );
+
+    const {
+        data: apiFixtures = [],
+        isLoading: loadingFixtures,
+        isFetching: fetchingFixtures,
+    } = useGetQueryFixture(
+        {
+            where: { date: { $gte: from, $lte: to } },
+            take: 200,
+            order: { date: 'ASC' },
+        } as any,
+        { query: { enabled: !useDeprecatedMocks && !!from } as any },
+    );
+
+    const fixtures = Array.isArray(apiFixtures) ? apiFixtures : [];
+
+    const teamIds = useMemo(
+        () => uniqueIds(fixtures.flatMap((f) => [f.homeTeamId, f.awayTeamId])),
+        [fixtures],
+    );
+    const competitionIds = useMemo(
+        () => uniqueIds(fixtures.map((f) => f.competitionId)),
+        [fixtures],
+    );
+
+    const { data: teamsData = [], isLoading: loadingTeams } = useGetQueryTeam(
+        { where: { id: { $in: teamIds.length ? teamIds : [-1] } }, take: Math.max(teamIds.length, 1) } as any,
+        { query: { enabled: !useDeprecatedMocks && teamIds.length > 0 } as any },
+    );
+    const { data: competitionsData = [], isLoading: loadingCompetitions } = useGetQueryCompetition(
+        {
+            where: { id: { $in: competitionIds.length ? competitionIds : [-1] } },
+            take: Math.max(competitionIds.length, 1),
+        } as any,
+        { query: { enabled: !useDeprecatedMocks && competitionIds.length > 0 } as any },
+    );
+
+    const matches = useMemo((): DayMatch[] => {
+        if (useDeprecatedMocks && selectedDate) {
+            return buildDeprecatedMockMatches(selectedDate, today).map((m) => ({
+                ...m,
+                homeLogo: deprecatedMockTeamCrests[m.homeTeam],
+                awayLogo: deprecatedMockTeamCrests[m.awayTeam],
+            }));
+        }
+        return mapApiFixtures(
+            fixtures,
+            Array.isArray(teamsData) ? teamsData : [],
+            Array.isArray(competitionsData) ? competitionsData : [],
+        );
+    }, [useDeprecatedMocks, selectedDate, today, fixtures, teamsData, competitionsData]);
+
+    const loading = useDeprecatedMocks
+        ? false
+        : loadingFixtures ||
+          fetchingFixtures ||
+          (teamIds.length > 0 && loadingTeams) ||
+          (competitionIds.length > 0 && loadingCompetitions);
 
     function onPrevClick() {
         const newStart = new Date(currentStartDate);
@@ -165,10 +260,10 @@ export function MatchesPage() {
     }
 
     function onReturnToToday() {
-        const t = new Date();
-        t.setHours(0, 0, 0, 0);
-        const newStart = new Date(t);
-        newStart.setDate(t.getDate() - 3);
+        const t0 = new Date();
+        t0.setHours(0, 0, 0, 0);
+        const newStart = new Date(t0);
+        newStart.setDate(t0.getDate() - 3);
         setCurrentStartDate(newStart);
         setSelectedDateIndex(3);
     }
@@ -183,98 +278,6 @@ export function MatchesPage() {
         if (diff === 1) return t('matches.tomorrow');
         return formatMatchShortDate(d);
     }
-
-    useEffect(() => {
-        const date = dates[selectedDateIndex];
-        if (!date) return;
-
-        setLoading(true);
-        const timer = window.setTimeout(() => {
-            const isPast = date < today && date.toDateString() !== today.toDateString();
-            const isToday = date.toDateString() === today.toDateString();
-            const now = new Date();
-            const currentHour = now.getHours();
-
-            const mockMatches: TodayMatch[] = [
-                {
-                    id: 'match1',
-                    competitionName: 'Premier League',
-                    homeTeam: 'Team A',
-                    awayTeam: 'Team B',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0).toISOString(),
-                    venue: 'Stadium A',
-                    homeScore: isPast ? 2 : isToday && currentHour >= 15 && currentHour < 17 ? 1 : undefined,
-                    awayScore: isPast ? 1 : isToday && currentHour >= 15 && currentHour < 17 ? 0 : undefined,
-                    hasTickets: true,
-                    isLive: isToday && currentHour >= 15 && currentHour < 17,
-                },
-                {
-                    id: 'match2',
-                    competitionName: 'Premier League',
-                    homeTeam: 'Team C',
-                    awayTeam: 'Team D',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 30).toISOString(),
-                    venue: 'Stadium B',
-                    homeScore: isPast ? 0 : isToday && currentHour >= 17 && currentHour < 19 ? 2 : undefined,
-                    awayScore: isPast ? 0 : isToday && currentHour >= 17 && currentHour < 19 ? 1 : undefined,
-                    hasTickets: true,
-                    isLive: isToday && currentHour >= 17 && currentHour < 19,
-                },
-                {
-                    id: 'match3',
-                    competitionName: 'Premier League',
-                    homeTeam: 'Team E',
-                    awayTeam: 'Team F',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 30).toISOString(),
-                    venue: 'Stadium C',
-                    homeScore: isPast ? 0 : undefined,
-                    awayScore: isPast ? 0 : undefined,
-                    hasTickets: false,
-                    isLive: false,
-                },
-                {
-                    id: 'match4',
-                    competitionName: 'Premier League',
-                    homeTeam: 'Team G',
-                    awayTeam: 'Team H',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 30).toISOString(),
-                    venue: 'Stadium D',
-                    homeScore: isPast ? 0 : undefined,
-                    awayScore: isPast ? 0 : undefined,
-                    hasTickets: true,
-                    isLive: false,
-                },
-                {
-                    id: 'match5',
-                    competitionName: 'Champions League',
-                    homeTeam: 'Team I',
-                    awayTeam: 'Team J',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 45).toISOString(),
-                    venue: 'Stadium E',
-                    homeScore: isPast ? 3 : undefined,
-                    awayScore: isPast ? 2 : undefined,
-                    hasTickets: true,
-                    isLive: false,
-                },
-                {
-                    id: 'match6',
-                    competitionName: 'FA Cup',
-                    homeTeam: 'Team K',
-                    awayTeam: 'Team L',
-                    date: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 45).toISOString(),
-                    venue: 'Stadium F',
-                    homeScore: isPast ? 3 : undefined,
-                    awayScore: isPast ? 2 : undefined,
-                    hasTickets: false,
-                    isLive: false,
-                },
-            ];
-            setMatches(mockMatches);
-            setLoading(false);
-        }, 300);
-
-        return () => window.clearTimeout(timer);
-    }, [selectedDateKey, today, dates, selectedDateIndex]);
 
     const filteredMatches = useMemo(() => {
         const query = teamSearch.trim().toLowerCase();
@@ -291,7 +294,7 @@ export function MatchesPage() {
     }, [matches, showLive, showAvailableTickets, teamSearch]);
 
     const matchGroups = useMemo(() => {
-        const byCompetition = filteredMatches.reduce<Record<string, TodayMatch[]>>((acc, match) => {
+        const byCompetition = filteredMatches.reduce<Record<string, DayMatch[]>>((acc, match) => {
             if (!acc[match.competitionName]) acc[match.competitionName] = [];
             acc[match.competitionName].push(match);
             return acc;
