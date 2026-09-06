@@ -307,11 +307,11 @@ export function ScorePredictionCard({
                             >
                                 {homeTeam}
                             </Text>
-                        ) : (
+                        ) : homePercentage >= 8 ? (
                             <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
                                 {Math.round(homePercentage)}%
                             </Text>
-                        )}
+                        ) : null}
                     </Box>
 
                     <Box
@@ -360,11 +360,11 @@ export function ScorePredictionCard({
                             >
                                 {t('match.draw')}
                             </Text>
-                        ) : (
+                        ) : drawPercentage >= 8 ? (
                             <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
                                 {Math.round(drawPercentage)}%
                             </Text>
-                        )}
+                        ) : null}
                     </Box>
 
                     <Box
@@ -416,11 +416,11 @@ export function ScorePredictionCard({
                             >
                                 {awayTeam}
                             </Text>
-                        ) : (
+                        ) : awayPercentage >= 8 ? (
                             <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
                                 {Math.round(awayPercentage)}%
                             </Text>
-                        )}
+                        ) : null}
                     </Box>
                 </Box>
 
@@ -430,7 +430,7 @@ export function ScorePredictionCard({
                     </Text>
                 )}
 
-                {userScorePrediction && status !== 'past' && (
+                {userScorePrediction && votingOpen && (
                     <Text size="sm" c="var(--modern-lime)" ta="center" mt="md" fw={600}>
                         {t('match.yourPrediction')}{' '}
                         {userScorePrediction === 'home'
