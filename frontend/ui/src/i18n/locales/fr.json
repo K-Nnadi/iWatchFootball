@@ -343,6 +343,7 @@
     "formation": "Formation",
     "pregamePredictions": "Pronostics d'avant-match",
     "whoWillWin": "Qui va gagner ?",
+    "tapToVote": "Touchez un côté pour voter",
     "draw": "Nul",
     "basedOnPredictions": "BasÃ© sur {{count}} pronostics",
     "yourPrediction": "Votre pronostic :",

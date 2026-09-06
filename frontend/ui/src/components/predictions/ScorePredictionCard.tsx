@@ -6,6 +6,7 @@ import { useCreatePrediction } from '@iWatchFootball/clients/controllers/predict
 import { useAuthStore } from '../../shared/stores/auth.store';
 import { notify } from '../../shared/notify';
 import { useTranslation } from '../../i18n/useTranslation';
+import { isKickoffUpcoming } from '../match/matchCalendarStatus';
 
 export interface ScorePredictionCardProps {
     homeTeam: string;
@@ -82,6 +83,7 @@ export function ScorePredictionCard({
     } | null>(null);
 
     const status = useMemo(() => getMatchStatus(date), [date]);
+    const votingOpen = useMemo(() => isKickoffUpcoming(date), [date]);
 
     const tallyQueryKey = ['/prediction/fixture', fixtureId, 'tally'] as const;
 
@@ -116,7 +118,7 @@ export function ScorePredictionCard({
     }, [status, useFixturePoll]);
 
     function handleScorePrediction(prediction: PredictionSide) {
-        if (userScorePrediction || status === 'past') return;
+        if (userScorePrediction || !votingOpen) return;
 
         if (useFixturePoll) {
             if (!isLoggedIn || !user?.id) {
@@ -164,7 +166,7 @@ export function ScorePredictionCard({
     const totalPredictions = homePredictionCount + drawPredictionCount + awayPredictionCount;
 
     const showEqualSections =
-        status === 'future' &&
+        votingOpen &&
         !userScorePrediction &&
         ((!useFixturePoll && demoPredictions.length === 0) ||
             (useFixturePoll && tallyLoading) ||
@@ -187,7 +189,7 @@ export function ScorePredictionCard({
           : 0;
 
     const pollLocked =
-        status === 'past' ||
+        !votingOpen ||
         !!userScorePrediction ||
         createPredictionMut.isPending ||
         (useFixturePoll && tallyLoading);
@@ -195,12 +197,12 @@ export function ScorePredictionCard({
     const showPredictionTotalFooter =
         totalPredictions > 0 && (!showEqualSections || userScorePrediction);
 
-    const pollHeading = status === 'past' ? t('match.pregamePredictions') : t('match.whoWillWin');
+    const pollHeading = votingOpen ? t('match.whoWillWin') : t('match.pregamePredictions');
 
     const pastFixturePollAwaitingData =
-        status === 'past' && useFixturePoll && tallyLoading;
+        !votingOpen && useFixturePoll && tallyLoading;
     const pastFixturePollNothingToShow =
-        status === 'past' && useFixturePoll && !tallyLoading && totalPredictions === 0;
+        !votingOpen && useFixturePoll && !tallyLoading && totalPredictions === 0;
 
     if (pastFixturePollNothingToShow) {
         return null;
@@ -219,7 +221,7 @@ export function ScorePredictionCard({
         >
             <Title
                 order={3}
-                mb="lg"
+                mb={votingOpen && !userScorePrediction ? 'xs' : 'lg'}
                 ta="center"
                 style={{
                     color: 'var(--modern-text-primary)',
@@ -229,6 +231,12 @@ export function ScorePredictionCard({
             >
                 {pollHeading}
             </Title>
+
+            {votingOpen && !userScorePrediction ? (
+                <Text size="sm" c="dimmed" ta="center" mb="md">
+                    {t('match.tapToVote')}
+                </Text>
+            ) : null}
 
             <Box>
                 {pastFixturePollAwaitingData ? (
@@ -252,8 +260,11 @@ export function ScorePredictionCard({
                         onClick={() => {
                             if (!pollLocked) handleScorePrediction('home');
                         }}
+                        role={pollLocked ? undefined : 'button'}
+                        aria-label={homeTeam}
                         style={{
                             width: `${homePercentage}%`,
+                            minWidth: pollLocked ? undefined : '4.5rem',
                             backgroundColor:
                                 status === 'past' && matchResult?.winner === 'home'
                                     ? 'rgba(0, 255, 136, 0.3)'
@@ -307,8 +318,11 @@ export function ScorePredictionCard({
                         onClick={() => {
                             if (!pollLocked) handleScorePrediction('draw');
                         }}
+                        role={pollLocked ? undefined : 'button'}
+                        aria-label={t('match.draw')}
                         style={{
                             width: `${drawPercentage}%`,
+                            minWidth: pollLocked ? undefined : '4.5rem',
                             backgroundColor:
                                 status === 'past' && matchResult?.winner === 'draw'
                                     ? 'rgba(0, 255, 136, 0.3)'
@@ -357,8 +371,11 @@ export function ScorePredictionCard({
                         onClick={() => {
                             if (!pollLocked) handleScorePrediction('away');
                         }}
+                        role={pollLocked ? undefined : 'button'}
+                        aria-label={awayTeam}
                         style={{
                             width: `${awayPercentage}%`,
+                            minWidth: pollLocked ? undefined : '4.5rem',
                             backgroundColor:
                                 status === 'past' && matchResult?.winner === 'away'
                                     ? 'rgba(0, 255, 136, 0.3)'

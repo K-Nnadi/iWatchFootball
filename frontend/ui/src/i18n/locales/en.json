@@ -343,6 +343,7 @@
     "formation": "Formation",
     "pregamePredictions": "Pregame predictions",
     "whoWillWin": "Who will win?",
+    "tapToVote": "Tap a side to vote",
     "draw": "Draw",
     "basedOnPredictions": "Based on {{count}} predictions",
     "yourPrediction": "Your prediction:",

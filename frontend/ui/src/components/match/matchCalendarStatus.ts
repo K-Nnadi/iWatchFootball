@@ -14,3 +14,10 @@ export function getMatchStatus(matchDateStr: string): 'past' | 'today' | 'future
     }
     return 'future';
 }
+
+/** True until kickoff — predictions stay open for today's not-yet-started matches. */
+export function isKickoffUpcoming(matchDateStr: string, now: Date = new Date()): boolean {
+    const kickoff = new Date(matchDateStr);
+    if (Number.isNaN(kickoff.getTime())) return false;
+    return kickoff.getTime() > now.getTime();
+}
