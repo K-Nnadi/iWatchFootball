@@ -557,7 +557,7 @@ export function MatchEventsSection({
 
         const resolve = (id: number) => nameById.get(id) ?? `Player #${id}`;
 
-        for (const g of payload.goals) {
+        for (const g of payload.goals ?? []) {
             const side = resolveRowSide(typeof g.teamId === 'number' ? g.teamId : undefined, homeTeamId, awayTeamId);
             const team =
                 typeof g.teamId === 'number'
@@ -583,7 +583,7 @@ export function MatchEventsSection({
             });
         }
 
-        for (const c of payload.cards) {
+        for (const c of payload.cards ?? []) {
             const k = cardKind(c.type);
             if (!k) continue;
             const tid = typeof c.teamId === 'number' ? c.teamId : undefined;
@@ -605,7 +605,7 @@ export function MatchEventsSection({
             });
         }
 
-        for (const raw of payload.substitutions) {
+        for (const raw of payload.substitutions ?? []) {
             const s = parseSubstitution(raw);
             if (!s) continue;
             const side = resolveRowSide(s.teamId, homeTeamId, awayTeamId);
