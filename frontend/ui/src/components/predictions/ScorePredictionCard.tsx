@@ -194,6 +194,32 @@ export function ScorePredictionCard({
         createPredictionMut.isPending ||
         (useFixturePoll && tallyLoading);
 
+    const pollSegments = (
+        [
+            {
+                side: 'home' as const,
+                label: homeTeam,
+                percentage: homePercentage,
+                idleColor: 'rgba(34, 139, 230, 0.35)',
+                hoverColor: 'rgba(34, 139, 230, 0.55)',
+            },
+            {
+                side: 'draw' as const,
+                label: t('match.draw'),
+                percentage: drawPercentage,
+                idleColor: 'rgba(250, 176, 5, 0.35)',
+                hoverColor: 'rgba(250, 176, 5, 0.55)',
+            },
+            {
+                side: 'away' as const,
+                label: awayTeam,
+                percentage: awayPercentage,
+                idleColor: 'rgba(250, 82, 82, 0.35)',
+                hoverColor: 'rgba(250, 82, 82, 0.55)',
+            },
+        ]
+    ).filter((seg) => showEqualSections || seg.percentage > 0);
+
     const showPredictionTotalFooter =
         totalPredictions > 0 && (!showEqualSections || userScorePrediction);
 
@@ -256,177 +282,82 @@ export function ScorePredictionCard({
                         marginBottom: '1rem',
                     }}
                 >
-                    <Box
-                        onClick={() => {
-                            if (!pollLocked) handleScorePrediction('home');
-                        }}
-                        role={pollLocked ? undefined : 'button'}
-                        aria-label={homeTeam}
-                        style={{
-                            width: `${homePercentage}%`,
-                            minWidth: pollLocked ? undefined : '4.5rem',
-                            backgroundColor:
-                                status === 'past' && matchResult?.winner === 'home'
-                                    ? 'rgba(0, 255, 136, 0.3)'
-                                    : userScorePrediction === 'home'
-                                      ? 'rgba(0, 255, 136, 0.3)'
-                                      : 'rgba(34, 139, 230, 0.3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRight: '2px solid var(--modern-border-color)',
-                            cursor: pollLocked ? 'default' : 'pointer',
-                            transition: 'all 0.2s ease',
-                            position: 'relative',
-                            borderRadius: '30px 0 0 30px',
-                            opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!pollLocked) {
-                                e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.5)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!pollLocked) {
-                                e.currentTarget.style.backgroundColor = 'rgba(34, 139, 230, 0.3)';
-                            }
-                        }}
-                    >
-                        {showEqualSections ? (
-                            <Text
-                                size="sm"
-                                fw={700}
+                    {pollSegments.map((seg, index) => {
+                        const isLast = index === pollSegments.length - 1;
+                        const isSelected = userScorePrediction === seg.side;
+                        const isWinner = status === 'past' && matchResult?.winner === seg.side;
+                        const fill = isWinner
+                            ? 'rgba(0, 255, 136, 0.3)'
+                            : isSelected
+                              ? seg.hoverColor
+                              : seg.idleColor;
+                        const radius =
+                            pollSegments.length === 1
+                                ? '30px'
+                                : index === 0
+                                  ? '30px 0 0 30px'
+                                  : isLast
+                                    ? '0 30px 30px 0'
+                                    : 0;
+                        return (
+                            <Box
+                                key={seg.side}
+                                onClick={() => {
+                                    if (!pollLocked) handleScorePrediction(seg.side);
+                                }}
+                                role={pollLocked ? undefined : 'button'}
+                                aria-label={seg.label}
                                 style={{
-                                    color: 'var(--modern-text-primary)',
-                                    textAlign: 'center',
-                                    padding: '0 8px',
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                    whiteSpace: 'nowrap',
+                                    width: `${seg.percentage}%`,
+                                    minWidth: pollLocked ? undefined : '4.5rem',
+                                    backgroundColor: fill,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRight: isLast ? 'none' : '2px solid var(--modern-border-color)',
+                                    cursor: pollLocked ? 'default' : 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    borderRadius: radius,
+                                    opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!pollLocked) {
+                                        e.currentTarget.style.backgroundColor = seg.hoverColor;
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!pollLocked) {
+                                        e.currentTarget.style.backgroundColor = fill;
+                                    }
                                 }}
                             >
-                                {homeTeam}
-                            </Text>
-                        ) : homePercentage >= 8 ? (
-                            <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
-                                {Math.round(homePercentage)}%
-                            </Text>
-                        ) : null}
-                    </Box>
-
-                    <Box
-                        onClick={() => {
-                            if (!pollLocked) handleScorePrediction('draw');
-                        }}
-                        role={pollLocked ? undefined : 'button'}
-                        aria-label={t('match.draw')}
-                        style={{
-                            width: `${drawPercentage}%`,
-                            minWidth: pollLocked ? undefined : '4.5rem',
-                            backgroundColor:
-                                status === 'past' && matchResult?.winner === 'draw'
-                                    ? 'rgba(0, 255, 136, 0.3)'
-                                    : userScorePrediction === 'draw'
-                                      ? 'rgba(0, 255, 136, 0.3)'
-                                      : 'rgba(250, 176, 5, 0.3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRight: '2px solid var(--modern-border-color)',
-                            cursor: pollLocked ? 'default' : 'pointer',
-                            transition: 'all 0.2s ease',
-                            opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!pollLocked) {
-                                e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.5)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!pollLocked) {
-                                e.currentTarget.style.backgroundColor = 'rgba(250, 176, 5, 0.3)';
-                            }
-                        }}
-                    >
-                        {showEqualSections ? (
-                            <Text
-                                size="sm"
-                                fw={700}
-                                style={{
-                                    color: 'var(--modern-text-primary)',
-                                    textAlign: 'center',
-                                    padding: '0 8px',
-                                }}
-                            >
-                                {t('match.draw')}
-                            </Text>
-                        ) : drawPercentage >= 8 ? (
-                            <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
-                                {Math.round(drawPercentage)}%
-                            </Text>
-                        ) : null}
-                    </Box>
-
-                    <Box
-                        onClick={() => {
-                            if (!pollLocked) handleScorePrediction('away');
-                        }}
-                        role={pollLocked ? undefined : 'button'}
-                        aria-label={awayTeam}
-                        style={{
-                            width: `${awayPercentage}%`,
-                            minWidth: pollLocked ? undefined : '4.5rem',
-                            backgroundColor:
-                                status === 'past' && matchResult?.winner === 'away'
-                                    ? 'rgba(0, 255, 136, 0.3)'
-                                    : userScorePrediction === 'away'
-                                      ? 'rgba(0, 255, 136, 0.3)'
-                                      : 'rgba(250, 82, 82, 0.3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: pollLocked ? 'default' : 'pointer',
-                            transition: 'all 0.2s ease',
-                            borderRadius: '0 30px 30px 0',
-                            opacity: useFixturePoll && tallyLoading ? 0.6 : 1,
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!pollLocked) {
-                                e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.5)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!pollLocked) {
-                                e.currentTarget.style.backgroundColor = 'rgba(250, 82, 82, 0.3)';
-                            }
-                        }}
-                    >
-                        {showEqualSections ? (
-                            <Text
-                                size="sm"
-                                fw={700}
-                                style={{
-                                    color: 'var(--modern-text-primary)',
-                                    textAlign: 'center',
-                                    padding: '0 8px',
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                {awayTeam}
-                            </Text>
-                        ) : awayPercentage >= 8 ? (
-                            <Text size="lg" fw={700} style={{ color: 'var(--modern-text-primary)' }}>
-                                {Math.round(awayPercentage)}%
-                            </Text>
-                        ) : null}
-                    </Box>
+                                <Text
+                                    size={showEqualSections ? 'sm' : 'md'}
+                                    fw={700}
+                                    style={{
+                                        color: 'var(--modern-text-primary)',
+                                        textAlign: 'center',
+                                        padding: '0 8px',
+                                        textOverflow: 'ellipsis',
+                                        overflow: 'hidden',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {showEqualSections
+                                        ? seg.label
+                                        : `${seg.label} · ${Math.round(seg.percentage)}%`}
+                                </Text>
+                            </Box>
+                        );
+                    })}
                 </Box>
 
                 {showPredictionTotalFooter && (
                     <Text size="sm" c="dimmed" ta="center" mt="md">
-                        {t('match.basedOnPredictions', { count: totalPredictions })}
+                        {t(
+                            totalPredictions === 1 ? 'match.basedOnPrediction' : 'match.basedOnPredictions',
+                            { count: totalPredictions },
+                        )}
                     </Text>
                 )}
 

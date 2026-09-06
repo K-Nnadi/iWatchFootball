@@ -345,6 +345,7 @@
     "whoWillWin": "Qui va gagner ?",
     "tapToVote": "Touchez un côté pour voter",
     "draw": "Nul",
+    "basedOnPrediction": "BasÃ© sur {{count}} pronostic",
     "basedOnPredictions": "BasÃ© sur {{count}} pronostics",
     "yourPrediction": "Votre pronostic :",
     "couldNotSavePrediction": "Impossible d'enregistrer le pronostic",

@@ -345,6 +345,7 @@
     "whoWillWin": "Who will win?",
     "tapToVote": "Tap a side to vote",
     "draw": "Draw",
+    "basedOnPrediction": "Based on {{count}} prediction",
     "basedOnPredictions": "Based on {{count}} predictions",
     "yourPrediction": "Your prediction:",
     "couldNotSavePrediction": "Could not save prediction",

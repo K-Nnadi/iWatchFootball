@@ -345,6 +345,7 @@
     "whoWillWin": "Quem vai ganhar?",
     "tapToVote": "Toque num lado para votar",
     "draw": "Empate",
+    "basedOnPrediction": "Com base em {{count}} previsão",
     "basedOnPredictions": "Com base em {{count}} previsões",
     "yourPrediction": "A sua previsão:",
     "couldNotSavePrediction": "Não foi possível guardar a previsão",
