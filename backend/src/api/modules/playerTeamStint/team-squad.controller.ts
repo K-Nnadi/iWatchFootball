@@ -3,13 +3,12 @@ import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Public } from '../../../auth/decorators/public.decorator';
 import { PlayerTeamStintService } from './playerTeamStint.service';
 import { TransferService } from '../transfer/transfer.module';
-import { Player } from '../player/player.entity';
 import { Transfer } from '../transfer/transfer.entity';
-
-export class TeamSquadResponse {
-    players!: Player[];
-    seasonId?: number;
-}
+import {
+    TeamCurrentManagerResponse,
+    TeamSeasonsResponse,
+    TeamSquadResponse,
+} from './team-squad.types';
 
 export class TeamTransfersResponse {
     ins!: Transfer[];
@@ -29,7 +28,7 @@ export class TeamSquadController {
     @ApiOperation({ summary: 'Current or season-scoped squad for a team' })
     @ApiQuery({ name: 'seasonId', required: false, type: Number })
     @ApiQuery({ name: 'includeLoans', required: false, type: Boolean })
-    @ApiOkResponse({ description: 'Players in the squad' })
+    @ApiOkResponse({ type: TeamSquadResponse, description: 'Display-ready squad members' })
     async getTeamSquad(
         @Param('teamId', ParseIntPipe) teamId: number,
         @Query('seasonId') seasonIdRaw?: string,
@@ -38,16 +37,36 @@ export class TeamSquadController {
         const includeLoans = includeLoansRaw === 'true' || includeLoansRaw === '1';
         const seasonId =
             seasonIdRaw != null && seasonIdRaw !== '' ? Number(seasonIdRaw) : undefined;
+        const scopedSeason = seasonId != null && Number.isFinite(seasonId) ? seasonId : undefined;
 
-        const players =
-            seasonId != null && Number.isFinite(seasonId)
-                ? await this.stintService.getSquadForSeason(teamId, seasonId, includeLoans)
-                : await this.stintService.getCurrentSquad(teamId, includeLoans);
+        const players = await this.stintService.getSquadMembers(teamId, scopedSeason, includeLoans);
 
         return {
             players,
-            ...(seasonId != null && Number.isFinite(seasonId) ? { seasonId } : {}),
+            scope: scopedSeason != null ? 'season' : 'current',
+            ...(scopedSeason != null ? { seasonId: scopedSeason } : {}),
         };
+    }
+
+    @Get(':teamId/manager')
+    @Public()
+    @ApiOperation({ summary: 'Current manager for a team (employment first, then team.managerId)' })
+    @ApiOkResponse({ type: TeamCurrentManagerResponse })
+    async getTeamManager(
+        @Param('teamId', ParseIntPipe) teamId: number,
+    ): Promise<TeamCurrentManagerResponse> {
+        return this.stintService.getCurrentManager(teamId);
+    }
+
+    @Get(':teamId/seasons')
+    @Public()
+    @ApiOperation({ summary: 'Seasons this team has squad or competition rows for' })
+    @ApiOkResponse({ type: TeamSeasonsResponse })
+    async getTeamSeasons(
+        @Param('teamId', ParseIntPipe) teamId: number,
+    ): Promise<TeamSeasonsResponse> {
+        const seasons = await this.stintService.getTeamSeasons(teamId);
+        return { seasons };
     }
 
     @Get(':teamId/transfers')

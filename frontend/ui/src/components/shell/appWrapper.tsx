@@ -3,6 +3,7 @@ import { Header } from './header';
 import { Navbar } from './navbar';
 import { Main } from "./main";
 import { PageTransition } from '../transitions/PageTransition';
+import { ScrollToTop } from './ScrollToTop';
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useHeaderNavbarStore } from "../../shared/stores/headerNavbar.store";
@@ -62,6 +63,7 @@ export function AppWrapper() {
             }}
             padding={0}
         >
+            <ScrollToTop />
             {!hideChrome && <Header showHeader={showHeader} isLoggedIn={isLoggedIn} />}
             {!hideChrome && <Navbar />}
             <PageTransition>

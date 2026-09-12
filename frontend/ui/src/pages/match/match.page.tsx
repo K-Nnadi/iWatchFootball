@@ -20,6 +20,7 @@ import { LookingForTicketCTA } from '../../components/ticketDemand/LookingForTic
 import { DemandCounter } from '../../components/ticketDemand/DemandCounter';
 import { MatchInsightPanel } from '../../components/match/MatchInsightPanel';
 import { useGetOneFixture } from '@iWatchFootball/clients/controllers/fixture';
+import { formatLiveClockLabel, LIVE_MATCH_DETAIL_POLL_MS } from '../../shared/liveClock';
 import { useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetOneStadium } from '@iWatchFootball/clients/controllers/stadium';
 import { useGetOneCompetition } from '@iWatchFootball/clients/controllers/competition';
@@ -175,7 +176,13 @@ export function MatchPage() {
 
     const { data: fixture, isLoading: loadingFixture, isError: fixtureIsError } = useGetOneFixture(
         fixtureNumericId,
-        { query: { enabled: fetchFromApi } as any }
+        {
+            query: {
+                enabled: fetchFromApi,
+                refetchInterval: (query: { state: { data?: { status?: string } } }) =>
+                    query.state.data?.status === 'Live' ? LIVE_MATCH_DETAIL_POLL_MS : false,
+            } as any,
+        },
     );
 
     const homeTeamId = fixture?.homeTeamId;
@@ -209,6 +216,8 @@ export function MatchPage() {
                 },
             }),
         enabled: fetchFromApi && Number.isFinite(fixtureNumericId),
+        refetchInterval:
+            fixture?.status === 'Live' ? LIVE_MATCH_DETAIL_POLL_MS : false,
     });
 
     const positionIds = useMemo(() => collectPositionIds(bundleLineUps), [bundleLineUps]);
@@ -275,6 +284,12 @@ export function MatchPage() {
                 : {}),
             stadiumId: stadium.id,
             stadiumMetadata: stadium.metadata,
+            fixtureStatus: fixture.status,
+            liveClockLabel: formatLiveClockLabel({
+                status: fixture.status,
+                metadata: meta,
+                kickoffIso: fixture.date,
+            }),
         };
     }, [fixture, homeTeam, awayTeam, stadium, competition, bundleLineUps, positionsById]);
 
@@ -465,6 +480,7 @@ export function MatchPage() {
                             awayTeamId={matchDetails.awayTeamId}
                             homeTeamName={matchDetails.homeTeam}
                             awayTeamName={matchDetails.awayTeam}
+                            isLive={fixture.status === 'Live'}
                         />
                     </Container>
                 </Box>

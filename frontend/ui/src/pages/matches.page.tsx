@@ -7,7 +7,10 @@ import type { Competition, Fixture, Team } from '@iWatchFootball/clients/control
 import { usePageTransition } from '../hooks/usePageTransition';
 import { MatchToolbar } from '../components/filters/MatchToolbar';
 import { formatMatchShortDate, useTranslation } from '../i18n';
-import { resolveFixtureScores } from '../shared/fixtureScores';
+import { scoresFromFixtureRow } from '../shared/fixtureScores';
+import { formatLiveClockLabel, LIVE_FIXTURE_POLL_MS } from '../shared/liveClock';
+import { queryTicketLinks } from '../shared/api/ticketLink.api';
+import { useQuery } from '@tanstack/react-query';
 import {
     UiBody,
     UiCard,
@@ -35,6 +38,7 @@ type DayMatch = {
     awayScore?: number;
     hasTickets?: boolean;
     isLive?: boolean;
+    time?: string;
 };
 
 function isFinishedMatch(m: DayMatch): boolean {
@@ -52,7 +56,7 @@ function toMatchRowData(m: DayMatch): MatchRowData {
         minute: '2-digit',
     });
 
-    if (m.isLive && m.homeScore != null && m.awayScore != null) {
+    if (m.isLive) {
         return {
             id: m.id,
             homeTeam: m.homeTeam,
@@ -61,7 +65,7 @@ function toMatchRowData(m: DayMatch): MatchRowData {
             awayScore: m.awayScore,
             homeLogo: m.homeLogo,
             awayLogo: m.awayLogo,
-            time: 'LIVE',
+            time: m.time ?? 'LIVE',
             isLive: true,
             hasTickets: ticketsAvailable(m),
         };
@@ -76,7 +80,7 @@ function toMatchRowData(m: DayMatch): MatchRowData {
             awayScore: m.awayScore,
             homeLogo: m.homeLogo,
             awayLogo: m.awayLogo,
-            time: 'FT',
+            time: m.time && m.time !== kickoff ? m.time : 'FT',
             isLive: false,
             hasTickets: false,
         };
@@ -88,7 +92,7 @@ function toMatchRowData(m: DayMatch): MatchRowData {
         awayTeam: m.awayTeam,
         homeLogo: m.homeLogo,
         awayLogo: m.awayLogo,
-        time: kickoff,
+        time: m.time ?? kickoff,
         isLive: false,
         hasTickets: ticketsAvailable(m),
     };
@@ -104,10 +108,28 @@ function uniqueIds(values: Array<number | undefined>): number[] {
     return [...new Set(values.filter((id): id is number => typeof id === 'number'))];
 }
 
+function ticketedFixtureIds(
+    fixtures: Fixture[],
+    links: Array<{ fixtureId?: number; teamId?: number; competitionId?: number }>,
+): Set<number> {
+    const ids = new Set<number>();
+    for (const fix of fixtures) {
+        const hit = links.some((l) => {
+            if (l.fixtureId != null && l.fixtureId === fix.id) return true;
+            if (l.teamId != null && (l.teamId === fix.homeTeamId || l.teamId === fix.awayTeamId)) return true;
+            if (l.competitionId != null && l.competitionId === fix.competitionId) return true;
+            return false;
+        });
+        if (hit) ids.add(fix.id);
+    }
+    return ids;
+}
+
 function mapApiFixtures(
     fixtures: Fixture[],
     teams: Team[],
     competitions: Competition[],
+    ticketedIds: Set<number>,
 ): DayMatch[] {
     const teamById = new Map(teams.map((t) => [t.id, t]));
     const competitionById = new Map(competitions.map((c) => [c.id, c]));
@@ -116,7 +138,8 @@ function mapApiFixtures(
         const home = typeof fix.homeTeamId === 'number' ? teamById.get(fix.homeTeamId) : undefined;
         const away = typeof fix.awayTeamId === 'number' ? teamById.get(fix.awayTeamId) : undefined;
         const competition = competitionById.get(fix.competitionId);
-        const scores = resolveFixtureScores(fix);
+        const scores = scoresFromFixtureRow(fix);
+        const isLive = fix.status === 'Live';
         return {
             id: String(fix.id),
             competitionName: competition?.name?.trim() || 'Competition',
@@ -125,9 +148,15 @@ function mapApiFixtures(
             date: fix.date,
             homeLogo: home?.logoUrl,
             awayLogo: away?.logoUrl,
-            homeScore: scores?.home,
-            awayScore: scores?.away,
-            isLive: fix.status === 'Live',
+            homeScore: scores.homeScore,
+            awayScore: scores.awayScore,
+            isLive,
+            hasTickets: ticketedIds.has(fix.id),
+            time: formatLiveClockLabel({
+                status: fix.status,
+                metadata: fix.metadata,
+                kickoffIso: fix.date,
+            }),
         };
     });
 }
@@ -168,6 +197,8 @@ export function MatchesPage() {
     }, [currentStartDate, windowSize]);
 
     const selectedDate = dates[selectedDateIndex];
+    const isSelectedToday =
+        !!selectedDate && selectedDate.toDateString() === today.toDateString();
     const { from, to } = useMemo(
         () => (selectedDate ? dayRangeIso(selectedDate) : { from: '', to: '' }),
         [selectedDate],
@@ -183,8 +214,20 @@ export function MatchesPage() {
             take: 200,
             order: { date: 'ASC' },
         } as any,
-        { query: { enabled: !useDeprecatedMocks && !!from } as any },
+        {
+            query: {
+                enabled: !useDeprecatedMocks && !!from,
+                refetchInterval: !useDeprecatedMocks && isSelectedToday ? LIVE_FIXTURE_POLL_MS : false,
+            } as any,
+        },
     );
+
+    const { data: ticketLinks = [] } = useQuery({
+        queryKey: ['ticket-links', 'matches-list'],
+        queryFn: () => queryTicketLinks({}),
+        enabled: !useDeprecatedMocks,
+        staleTime: 60_000,
+    });
 
     const fixtures = Array.isArray(apiFixtures) ? apiFixtures : [];
 
@@ -221,8 +264,9 @@ export function MatchesPage() {
             fixtures,
             Array.isArray(teamsData) ? teamsData : [],
             Array.isArray(competitionsData) ? competitionsData : [],
+            ticketedFixtureIds(fixtures, ticketLinks),
         );
-    }, [useDeprecatedMocks, selectedDate, today, fixtures, teamsData, competitionsData]);
+    }, [useDeprecatedMocks, selectedDate, today, fixtures, teamsData, competitionsData, ticketLinks]);
 
     const loading = useDeprecatedMocks
         ? false

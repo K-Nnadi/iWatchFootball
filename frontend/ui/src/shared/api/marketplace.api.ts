@@ -18,11 +18,14 @@ export interface MarketplaceListing {
     id: number;
     ticketId: number;
     sellerId: number;
+    buyerId?: number;
     askPrice: number;
     status: 'ACTIVE' | 'SOLD' | 'CANCELLED' | 'EXPIRED';
     expiresAt: string;
     createdAt: string;
     updatedAt: string;
+    transferInitiatedAt?: string | null;
+    receiptConfirmedAt?: string | null;
     ticket?: MarketplaceTicket;
 }
 
@@ -31,6 +34,41 @@ export interface FeePreview {
     adminFee: number;
     adminFeeRate: number;
     totalBuyerPays: number;
+    sellerFeeRate?: number;
+    sellerNetPayout?: number;
+    escrowHeld?: boolean;
+}
+
+export interface SellerConnectStatus {
+    configured: boolean;
+    stripeConnectAccountId: string | null;
+    onboardingComplete: boolean;
+    payoutsEnabled: boolean;
+    canList: boolean;
+}
+
+export interface SellerPayoutEstimate {
+    grossAmount: number;
+    platformFee: number;
+    netPayout: number;
+}
+
+export interface EscrowHoldView {
+    id: number;
+    marketplaceTransactionId: number;
+    amount: number;
+    currency: string;
+    status: 'HELD' | 'RELEASED' | 'REFUNDED';
+    heldAt: string;
+    releasedAt?: string | null;
+    refundedAt?: string | null;
+}
+
+export interface UserTrustSummary {
+    userId: number;
+    averageRating: number;
+    totalTransactions: number;
+    trustScore: number;
 }
 
 export interface ListingsResponse {
@@ -105,4 +143,60 @@ export async function confirmMarketplacePurchase(body: {
         body,
     );
     return data;
+}
+
+export async function getMarketplaceFees(): Promise<{ buyerFeeRate: number; sellerFeeRate: number }> {
+    const { data } = await axios.get<{ buyerFeeRate: number; sellerFeeRate: number }>('/marketplace/fees');
+    return data;
+}
+
+export async function getSellerPayoutPreview(askPrice: number): Promise<SellerPayoutEstimate> {
+    const { data } = await axios.get<SellerPayoutEstimate>('/marketplace/fees/payout-preview', {
+        params: { askPrice },
+    });
+    return data;
+}
+
+export async function getSellerConnectStatus(): Promise<SellerConnectStatus> {
+    const { data } = await axios.get<SellerConnectStatus>('/seller/connect/status');
+    return data;
+}
+
+export async function startSellerConnectOnboarding(): Promise<{ url: string }> {
+    const { data } = await axios.post<{ url: string }>('/seller/connect/onboard');
+    return data;
+}
+
+export async function getListingEscrow(listingId: number): Promise<EscrowHoldView | null> {
+    const { data } = await axios.get<EscrowHoldView | null>(`/marketplace/listings/${listingId}/escrow`);
+    return data;
+}
+
+export async function refundMarketplaceEscrow(transactionId: number): Promise<EscrowHoldView> {
+    const { data } = await axios.post<EscrowHoldView>(`/marketplace/payments/refund/${transactionId}`);
+    return data;
+}
+
+export async function confirmListingTransfer(listingId: number): Promise<void> {
+    await axios.post(`/marketplace/listings/${listingId}/confirm-transfer`);
+}
+
+export async function getUserTrustSummary(userId: number): Promise<UserTrustSummary> {
+    const { data } = await axios.get<UserTrustSummary>(`/ratings/${userId}/summary`);
+    return data;
+}
+
+export async function getMyListingRating(listingId: number): Promise<{ score: number } | null> {
+    const { data } = await axios.get<{ score: number } | null>(`/ratings/listing/${listingId}`);
+    return data;
+}
+
+export async function submitListingRating(body: {
+    listingId: number;
+    targetUserId: number;
+    raterRole: 'BUYER' | 'SELLER';
+    score: number;
+    comment?: string;
+}): Promise<void> {
+    await axios.post('/ratings', body);
 }

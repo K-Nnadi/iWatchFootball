@@ -17,6 +17,7 @@ import { PlayerLineUpModule } from '../../modules/playerLineUp/playerLineUp.modu
 import { ManagerModule } from '../../modules/manager/manager.module';
 import { StadiumModule, StadiumService } from '../../modules/stadium/stadium.module';
 import { FixtureTeamStatModule } from '../../modules/fixtureTeamStat/fixtureTeamStat.module';
+import { PlayerTeamStintModule } from '../../modules/playerTeamStint/playerTeamStint.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FixtureTeamStatModule } from '../../modules/fixtureTeamStat/fixtureTeam
     ManagerModule,
     StadiumModule,
     FixtureTeamStatModule,
+    PlayerTeamStintModule,
   ],
   providers: [SportMonksHttpService, SportMonksAdapterService],
   controllers: [SportMonksController],

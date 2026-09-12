@@ -5,6 +5,7 @@ import { DataSyncRunDto, isApiSportsPipelineEnabled, SYNC_STEP } from './data-sy
 import { StatsBombAdapterService } from '../../adapters/statsbomb/statsbomb-adapter.service';
 import { ApiSportsAdapterService } from '../../adapters/api-sports/api-sports-adapter.service';
 import { SportMonksAdapterService } from '../../adapters/sportmonks/sportmonks-adapter.service';
+import { SportApiAdapterService } from '../../adapters/sportapi/sportapi-adapter.service';
 
 @Injectable()
 export class DataSyncPipelineService {
@@ -15,6 +16,7 @@ export class DataSyncPipelineService {
     private readonly statsBombAdapterService: StatsBombAdapterService,
     private readonly apiSportsAdapterService: ApiSportsAdapterService,
     private readonly sportMonksAdapterService: SportMonksAdapterService,
+    private readonly sportApiAdapterService: SportApiAdapterService,
   ) {}
 
   async execute(jobId: number): Promise<{
@@ -84,6 +86,9 @@ export class DataSyncPipelineService {
             case SYNC_STEP.SPORTMONKS:
               await this.runSportMonks(jobId, dto, step, stepSummaries);
               break;
+            case SYNC_STEP.SPORTAPI:
+              await this.runSportApi(jobId, dto, step, stepSummaries);
+              break;
             default:
               await this.syncJobService.patchStep(step.id, {
                 status: 'skipped',
@@ -107,7 +112,7 @@ export class DataSyncPipelineService {
   }
 
   private isBudgetedApiStep(stepKey: string, dto: DataSyncRunDto): boolean {
-    if (stepKey === SYNC_STEP.STATS_BOMB || stepKey === SYNC_STEP.SPORTMONKS) return false;
+    if (stepKey === SYNC_STEP.STATS_BOMB || stepKey === SYNC_STEP.SPORTMONKS || stepKey === SYNC_STEP.SPORTAPI) return false;
     return isApiSportsPipelineEnabled(dto);
   }
 
@@ -292,11 +297,17 @@ export class DataSyncPipelineService {
         allPages,
         maxPages,
         maxRequests: cap,
+        syncEventsAfter: fx.syncEventsAfter === true,
+        syncEventsMaxRequests: fx.syncEventsMaxRequests,
+        syncLineupsAfter: fx.syncLineupsAfter === true,
+        syncLineupsMaxRequests: fx.syncLineupsMaxRequests,
       });
       const fixtureReq = r.apiRequests;
       const standingsReq = r.standingsApiRequests ?? 0;
       const primaryVenuesReq = r.primaryVenuesApiRequests ?? 0;
-      const totalUsed = fixtureReq + standingsReq + primaryVenuesReq;
+      const eventReq = r.fixtureEventsRequests ?? 0;
+      const lineupReq = r.fixtureLineupsRequests ?? 0;
+      const totalUsed = fixtureReq + standingsReq + primaryVenuesReq + eventReq + lineupReq;
       await this.syncJobService.addApiRequests(jobId, totalUsed);
       remaining = Math.max(0, remaining - totalUsed);
       perLeagueResults.push({ league: leagues[i], ...r });
@@ -374,8 +385,41 @@ export class DataSyncPipelineService {
       to: sm.to,
       syncStandings: sm.syncStandings,
       syncFixtureDetails: sm.syncFixtureDetails,
+      syncSquads: sm.syncSquads,
       maxApiRequests: budget,
       timezone: sm.timezone,
+    });
+
+    const remaining = Number(result.apiRequestsRemaining ?? 0);
+    const used = Math.max(0, budget - remaining);
+    await this.syncJobService.addApiRequests(jobId, used);
+    stepSummaries[step.stepKey] = result;
+    await this.syncJobService.patchStep(step.id, { status: 'completed', resultSummary: result as any });
+  }
+
+  private async runSportApi(
+    jobId: number,
+    dto: DataSyncRunDto,
+    step: SyncJobStep,
+    stepSummaries: Record<string, Record<string, unknown>>,
+  ): Promise<void> {
+    const sa = dto.sportapi;
+    if (!sa?.uniqueTournamentIds?.length || !sa.from || !sa.to) {
+      const summary = { skipped: true, reason: 'uniqueTournamentIds, from, and to required' };
+      stepSummaries[step.stepKey] = summary;
+      await this.syncJobService.patchStep(step.id, { status: 'completed', resultSummary: summary });
+      return;
+    }
+
+    const budget = Math.max(0, Number(sa.maxApiRequests) || 0);
+    const result = await this.sportApiAdapterService.runPipeline({
+      uniqueTournamentIds: sa.uniqueTournamentIds,
+      from: sa.from,
+      to: sa.to,
+      syncStandings: sa.syncStandings,
+      syncFixtureDetails: sa.syncFixtureDetails,
+      maxApiRequests: budget,
+      timezoneOffset: sa.timezoneOffset,
     });
 
     const remaining = Number(result.apiRequestsRemaining ?? 0);

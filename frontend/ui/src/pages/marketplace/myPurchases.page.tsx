@@ -23,6 +23,8 @@ import { notify } from '../../shared/notify';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import axios from 'axios';
 import type { MarketplaceListing } from '../../shared/api/marketplace.api';
+import { getListingEscrow, refundMarketplaceEscrow, type EscrowHoldView } from '../../shared/api/marketplace.api';
+import { RatingsPanel } from './RatingsPanel';
 
 const STATUS_COLORS: Record<string, string> = {
     DRAFT: 'gray',
@@ -58,6 +60,7 @@ async function raiseDispute(listingId: number, reason: string, details: string):
 export function MyPurchasesPage() {
     const { navigateWithTransition } = usePageTransition();
     const [purchases, setPurchases] = useState<MarketplaceListing[]>([]);
+    const [escrowByListing, setEscrowByListing] = useState<Record<number, EscrowHoldView | null>>({});
     const [loading, setLoading] = useState(true);
     const [confirmingId, setConfirmingId] = useState<number | null>(null);
 
@@ -66,6 +69,17 @@ export function MyPurchasesPage() {
         try {
             const data = await getMyPurchases();
             setPurchases(data);
+            const escrowEntries: Record<number, EscrowHoldView | null> = {};
+            await Promise.all(
+                data.map(async (listing) => {
+                    try {
+                        escrowEntries[listing.id] = await getListingEscrow(listing.id);
+                    } catch {
+                        escrowEntries[listing.id] = null;
+                    }
+                }),
+            );
+            setEscrowByListing(escrowEntries);
         } catch {
             notify.error('Could not load purchases', 'Please try again later.');
         } finally {
@@ -95,8 +109,9 @@ export function MyPurchasesPage() {
 
     const renderCard = (listing: MarketplaceListing) => {
         const status = listing.status as string;
-        const transferInitiated = !!(listing as unknown as Record<string, unknown>).transferInitiatedAt;
-        const receiptConfirmed = !!(listing as unknown as Record<string, unknown>).receiptConfirmedAt;
+        const transferInitiated = !!listing.transferInitiatedAt;
+        const receiptConfirmed = !!listing.receiptConfirmedAt;
+        const escrow = escrowByListing[listing.id];
 
         return (
             <Paper key={listing.id} p="md" radius="md" withBorder>
@@ -132,6 +147,25 @@ export function MyPurchasesPage() {
                                 Awaiting seller to initiate the transfer.
                             </Text>
                         )}
+                        {status === 'SOLD' && escrow?.status === 'HELD' && (
+                            <Text size="xs" c="dimmed">
+                                {formatPrice(Number(escrow.amount))} held in escrow until you confirm receipt.
+                            </Text>
+                        )}
+                        {status === 'SOLD' && escrow?.status === 'RELEASED' && (
+                            <Text size="xs" c="dimmed">Seller payout released.</Text>
+                        )}
+                        {status === 'SOLD' && escrow?.status === 'REFUNDED' && (
+                            <Text size="xs" c="red">This sale was refunded.</Text>
+                        )}
+                        {receiptConfirmed && listing.sellerId != null && (
+                            <RatingsPanel
+                                listingId={listing.id}
+                                targetUserId={listing.sellerId}
+                                raterRole="BUYER"
+                                enabled
+                            />
+                        )}
                     </Stack>
 
                     <Stack gap="xs" align="flex-end" style={{ flexShrink: 0 }}>
@@ -144,6 +178,24 @@ export function MyPurchasesPage() {
                                 onClick={() => void handleConfirmReceipt(listing.id)}
                             >
                                 Confirm receipt
+                            </Button>
+                        )}
+                        {status === 'SOLD' && escrow?.status === 'HELD' && (
+                            <Button
+                                size="xs"
+                                variant="light"
+                                color="orange"
+                                onClick={() => {
+                                    if (!window.confirm('Request a refund of the held funds?')) return;
+                                    void refundMarketplaceEscrow(escrow.marketplaceTransactionId)
+                                        .then(() => {
+                                            notify.success('Refund requested', 'Held funds are being returned.');
+                                            void fetchPurchases();
+                                        })
+                                        .catch(() => notify.error('Refund failed', 'Please try again or raise a dispute.'));
+                                }}
+                            >
+                                Request refund
                             </Button>
                         )}
                         {status === 'SOLD' && (

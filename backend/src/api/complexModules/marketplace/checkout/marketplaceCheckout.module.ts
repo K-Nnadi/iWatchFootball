@@ -11,6 +11,7 @@ import { MarketplaceCheckoutController } from './marketplaceCheckout.controller'
 import { MarketplaceCheckoutService } from './marketplaceCheckout.service';
 import { LoyaltyModule } from '../../loyalty/loyalty.module';
 import { LogModule } from '../../../modules/log/log.module';
+import { MarketplacePayoutModule } from '../marketplace-payout.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { LogModule } from '../../../modules/log/log.module';
         UserTicketLogModule,
         LoyaltyModule,
         LogModule,
+        MarketplacePayoutModule,
         TypeOrmModule.forFeature([MarketplaceListing, MarketplaceTransaction]),
     ],
     controllers: [MarketplaceCheckoutController],

@@ -1,8 +1,8 @@
-# One-click data sync (StatsBomb + API-Sports + SportMonks)
+# One-click data sync (StatsBomb + API-Sports + SportMonks + RapidAPI SportAPI)
 
 Admin API under **`/admin/data-sync`** (JWT + **ADMIN** role):
 
-- **`POST /admin/data-sync/run`** — Runs StatsBomb (optional), API-Sports imports, and/or SportMonks pipeline under configured request budgets. StatsBomb does **not** count toward API-Sports `maxApiRequests`.
+- **`POST /admin/data-sync/run`** — Runs StatsBomb (optional), API-Sports imports, SportMonks, and/or RapidAPI SportAPI under configured request budgets. StatsBomb does **not** count toward API-Sports `maxApiRequests`.
 - **`GET /admin/data-sync/jobs/:id`** — Job row plus **`syncJobStep`** checkpoints (`status`, `cursor`, `resultSummary`).
 
 ## SportMonks (direct adapter)
@@ -17,6 +17,24 @@ Admin endpoints under **`/sportmonks`** (JWT + **ADMIN**):
 - **`POST /sportmonks/sync/run`** — Full pipeline (leagues → standings → fixtures → details).
 
 Set **`SPORTMONKS_API_TOKEN`** in `backend/.env`. Include a `sportmonks` block in **`POST /admin/data-sync/run`** to run the SportMonks step in the one-click job.
+
+## RapidAPI SportAPI (sportapi7)
+
+Same RapidAPI key as the Cursor MCP server (`RapidAPI Hub - SportAPI` in `.cursor/mcp.json`). Runtime ingest uses REST; MCP is for agent-side discovery.
+
+Admin endpoints under **`/sportapi`** (JWT + **ADMIN**):
+
+- **`GET /sportapi/status`** — Whether `RAPIDAPI_SPORTAPI_KEY` is set.
+- **`GET /sportapi/discover/categories`**, **`/discover/fixtures`**, **`/discover/live`** — Proxy reads (not persisted).
+- **`POST /sportapi/sync/import/fixtures`** — Fixtures for a date window (`uniqueTournamentIds` optional; 17 = Premier League).
+- **`POST /sportapi/sync/import/live`** — Currently live football fixtures.
+- **`POST /sportapi/sync/fixture-details`** — Incidents, lineups, team stats (3 requests per match).
+- **`POST /sportapi/sync/standings`** — Total table for a uniqueTournament + season.
+- **`POST /sportapi/sync/run`** — Fixtures → optional details → standings.
+
+Set **`RAPIDAPI_SPORTAPI_KEY`** (or `RAPIDAPI_KEY`) in `backend/.env`. Include a `sportapi` block in **`POST /admin/data-sync/run`**. Live polling (`POST /admin/live-fixtures/sync`) also uses SportAPI when the key is set.
+
+The BASIC RapidAPI plan is 50 requests/month — keep `syncFixtureDetails` false and `maxApiRequests` small.
 
 ## Quotas and resume
 

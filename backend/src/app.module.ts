@@ -50,6 +50,7 @@ import {NewsAggregatorModule} from "./api/services/news/news-aggregator.module";
 import {StatsBombAdapterModule} from "./api/adapters/statsbomb/statsbomb-adapter.module";
 import {ApiSportsAdapterModule} from "./api/adapters/api-sports/api-sports-adapter.module";
 import {SportMonksAdapterModule} from "./api/adapters/sportmonks/sportmonks-adapter.module";
+import {SportApiAdapterModule} from "./api/adapters/sportapi/sportapi-adapter.module";
 import {DataSeedingModule} from "./api/complexControllers/dataSeeding.controller";
 import {InsightsModule} from "./api/complexModules/insights/insights.module";
 import {DataSyncModule} from "./api/complexModules/dataSync/data-sync.module";
@@ -136,6 +137,7 @@ const Modules = [
     StatsBombAdapterModule,
     ApiSportsAdapterModule,
     SportMonksAdapterModule,
+    SportApiAdapterModule,
     UserSubscriptionModule,
     PaymentsIntegrationModule,
     IntegrationModule,

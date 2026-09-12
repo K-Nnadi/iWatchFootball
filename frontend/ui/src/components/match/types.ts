@@ -44,5 +44,7 @@ export interface MatchDetails {
     awayRecentForm?: ('W' | 'D' | 'L')[];
     stadiumId?: number;
     stadiumMetadata?: unknown;
+    fixtureStatus?: string;
+    liveClockLabel?: string;
 }
 

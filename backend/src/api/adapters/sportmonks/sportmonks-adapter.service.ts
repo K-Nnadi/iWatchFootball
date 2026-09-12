@@ -18,6 +18,7 @@ import type {
   SportMonksSeason,
   SportMonksStanding,
   SportMonksStatistic,
+  SportMonksSquadPlayer,
   SportMonksTeam,
 } from './sportmonks.types';
 import { CompetitionService } from '../../modules/competition/competition.module';
@@ -35,6 +36,7 @@ import { PlayerLineUpService } from '../../modules/playerLineUp/playerLineUp.mod
 import { ManagerService } from '../../modules/manager/manager.module';
 import { StadiumService } from '../../modules/stadium/stadium.module';
 import { FixtureTeamStatService } from '../../modules/fixtureTeamStat/fixtureTeamStat.service';
+import { PlayerTeamStintService } from '../../modules/playerTeamStint/playerTeamStint.service';
 import { FixtureTeamStatSide } from '../../modules/fixtureTeamStat/fixtureTeamStat.entity';
 import { CreateCompetitionStandingDTO } from '../../modules/competitionStanding/competitionStanding.entity';
 import { CompetitionType } from '../../enums/competition.enum';
@@ -95,6 +97,7 @@ export type SportMonksPipelineOptions = {
   to: string;
   syncStandings?: boolean;
   syncFixtureDetails?: boolean;
+  syncSquads?: boolean;
   maxApiRequests: number;
   timezone?: string;
 };
@@ -127,6 +130,7 @@ export class SportMonksAdapterService {
     private readonly managerService: ManagerService,
     private readonly stadiumService: StadiumService,
     private readonly fixtureTeamStatService: FixtureTeamStatService,
+    private readonly playerTeamStintService: PlayerTeamStintService,
   ) {}
 
   private invalidateCaches(): void {
@@ -1506,6 +1510,141 @@ export class SportMonksAdapterService {
     return true;
   }
 
+  /**
+   * Import season squads into `playerTeamStint`.
+   * Uses `GET /squads/seasons/{sportmonksSeasonId}/teams/{sportmonksTeamId}?include=player`.
+   */
+  async importSquads(options: {
+    seasonId: number;
+    maxRequests?: number;
+    teamIds?: number[];
+  }): Promise<{
+    teamsProcessed: number;
+    playersLinked: number;
+    stintsOpened: number;
+    stintsClosed: number;
+    apiRequests: number;
+    errors: string[];
+  }> {
+    const errors: string[] = [];
+    let apiRequests = 0;
+    let teamsProcessed = 0;
+    let playersLinked = 0;
+    let stintsOpened = 0;
+    let stintsClosed = 0;
+    const maxRequests = options.maxRequests ?? 40;
+
+    const [seasonRow] = await this.seasonService.getQuery({ where: { id: options.seasonId } });
+    if (!seasonRow) {
+      return {
+        teamsProcessed: 0,
+        playersLinked: 0,
+        stintsOpened: 0,
+        stintsClosed: 0,
+        apiRequests: 0,
+        errors: ['season not found'],
+      };
+    }
+    const smSeasonId = this.getProviderExternalId(seasonRow.metadata);
+    if (!smSeasonId) {
+      return {
+        teamsProcessed: 0,
+        playersLinked: 0,
+        stintsOpened: 0,
+        stintsClosed: 0,
+        apiRequests: 0,
+        errors: ['season has no sportmonks external id'],
+      };
+    }
+
+    let tcsRows = await this.teamCompetitionSeasonService.getQuery({
+      where: { seasonId: options.seasonId },
+    });
+    if (options.teamIds?.length) {
+      const wanted = new Set(options.teamIds);
+      tcsRows = tcsRows.filter((r) => wanted.has(r.teamId));
+    }
+
+    const teams = await this.getTeamsCached();
+    const teamById = new Map(teams.map((t) => [t.id as number, t]));
+
+    const targets: Array<{ localTeamId: number; smTeamId: string }> = [];
+    for (const row of tcsRows) {
+      const team = teamById.get(row.teamId);
+      const smTeamId = this.getProviderExternalId(team?.metadata);
+      if (!smTeamId) continue;
+      targets.push({ localTeamId: row.teamId, smTeamId });
+    }
+
+    if (targets.length === 0 && apiRequests < maxRequests) {
+      try {
+        const listed = await this.http.getAllPages<SportMonksParticipant>(
+          `/teams/seasons/${smSeasonId}`,
+          { per_page: 50 },
+          { maxPages: 5, maxRequests: Math.min(5, maxRequests) },
+        );
+        apiRequests += listed.apiRequests;
+        await this.http.delay();
+        for (const p of listed.items) {
+          if (!p?.id) continue;
+          const local = await this.findLocalTeamBySportMonksId(p.id);
+          if (!local?.id) continue;
+          targets.push({ localTeamId: local.id, smTeamId: String(p.id) });
+        }
+      } catch (e: any) {
+        errors.push(`teams/seasons ${smSeasonId}: ${e?.message ?? e}`);
+      }
+    }
+
+    for (const target of targets) {
+      if (apiRequests >= maxRequests) break;
+      try {
+        const body = await this.http.get<unknown>(
+          `/squads/seasons/${smSeasonId}/teams/${target.smTeamId}`,
+          { include: 'player' },
+        );
+        apiRequests += 1;
+        await this.http.delay();
+        const squad = extractSportMonksList<SportMonksSquadPlayer>(body);
+        const playerIds: number[] = [];
+        const kitByPlayerId: Record<number, number> = {};
+        for (const row of squad) {
+          const src = row.player ?? (row.player_id ? { id: row.player_id } : null);
+          if (!src?.id) continue;
+          const localPlayer = await this.upsertPlayerFromSportMonks(src as any);
+          if (!localPlayer?.id) continue;
+          playerIds.push(localPlayer.id);
+          playersLinked += 1;
+          const kit = row.jersey_number != null ? Number(row.jersey_number) : NaN;
+          if (Number.isFinite(kit) && kit > 0) kitByPlayerId[localPlayer.id] = kit;
+        }
+        const stints = await this.playerTeamStintService.syncCurrentRosterFromImport(
+          target.localTeamId,
+          playerIds,
+          options.seasonId,
+          kitByPlayerId,
+        );
+        stintsOpened += stints.opened;
+        stintsClosed += stints.closed;
+        teamsProcessed += 1;
+      } catch (e: any) {
+        errors.push(`squad team ${target.smTeamId}: ${e?.message ?? e}`);
+      }
+    }
+
+    this.logger.log(
+      `importSquads season ${options.seasonId}: ${teamsProcessed} teams, ${playersLinked} players, +${stintsOpened} stints (${apiRequests} req)`,
+    );
+    return {
+      teamsProcessed,
+      playersLinked,
+      stintsOpened,
+      stintsClosed,
+      apiRequests,
+      errors,
+    };
+  }
+
   /** Full pipeline: leagues → fixtures → standings → optional details. */
   async runPipeline(options: SportMonksPipelineOptions): Promise<Record<string, unknown>> {
     let remaining = Math.max(0, options.maxApiRequests);
@@ -1559,6 +1698,29 @@ export class SportMonksAdapterService {
       summary.standings = { processed: 0, errors: [], skipped: true };
     } else {
       summary.standings = { processed: 0, errors: [] };
+    }
+
+    if (options.syncSquads !== false && remaining > 0) {
+      this.invalidateCaches();
+      const seasons = await this.getSeasonsCached();
+      const localSeasonIds = seasons
+        .filter((s) => {
+          const ext = this.getProviderExternalId(s.metadata);
+          if (!ext) return false;
+          const lid = (s.metadata as any)?.sportmonks?.leagueId;
+          return lid != null && options.leagueIds.includes(Number(lid));
+        })
+        .map((s) => s.id);
+      const squadSummary: Record<string, unknown>[] = [];
+      for (const seasonId of localSeasonIds) {
+        if (remaining < 1) break;
+        const r = await this.importSquads({ seasonId, maxRequests: remaining });
+        remaining = Math.max(0, remaining - r.apiRequests);
+        squadSummary.push(r);
+      }
+      summary.squads = squadSummary;
+    } else if (options.syncSquads === false) {
+      summary.squads = { skipped: true };
     }
 
     summary.apiRequestsRemaining = remaining;

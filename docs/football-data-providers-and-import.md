@@ -13,7 +13,7 @@ This document consolidates provider research (via football-docs), the current I 
 | **Low-cost fallback** | TheSportsDB | Free/public tier, live scores and metadata; not event-analytics grade |
 | **Deep analytics layer** | StatsBomb | Rich events, lineups, IQ metrics (commercial); open data is selective but already integrated here |
 
-**Current platform:** StatsBomb open data + API-Sports (API-Football v3) + **SportMonks** adapter are wired. Sportradar, TheSportsDB, and FotMob are not integrated.
+**Current platform:** StatsBomb open data + API-Sports (API-Football v3) + SportMonks + **RapidAPI SportAPI** adapters are wired. Sportradar, TheSportsDB, and FotMob are not integrated.
 
 ---
 
@@ -55,7 +55,9 @@ This document consolidates provider research (via football-docs), the current I 
 
 ```
 StatsBomb (GitHub open data) ──sync──► PostgreSQL entities
-API-Sports (v3.football.api-sports.io) ──import/discover──► PostgreSQL (+ live proxy only)
+API-Sports (v3.football.api-sports.io) ──import/discover──► PostgreSQL (+ live)
+SportMonks ──import──► PostgreSQL
+RapidAPI SportAPI (sportapi7) ──import/live──► PostgreSQL
 YouTube ──highlights job──► fixtureHighlight
 Web UI ──Orval clients──► REST API ──► DB
 Mobile ──mock data only
@@ -65,6 +67,8 @@ Mobile ──mock data only
 |----------|------------------|-------------------|
 | **StatsBomb** | `backend/src/api/adapters/statsbomb/` | `competition`, `season`, `team`, `player`, `fixture`, `stadium`, `manager`, `lineUp`, `playerLineUp`, `goal`, `card`, `substitution`, `playerFixtureStat`, derived `fixtureTeamStat` |
 | **API-Sports** | `backend/src/api/adapters/api-sports/` | Competitions, seasons, `competitionStanding`, players, fixtures (scores/status), `teamStadium`, `transfer`, `fixtureTeamStat` |
+| **SportMonks** | `backend/src/api/adapters/sportmonks/` | Competitions, seasons, fixtures, events, lineups, standings, `fixtureTeamStat` |
+| **RapidAPI SportAPI** | `backend/src/api/adapters/sportapi/` | Competitions, seasons, fixtures, live scores, incidents, lineups, standings, `fixtureTeamStat` |
 | **YouTube** | `backend/src/api/complexModules/highlights/` | `fixtureHighlight` |
 
 **Not integrated:** Sportradar, TheSportsDB, FotMob.
@@ -73,7 +77,7 @@ Mobile ──mock data only
 
 Entities store external IDs under `metadata.providers.<slug>` (see `libraries/base/entity/entityMetadata.ts`):
 
-- Canonical slugs in use: `apisports`, `statsbomb`
+- Canonical slugs in use: `apisports`, `statsbomb`, `sportmonks`, `sportapi`
 - Fixture correlation: StatsBomb fixtures matched to API-Sports fixtures within ±6h kickoff window
 
 ### 3.3 Backend entities (football graph)
@@ -424,8 +428,8 @@ YouTube highlight ingestion runs via the highlights scheduler (BullMQ when Redis
 3. **API-Sports fixtures** — date window covering current season / matchday panel needs.
 4. **API-Sports players + enrich** — fills squads and profile fields for teams missing from StatsBomb.
 5. **API-Sports fixture-stats** — team-level match statistics for fixtures that lack StatsBomb rollups.
-6. **Verify in UI** — competition page, match page (numeric ID), team and player pages.
-7. **(Future) SportMonks import** — once adapter exists, use for live scores + single-provider consistency on chosen leagues.
+7. **RapidAPI SportAPI (optional fallback)** — live scores and extra league coverage via `sportapi7`. Keep `syncFixtureDetails` off on the BASIC 50/month quota.
+8. **Verify in UI** — competition page, match page (numeric ID), team and player pages.
 
 ---
 
@@ -460,6 +464,39 @@ Or via one-click job — add `sportmonks` to `POST /admin/data-sync/run`:
 
 ---
 
+## 8b. RapidAPI SportAPI import flow (implemented)
+
+Adapter: `backend/src/api/adapters/sportapi/`
+
+Cursor MCP: `.cursor/mcp.json` → `RapidAPI Hub - SportAPI` (`mcp-remote` + `https://mcp.rapidapi.com`). Same RapidAPI key as `RAPIDAPI_SPORTAPI_KEY`.
+
+| Step | Endpoint | Maps to |
+|------|----------|---------|
+| 1 | `GET /sportapi/discover/fixtures?date=` | Preview scheduled events |
+| 2 | `POST /sportapi/sync/import/fixtures` | `competition`, `season`, `team`, `fixture` |
+| 3 | `POST /sportapi/sync/standings` | `competitionStanding` |
+| 4 | `POST /sportapi/sync/fixture-details` | `goal`, `card`, `substitution`, `lineUp`, `fixtureTeamStat` |
+| 5 | `POST /sportapi/sync/import/live` | Live scores (also used by `/admin/live-fixtures`) |
+
+Or via one-click job — add `sportapi` to `POST /admin/data-sync/run`:
+
+```json
+{
+  "sportapi": {
+    "uniqueTournamentIds": [17],
+    "from": "2026-09-06",
+    "to": "2026-09-07",
+    "maxApiRequests": 10,
+    "syncStandings": true,
+    "syncFixtureDetails": false
+  }
+}
+```
+
+**Identity:** `metadata.providers.sportapi.externalId` (Sofascore-style event / uniqueTournament / team ids).
+
+---
+
 ## 9. Environment variables checklist
 
 | Variable | Provider / feature |
@@ -468,6 +505,7 @@ Or via one-click job — add `sportmonks` to `POST /admin/data-sync/run`:
 | `STATSBOMB_INSECURE_TLS` | StatsBomb GitHub fetch |
 | `REDIS_HOST` | Async data-sync + highlights |
 | `SPORTMONKS_API_TOKEN` | SportMonks adapter |
+| `RAPIDAPI_SPORTAPI_KEY` | RapidAPI SportAPI (`sportapi7.p.rapidapi.com`; `RAPIDAPI_KEY` also accepted) |
 | `SPORTRADAR_API_KEY` | *(future)* Sportradar |
 
 ---
@@ -481,6 +519,7 @@ Or via one-click job — add `sportmonks` to `POST /admin/data-sync/run`:
 | `backend/src/api/adapters/statsbomb/` | StatsBomb adapter |
 | `backend/src/api/adapters/api-sports/` | API-Sports adapter |
 | `backend/src/api/adapters/sportmonks/` | SportMonks adapter |
+| `backend/src/api/adapters/sportapi/` | RapidAPI SportAPI adapter |
 | `libraries/base/entity/entityMetadata.ts` | Cross-provider ID convention |
 | `frontend/ui/src/pages/admin/dashboard.page.tsx` | Admin sync UI |
 | `clients/controllers/admin-data-sync.ts` | Generated client for pipeline |

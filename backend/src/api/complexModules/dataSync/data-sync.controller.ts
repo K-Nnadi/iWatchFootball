@@ -25,7 +25,7 @@ import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../auth/decorators/roles.decorator';
 import { UserRole } from '../../../auth/types/security.types';
-import { DataSyncRunDto, isApiSportsPipelineEnabled } from './data-sync.dto';
+import { DataSyncRunDto, isApiSportsPipelineEnabled, isSportApiPipelineEnabled, isSportMonksPipelineEnabled } from './data-sync.dto';
 import { SyncJobService } from './sync-job.service';
 import { DataSyncPipelineService } from './data-sync-pipeline.service';
 
@@ -89,6 +89,24 @@ export class DataSyncController {
             leagueApiIds: [39],
             maxApiRequests: 40,
             fixtures: { from: '2024-08-16', to: '2024-08-18', maxRequestsPerLeague: 5 },
+          },
+        },
+      },
+      rapidApiSportApi: {
+        summary: 'RapidAPI SportAPI only — Premier League window',
+        description:
+          'Uses sportapi7 via RapidAPI. uniqueTournament 17 = Premier League. Keep maxApiRequests low on the BASIC 50/month quota; leave syncFixtureDetails false unless you need incidents/lineups.',
+        value: {
+          statsbomb: false,
+          async: false,
+          sportapi: {
+            enabled: true,
+            uniqueTournamentIds: [17],
+            from: '2026-09-06',
+            to: '2026-09-07',
+            maxApiRequests: 10,
+            syncStandings: true,
+            syncFixtureDetails: false,
           },
         },
       },
@@ -157,8 +175,15 @@ export class DataSyncController {
     if (body.resumeJobId != null) {
       return;
     }
-    if (!body.statsbomb && !isApiSportsPipelineEnabled(body)) {
-      throw new BadRequestException('Enable at least one of statsbomb or apiSports (or pass resumeJobId)');
+    if (
+      !body.statsbomb &&
+      !isApiSportsPipelineEnabled(body) &&
+      !isSportMonksPipelineEnabled(body) &&
+      !isSportApiPipelineEnabled(body)
+    ) {
+      throw new BadRequestException(
+        'Enable at least one of statsbomb, apiSports, sportmonks, or sportapi (or pass resumeJobId)',
+      );
     }
     if (isApiSportsPipelineEnabled(body)) {
       const api = body.apiSports!;

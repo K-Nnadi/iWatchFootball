@@ -2490,9 +2490,12 @@ export class StatsBombAdapterService {
       const playerNames = new Set<string>();
       const teamNames = new Set<string>();
       
+      const assistNameByGoalEventId = this.mapAssistPlayerNameByGoalEventId(events);
       goalEvents.forEach(e => {
         if (e.player?.name) playerNames.add(e.player.name);
         if (e.team?.name) teamNames.add(e.team.name);
+        const assistName = assistNameByGoalEventId.get(e.id);
+        if (assistName) playerNames.add(assistName);
       });
       
       cardEvents.forEach(e => {
@@ -2532,9 +2535,10 @@ export class StatsBombAdapterService {
       const eventPromises: Promise<void>[] = [];
       
       if (!options?.skipGoals) {
-        // Process goals in parallel
         goalEvents.forEach(event => {
-          eventPromises.push(this.syncGoal(event, fixtureId, playerMap, teamMap));
+          const assistName = assistNameByGoalEventId.get(event.id);
+          const assistant = assistName ? playerMap.get(assistName) ?? null : null;
+          eventPromises.push(this.syncGoal(event, fixtureId, playerMap, teamMap, assistant));
         });
       }
       
@@ -2884,10 +2888,56 @@ export class StatsBombAdapterService {
     } as any);
   }
 
+  /** Shot event id → assisting player's StatsBomb name. */
+  private mapAssistPlayerNameByGoalEventId(events: StatsBombEvent[]): Map<string, string> {
+    const byId = new Map<string, StatsBombEvent>();
+    for (const event of events) {
+      if (event.id) byId.set(event.id, event);
+    }
+
+    const assistNameByGoalEventId = new Map<string, string>();
+
+    for (const event of events) {
+      if (event.period === 5) continue;
+      if (event.type?.name !== 'Shot' || event.shot?.outcome?.name !== 'Goal') continue;
+      const keyPassId = event.shot?.key_pass_id;
+      if (!keyPassId) continue;
+      const pass = byId.get(keyPassId);
+      const name = pass?.player?.name?.trim();
+      if (name) assistNameByGoalEventId.set(event.id, name);
+    }
+
+    for (const event of events) {
+      if (event.period === 5) continue;
+      if (event.type?.name !== 'Pass' || !event.pass?.goal_assist) continue;
+      const shotId = event.pass.assisted_shot_id;
+      const name = event.player?.name?.trim();
+      if (!shotId || !name || assistNameByGoalEventId.has(shotId)) continue;
+      assistNameByGoalEventId.set(shotId, name);
+    }
+
+    return assistNameByGoalEventId;
+  }
+
+  private async upsertGoalAssistant(
+    goal: { id: number; assistantId?: number | null },
+    assistant: { id: number } | null | undefined,
+  ): Promise<void> {
+    if (!assistant?.id) return;
+    if (goal.assistantId === assistant.id) return;
+    await this.goalService.update(goal.id, { assistantId: assistant.id });
+  }
+
   /**
    * Sync a goal to database
    */
-  private async syncGoal(eventData: StatsBombEvent, fixtureId: number, playerMap?: Map<string, any>, teamMap?: Map<string, any>): Promise<void> {
+  private async syncGoal(
+    eventData: StatsBombEvent,
+    fixtureId: number,
+    playerMap?: Map<string, any>,
+    teamMap?: Map<string, any>,
+    assistant?: { id: number } | null,
+  ): Promise<void> {
     try {
       const statsbombPlayerName = eventData.player?.name ?? 'Unknown player';
       this.logger.debug(`🎯 Processing goal: ${statsbombPlayerName} at ${eventData.minute}'`);
@@ -2901,6 +2951,7 @@ export class StatsBombAdapterService {
       const existingGoalByEventId = await this.findGoalByStatsBombEventId(eventData.id, fixtureId);
       if (existingGoalByEventId) {
         await this.upsertIncidentTeamId('goal', existingGoalByEventId, team);
+        await this.upsertGoalAssistant(existingGoalByEventId, assistant);
         return;
       }
 
@@ -2931,6 +2982,7 @@ export class StatsBombAdapterService {
 
       if (existingGoalByFields) {
         await this.upsertIncidentTeamId('goal', existingGoalByFields, team);
+        await this.upsertGoalAssistant(existingGoalByFields, assistant);
         return;
       }
 
@@ -2944,6 +2996,7 @@ export class StatsBombAdapterService {
         scorerId: player.id,
         fixtureId: fixtureId,
         teamId: team.id,
+        assistantId: assistant?.id,
         penalty: eventData.shot?.type?.name === 'Penalty',
         ownGoal: false, // Would need additional logic to determine this
         metadata: {

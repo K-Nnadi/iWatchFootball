@@ -7,6 +7,7 @@ import {CrudRepoAdapter} from "@iWatchFootball/base-tools/crud/crud.repo.adapter
 import {Repository} from "typeorm";
 import { ManagerEmployment } from '../managerEmployment/managerEmployment.entity';
 import { Team } from '../team/team.entity';
+import { Fixture } from '../fixture/fixture.entity';
 import { ManagerProfileService } from './manager-profile.service';
 import { ManagerProfileController } from './manager-profile.controller';
 
@@ -26,7 +27,7 @@ export class ManagerController extends CrudController<Manager, CreateManagerDTO>
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Manager, ManagerEmployment, Team])],
+  imports: [TypeOrmModule.forFeature([Manager, ManagerEmployment, Team, Fixture])],
   controllers: [ManagerController, ManagerProfileController],
   providers: [ManagerService, ManagerProfileService],
   exports: [ManagerService, ManagerProfileService]

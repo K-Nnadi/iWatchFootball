@@ -19,8 +19,10 @@ import { ModernH1, ModernBody, ModernButton, ModernCard } from '../../components
 import {
     getMyListings,
     cancelListing,
+    confirmListingTransfer,
     type MarketplaceListing,
 } from '../../shared/api/marketplace.api';
+import { RatingsPanel } from './RatingsPanel';
 
 const STATUS_COLORS: Record<MarketplaceListing['status'], string> = {
     ACTIVE: 'var(--modern-lime)',
@@ -57,6 +59,7 @@ export function MyListingsPage() {
     const [listings, setListings] = useState<MarketplaceListing[]>([]);
     const [loading, setLoading] = useState(true);
     const [cancellingId, setCancellingId] = useState<number | null>(null);
+    const [transferringId, setTransferringId] = useState<number | null>(null);
     const [activeTab, setActiveTab] = useState<string>('active');
 
     const fetchListings = useCallback(async () => {
@@ -92,6 +95,19 @@ export function MyListingsPage() {
             notify.error(t('marketplace.cancellationFailedTitle'), msg);
         } finally {
             setCancellingId(null);
+        }
+    };
+
+    const handleConfirmTransfer = async (listingId: number) => {
+        setTransferringId(listingId);
+        try {
+            await confirmListingTransfer(listingId);
+            notify.success('Transfer marked', 'The buyer can now confirm receipt so your payout is released.');
+            void fetchListings();
+        } catch {
+            notify.error('Could not confirm transfer', 'Please try again.');
+        } finally {
+            setTransferringId(null);
         }
     };
 
@@ -189,6 +205,36 @@ export function MyListingsPage() {
                     </ModernButton>
                 </Group>
             )}
+            {listing.status === 'SOLD' && !listing.transferInitiatedAt && (
+                <ModernButton
+                    variant="primary"
+                    onClick={() => void handleConfirmTransfer(listing.id)}
+                    disabled={transferringId === listing.id}
+                    style={{ padding: '0.3rem 0.8rem', fontSize: '0.82rem' }}
+                >
+                    {transferringId === listing.id ? <Loader size="xs" /> : 'I transferred the ticket'}
+                </ModernButton>
+            )}
+            {listing.status === 'SOLD' && !!listing.transferInitiatedAt && !listing.receiptConfirmedAt && (
+                <Text size="xs" c="dimmed">
+                    Waiting for the buyer to confirm receipt. Payout stays in escrow until then.
+                </Text>
+            )}
+            {listing.status === 'SOLD' && !!listing.receiptConfirmedAt && (
+                <>
+                    <Text size="xs" c="dimmed">
+                        Buyer confirmed receipt — payout released.
+                    </Text>
+                    {listing.buyerId != null && (
+                        <RatingsPanel
+                            listingId={listing.id}
+                            targetUserId={listing.buyerId}
+                            raterRole="SELLER"
+                            enabled
+                        />
+                    )}
+                </>
+            )}
         </Paper>
     );
 
@@ -206,12 +252,20 @@ export function MyListingsPage() {
                         <IconTag size={28} color="var(--modern-lime)" />
                         <ModernH1>{t('marketplace.myListings')}</ModernH1>
                     </Group>
-                    <ModernButton
-                        variant="primary"
-                        onClick={() => navigateWithTransition('/marketplace/sell')}
-                    >
-                        {t('marketplace.newListing')}
-                    </ModernButton>
+                    <Group gap="sm">
+                        <ModernButton
+                            variant="secondary"
+                            onClick={() => navigateWithTransition('/seller/onboarding')}
+                        >
+                            Payouts
+                        </ModernButton>
+                        <ModernButton
+                            variant="primary"
+                            onClick={() => navigateWithTransition('/marketplace/sell')}
+                        >
+                            {t('marketplace.newListing')}
+                        </ModernButton>
+                    </Group>
                 </Group>
 
                 <ModernBody

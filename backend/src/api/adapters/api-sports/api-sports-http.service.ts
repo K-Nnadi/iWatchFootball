@@ -101,6 +101,10 @@ export class ApiSportsHttpService {
     );
   }
 
+  isConfigured(): boolean {
+    return this.authMode !== 'none';
+  }
+
   async get<T = any>(path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
     if (this.authMode === 'none') {
       throw new HttpException(

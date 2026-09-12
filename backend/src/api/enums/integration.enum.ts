@@ -15,6 +15,7 @@ export enum IntegrationProvider {
     API_SPORTS = 'api_sports',
     STATSBOMB = 'statsbomb',
     SPORTMONKS = 'sportmonks',
+    SPORTAPI = 'sportapi',
     CUSTOM = 'custom',
 }
 

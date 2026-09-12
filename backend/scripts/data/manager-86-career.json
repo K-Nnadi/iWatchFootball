@@ -1,0 +1,87 @@
+{
+  "careerHistory": [
+    {
+      "team": { "name": "Real Madrid", "id": 2829, "countryHint": "Spain" },
+      "performance": { "total": 4, "wins": 3, "draws": 0, "losses": 1, "totalPoints": 9 },
+      "startTimestamp": 1782864000,
+      "endTimestamp": 1877472000
+    },
+    {
+      "team": { "name": "Benfica", "id": 3006, "countryHint": "Portugal" },
+      "performance": { "total": 45, "wins": 27, "draws": 10, "losses": 8, "totalPoints": 91 },
+      "startTimestamp": 1758153600,
+      "endTimestamp": 1782777600
+    },
+    {
+      "team": { "name": "Fenerbahçe", "id": 3052, "countryHint": "Turkey" },
+      "performance": { "total": 62, "wins": 37, "draws": 14, "losses": 11, "totalPoints": 125 },
+      "startTimestamp": 1719792000,
+      "endTimestamp": 1756425600
+    },
+    {
+      "team": { "name": "AS Roma", "id": 2702, "countryHint": "Italy" },
+      "performance": { "total": 138, "wins": 68, "draws": 30, "losses": 40, "totalPoints": 234 },
+      "startTimestamp": 1625097600,
+      "endTimestamp": 1705363200
+    },
+    {
+      "team": { "name": "Tottenham Hotspur", "id": 33, "countryHint": "England" },
+      "performance": { "total": 86, "wins": 45, "draws": 17, "losses": 24, "totalPoints": 152 },
+      "startTimestamp": 1574208000,
+      "endTimestamp": 1618790400
+    },
+    {
+      "team": { "name": "Manchester United", "id": 35, "countryHint": "England" },
+      "performance": { "total": 144, "wins": 84, "draws": 31, "losses": 29, "totalPoints": 283 },
+      "startTimestamp": 1467331200,
+      "endTimestamp": 1545091200
+    },
+    {
+      "team": { "name": "Chelsea", "id": 38, "countryHint": "England" },
+      "performance": { "total": 136, "wins": 80, "draws": 27, "losses": 29, "totalPoints": 267 },
+      "startTimestamp": 1372636800,
+      "endTimestamp": 1450310400
+    },
+    {
+      "team": { "name": "Real Madrid", "id": 2829, "countryHint": "Spain" },
+      "performance": { "total": 178, "wins": 127, "draws": 28, "losses": 23, "totalPoints": 409 },
+      "startTimestamp": 1277942400,
+      "endTimestamp": 1372550400
+    },
+    {
+      "team": { "name": "Inter", "id": 2697, "countryHint": "Italy" },
+      "performance": { "total": 108, "wins": 68, "draws": 25, "losses": 15, "totalPoints": 229 },
+      "startTimestamp": 1214870400,
+      "endTimestamp": 1277856000
+    },
+    {
+      "team": { "name": "Chelsea", "id": 38, "countryHint": "England" },
+      "performance": { "total": 185, "wins": 124, "draws": 38, "losses": 23, "totalPoints": 410 },
+      "startTimestamp": 1088640000,
+      "endTimestamp": 1190246400
+    },
+    {
+      "team": { "name": "FC Porto", "id": 3002, "countryHint": "Portugal" },
+      "performance": { "total": 127, "wins": 91, "draws": 21, "losses": 15, "totalPoints": 294 },
+      "startTimestamp": 1011744000,
+      "endTimestamp": 1088553600
+    },
+    {
+      "team": { "name": "União de Leiria", "id": 3000, "countryHint": "Portugal" },
+      "performance": { "total": 20, "wins": 9, "draws": 7, "losses": 4, "totalPoints": 34 },
+      "startTimestamp": 993945600,
+      "endTimestamp": 1011657600
+    },
+    {
+      "team": { "name": "Benfica", "id": 3006, "countryHint": "Portugal" },
+      "performance": { "total": 11, "wins": 6, "draws": 3, "losses": 2, "totalPoints": 21 },
+      "startTimestamp": 969408000,
+      "endTimestamp": 975974400
+    },
+    {
+      "team": { "name": "Vitória Setúbal U19", "id": 78155, "countryHint": "Portugal" },
+      "startTimestamp": 615254400,
+      "endTimestamp": 646704000
+    }
+  ]
+}

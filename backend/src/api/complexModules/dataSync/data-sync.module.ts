@@ -10,6 +10,7 @@ import { DataSyncProcessor } from './data-sync.processor';
 import { StatsBombAdapterModule } from '../../adapters/statsbomb/statsbomb-adapter.module';
 import { ApiSportsAdapterModule } from '../../adapters/api-sports/api-sports-adapter.module';
 import { SportMonksAdapterModule } from '../../adapters/sportmonks/sportmonks-adapter.module';
+import { SportApiAdapterModule } from '../../adapters/sportapi/sportapi-adapter.module';
 
 const hasRedis = !!process.env.REDIS_HOST;
 const bullQueueModule = hasRedis
@@ -24,6 +25,7 @@ const bullQueueModule = hasRedis
     StatsBombAdapterModule,
     ApiSportsAdapterModule,
     SportMonksAdapterModule,
+    SportApiAdapterModule,
     ...(bullQueueModule ? [bullQueueModule] : []),
   ],
   controllers: [DataSyncController],

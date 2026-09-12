@@ -4,9 +4,12 @@ import {
     Container, LoadingOverlay, Tabs, Text, Box, Group, Badge,
     Stack, Center, Table, Select, ThemeIcon,
 } from '@mantine/core';
-import { IconTable, IconCalendar, IconWorld, IconFlag, IconTrophy, IconArrowUp, IconArrowDown, IconMinus } from '@tabler/icons-react';
+import {
+    IconTable, IconCalendar, IconWorld, IconFlag, IconTrophy,
+    IconArrowUp, IconArrowDown, IconMinus, IconChartBar, IconBallFootball,
+} from '@tabler/icons-react';
 import { ModernCard, ModernH2 } from '../components/modern';
-import { UiMatchList, type MatchRowData } from '../components/ui';
+import { UiMatchList } from '../components/ui';
 import { useGetOneCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useGetQueryTeamCompetitionSeason } from '@iWatchFootball/clients/controllers/team-competition-season';
 import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
@@ -17,75 +20,17 @@ import { useQuery } from '@tanstack/react-query';
 import { usePageTransition } from '../hooks/usePageTransition';
 import { formatMatchHeadingDate, useTranslation } from '../i18n';
 import '../styles/modern.css';
-import { resolveFixtureScores, type FixtureScoresInput } from '../shared/fixtureScores';
-
-type FixtureRecord = {
-    id: number;
-    date: string;
-    status?: string;
-    homeTeamId: number;
-    awayTeamId: number;
-    homeScore?: number;
-    awayScore?: number;
-    metadata?: { homeScore?: number; awayScore?: number };
-};
-
-type TeamRecord = {
-    id: number;
-    name?: string;
-    logoUrl?: string;
-};
-
-function fixtureToMatchRowData(fix: FixtureRecord, teams: TeamRecord[]): MatchRowData {
-    const homeTeam = teams.find((t) => t.id === fix.homeTeamId);
-    const awayTeam = teams.find((t) => t.id === fix.awayTeamId);
-    const home = homeTeam?.name ?? `Team ${fix.homeTeamId}`;
-    const away = awayTeam?.name ?? `Team ${fix.awayTeamId}`;
-    const scores = resolveFixtureScores(fix as FixtureScoresInput);
-    const isLive = fix.status === 'Live';
-    const kickoff = new Date(fix.date).toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-
-    if (isLive && scores) {
-        return {
-            id: fix.id,
-            homeTeam: home,
-            awayTeam: away,
-            homeScore: scores.home,
-            awayScore: scores.away,
-            homeLogo: homeTeam?.logoUrl,
-            awayLogo: awayTeam?.logoUrl,
-            time: 'LIVE',
-            isLive: true,
-        };
-    }
-
-    if (scores) {
-        return {
-            id: fix.id,
-            homeTeam: home,
-            awayTeam: away,
-            homeScore: scores.home,
-            awayScore: scores.away,
-            homeLogo: homeTeam?.logoUrl,
-            awayLogo: awayTeam?.logoUrl,
-            time: fix.status === 'Completed' ? 'FT' : kickoff,
-            isLive: false,
-        };
-    }
-
-    return {
-        id: fix.id,
-        homeTeam: home,
-        awayTeam: away,
-        homeLogo: homeTeam?.logoUrl,
-        awayLogo: awayTeam?.logoUrl,
-        time: kickoff,
-        isLive: false,
-    };
-}
+import { usePlatformFeaturesStore } from '../shared/stores/platformFeatures.store';
+import {
+    CompetitionMySeasonTab,
+    CompetitionStatsTab,
+} from './competition/competitionTabs';
+import {
+    competitionTableStyles,
+    fixtureToMatchRowData,
+    type FixtureRecord,
+    type TeamRecord,
+} from './competition/shared';
 
 interface CompetitionStanding {
     id: number;
@@ -153,6 +98,8 @@ export function CompetitionPage() {
     }, [tcsAll, allSeasons]);
 
     const [selectedSeasonId, setSelectedSeasonId] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<string | null>('table');
+    const attendanceTrackingEnabled = usePlatformFeaturesStore((s) => s.attendanceTrackingEnabled);
     const activeSeasonId = selectedSeasonId
         ? Number(selectedSeasonId)
         : seasonOptions[0]?.id ?? null;
@@ -218,19 +165,24 @@ export function CompetitionPage() {
 
     // Fixtures for this competition + season
     const { data: fixtures = [], isLoading: isLoadingFixtures } = useGetQueryFixture(
-        { where: { competitionId, seasonId: activeSeasonId ?? undefined }, take: 100, order: { date: 'ASC' } } as any,
+        { where: { competitionId, seasonId: activeSeasonId ?? undefined }, take: 500, order: { date: 'DESC' } } as any,
         { query: { enabled: !!competitionId && !!activeSeasonId } as any }
     );
 
     const sortedStandings = dedupedStandings;
 
     const fixtureGroups = useMemo(() => {
-        const groups: Record<string, FixtureRecord[]> = {};
-        (fixtures as FixtureRecord[]).forEach((f) => {
+        const groups = new Map<string, FixtureRecord[]>();
+        const sortedFixtures = [...(fixtures as FixtureRecord[])].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
+        for (const f of sortedFixtures) {
             const key = f.date.slice(0, 10);
-            (groups[key] ??= []).push(f);
-        });
-        return Object.entries(groups).map(([date, dayFixtures]) => ({
+            const day = groups.get(key);
+            if (day) day.push(f);
+            else groups.set(key, [f]);
+        }
+        return Array.from(groups.entries()).map(([date, dayFixtures]) => ({
             league: formatMatchHeadingDate(new Date(`${date}T12:00:00`)),
             matches: dayFixtures.map((f) => fixtureToMatchRowData(f, teamsData as TeamRecord[])),
         }));
@@ -282,8 +234,11 @@ export function CompetitionPage() {
                 </Group>
             </ModernCard>
 
-            <Tabs defaultValue="table" styles={{
-                list: { borderBottom: '2px solid var(--modern-card-border)', marginBottom: '1.5rem' },
+            <Tabs
+                value={activeTab}
+                onChange={setActiveTab}
+                styles={{
+                list: { borderBottom: '2px solid var(--modern-card-border)', marginBottom: '1.5rem', flexWrap: 'wrap' },
                 tab: {
                     color: 'var(--modern-text-secondary)', padding: '0.75rem 1.5rem', fontWeight: 500,
                     '&[data-active]': { color: 'var(--modern-lime)', borderBottomColor: 'var(--modern-lime)' },
@@ -292,6 +247,12 @@ export function CompetitionPage() {
                 <Tabs.List>
                     <Tabs.Tab value="table" leftSection={<IconTable size={16} />}>{t('competitions.tabTable')}</Tabs.Tab>
                     <Tabs.Tab value="fixtures" leftSection={<IconCalendar size={16} />}>{t('competitions.tabFixtures')}</Tabs.Tab>
+                    <Tabs.Tab value="stats" leftSection={<IconChartBar size={16} />}>{t('competitions.tabStats')}</Tabs.Tab>
+                    {attendanceTrackingEnabled && (
+                        <Tabs.Tab value="my-season" leftSection={<IconBallFootball size={16} />}>
+                            {t('competitions.tabMySeason')}
+                        </Tabs.Tab>
+                    )}
                 </Tabs.List>
 
                 {/* ── Standings tab ── */}
@@ -307,10 +268,7 @@ export function CompetitionPage() {
                         </Center>
                     ) : (
                         <ModernCard hover={false} style={{ padding: 0, overflow: 'hidden' }}>
-                            <Table highlightOnHover styles={{
-                                th: { color: 'var(--modern-text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0.75rem 1rem' },
-                                td: { padding: '0.65rem 1rem', borderColor: 'var(--modern-card-border)' },
-                            }}>
+                            <Table highlightOnHover styles={competitionTableStyles}>
                                 <Table.Thead>
                                     <Table.Tr>
                                         <Table.Th w={40}>#</Table.Th>
@@ -424,6 +382,39 @@ export function CompetitionPage() {
                         />
                     )}
                 </Tabs.Panel>
+
+                <Tabs.Panel value="stats">
+                    <CompetitionStatsTab
+                        competitionId={competitionId}
+                        seasonId={activeSeasonId}
+                        teams={teamsData as TeamRecord[]}
+                        onPlayerClick={(playerId) =>
+                            navigateWithTransition(`/player/${playerId}`, {
+                                transitionType: 'loading',
+                                duration: 900,
+                            })
+                        }
+                    />
+                </Tabs.Panel>
+
+                {attendanceTrackingEnabled && (
+                    <Tabs.Panel value="my-season">
+                        <CompetitionMySeasonTab
+                            competitionId={competitionId}
+                            seasonId={activeSeasonId}
+                            seasonFixtures={fixtures as FixtureRecord[]}
+                            teams={teamsData as TeamRecord[]}
+                            locale={locale}
+                            onMatchClick={(id) =>
+                                navigateWithTransition(`/match/${id}`, {
+                                    transitionType: 'loading',
+                                    duration: 1200,
+                                })
+                            }
+                            onBrowseFixtures={() => setActiveTab('fixtures')}
+                        />
+                    </Tabs.Panel>
+                )}
             </Tabs>
         </Container>
     );

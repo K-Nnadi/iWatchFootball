@@ -22,6 +22,8 @@ import { UserTicketLogService } from '../userTicketLog/userTicketLog.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../enums/notification.enum';
 import { MarketplaceDispute } from '../marketplaceDispute/marketplaceDispute.entity';
+import { SellerConnectService } from '../../complexModules/marketplace/seller-connect.service';
+import { EscrowService } from '../../complexModules/marketplace/escrow.service';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
@@ -49,6 +51,8 @@ export class MarketplaceListingService {
         private readonly ownershipHistory: TicketOwnershipHistoryService,
         private readonly userTicketLog: UserTicketLogService,
         private readonly notificationService: NotificationService,
+        private readonly sellerConnect: SellerConnectService,
+        private readonly escrowService: EscrowService,
     ) {}
 
     /** Adds fixtureLabel, fixtureDate (kick-off ISO), stadiumName onto each nested ticket for API consumers. */
@@ -113,6 +117,7 @@ export class MarketplaceListingService {
         if (params.askPrice <= 0) {
             throw new BadRequestException('Ask price must be greater than zero');
         }
+        await this.sellerConnect.assertCanList(params.sellerId);
 
         const listingId = await this.dataSource.transaction(async (manager) => {
             const ticketRepo = manager.getRepository(Ticket);
@@ -456,6 +461,15 @@ export class MarketplaceListingService {
 
         listing.receiptConfirmedAt = new Date();
         const saved = await this.repo.save(listing);
+
+        try {
+            await this.escrowService.releaseByListingId(listingId, buyerId);
+        } catch (e) {
+            // Legacy sales without an escrow row still confirm receipt.
+            if (!(e instanceof BadRequestException) && !(e instanceof NotFoundException)) {
+                throw e;
+            }
+        }
 
         await this.notificationService.createIfAllowed({
             userId: listing.sellerId,

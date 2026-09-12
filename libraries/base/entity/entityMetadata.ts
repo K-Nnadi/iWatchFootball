@@ -51,6 +51,7 @@ export const ENTITY_METADATA_PROVIDER = {
   APISPORTS: 'apisports',
   STATSBOMB: 'statsbomb',
   SPORTMONKS: 'sportmonks',
+  SPORTAPI: 'sportapi',
 } as const;
 
 export type KnownMetadataProviderSlug = (typeof ENTITY_METADATA_PROVIDER)[keyof typeof ENTITY_METADATA_PROVIDER];

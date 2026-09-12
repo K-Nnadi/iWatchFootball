@@ -14,6 +14,7 @@ import { Team } from '../team/team.entity';
 export enum FixtureTeamStatSource {
     API_SPORTS = 'api_sports',
     SPORTMONKS = 'sportmonks',
+    SPORTAPI = 'sportapi',
     DERIVED = 'derived',
     MANUAL = 'manual',
 }

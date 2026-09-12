@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ActionIcon, Badge, Group, Paper, Select, Stack, Text, useMantineColorScheme } from '@mantine/core';
 import { IconInfoCircle, IconPrinter, IconCamera } from '@tabler/icons-react';
 import { ModernButton, ModernH3 } from '../modern';
@@ -52,6 +51,8 @@ export function TicketCard({ ticket, onBuyNow, buying }: TicketCardProps) {
                 border: `1px solid ${defaultBorder}`,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
+                height: 'auto',
+                flex: '0 0 auto',
             }}
             onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'var(--modern-lime)';
@@ -60,54 +61,57 @@ export function TicketCard({ ticket, onBuyNow, buying }: TicketCardProps) {
                 e.currentTarget.style.borderColor = defaultBorder;
             }}
         >
-            <Group justify="space-between" mb="xs">
-                <Badge color={CATEGORY_COLORS[ticket.category] || 'gray'}>
-                    Category {ticket.category}
-                </Badge>
-                <Group gap="xs">
-                    <ActionIcon size="sm" variant="subtle" aria-label="Ticket information">
-                        <IconInfoCircle size={16} />
-                    </ActionIcon>
-                    <ActionIcon size="sm" variant="subtle" aria-label="Print ticket">
-                        <IconPrinter size={16} />
-                    </ActionIcon>
-                    <ActionIcon size="sm" variant="subtle" aria-label="View seat">
-                        <IconCamera size={16} />
-                    </ActionIcon>
+            <Stack gap="sm">
+                <Group justify="space-between">
+                    <Badge color={CATEGORY_COLORS[ticket.category] || 'gray'}>
+                        Category {ticket.category}
+                    </Badge>
+                    <Group gap="xs">
+                        <ActionIcon size="sm" variant="subtle" aria-label="Ticket information">
+                            <IconInfoCircle size={16} />
+                        </ActionIcon>
+                        <ActionIcon size="sm" variant="subtle" aria-label="Print ticket">
+                            <IconPrinter size={16} />
+                        </ActionIcon>
+                        <ActionIcon size="sm" variant="subtle" aria-label="View seat">
+                            <IconCamera size={16} />
+                        </ActionIcon>
+                    </Group>
                 </Group>
-            </Group>
 
-            <Stack gap="xs">
-                {ticket.row && (
-                    <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
-                        Row: {ticket.row}
-                    </Text>
-                )}
-                <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
+                <Text size="sm" fw={600} style={{ color: 'var(--modern-text-primary)' }}>
                     {ticket.ticketType}
                 </Text>
-                {ticket.fanSide && (
-                    <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
-                        {ticket.fanSide} Fans
-                    </Text>
-                )}
-                {ticket.block && (
-                    <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
-                        Block: {ticket.block}
-                    </Text>
-                )}
-                {ticket.clearView && (
-                    <Badge size="xs" variant="light" color="green">
-                        Clear View
-                    </Badge>
-                )}
-                {ticket.adultTickets && (
-                    <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
-                        Adult Tickets
-                    </Text>
-                )}
 
-                <Group justify="space-between" mt="sm">
+                <Group gap="xs" wrap="wrap">
+                    {ticket.row && (
+                        <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
+                            Row: {ticket.row}
+                        </Text>
+                    )}
+                    {ticket.fanSide && (
+                        <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
+                            {ticket.fanSide} Fans
+                        </Text>
+                    )}
+                    {ticket.block && (
+                        <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
+                            Block: {ticket.block}
+                        </Text>
+                    )}
+                    {ticket.clearView && (
+                        <Badge size="xs" variant="light" color="green">
+                            Clear View
+                        </Badge>
+                    )}
+                    {ticket.adultTickets && (
+                        <Text size="xs" style={{ color: 'var(--modern-text-secondary)' }}>
+                            Adult Tickets
+                        </Text>
+                    )}
+                </Group>
+
+                <Group justify="space-between" align="center">
                     <Select
                         placeholder="Qty"
                         data={quantityOptions}

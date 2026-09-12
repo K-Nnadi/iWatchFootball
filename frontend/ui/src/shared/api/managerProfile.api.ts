@@ -14,6 +14,18 @@ export type ManagerCareerRow = {
     source: ManagerCareerSource;
 };
 
+export type ManagerMatchRow = {
+    id: number;
+    date: string;
+    homeTeamId: number;
+    awayTeamId: number;
+    homeTeamName: string;
+    awayTeamName: string;
+    homeScore?: number;
+    awayScore?: number;
+    metadata?: unknown;
+};
+
 export type ManagerProfileResponse = {
     manager: {
         id: number;
@@ -26,6 +38,7 @@ export type ManagerProfileResponse = {
     career: ManagerCareerRow[];
     currentTeamId?: number;
     clubsManagedCount: number;
+    recentMatches?: ManagerMatchRow[];
 };
 
 export async function fetchManagerProfile(managerId: number): Promise<ManagerProfileResponse> {

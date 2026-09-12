@@ -1,9 +1,10 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../../auth/decorators/public.decorator';
 import { PlayerMatchesService } from './player-matches.service';
 import { PlayerAdvancedStatsService } from '../playerFixtureStat/player-advanced-stats.service';
 import { AdvancedStatsFeatureService } from '../platformConfig/advanced-stats-feature.service';
+import { PlayerService, type PlayerLookupRow } from './player.service';
 import type { PlayerMatchesResponse } from './player-matches.types';
 import type { PlayerAdvancedStatsResponse } from '../playerFixtureStat/player-advanced-stats.service';
 
@@ -11,10 +12,28 @@ import type { PlayerAdvancedStatsResponse } from '../playerFixtureStat/player-ad
 @Controller('player')
 export class PlayerProfileController {
     constructor(
+        private readonly playerService: PlayerService,
         private readonly playerMatchesService: PlayerMatchesService,
         private readonly playerAdvancedStatsService: PlayerAdvancedStatsService,
         private readonly advancedStatsFeature: AdvancedStatsFeatureService,
     ) {}
+
+    @Post('lookup')
+    @Public()
+    @ApiOperation({ summary: 'Resolve player names and photos by id (public, body — not GET /query $in)' })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: { ids: { type: 'array', items: { type: 'number' } } },
+        },
+    })
+    @ApiOkResponse({ description: 'id, name, photoUrl for each found player' })
+    async lookupPlayers(@Body() body: { ids?: unknown }): Promise<PlayerLookupRow[]> {
+        const ids = Array.isArray(body?.ids)
+            ? body.ids.map((value) => Number(value)).filter((id) => Number.isInteger(id) && id > 0)
+            : [];
+        return this.playerService.lookupByIds(ids);
+    }
 
     @Get(':playerId/matches')
     @Public()

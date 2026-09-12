@@ -85,6 +85,7 @@ export function ManagerPage() {
     const manager = profile?.manager;
     const career = profile?.career ?? [];
     const currentTeamId = profile?.currentTeamId;
+    const profileMatches = profile?.recentMatches ?? [];
 
     const { data: homeFixtures = [] } = useGetQueryFixture(
         {
@@ -92,7 +93,7 @@ export function ManagerPage() {
             take: 20,
             order: { date: 'DESC' as const },
         } as any,
-        { query: { enabled: fetchFromApi && currentTeamId != null } as any },
+        { query: { enabled: fetchFromApi && currentTeamId != null && profileMatches.length === 0 } as any },
     );
 
     const { data: awayFixtures = [] } = useGetQueryFixture(
@@ -101,13 +102,17 @@ export function ManagerPage() {
             take: 20,
             order: { date: 'DESC' as const },
         } as any,
-        { query: { enabled: fetchFromApi && currentTeamId != null } as any },
+        { query: { enabled: fetchFromApi && currentTeamId != null && profileMatches.length === 0 } as any },
     );
 
     const teamIds = useMemo(() => {
         const ids = new Set<number>();
         for (const row of career) ids.add(row.teamId);
         if (currentTeamId != null) ids.add(currentTeamId);
+        for (const row of profileMatches) {
+            ids.add(row.homeTeamId);
+            ids.add(row.awayTeamId);
+        }
         for (const raw of [...homeFixtures, ...awayFixtures]) {
             const h = asFiniteNumberId((raw as { homeTeamId?: unknown }).homeTeamId);
             const a = asFiniteNumberId((raw as { awayTeamId?: unknown }).awayTeamId);
@@ -115,14 +120,39 @@ export function ManagerPage() {
             if (a != null) ids.add(a);
         }
         return Array.from(ids);
-    }, [career, currentTeamId, homeFixtures, awayFixtures]);
+    }, [career, currentTeamId, profileMatches, homeFixtures, awayFixtures]);
 
     const { data: teams = [] } = useGetQueryTeam(
-        { where: { id: { $in: teamIds.length ? teamIds : [-1] } }, take: 100 } as any,
+        {
+            where: { id: { $in: teamIds.length ? teamIds : [-1] } },
+            take: Math.max(teamIds.length, 1),
+        } as any,
         { query: { enabled: fetchFromApi && teamIds.length > 0 } as any },
     );
 
-    const teamById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
+    const teamById = useMemo(() => {
+        const m = new Map<number, (typeof teams)[number]>();
+        for (const team of teams) {
+            const id = asFiniteNumberId(team.id);
+            if (id != null) m.set(id, team);
+        }
+        return m;
+    }, [teams]);
+
+    const teamNameById = useMemo(() => {
+        const m = new Map<number, string>();
+        for (const row of career) {
+            if (row.teamName) m.set(row.teamId, row.teamName);
+        }
+        for (const row of profileMatches) {
+            m.set(row.homeTeamId, row.homeTeamName);
+            m.set(row.awayTeamId, row.awayTeamName);
+        }
+        for (const [id, team] of teamById) {
+            if (team.name) m.set(id, team.name);
+        }
+        return m;
+    }, [career, profileMatches, teamById]);
 
     const currentCareerRow =
         currentTeamId != null ? career.find((c) => c.teamId === currentTeamId) : undefined;
@@ -131,16 +161,31 @@ export function ManagerPage() {
     const currentTeamLogo = currentTeamFromQuery?.logoUrl ?? currentCareerRow?.crest ?? undefined;
 
     const recentFixtures = useMemo(() => {
-        if (currentTeamId == null) return [];
         type Fx = {
             id: number;
             date: string;
             homeTeamId?: number;
             awayTeamId?: number;
+            homeTeamName?: string;
+            awayTeamName?: string;
             homeScore?: unknown;
             awayScore?: unknown;
             metadata?: unknown;
         };
+        if (profileMatches.length > 0) {
+            return profileMatches.map((row) => ({
+                id: row.id,
+                date: row.date,
+                homeTeamId: row.homeTeamId,
+                awayTeamId: row.awayTeamId,
+                homeTeamName: row.homeTeamName,
+                awayTeamName: row.awayTeamName,
+                homeScore: row.homeScore,
+                awayScore: row.awayScore,
+                metadata: row.metadata,
+            }));
+        }
+        if (currentTeamId == null) return [];
         const merged = new Map<number, Fx>();
         for (const raw of [...homeFixtures, ...awayFixtures] as Fx[]) {
             const nid = asFiniteNumberId(raw.id);
@@ -156,7 +201,7 @@ export function ManagerPage() {
             })
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             .slice(0, 12);
-    }, [homeFixtures, awayFixtures, currentTeamId]);
+    }, [profileMatches, homeFixtures, awayFixtures, currentTeamId]);
 
     const careerRows = useMemo(() => {
         return career.map((row) => {
@@ -322,13 +367,13 @@ export function ManagerPage() {
                                         const homeTeamId = asFiniteNumberId(f.homeTeamId);
                                         const awayTeamId = asFiniteNumberId(f.awayTeamId);
                                         const isHome = homeTeamId === currentTeamId;
-                                        const homeTeam = homeTeamId != null ? teamById.get(homeTeamId) : undefined;
-                                        const awayTeam = awayTeamId != null ? teamById.get(awayTeamId) : undefined;
                                         const homeName =
-                                            homeTeam?.name ??
+                                            f.homeTeamName ??
+                                            (homeTeamId != null ? teamNameById.get(homeTeamId) : undefined) ??
                                             (homeTeamId != null ? `Team #${homeTeamId}` : 'Home');
                                         const awayName =
-                                            awayTeam?.name ??
+                                            f.awayTeamName ??
+                                            (awayTeamId != null ? teamNameById.get(awayTeamId) : undefined) ??
                                             (awayTeamId != null ? `Team #${awayTeamId}` : 'Away');
                                         const scores = scoresFromFixtureRow(f);
                                         const resultMeta = parseFixtureResultFromMetadata(

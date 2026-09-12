@@ -44,6 +44,9 @@ const envInfo = {
     API_SPORTS_KEY: process.env.API_SPORTS_KEY || process.env.FOOTBALLAPISPORTS_API_KEY
         ? '***set***'
         : 'not set',
+    RAPIDAPI_SPORTAPI_KEY: process.env.RAPIDAPI_SPORTAPI_KEY || process.env.RAPIDAPI_KEY
+        ? '***set***'
+        : 'not set',
     DATABASE_HOST: process.env.DATABASE_HOST ? '***set***' : 'not set',
     DATABASE_PORT: process.env.DATABASE_PORT || 'not set',
     DATABASE_NAME: process.env.DATABASE_NAME || 'not set',

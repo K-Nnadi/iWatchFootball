@@ -1,5 +1,6 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {NotFound} from "./pages/notFound.page";
+import {RootRouteErrorPage, RouteErrorPage} from "./pages/routeError.page";
 import {LogsPage} from "./pages/logs.page";
 import {HomePage} from "./pages/home.page";
 import {MatchesPage} from "./pages/matches.page";
@@ -8,6 +9,7 @@ import {SignUpPage} from "./pages/signUp.page";
 import {LoginPage} from "./pages/login.page";
 import {ForgotPasswordPage} from "./pages/forgotPassword.page";
 import {CompetitionsPage} from "./pages/competitions.page";
+import {TeamsPage} from "./pages/teams.page";
 // import {TransitionDemoPage} from "./pages/transition-demo.page"; // File not found
 import {AppWrapper} from "./components/shell/appWrapper";
 import React from "react";
@@ -48,6 +50,7 @@ import { TicketDemandFeatureRoute } from "./components/auth/TicketDemandFeatureR
 import { AttendanceHistoryPage } from "./pages/attendance/attendance.page";
 import { MyInterestsPage } from "./pages/ticketInterests/myInterests.page";
 import { MyPurchasesPage } from "./pages/marketplace/myPurchases.page";
+import { SellerOnboardingPage } from "./pages/marketplace/sellerOnboarding.page";
 import { FriendsPage } from "./pages/friends.page";
 import { CompareFriendPage } from "./pages/friendsCompare.page";
 import { MultiCompareFriendsPage } from "./pages/friendsMultiCompare.page";
@@ -66,6 +69,7 @@ const IWatchFootballElements: ElementMap = {
     matches: <MatchesPage/>,
     settings: <SettingsPage/>,
     competitions: <CompetitionsPage />,
+    teams: <TeamsPage />,
     checkout: <CheckoutPage/>,
     thankYou: <ThankYouPage/>,
     news: <NewsPage/>,
@@ -89,6 +93,11 @@ const IWatchFootballElements: ElementMap = {
     'marketplace/sell': (
         <MarketplaceFeatureRoute>
             <CreateListingPage/>
+        </MarketplaceFeatureRoute>
+    ),
+    'seller/onboarding': (
+        <MarketplaceFeatureRoute>
+            <SellerOnboardingPage/>
         </MarketplaceFeatureRoute>
     ),
     attendance: (
@@ -181,67 +190,73 @@ const router = createBrowserRouter([
     {
         path: '/',
         element: <AppWrapper />,
+        errorElement: <RootRouteErrorPage />,
         children: [
             {
-                path: 'welcome',
-                element: (
-                    <PublicOnlyRoute>
-                        <AuthWelcomePage />
-                    </PublicOnlyRoute>
-                ),
-            },
-            {
-                path: 'signIn',
-                element: (
-                    <PublicOnlyRoute>
-                        <LoginPage />
-                    </PublicOnlyRoute>
-                ),
-            },
-            {
-                path: 'join',
-                element: (
-                    <PublicOnlyRoute>
-                        <SignUpPage />
-                    </PublicOnlyRoute>
-                ),
-            },
-            {
-                path: 'forgot-password',
-                element: (
-                    <PublicOnlyRoute>
-                        <ForgotPasswordPage />
-                    </PublicOnlyRoute>
-                ),
-            },
-            {
-                index: true,
-                element: <RootEntry />,
-            },
-            { path: 'contact', element: <ContactPage /> },
-            { path: 'help', element: <HelpPage /> },
-            { path: 'licenses', element: <LicensesPage /> },
-            { path: 'privacy', element: <LegalDocumentPage doc="privacy" /> },
-            { path: 'terms', element: <LegalDocumentPage doc="terms" /> },
-            { path: 'cookies', element: <LegalDocumentPage doc="cookies" /> },
-            {
-                element: <RequireAuth />,
+                errorElement: <RouteErrorPage />,
                 children: [
-                    { path: 'onboarding', element: <OnboardingPage /> },
                     {
-                        element: <OnboardingGate />,
+                        path: 'welcome',
+                        element: (
+                            <PublicOnlyRoute>
+                                <AuthWelcomePage />
+                            </PublicOnlyRoute>
+                        ),
+                    },
+                    {
+                        path: 'signIn',
+                        element: (
+                            <PublicOnlyRoute>
+                                <LoginPage />
+                            </PublicOnlyRoute>
+                        ),
+                    },
+                    {
+                        path: 'join',
+                        element: (
+                            <PublicOnlyRoute>
+                                <SignUpPage />
+                            </PublicOnlyRoute>
+                        ),
+                    },
+                    {
+                        path: 'forgot-password',
+                        element: (
+                            <PublicOnlyRoute>
+                                <ForgotPasswordPage />
+                            </PublicOnlyRoute>
+                        ),
+                    },
+                    {
+                        index: true,
+                        element: <RootEntry />,
+                    },
+                    { path: 'contact', element: <ContactPage /> },
+                    { path: 'help', element: <HelpPage /> },
+                    { path: 'licenses', element: <LicensesPage /> },
+                    { path: 'privacy', element: <LegalDocumentPage doc="privacy" /> },
+                    { path: 'terms', element: <LegalDocumentPage doc="terms" /> },
+                    { path: 'cookies', element: <LegalDocumentPage doc="cookies" /> },
+                    {
+                        element: <RequireAuth />,
                         children: [
-                            { path: 'home', element: <HomePage /> },
-                            ...childrenRoutes,
-                            ...additionalRoutes,
+                            { path: 'onboarding', element: <OnboardingPage /> },
                             {
-                                element: <RequireAdmin />,
+                                element: <OnboardingGate />,
                                 children: [
-                                    { path: '/admin', element: <AdminDashboardPage /> },
-                                    { path: '/admin/discount-codes', element: <DiscountCodesAdminPage /> },
-                                    { path: '/admin/ticket-links', element: <TicketLinksAdminPage /> },
-                                    { path: '/admin/affiliate-partners', element: <AffiliatePartnersAdminPage /> },
-                                    { path: '/admin/ticket-link-analytics', element: <TicketLinkAnalyticsPage /> },
+                                    { path: 'home', element: <HomePage /> },
+                                    ...childrenRoutes,
+                                    ...additionalRoutes,
+                                    {
+                                        element: <RequireAdmin />,
+                                        children: [
+                                            { path: '/admin', element: <AdminDashboardPage /> },
+                                            { path: '/admin/discount-codes', element: <DiscountCodesAdminPage /> },
+                                            { path: '/admin/ticket-links', element: <TicketLinksAdminPage /> },
+                                            { path: '/admin/affiliate-partners', element: <AffiliatePartnersAdminPage /> },
+                                            { path: '/admin/ticket-link-analytics', element: <TicketLinkAnalyticsPage /> },
+                                        ],
+                                    },
                                 ],
                             },
                         ],

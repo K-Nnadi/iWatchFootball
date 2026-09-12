@@ -143,6 +143,57 @@ export class FixtureTeamStatService {
         await this.statRepo.upsert(input as any, ['fixtureId', 'teamId']);
     }
 
+    /** Map RapidAPI SportAPI (Sofascore-style) period stats to columns and upsert. */
+    async upsertFromSportApiStatistics(
+        fixtureId: number,
+        teamId: number,
+        side: FixtureTeamStatSide,
+        stats: Array<{ name?: string; home?: string | number; away?: string | number; key?: string }>,
+        which: 'home' | 'away',
+    ): Promise<void> {
+        const pick = (names: string[]): number | undefined => {
+            const wanted = names.map((n) => n.toLowerCase());
+            const row = stats.find((s) => wanted.includes(String(s.name ?? s.key ?? '').toLowerCase()));
+            if (!row) return undefined;
+            const sideVal = which === 'home' ? row.home : row.away;
+            if (sideVal == null || sideVal === '') return undefined;
+            const raw = String(sideVal).replace('%', '').trim();
+            const n = Number(raw);
+            return Number.isFinite(n) ? n : undefined;
+        };
+
+        const input: FixtureTeamStatInput = {
+            fixtureId,
+            teamId,
+            side,
+            source: FixtureTeamStatSource.SPORTAPI,
+            possession: pick(['Ball possession', 'Possession']),
+            shotsTotal: pick(['Total shots', 'Shots']),
+            shotsOnTarget: pick(['Shots on target', 'Shots on goal']),
+            shotsOffTarget: pick(['Shots off target', 'Shots off goal']),
+            shotsBlocked: pick(['Blocked shots', 'Shots blocked']),
+            shotsInsideBox: pick(['Shots inside box', 'Shots from inside the box']),
+            shotsOutsideBox: pick(['Shots outside box', 'Shots from outside the box']),
+            corners: pick(['Corner kicks', 'Corners']),
+            fouls: pick(['Fouls', 'Fouls committed']),
+            offsides: pick(['Offsides']),
+            yellowCards: pick(['Yellow cards']),
+            redCards: pick(['Red cards']),
+            goalkeeperSaves: pick(['Goalkeeper saves', 'Saves']),
+            passesTotal: pick(['Passes', 'Total passes']),
+            passesAccurate: pick(['Accurate passes', 'Passes accurate']),
+            passAccuracyPct: pick(['Accurate passes percentage', 'Pass accuracy', 'Passes %']),
+            xg: pick(['Expected goals (xG)', 'Expected goals', 'xG']),
+        };
+
+        const hasAny = Object.entries(input).some(
+            ([k, v]) => !['fixtureId', 'teamId', 'side', 'source'].includes(k) && v != null,
+        );
+        if (!hasAny) return;
+
+        await this.statRepo.upsert(input as any, ['fixtureId', 'teamId']);
+    }
+
     /**
      * Derive team-level stats by summing `playerFixtureStat` rows per team.
      * Resolves player→team assignment via the `playerLineup` / `lineUp` tables.

@@ -33,9 +33,15 @@ import carouselClasses from '../components/carousel/news.carousel.module.css';
 import {usePageTransition} from "../hooks/usePageTransition";
 import {useScrollAnimation} from "../hooks/useScrollAnimation";
 import {ModernBody, ModernButton, ModernCaption, ModernCard, ModernH1, ModernH2, ModernH3} from '../components/modern';
-import { UiAccent, UiCaption, UiMatchList, UiSectionHeader } from '../components/ui';
+import { UiAccent, UiBody, UiCaption, UiMatchList, UiSectionHeader, type MatchRowData } from '../components/ui';
 import { useTranslation } from '../i18n/useTranslation';
 import { useGetAllNewsArticle } from '@iWatchFootball/clients/controllers/news-article';
+import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
+import { useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
+import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
+import type { Competition, Fixture, Team } from '@iWatchFootball/clients/controllers/iWatchFootballAPI.schemas';
+import { scoresFromFixtureRow } from '../shared/fixtureScores';
+import { formatLiveClockLabel, LIVE_FIXTURE_POLL_MS } from '../shared/liveClock';
 
 dayjs.extend(relativeTime);
 
@@ -94,14 +100,15 @@ function HeroSection() {
                         <Center>
                             <Box
                                 component="img"
-                                src="https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=600&q=80"
-                                alt="Football action"
+                                src="/images/hero-football.png"
+                                alt="Football player celebrating"
                                 className="hero-image"
                                 style={{
                                     borderRadius: '1rem',
                                     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
                                     maxWidth: '100%',
                                     height: 'auto',
+                                    objectFit: 'cover',
                                     transition: 'transform 0.3s ease'
                                 }}
                             />
@@ -113,62 +120,123 @@ function HeroSection() {
     );
 }
 
-// Live Matches Section — Fotmob-style compact match list
+function uniqueIds(values: Array<number | undefined>): number[] {
+    const ids: number[] = [];
+    const seen = new Set<number>();
+    for (const id of values) {
+        if (typeof id === 'number' && !seen.has(id)) {
+            seen.add(id);
+            ids.push(id);
+        }
+    }
+    return ids;
+}
+
+function todayRangeIso(): { from: string; to: string } {
+    const now = new Date();
+    const from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    return { from: from.toISOString(), to: to.toISOString() };
+}
+
+function fixtureToHomeRow(
+    fix: Fixture,
+    teamById: Map<number, Team>,
+    competitionById: Map<number, Competition>,
+): { league: string; row: MatchRowData } {
+    const home = typeof fix.homeTeamId === 'number' ? teamById.get(fix.homeTeamId) : undefined;
+    const away = typeof fix.awayTeamId === 'number' ? teamById.get(fix.awayTeamId) : undefined;
+    const competition = competitionById.get(fix.competitionId);
+    const scores = scoresFromFixtureRow(fix);
+    const isLive = fix.status === 'Live';
+    return {
+        league: competition?.name?.trim() || 'Competition',
+        row: {
+            id: fix.id,
+            homeTeam: home?.name?.trim() || (fix.homeTeamId != null ? `Team ${fix.homeTeamId}` : 'Home'),
+            awayTeam: away?.name?.trim() || (fix.awayTeamId != null ? `Team ${fix.awayTeamId}` : 'Away'),
+            homeLogo: home?.logoUrl,
+            awayLogo: away?.logoUrl,
+            homeScore: scores.homeScore,
+            awayScore: scores.awayScore,
+            time: formatLiveClockLabel({
+                status: fix.status,
+                metadata: fix.metadata,
+                kickoffIso: fix.date,
+            }),
+            isLive,
+        },
+    };
+}
+
 function LiveMatchesSection() {
     const { t } = useTranslation();
     const { navigateWithTransition } = usePageTransition();
     const scrollAnimation = useScrollAnimation({ animationType: 'fadeUp', delay: 0, threshold: 0.2 });
+    const todayRange = useMemo(() => todayRangeIso(), []);
 
-    const matchGroups = [
+    const { data: liveFixturesRaw = [], isLoading: loadingLive } = useGetQueryFixture(
+        { where: { status: 'Live' }, take: 80, order: { date: 'ASC' } } as any,
+        { query: { refetchInterval: LIVE_FIXTURE_POLL_MS } as any },
+    );
+    const { data: todayFixturesRaw = [], isLoading: loadingToday } = useGetQueryFixture(
         {
-            league: 'Premier League',
-            matches: [
-                {
-                    id: 1,
-                    homeTeam: 'Arsenal',
-                    awayTeam: 'Chelsea',
-                    homeScore: 2,
-                    awayScore: 1,
-                    time: "65'",
-                    isLive: true,
-                    homeLogo: 'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?auto=format&w=120&q=80',
-                    awayLogo: 'https://images.unsplash.com/photo-1592206112774-73d688f6e46e?auto=format&w=120&q=80',
-                },
-            ],
-        },
+            where: { date: { $gte: todayRange.from, $lte: todayRange.to } },
+            take: 80,
+            order: { date: 'ASC' },
+        } as any,
+        { query: { refetchInterval: LIVE_FIXTURE_POLL_MS } as any },
+    );
+
+    const liveFixtures = Array.isArray(liveFixturesRaw) ? liveFixturesRaw : [];
+    const todayFixtures = Array.isArray(todayFixturesRaw) ? todayFixturesRaw : [];
+    const fixtures = liveFixtures.length > 0 ? liveFixtures : todayFixtures;
+
+    const teamIds = useMemo(
+        () => uniqueIds(fixtures.flatMap((f) => [f.homeTeamId, f.awayTeamId])),
+        [fixtures],
+    );
+    const competitionIds = useMemo(
+        () => uniqueIds(fixtures.map((f) => f.competitionId)),
+        [fixtures],
+    );
+
+    const { data: teamsData = [], isLoading: loadingTeams } = useGetQueryTeam(
+        { where: { id: { $in: teamIds.length ? teamIds : [-1] } }, take: Math.max(teamIds.length, 1) } as any,
+        { query: { enabled: teamIds.length > 0 } as any },
+    );
+    const { data: competitionsData = [], isLoading: loadingCompetitions } = useGetQueryCompetition(
         {
-            league: 'La Liga',
-            matches: [
-                {
-                    id: 2,
-                    homeTeam: 'Barcelona',
-                    awayTeam: 'Real Madrid',
-                    homeScore: 2,
-                    awayScore: 2,
-                    time: "86'",
-                    isLive: true,
-                    homeLogo: 'https://images.unsplash.com/photo-1594450890928-98d96ebf2ad0?auto=format&w=120&q=80',
-                    awayLogo: 'https://images.unsplash.com/photo-1599245895529-3c0992ab3c91?auto=format&w=120&q=80',
-                },
-            ],
-        },
-        {
-            league: 'Serie A',
-            matches: [
-                {
-                    id: 3,
-                    homeTeam: 'Juventus',
-                    awayTeam: 'Inter',
-                    homeScore: 1,
-                    awayScore: 3,
-                    time: 'FT',
-                    isLive: false,
-                    homeLogo: 'https://images.unsplash.com/photo-1605973174423-47046f81ec9b?auto=format&w=120&q=80',
-                    awayLogo: 'https://images.unsplash.com/photo-1616941360635-7d51b6607429?auto=format&w=120&q=80',
-                },
-            ],
-        },
-    ];
+            where: { id: { $in: competitionIds.length ? competitionIds : [-1] } },
+            take: Math.max(competitionIds.length, 1),
+        } as any,
+        { query: { enabled: competitionIds.length > 0 } as any },
+    );
+
+    const matchGroups = useMemo(() => {
+        const teams = Array.isArray(teamsData) ? teamsData : [];
+        const competitions = Array.isArray(competitionsData) ? competitionsData : [];
+        const teamById = new Map(teams.map((t) => [t.id, t]));
+        const competitionById = new Map(competitions.map((c) => [c.id, c]));
+        const byLeague = new Map<string, MatchRowData[]>();
+        for (const fix of fixtures) {
+            const { league, row } = fixtureToHomeRow(fix, teamById, competitionById);
+            const list = byLeague.get(league) ?? [];
+            list.push(row);
+            byLeague.set(league, list);
+        }
+        const groups: { league: string; matches: MatchRowData[] }[] = [];
+        byLeague.forEach((matches, league) => {
+            groups.push({ league, matches });
+        });
+        return groups;
+    }, [fixtures, teamsData, competitionsData]);
+
+    const loading =
+        loadingLive ||
+        loadingToday ||
+        (teamIds.length > 0 && loadingTeams) ||
+        (competitionIds.length > 0 && loadingCompetitions);
 
     return (
         <Box
@@ -191,10 +259,23 @@ function LiveMatchesSection() {
                     }
                     action={{ label: t('home.viewAll'), onClick: () => navigateWithTransition('/matches') }}
                 />
-                <UiMatchList
-                    groups={matchGroups}
-                    onMatchClick={(id) => navigateWithTransition(`/match/${id}`)}
-                />
+                {loading ? (
+                    <Stack gap="sm">
+                        <Skeleton height={64} radius="md" />
+                        <Skeleton height={64} radius="md" />
+                        <Skeleton height={64} radius="md" />
+                    </Stack>
+                ) : matchGroups.length === 0 ? (
+                    <Stack gap={4}>
+                        <UiBody>{t('home.liveEmpty')}</UiBody>
+                        <UiCaption>{t('home.liveEmptyHint')}</UiCaption>
+                    </Stack>
+                ) : (
+                    <UiMatchList
+                        groups={matchGroups}
+                        onMatchClick={(id) => navigateWithTransition(`/match/${id}`)}
+                    />
+                )}
             </Container>
         </Box>
     );

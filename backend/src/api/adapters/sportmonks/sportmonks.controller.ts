@@ -77,6 +77,17 @@ export class SportMonksSyncFixtureDetailsDto {
   sportmonksFixtureId?: number;
 }
 
+export class SportMonksSyncSquadsDto {
+  @ApiProperty({ description: 'Local season id' })
+  seasonId!: number;
+
+  @ApiPropertyOptional({ default: 40 })
+  maxRequests?: number;
+
+  @ApiPropertyOptional({ type: [Number], description: 'Limit to these local team ids' })
+  teamIds?: number[];
+}
+
 export class SportMonksRunPipelineDto {
   @ApiProperty({ type: [Number], example: [8] })
   leagueIds!: number[];
@@ -92,6 +103,9 @@ export class SportMonksRunPipelineDto {
 
   @ApiPropertyOptional({ default: true })
   syncFixtureDetails?: boolean;
+
+  @ApiPropertyOptional({ default: true, description: 'Import season squads into playerTeamStint' })
+  syncSquads?: boolean;
 
   @ApiProperty({ example: 100 })
   maxApiRequests!: number;
@@ -165,6 +179,14 @@ export class SportMonksController {
   @ApiBody({ type: SportMonksSyncFixtureDetailsDto })
   syncFixtureDetails(@Body() body: SportMonksSyncFixtureDetailsDto) {
     return this.adapter.syncFixtureDetails(body);
+  }
+
+  @Post('sync/import/squads')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Import season squads into playerTeamStint' })
+  @ApiBody({ type: SportMonksSyncSquadsDto })
+  importSquads(@Body() body: SportMonksSyncSquadsDto) {
+    return this.adapter.importSquads(body);
   }
 
   @Post('sync/run')

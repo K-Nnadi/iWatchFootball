@@ -1,5 +1,5 @@
 import { Card, Image, Text, Title, Stack, Group, Divider, ScrollArea, Modal, Badge, Box, SimpleGrid, Paper } from '@mantine/core';
-import { IconBallFootball, IconBolt, IconCalendar, IconMapPin, IconExternalLink } from '@tabler/icons-react';
+import { IconBallFootball, IconBolt, IconCalendar, IconChartBar, IconMapPin, IconExternalLink } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
 import { UserGame, MatchEvent } from '../pages/logs.page';
 import { UiCard, UiH3, UiBody, UiButton } from '../components/ui';
@@ -445,6 +445,31 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
 
     const stats = calculateStats();
 
+    const advancedCategories: StatCategory[] = useMemo(() => {
+        if (!attendanceAdvancedStatsEnabled) return [];
+        return (advancedAttendanceStats?.leaderboards ?? []).map((board) => ({
+            title: board.title,
+            topPlayers: board.entries.map((entry) => ({
+                rank: entry.rank,
+                name: entry.name,
+                id: String(entry.playerId),
+                team: '',
+                crest: '',
+                value: entry.value,
+            })),
+        }));
+    }, [attendanceAdvancedStatsEnabled, advancedAttendanceStats]);
+
+    const advancedTitles = useMemo(
+        () => new Set(advancedCategories.map((category) => category.title)),
+        [advancedCategories],
+    );
+
+    const leaderboardCategories = useMemo(
+        () => [...stats, ...advancedCategories],
+        [stats, advancedCategories],
+    );
+
     if (loggedFixtures.length === 0) {
         return (
             <Stack gap="md" p="md" style={{ textAlign: 'center' }}>
@@ -454,21 +479,22 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
         );
     }
 
-    const hasLeaderboards = stats.length > 0;
+    const hasLeaderboards = leaderboardCategories.length > 0;
 
     const handlePlayerClick = (playerName: string, playerId: string, category: string) => {
-        const isPlayerStat =
-            category === CAT_GOALS ||
-            category === CAT_ASSISTS ||
-            category === CAT_YELLOW_CARDS ||
-            category === CAT_RED_CARDS;
-
-        if (!isPlayerStat) return;
-
         if (isNavigablePlayerId(playerId)) {
             navigateWithTransition(`/player/${playerId}`, playerPageTransition);
             return;
         }
+
+        const isPlayerStat =
+            category === CAT_GOALS ||
+            category === CAT_ASSISTS ||
+            category === CAT_YELLOW_CARDS ||
+            category === CAT_RED_CARDS ||
+            advancedTitles.has(category);
+
+        if (!isPlayerStat) return;
 
         setSelectedPlayer({ name: playerName, id: playerId, category });
         setModalOpen(true);
@@ -608,7 +634,7 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                     ) : null}
 
                     {hasLeaderboards
-                        ? stats.map((category) => {
+                        ? leaderboardCategories.map((category) => {
                               const total = category.topPlayers.length;
                               const shown =
                                   leaderboardVisibleByTitle[category.title] ?? STATS_LEADER_INITIAL;
@@ -646,6 +672,8 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                           <IconBolt size={22} stroke={1.65} aria-hidden />
                                       ) : category.title === CAT_VENUES ? (
                                           <IconMapPin size={22} stroke={1.65} aria-hidden />
+                                      ) : advancedTitles.has(category.title) ? (
+                                          <IconChartBar size={22} stroke={1.65} aria-hidden />
                                       ) : (
                                           <IconCalendar size={22} stroke={1.65} aria-hidden />
                                       )}
@@ -670,7 +698,8 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                                                   category.title === CAT_GOALS ||
                                                   category.title === CAT_ASSISTS ||
                                                   category.title === CAT_YELLOW_CARDS ||
-                                                  category.title === CAT_RED_CARDS;
+                                                  category.title === CAT_RED_CARDS ||
+                                                  advancedTitles.has(category.title);
 
                                               const topRowBg =
                                                   player.rank !== 1
@@ -848,37 +877,6 @@ const NewStatsTab = ({ loggedFixtures }: StatsTabProps) => {
                               );
                           })
                         : null}
-
-                    {attendanceAdvancedStatsEnabled ? (
-                        <Stack gap="sm" mt="md">
-                            <Title order={4} c="var(--modern-text-primary)">
-                                {t('logs.advancedStatsSection')}
-                            </Title>
-                            {(advancedAttendanceStats?.leaderboards?.length ?? 0) > 0 ? (
-                                advancedAttendanceStats!.leaderboards.map((board) => (
-                                    <Stack key={board.metric} gap="xs">
-                                        <Text fw={600} size="sm">
-                                            {board.title}
-                                        </Text>
-                                        {board.entries.map((entry) => (
-                                            <Group key={`${board.metric}-${entry.playerId}`} justify="space-between">
-                                                <Text size="sm">
-                                                    {entry.rank}. {entry.name}
-                                                </Text>
-                                                <Text size="sm" fw={600}>
-                                                    {entry.value}
-                                                </Text>
-                                            </Group>
-                                        ))}
-                                    </Stack>
-                                ))
-                            ) : (
-                                <Text size="sm" c="dimmed" px="xs">
-                                    {t('logs.advancedStatsComingSoon')}
-                                </Text>
-                            )}
-                        </Stack>
-                    ) : null}
                 </Stack>
             </ScrollArea>
 

@@ -22,6 +22,17 @@ export class UserRatingController {
         return this.service.submitRating(userId, dto);
     }
 
+    @Get('listing/:listingId')
+    @ApiOperation({ summary: 'Get the current user rating for a listing, if any' })
+    async getMyListingRating(
+        @Param('listingId', ParseIntPipe) listingId: number,
+        @Req() req: AuthedRequest,
+    ) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException();
+        return this.service.getMyRatingForListing(listingId, userId);
+    }
+
     @Get(':userId/summary')
     @Public()
     @ApiOperation({ summary: 'Get public trust score summary for a user' })

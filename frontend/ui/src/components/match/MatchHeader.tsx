@@ -129,6 +129,8 @@ export function MatchHeader({
         typeof matchDetails.awayScore === 'number' &&
         Number.isFinite(matchDetails.homeScore) &&
         Number.isFinite(matchDetails.awayScore);
+    const isLive = matchDetails.fixtureStatus === 'Live';
+    const clockLabel = matchDetails.liveClockLabel;
 
     const competitionNavId =
         typeof matchDetails.competitionId === 'number' &&
@@ -155,27 +157,14 @@ export function MatchHeader({
             navigateWithTransition(`/seat-selection/${matchDetails.matchId}`, {
                 transitionType: 'loading',
                 duration: 1200,
-                state: {
-                    homeTeam: matchDetails.homeTeam,
-                    awayTeam: matchDetails.awayTeam,
-                    homeTeamId: matchDetails.homeTeamId,
-                    awayTeamId: matchDetails.awayTeamId,
-                    homeTeamLogo: matchDetails.homeTeamLogo,
-                    awayTeamLogo: matchDetails.awayTeamLogo,
-                    date: matchDetails.date,
-                    venue: matchDetails.venue,
-                    competition: matchDetails.competition,
-                    stadiumId: matchDetails.stadiumId,
-                    stadiumMetadata: matchDetails.stadiumMetadata,
-                }
             });
         }
     };
 
-    const content = (
-        <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
+    const card = (
             <Paper
                 p={{ base: 'md', sm: 'xl' }}
+                mb={variant === 'compact' ? 'lg' : 0}
                 style={{
                     backgroundColor: 'var(--modern-card-bg)',
                     border: '1px solid var(--modern-border-color)',
@@ -364,7 +353,19 @@ export function MatchHeader({
                                             {matchDetails.awayScore}
                                         </Text>
                                     </Group>
-                                    {ticketStatus === 'past' && (
+                                    {isLive && clockLabel ? (
+                                        <Text
+                                            fz="xs"
+                                            tt="uppercase"
+                                            fw={750}
+                                            style={{
+                                                letterSpacing: '0.14em',
+                                                color: 'var(--modern-lime)',
+                                            }}
+                                        >
+                                            Live · {clockLabel}
+                                        </Text>
+                                    ) : ticketStatus === 'past' ? (
                                         <Text
                                             fz="xs"
                                             tt="uppercase"
@@ -379,7 +380,7 @@ export function MatchHeader({
                                         >
                                             Final score
                                         </Text>
-                                    )}
+                                    ) : null}
                                 </>
                             ) : (
                                 <Text
@@ -485,6 +486,11 @@ export function MatchHeader({
                     </Group>
                 </Stack>
             </Paper>
+    );
+
+    const content = (
+        <Container size="xl" style={{ position: 'relative', zIndex: 1 }} px={{ base: 'md', md: 'xl' }}>
+            {card}
         </Container>
     );
 
@@ -523,6 +529,6 @@ export function MatchHeader({
         );
     }
 
-    return content;
+    return card;
 }
 

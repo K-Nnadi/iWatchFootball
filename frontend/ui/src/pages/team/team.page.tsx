@@ -21,7 +21,7 @@ import {
 import { IconUsers, IconCalendar, IconExchange, IconTrophy, IconFlag, IconBuilding, IconUser, IconMapPin } from '@tabler/icons-react';
 import { useParams } from 'react-router-dom';
 import { mockTeams } from './mockTeams';
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from '../../i18n';
 import {
     parseFixtureResultFromMetadata,
@@ -32,15 +32,18 @@ import {
 import { usePageTransition } from '../../hooks/usePageTransition';
 import '../../styles/modern.css';
 import { useGetOneTeam, useGetQueryTeam } from '@iWatchFootball/clients/controllers/team';
-import { useGetOneManager } from '@iWatchFootball/clients/controllers/manager';
 import { useGetQueryStadium } from '@iWatchFootball/clients/controllers/stadium';
 import { useGetQueryTeamStadium } from '@iWatchFootball/clients/controllers/team-stadium';
 import { useGetQueryFixture } from '@iWatchFootball/clients/controllers/fixture';
 import { useGetQueryPlayer } from '@iWatchFootball/clients/controllers/player';
-import { useGetQueryPosition } from '@iWatchFootball/clients/controllers/position';
 import { useGetQueryCompetition } from '@iWatchFootball/clients/controllers/competition';
-import { useGetAllSeason } from '@iWatchFootball/clients/controllers/season';
-import { useTeamSquad, useTeamTransfers } from '../../shared/api/teamSquad.api';
+import { useGetQuerySeason } from '@iWatchFootball/clients/controllers/season';
+import {
+    useTeamManager,
+    useTeamSeasons,
+    useTeamSquad,
+    useTeamTransfers,
+} from '../../shared/api/teamSquad.api';
 import { TicketLinkButton } from '../../components/tickets/TicketLinkButton';
 import {
     resolvePositionGroup,
@@ -334,6 +337,18 @@ function groupSquadByPosition(squad: DisplaySquadMember[]) {
     return grouped as Record<SquadPositionGroup, DisplaySquadMember[]>;
 }
 
+function asSquadPositionGroup(value: string | undefined, positionName: string): SquadPositionGroup {
+    if (
+        value === 'Goalkeeper' ||
+        value === 'Defender' ||
+        value === 'Midfielder' ||
+        value === 'Forward'
+    ) {
+        return value;
+    }
+    return resolvePositionGroup(positionName);
+}
+
 export function TeamPage() {
     const { t } = useTranslation();
     const { id } = useParams<{ id?: string }>();
@@ -344,18 +359,25 @@ export function TeamPage() {
     const [selectedComp, setSelectedComp] = useState<string>('All Competitions');
     const [homeAwayFilter, setHomeAwayFilter] = useState<'all' | 'home' | 'away'>('all');
     const [squadSeasonId, setSquadSeasonId] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<string | null>('squad');
+    const [visitedTabs, setVisitedTabs] = useState(() => new Set<string>(['squad']));
     const { navigateWithTransition } = usePageTransition();
+
+    useEffect(() => {
+        setActiveTab('squad');
+        setVisitedTabs(new Set(['squad']));
+    }, [teamIdNum]);
 
     const { data: apiTeam, isLoading: loadingApiTeam } = useGetOneTeam(teamIdNum, {
         query: { enabled: fetchFromApi } as any,
     });
 
-    const managerNumericId = asFiniteNumberId(apiTeam?.managerId);
-    const { data: manager } = useGetOneManager(managerNumericId ?? 0, {
-        query: {
-            enabled: fetchFromApi && !!apiTeam && managerNumericId !== undefined,
-        } as any,
-    });
+    const loadFixtures = fetchFromApi && !!apiTeam && visitedTabs.has('fixtures');
+    const loadTransfers = fetchFromApi && !!apiTeam && visitedTabs.has('transfers');
+
+    const { data: managerResponse } = useTeamManager(teamIdNum, fetchFromApi && !!apiTeam);
+    const manager = managerResponse?.manager ?? null;
+    const managerNumericId = asFiniteNumberId(manager?.id);
 
     /** Home grounds are now sourced from the `teamStadium` link table (replaces legacy `team.stadiumIds` / `stadium.teamIds`). */
     const { data: teamStadiumLinks = [] } = useGetQueryTeamStadium(
@@ -409,7 +431,9 @@ export function TeamPage() {
         fetchFromApi && !!apiTeam,
     );
 
-    const { data: transfersResponse } = useTeamTransfers(teamIdNum, fetchFromApi && !!apiTeam);
+    const { data: seasonsResponse } = useTeamSeasons(teamIdNum, fetchFromApi && !!apiTeam);
+
+    const { data: transfersResponse, isLoading: loadingTransfers } = useTeamTransfers(teamIdNum, loadTransfers);
 
     const transferPlayerIds = useMemo(() => {
         const ids = new Set<number>();
@@ -424,7 +448,7 @@ export function TeamPage() {
         { where: { id: { $in: transferPlayerIds.length ? transferPlayerIds : [-1] } }, take: 200 } as any,
         {
             query: {
-                enabled: fetchFromApi && transferPlayerIds.length > 0,
+                enabled: loadTransfers && transferPlayerIds.length > 0,
             } as any,
         },
     );
@@ -434,69 +458,14 @@ export function TeamPage() {
         [transferPlayers],
     );
 
-    const playersData = useMemo(
-        () => [...(squadResponse?.players ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
-        [squadResponse?.players],
-    );
-
-    const positionIdsForSquad = useMemo(() => {
-        const ids = new Set<number>();
-        for (const pl of playersData) {
-            (pl.positionIds ?? []).forEach((pid) => {
-                const n = asFiniteNumberId(pid);
-                if (n !== undefined) ids.add(n);
-            });
-        }
-        return Array.from(ids);
-    }, [playersData]);
-
-    const { data: positionRows = [] } = useGetQueryPosition(
-        {
-            where: { id: { $in: positionIdsForSquad.length ? positionIdsForSquad : [-1] } },
-            take: 200,
-        } as any,
-        {
-            query: {
-                enabled: fetchFromApi && !!apiTeam && positionIdsForSquad.length > 0,
-            } as any,
-        }
-    );
-
-    const positionsById = useMemo(() => {
-        const m = new Map<number, { name: string; type?: string }>();
-        for (const p of positionRows) {
-            m.set(p.id, { name: p.name, type: p.type });
-        }
-        return m;
-    }, [positionRows]);
-
-    const { data: homeFixturesRaw = [] } = useGetQueryFixture(
+    const { data: homeFixturesRaw = [], isLoading: loadingHomeFixtures } = useGetQueryFixture(
         { where: { homeTeamId: teamIdNum }, take: 75, order: { date: 'DESC' as const } } as any,
-        { query: { enabled: fetchFromApi && !!apiTeam } as any }
+        { query: { enabled: loadFixtures } as any }
     );
 
-    const { data: awayFixturesRaw = [] } = useGetQueryFixture(
+    const { data: awayFixturesRaw = [], isLoading: loadingAwayFixtures } = useGetQueryFixture(
         { where: { awayTeamId: teamIdNum }, take: 75, order: { date: 'DESC' as const } } as any,
-        { query: { enabled: fetchFromApi && !!apiTeam } as any }
-    );
-
-    const { data: opponentTeamsLookup = [] } = useGetQueryTeam(
-        { take: 600 } as any,
-        { query: { enabled: fetchFromApi && !!apiTeam } as any }
-    );
-
-    const { data: competitionsLookup = [] } = useGetQueryCompetition(
-        { take: 400 } as any,
-        { query: { enabled: fetchFromApi && !!apiTeam } as any }
-    );
-
-    const { data: allSeasons = [] } = useGetAllSeason({
-        query: { enabled: fetchFromApi && !!apiTeam } as any,
-    });
-
-    const seasonsById = useMemo(
-        () => new Map(allSeasons.map((s) => [s.id, { yearStart: s.yearStart, yearEnd: s.yearEnd }])),
-        [allSeasons],
+        { query: { enabled: loadFixtures } as any }
     );
 
     const mergedApiFixtures = useMemo(() => {
@@ -522,6 +491,56 @@ export function TeamPage() {
         );
     }, [homeFixturesRaw, awayFixturesRaw]);
 
+    const fixtureLookupIds = useMemo(() => {
+        const teamIds = new Set<number>();
+        const competitionIds = new Set<number>();
+        const seasonIds = new Set<number>();
+        for (const f of mergedApiFixtures) {
+            const homeId = asFiniteNumberId(f.homeTeamId);
+            const awayId = asFiniteNumberId(f.awayTeamId);
+            const competitionId = asFiniteNumberId(f.competitionId);
+            const seasonId = asFiniteNumberId(f.seasonId);
+            if (homeId !== undefined) teamIds.add(homeId);
+            if (awayId !== undefined) teamIds.add(awayId);
+            if (competitionId !== undefined) competitionIds.add(competitionId);
+            if (seasonId !== undefined) seasonIds.add(seasonId);
+        }
+        return {
+            teamIds: Array.from(teamIds),
+            competitionIds: Array.from(competitionIds),
+            seasonIds: Array.from(seasonIds),
+        };
+    }, [mergedApiFixtures]);
+
+    const { data: opponentTeamsLookup = [] } = useGetQueryTeam(
+        {
+            where: { id: { $in: fixtureLookupIds.teamIds.length ? fixtureLookupIds.teamIds : [-1] } },
+            take: Math.max(fixtureLookupIds.teamIds.length, 1),
+        } as any,
+        { query: { enabled: loadFixtures && fixtureLookupIds.teamIds.length > 0 } as any },
+    );
+
+    const { data: competitionsLookup = [] } = useGetQueryCompetition(
+        {
+            where: { id: { $in: fixtureLookupIds.competitionIds.length ? fixtureLookupIds.competitionIds : [-1] } },
+            take: Math.max(fixtureLookupIds.competitionIds.length, 1),
+        } as any,
+        { query: { enabled: loadFixtures && fixtureLookupIds.competitionIds.length > 0 } as any },
+    );
+
+    const { data: fixtureSeasons = [] } = useGetQuerySeason(
+        {
+            where: { id: { $in: fixtureLookupIds.seasonIds.length ? fixtureLookupIds.seasonIds : [-1] } },
+            take: Math.max(fixtureLookupIds.seasonIds.length, 1),
+        } as any,
+        { query: { enabled: loadFixtures && fixtureLookupIds.seasonIds.length > 0 } as any },
+    );
+
+    const seasonsById = useMemo(
+        () => new Map(fixtureSeasons.map((s) => [s.id, { yearStart: s.yearStart, yearEnd: s.yearEnd }])),
+        [fixtureSeasons],
+    );
+
     const teamNameLookup = useMemo(() => new Map(opponentTeamsLookup.map((t) => [t.id, t.name])), [opponentTeamsLookup]);
     const competitionNameLookup = useMemo(() => new Map(competitionsLookup.map((c) => [c.id, c.name])), [competitionsLookup]);
 
@@ -529,13 +548,6 @@ export function TeamPage() {
         const mockFallback = mockTeams.find((t) => t.id === teamIdNum);
 
         if (fetchFromApi && apiTeam) {
-            const primaryPosFor = (p: (typeof playersData)[number]): { name: string; group: SquadPositionGroup } => {
-                const pid0 = (p.positionIds ?? []).map(asFiniteNumberId).find((n) => n !== undefined);
-                const info = pid0 != null ? positionsById.get(pid0) : undefined;
-                const name = info?.name ?? 'Player';
-                return { name, group: resolvePositionGroup(name, info?.type) };
-            };
-
             const fixturesMapped: DisplayFixture[] = mergedApiFixtures.map((f) => {
                 const isHome = asFiniteNumberId(f.homeTeamId) === teamIdNum;
                 const homeTeamId = asFiniteNumberId(f.homeTeamId);
@@ -610,17 +622,14 @@ export function TeamPage() {
                 managerName: manager?.name ?? '—',
                 managerNationality: displayNationalityLabel(manager?.nationality),
                 managerPhotoUrl: null,
-                squad: playersData.map((p) => {
-                    const pos = primaryPosFor(p);
-                    return {
-                        name: p.name,
-                        position: pos.name,
-                        positionGroup: pos.group,
-                        age: Math.max(0, ageFromIsoDate(typeof p.dateOfBirth === 'string' ? p.dateOfBirth : String(p.dateOfBirth))),
-                        nationality: displayNationalityLabel(p.nationality),
-                        playerRouteId: String(p.id),
-                    };
-                }),
+                squad: (squadResponse?.players ?? []).map((p) => ({
+                    name: p.name,
+                    position: p.position,
+                    positionGroup: asSquadPositionGroup(p.positionGroup, p.position),
+                    age: Math.max(0, ageFromIsoDate(p.dateOfBirth)),
+                    nationality: displayNationalityLabel(p.nationality),
+                    playerRouteId: String(p.id),
+                })),
                 fixtures: fixturesMapped,
                 transfers: emptyTransfers,
                 achievements: [],
@@ -636,8 +645,7 @@ export function TeamPage() {
         fetchFromApi,
         apiTeam,
         teamIdNum,
-        playersData,
-        positionsById,
+        squadResponse?.players,
         mergedApiFixtures,
         teamNameLookup,
         competitionNameLookup,
@@ -683,15 +691,15 @@ export function TeamPage() {
     const squadSeasonOptions = useMemo(
         () => [
             { value: '', label: t('teamPage.squadCurrent') },
-            ...[...allSeasons]
-                .sort((a, b) => (b.yearStart ?? 0) - (a.yearStart ?? 0))
-                .map((s) => ({
-                    value: String(s.id),
-                    label: `${s.yearStart}/${s.yearEnd}`,
-                })),
+            ...(seasonsResponse?.seasons ?? []).map((s) => ({
+                value: String(s.id),
+                label: s.label,
+            })),
         ],
-        [allSeasons, t],
+        [seasonsResponse?.seasons, t],
     );
+
+    const loadingFixtures = loadFixtures && (loadingHomeFixtures || loadingAwayFixtures);
 
     const transferDisplay = useMemo((): TransferBlock => {
         if (!fetchFromApi || !transfersResponse) return emptyTransfers;
@@ -888,7 +896,17 @@ export function TeamPage() {
             </Box>
 
             <Tabs
-                defaultValue="squad"
+                value={activeTab}
+                onChange={(value) => {
+                    setActiveTab(value);
+                    if (!value) return;
+                    setVisitedTabs((prev) => {
+                        if (prev.has(value)) return prev;
+                        const next = new Set(prev);
+                        next.add(value);
+                        return next;
+                    });
+                }}
                 styles={{
                     list: {
                         borderBottom: '2px solid var(--modern-card-border)',
@@ -951,7 +969,9 @@ export function TeamPage() {
                                         {t('teamPage.squadEmptyTitle')}
                                     </Text>
                                     <Text size="sm" ta="center" maw={480} c="dimmed">
-                                        {t('teamPage.squadEmptyHint')}
+                                        {squadSeasonId
+                                            ? t('teamPage.squadEmptySeasonHint')
+                                            : t('teamPage.squadEmptyHint')}
                                     </Text>
                                 </Stack>
                             </Center>
@@ -1134,7 +1154,11 @@ export function TeamPage() {
                     </Group>
 
                     {/* Filtered Fixtures */}
-                    {filteredFixtures.length === 0 ? (
+                    {loadingFixtures ? (
+                        <Center py="xl" pos="relative" mih={200}>
+                            <LoadingOverlay visible zIndex={5} overlayProps={{ blur: 1 }} />
+                        </Center>
+                    ) : filteredFixtures.length === 0 ? (
                         <Center py="xl">
                             <Stack align="center" gap="md">
                                 <IconCalendar size={48} style={{ color: 'var(--modern-text-secondary)', opacity: 0.5 }} />
@@ -1381,6 +1405,11 @@ export function TeamPage() {
                 </Tabs.Panel>
 
                 <Tabs.Panel value="transfers" pt="xl">
+                    {loadTransfers && loadingTransfers ? (
+                        <Center py="xl" pos="relative" mih={200}>
+                            <LoadingOverlay visible zIndex={5} overlayProps={{ blur: 1 }} />
+                        </Center>
+                    ) : (
                     <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
                         {/* Transfers In */}
                         <Box
@@ -1471,6 +1500,7 @@ export function TeamPage() {
                             )}
                         </Box>
                     </SimpleGrid>
+                    )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="achievements" pt="xl">

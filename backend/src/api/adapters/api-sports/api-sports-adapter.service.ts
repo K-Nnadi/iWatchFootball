@@ -32,9 +32,16 @@ import type {
 import { GoalService } from '../../modules/goal/goal.module';
 import { CardService } from '../../modules/card/card.module';
 import { SubstitutionService } from '../../modules/substitution/substitution.module';
+import { LineupService } from '../../modules/lineUp/lineUp.module';
+import { PlayerLineUpService } from '../../modules/playerLineUp/playerLineUp.module';
+import { ManagerService } from '../../modules/manager/manager.module';
+import { ManagerEmploymentService } from '../../modules/managerEmployment/managerEmployment.module';
 import { CardType } from '../../enums/card.enum';
+import type { ApiSportsLineupTeam } from './api-sports-fixture-lineups.types';
 
 const PROVIDER_KEY = ENTITY_METADATA_PROVIDER.APISPORTS;
+const PLACEHOLDER_MANAGER_NAME = 'API-Sports lineup (manager TBD)';
+const PLACEHOLDER_PLAYER_DOB = new Date(Date.UTC(1900, 0, 1));
 
 /** Max |Δkickoff| when matching API-Sports to an existing DB row from another provider */
 const FIXTURE_CORRELATION_MAX_MS = 6 * 60 * 60 * 1000;
@@ -117,6 +124,14 @@ export type ImportFixturesFromLeagueWindowOptions = {
   syncStatsAfter?: boolean;
   /** Max `/fixtures/statistics` requests when `syncStatsAfter` is true (default 20). */
   syncStatsMaxRequests?: number;
+  /** After fixtures, persist `GET /fixtures/events` for each imported match (1 request each). */
+  syncEventsAfter?: boolean;
+  /** Max `/fixtures/events` requests when `syncEventsAfter` is true (default 20). */
+  syncEventsMaxRequests?: number;
+  /** After fixtures, persist `GET /fixtures/lineups` for each imported match (1 request each). */
+  syncLineupsAfter?: boolean;
+  /** Max `/fixtures/lineups` requests when `syncLineupsAfter` is true (default 20). */
+  syncLineupsMaxRequests?: number;
 };
 
 export type ImportLiveFixturesOptions = {
@@ -177,6 +192,10 @@ export class ApiSportsAdapterService {
     private readonly goalService: GoalService,
     private readonly cardService: CardService,
     private readonly substitutionService: SubstitutionService,
+    private readonly lineupService: LineupService,
+    private readonly playerLineUpService: PlayerLineUpService,
+    private readonly managerService: ManagerService,
+    private readonly managerEmploymentService: ManagerEmploymentService,
   ) {}
 
   private getProviderExternalId(metadata: any): string | null {
@@ -1957,6 +1976,29 @@ export class ApiSportsAdapterService {
     }
   }
 
+  private extractLiveClock(fxStatus: {
+    short?: string;
+    long?: string;
+    elapsed?: number | null;
+    extra?: number | null;
+  } | undefined): { liveClock?: Record<string, unknown> } {
+    if (!fxStatus) return {};
+    const short = String(fxStatus.short ?? '').toUpperCase();
+    const elapsed = fxStatus.elapsed != null ? Number(fxStatus.elapsed) : NaN;
+    const extra = fxStatus.extra != null ? Number(fxStatus.extra) : NaN;
+    const liveLike = ['LIVE', '1H', '2H', 'HT', 'ET', 'BT', 'P', 'INT'].includes(short);
+    if (!liveLike && !Number.isFinite(elapsed)) return {};
+    return {
+      liveClock: {
+        short: short || undefined,
+        description: fxStatus.long != null ? String(fxStatus.long) : undefined,
+        elapsed: Number.isFinite(elapsed) ? elapsed : undefined,
+        extra: Number.isFinite(extra) && extra > 0 ? extra : undefined,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  }
+
   private mapApiFixtureStatus(short: string | undefined): FixtureStatus {
     const s = (short ?? 'NS').toUpperCase();
     if (['FT', 'AET', 'PEN', 'AWD'].includes(s)) return FixtureStatus.COMPLETED;
@@ -2191,6 +2233,7 @@ export class ApiSportsAdapterService {
     if (!date || Number.isNaN(date.getTime())) return 'skipped';
 
     const status = this.mapApiFixtureStatus(fx?.status?.short);
+    const liveClock = this.extractLiveClock(fx?.status);
     const stage = this.mapApiFixtureStage(league?.round);
     const attendanceRaw = fx?.attendance ?? row?.attendance;
     const attendance =
@@ -2211,6 +2254,7 @@ export class ApiSportsAdapterService {
       score: row?.score,
       homeScore: scorePair.homeScore,
       awayScore: scorePair.awayScore,
+      ...liveClock,
       ...resultFields,
     };
 
@@ -2310,6 +2354,12 @@ export class ApiSportsAdapterService {
     fixtureStatsOk: number;
     fixtureStatsSkipped: number;
     fixtureStatsRequests: number;
+    fixtureEventsOk: number;
+    fixtureEventsSkipped: number;
+    fixtureEventsRequests: number;
+    fixtureLineupsOk: number;
+    fixtureLineupsSkipped: number;
+    fixtureLineupsRequests: number;
     errors: string[];
   }> {
     const errors: string[] = [];
@@ -2335,6 +2385,12 @@ export class ApiSportsAdapterService {
         fixtureStatsOk: 0,
         fixtureStatsSkipped: 0,
         fixtureStatsRequests: 0,
+        fixtureEventsOk: 0,
+        fixtureEventsSkipped: 0,
+        fixtureEventsRequests: 0,
+        fixtureLineupsOk: 0,
+        fixtureLineupsSkipped: 0,
+        fixtureLineupsRequests: 0,
         errors: [`No local competition for API league ${options.leagueApiId}`],
       };
     }
@@ -2355,6 +2411,12 @@ export class ApiSportsAdapterService {
         fixtureStatsOk: 0,
         fixtureStatsSkipped: 0,
         fixtureStatsRequests: 0,
+        fixtureEventsOk: 0,
+        fixtureEventsSkipped: 0,
+        fixtureEventsRequests: 0,
+        fixtureLineupsOk: 0,
+        fixtureLineupsSkipped: 0,
+        fixtureLineupsRequests: 0,
         errors: [
           `No local season for ${options.seasonYear}-${options.seasonYear + 1}; import leagues/seasons first`,
         ],
@@ -2541,6 +2603,44 @@ export class ApiSportsAdapterService {
       }
     }
 
+    let fixtureEventsOk = 0;
+    let fixtureEventsSkipped = 0;
+    let fixtureEventsRequests = 0;
+    if (options.syncEventsAfter === true) {
+      const maxReq = options.syncEventsMaxRequests ?? 20;
+      const allUpsertedIds = Array.from(ctx.fixtureByApisportsExternalId.values()).map((f) => f.id as number);
+      for (const localFixtureId of allUpsertedIds) {
+        if (fixtureEventsRequests >= maxReq) break;
+        fixtureEventsRequests += 1;
+        try {
+          const result = await this.syncEventsForLocalFixture(localFixtureId);
+          if (result === 'ok') fixtureEventsOk += 1;
+          else fixtureEventsSkipped += 1;
+        } catch (e) {
+          errors.push(`fixtureEvents ${localFixtureId}: ${String(e)}`);
+        }
+      }
+    }
+
+    let fixtureLineupsOk = 0;
+    let fixtureLineupsSkipped = 0;
+    let fixtureLineupsRequests = 0;
+    if (options.syncLineupsAfter === true) {
+      const maxReq = options.syncLineupsMaxRequests ?? 20;
+      const allUpsertedIds = Array.from(ctx.fixtureByApisportsExternalId.values()).map((f) => f.id as number);
+      for (const localFixtureId of allUpsertedIds) {
+        if (fixtureLineupsRequests >= maxReq) break;
+        fixtureLineupsRequests += 1;
+        try {
+          const result = await this.syncLineupsForLocalFixture(localFixtureId);
+          if (result === 'ok') fixtureLineupsOk += 1;
+          else fixtureLineupsSkipped += 1;
+        } catch (e) {
+          errors.push(`fixtureLineups ${localFixtureId}: ${String(e)}`);
+        }
+      }
+    }
+
     this.logger.log(
       `importFixturesFromLeagueWindow: league ${options.leagueApiId} ${options.from}–${options.to} — +${created} ~${updated} skipped ${skipped} (${apiRequests} fixture req, concurrency ${concurrency})` +
         (wantApi ? `, standings ${standingsProcessed} (${standingsApiRequests} req)` : '') +
@@ -2550,6 +2650,12 @@ export class ApiSportsAdapterService {
           : '') +
         (options.syncStatsAfter === true
           ? `, fixtureStats ok=${fixtureStatsOk} skipped=${fixtureStatsSkipped} (${fixtureStatsRequests} req)`
+          : '') +
+        (options.syncEventsAfter === true
+          ? `, fixtureEvents ok=${fixtureEventsOk} skipped=${fixtureEventsSkipped} (${fixtureEventsRequests} req)`
+          : '') +
+        (options.syncLineupsAfter === true
+          ? `, fixtureLineups ok=${fixtureLineupsOk} skipped=${fixtureLineupsSkipped} (${fixtureLineupsRequests} req)`
           : ''),
     );
     return {
@@ -2566,6 +2672,12 @@ export class ApiSportsAdapterService {
       fixtureStatsOk,
       fixtureStatsSkipped,
       fixtureStatsRequests,
+      fixtureEventsOk,
+      fixtureEventsSkipped,
+      fixtureEventsRequests,
+      fixtureLineupsOk,
+      fixtureLineupsSkipped,
+      fixtureLineupsRequests,
       errors,
     };
   }
@@ -2926,5 +3038,263 @@ export class ApiSportsAdapterService {
       /** One call for `/leagues` plus standing requests already in `standingsApiRequests`. */
       apiRequestsUsed: 1 + (r.standingsApiRequests ?? 0),
     };
+  }
+
+  private localFixtureApiSportsId(fixture: { metadata?: unknown } | null | undefined): number | undefined {
+    const meta = fixture?.metadata as Record<string, any> | null | undefined;
+    const raw =
+      meta?.providers?.[PROVIDER_KEY]?.externalId ?? meta?.apisports?.fixtureId ?? null;
+    const n = raw != null ? Number(raw) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : undefined;
+  }
+
+  /** Persist `GET /fixtures/events` for a finished or in-play local fixture. */
+  async syncEventsForLocalFixture(localFixtureId: number): Promise<'ok' | 'skipped' | 'no_data'> {
+    const [fixture] = await this.fixtureService.getQuery({ where: { id: localFixtureId } as any });
+    if (!fixture) return 'skipped';
+    const apiId = this.localFixtureApiSportsId(fixture);
+    if (!apiId) {
+      this.logger.debug(`syncEventsForLocalFixture: fixture ${localFixtureId} has no API-Sports id`);
+      return 'skipped';
+    }
+
+    let raw: { response?: ApiSportsFixtureEvent[] };
+    try {
+      raw = await this.discoverFixtureEvents(apiId);
+    } catch (e) {
+      this.logger.warn(`syncEventsForLocalFixture: GET /fixtures/events?fixture=${apiId} failed — ${String(e)}`);
+      return 'no_data';
+    }
+
+    const events = Array.isArray(raw?.response) ? raw.response : [];
+    if (events.length === 0) return 'no_data';
+    await this.syncApiSportsEventsForFixture(localFixtureId, apiId, events);
+    return 'ok';
+  }
+
+  /** Persist `GET /fixtures/lineups` into lineUp / playerLineUp. */
+  async syncLineupsForLocalFixture(localFixtureId: number): Promise<'ok' | 'skipped' | 'no_data'> {
+    const [fixture] = await this.fixtureService.getQuery({ where: { id: localFixtureId } as any });
+    if (!fixture) return 'skipped';
+    const apiId = this.localFixtureApiSportsId(fixture);
+    if (!apiId) return 'skipped';
+
+    let raw: { response?: ApiSportsLineupTeam[] };
+    try {
+      raw = await this.http.get('/fixtures/lineups', { fixture: String(apiId) } as any);
+    } catch (e) {
+      this.logger.warn(`syncLineupsForLocalFixture: GET /fixtures/lineups?fixture=${apiId} failed — ${String(e)}`);
+      return 'no_data';
+    }
+
+    const sheets = Array.isArray(raw?.response) ? raw.response : [];
+    if (sheets.length === 0) return 'no_data';
+
+    const placeholderManagerId = await this.getOrCreatePlaceholderManager();
+    let wrote = 0;
+    for (const sheet of sheets) {
+      const teamApiId = sheet.team?.id != null ? Number(sheet.team.id) : null;
+      const team = teamApiId ? await this.findLocalTeamByApiSportsId(teamApiId) : null;
+      if (!team?.id) continue;
+
+      const coachManagerId =
+        (await this.ensureCoachEmployment(team.id, sheet.coach)) ?? placeholderManagerId;
+
+      let [lineUp] = await this.lineupService.getQuery({
+        where: { fixtureId: localFixtureId, teamId: team.id },
+      });
+      if (!lineUp) {
+        lineUp = await this.lineupService.create({
+          fixtureId: localFixtureId,
+          teamId: team.id,
+          managerId: coachManagerId,
+          formation: sheet.formation,
+          metadata: {
+            source: 'api-sports',
+            lastSync: new Date().toISOString(),
+            coachName: sheet.coach?.name,
+            coachApiId: sheet.coach?.id,
+          },
+        } as any);
+      } else if (sheet.formation) {
+        await this.lineupService.update(lineUp.id, {
+          id: lineUp.id,
+          formation: sheet.formation,
+          managerId: coachManagerId,
+          metadata: deepMergeEntityMetadata((lineUp.metadata ?? {}) as Record<string, unknown>, {
+            lastSync: new Date().toISOString(),
+            coachName: sheet.coach?.name,
+            coachApiId: sheet.coach?.id,
+          }) as any,
+        } as any);
+      }
+
+      const starters = sheet.startXI ?? [];
+      const subs = sheet.substitutes ?? [];
+      for (const row of starters) {
+        wrote += await this.upsertLineupPlayerRow(lineUp.id, row.player, true);
+      }
+      for (const row of subs) {
+        wrote += await this.upsertLineupPlayerRow(lineUp.id, row.player, false);
+      }
+    }
+
+    return wrote > 0 ? 'ok' : 'no_data';
+  }
+
+  private async getOrCreatePlaceholderManager(): Promise<number> {
+    const [existing] = await this.managerService.getQuery({
+      where: { name: PLACEHOLDER_MANAGER_NAME },
+    });
+    if (existing?.id) return existing.id;
+    const created = await this.managerService.create({
+      name: PLACEHOLDER_MANAGER_NAME,
+      nickname: 'API-Sports',
+      nationality: 'Unknown',
+      teamIds: [],
+      metadata: { source: 'api-sports', placeholderLineupManager: true },
+    } as any);
+    return created.id;
+  }
+
+  /**
+   * Upsert a manager from an API-Sports lineup coach and mark them as the team's current employment.
+   */
+  private async ensureCoachEmployment(
+    teamId: number,
+    coach?: { id?: number; name?: string },
+  ): Promise<number | null> {
+    const name = coach?.name?.trim();
+    const apiId = coach?.id != null ? Number(coach.id) : null;
+    if (!name && !apiId) return null;
+
+    const all = await this.managerService.getQuery({});
+    let manager =
+      (apiId != null
+        ? all.find((m) => this.getProviderExternalId(m?.metadata) === String(apiId))
+        : undefined) ??
+      (name ? all.find((m) => String(m?.name ?? '').trim().toLowerCase() === name.toLowerCase()) : undefined);
+
+    if (!manager?.id) {
+      const created = await this.managerService.create({
+        name: name || `Coach ${apiId}`,
+        nickname: name || `Coach ${apiId}`,
+        nationality: 'Unknown',
+        teamIds: [teamId],
+        metadata: {
+          source: 'api-sports',
+          providers: apiId != null ? { [PROVIDER_KEY]: { externalId: String(apiId) } } : undefined,
+        },
+      } as any);
+      if (!created?.id) return null;
+      manager = created;
+    } else {
+      const teamIds = Array.from(new Set([...(manager.teamIds ?? []), teamId]));
+      await this.managerService.update(manager.id, {
+        id: manager.id,
+        teamIds,
+        metadata: deepMergeEntityMetadata((manager.metadata ?? {}) as Record<string, unknown>, {
+          providers:
+            apiId != null ? { [PROVIDER_KEY]: { externalId: String(apiId) } } : undefined,
+        }) as any,
+      } as any);
+    }
+
+    const managerId = Number((manager as { id?: number } | undefined)?.id);
+    if (!Number.isFinite(managerId) || managerId <= 0) return null;
+    const existing = await this.managerEmploymentService.getQuery({
+      where: { managerId, teamId, isCurrent: true },
+    });
+    if (!existing.length) {
+      const previousCurrent = await this.managerEmploymentService.getQuery({
+        where: { teamId, isCurrent: true },
+      });
+      for (const row of previousCurrent) {
+        if (row.managerId === managerId) continue;
+        await this.managerEmploymentService.update(row.id, {
+          id: row.id,
+          isCurrent: false,
+          endDate: row.endDate ?? new Date(),
+        } as any);
+      }
+      await this.managerEmploymentService.create({
+        managerId,
+        teamId,
+        startDate: new Date(),
+        isCurrent: true,
+        metadata: {
+          source: 'api-sports',
+          apiSports: { coachId: apiId, coachName: name },
+        },
+      } as any);
+    }
+
+    await this.teamService.update(teamId, { id: teamId, managerId } as any);
+    return managerId;
+  }
+
+  private async upsertLineupPlayerRow(
+    lineupId: number,
+    playerSrc: { id?: number; name?: string; number?: number | null; pos?: string; grid?: string | null } | undefined,
+    isStarting: boolean,
+  ): Promise<number> {
+    const player = await this.ensurePlayerFromLineup(playerSrc);
+    if (!player?.id) return 0;
+    const [existingPlu] = await this.playerLineUpService.getQuery({
+      where: { lineupId, playerId: player.id },
+    });
+    const pluMeta = {
+      source: 'api-sports',
+      jerseyNumber: playerSrc?.number,
+      pos: playerSrc?.pos,
+      grid: playerSrc?.grid,
+    };
+    if (existingPlu) {
+      await this.playerLineUpService.update(existingPlu.id, {
+        id: existingPlu.id,
+        isStarting,
+        metadata: deepMergeEntityMetadata(
+          (existingPlu.metadata ?? {}) as Record<string, unknown>,
+          pluMeta as Record<string, unknown>,
+        ) as any,
+      } as any);
+    } else {
+      await this.playerLineUpService.create({
+        lineupId,
+        playerId: player.id,
+        isStarting,
+        isCaptain: false,
+        metadata: pluMeta,
+      } as any);
+    }
+    return 1;
+  }
+
+  private async ensurePlayerFromLineup(player?: {
+    id?: number;
+    name?: string;
+    number?: number | null;
+  }): Promise<any | null> {
+    const apiId = player?.id != null ? Number(player.id) : null;
+    if (apiId) {
+      const existing = await this.findLocalPlayerByApiSportsId(apiId);
+      if (existing) return existing;
+    }
+    const name = String(player?.name ?? '').trim();
+    if (!name) return null;
+
+    const created = await this.playerService.create({
+      name,
+      dateOfBirth: PLACEHOLDER_PLAYER_DOB,
+      nationality: 'Unknown',
+      positionIds: [],
+      kitNumber: player?.number != null ? Number(player.number) : undefined,
+      metadata: {
+        source: 'api-sports',
+        providers: apiId ? { [PROVIDER_KEY]: { externalId: String(apiId) } } : undefined,
+        apisports: apiId ? { playerId: apiId } : undefined,
+      },
+    } as any);
+    return created;
   }
 }

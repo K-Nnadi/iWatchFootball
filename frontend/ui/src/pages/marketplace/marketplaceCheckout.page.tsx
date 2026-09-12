@@ -34,6 +34,7 @@ import {
     type MarketplaceListing,
     type FeePreview,
 } from '../../shared/api/marketplace.api';
+import { TrustBadge } from './TrustBadge';
 
 export function MarketplaceCheckoutPage() {
     const { id } = useParams<{ id: string }>();
@@ -219,9 +220,12 @@ export function MarketplaceCheckoutPage() {
                         </Group>
                         <Group justify="space-between">
                             <Text size="sm" c="dimmed">Listing ID</Text>
-                            <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
-                                #{listing.id}
-                            </Text>
+                            <Group gap="xs">
+                                <TrustBadge userId={listing.sellerId} compact />
+                                <Text size="sm" style={{ color: 'var(--modern-text-primary)' }}>
+                                    #{listing.id}
+                                </Text>
+                            </Group>
                         </Group>
                         <Group justify="space-between">
                             <Text size="sm" c="dimmed">Listing expires</Text>
@@ -277,6 +281,9 @@ export function MarketplaceCheckoutPage() {
                                 {formatPrice(feePreview.totalBuyerPays)}
                             </Text>
                         </Group>
+                        <Text size="xs" c="dimmed">
+                            Payment is held in escrow until you confirm the ticket arrived in your club account.
+                        </Text>
                     </Stack>
                 </Paper>
 

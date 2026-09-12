@@ -238,4 +238,106 @@ export class PlayerFixtureStatService {
 
         return totals;
     }
+
+    /** Goal assists for a competition season: Goal.assistantId, falling back to StatsBomb goal_assist rollups. */
+    async assistCountsForCompetitionSeason(
+        competitionId: number,
+        seasonId: number,
+    ): Promise<Array<{ playerId: number; assists: number }>> {
+        const fromGoals = await this.statRepo.manager
+            .createQueryBuilder()
+            .select('g."assistantId"', 'playerId')
+            .addSelect('COUNT(*)::int', 'assists')
+            .from('goal', 'g')
+            .innerJoin('fixture', 'f', 'f.id = g."fixtureId"')
+            .where('f."competitionId" = :competitionId', { competitionId })
+            .andWhere('f."seasonId" = :seasonId', { seasonId })
+            .andWhere('g."assistantId" IS NOT NULL')
+            .andWhere('g."deletedAt" IS NULL')
+            .andWhere('f."deletedAt" IS NULL')
+            .groupBy('g."assistantId"')
+            .getRawMany<{ playerId: string | number; assists: string | number }>();
+
+        const fromRollup = await this.statRepo.manager
+            .createQueryBuilder()
+            .select('s."playerId"', 'playerId')
+            .addSelect('SUM(COALESCE(s."bigChancesCreated", 0))::int', 'assists')
+            .from('playerFixtureStat', 's')
+            .innerJoin('fixture', 'f', 'f.id = s."fixtureId"')
+            .where('f."competitionId" = :competitionId', { competitionId })
+            .andWhere('f."seasonId" = :seasonId', { seasonId })
+            .andWhere('s."deletedAt" IS NULL')
+            .andWhere('f."deletedAt" IS NULL')
+            .groupBy('s."playerId"')
+            .having('SUM(COALESCE(s."bigChancesCreated", 0)) > 0')
+            .getRawMany<{ playerId: string | number; assists: string | number }>();
+
+        const byPlayer = new Map<number, number>();
+        for (const row of [...fromGoals, ...fromRollup]) {
+            const playerId = Number(row.playerId);
+            const assists = Number(row.assists);
+            if (!Number.isFinite(playerId) || playerId <= 0 || !Number.isFinite(assists) || assists <= 0) {
+                continue;
+            }
+            byPlayer.set(playerId, Math.max(byPlayer.get(playerId) ?? 0, assists));
+        }
+
+        return Array.from(byPlayer, ([playerId, assists]) => ({ playerId, assists }));
+    }
+
+    /**
+     * Appearances: started, came on as a sub, or recorded match events.
+     * Distinct fixtures per player for the competition season.
+     */
+    async appearanceCountsForCompetitionSeason(
+        competitionId: number,
+        seasonId: number,
+    ): Promise<Array<{ playerId: number; played: number }>> {
+        const rows = (await this.statRepo.manager.query(
+            `
+            SELECT apps."playerId" AS "playerId", COUNT(DISTINCT apps."fixtureId")::int AS played
+            FROM (
+                SELECT plu."playerId" AS "playerId", lu."fixtureId" AS "fixtureId"
+                FROM "playerLineup" plu
+                INNER JOIN "lineUp" lu ON lu.id = plu."lineupId"
+                INNER JOIN fixture f ON f.id = lu."fixtureId"
+                WHERE f."competitionId" = $1
+                  AND f."seasonId" = $2
+                  AND plu."isStarting" = true
+                  AND plu."deletedAt" IS NULL
+                  AND lu."deletedAt" IS NULL
+                  AND f."deletedAt" IS NULL
+                UNION
+                SELECT s."playerInId" AS "playerId", s."fixtureId" AS "fixtureId"
+                FROM substitution s
+                INNER JOIN fixture f ON f.id = s."fixtureId"
+                WHERE f."competitionId" = $1
+                  AND f."seasonId" = $2
+                  AND s."deletedAt" IS NULL
+                  AND f."deletedAt" IS NULL
+                UNION
+                SELECT pfs."playerId" AS "playerId", pfs."fixtureId" AS "fixtureId"
+                FROM "playerFixtureStat" pfs
+                INNER JOIN fixture f ON f.id = pfs."fixtureId"
+                WHERE f."competitionId" = $1
+                  AND f."seasonId" = $2
+                  AND pfs."deletedAt" IS NULL
+                  AND f."deletedAt" IS NULL
+            ) apps
+            GROUP BY apps."playerId"
+            `,
+            [competitionId, seasonId],
+        )) as Array<{ playerId: string | number; played: string | number }>;
+
+        const result: Array<{ playerId: number; played: number }> = [];
+        for (const row of rows) {
+            const playerId = Number(row.playerId);
+            const played = Number(row.played);
+            if (!Number.isFinite(playerId) || playerId <= 0 || !Number.isFinite(played) || played <= 0) {
+                continue;
+            }
+            result.push({ playerId, played });
+        }
+        return result;
+    }
 }

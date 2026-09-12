@@ -15,6 +15,10 @@ export class UserRatingService {
         private readonly repo: Repository<UserRating>,
     ) {}
 
+    async getMyRatingForListing(listingId: number, raterUserId: number): Promise<UserRating | null> {
+        return this.repo.findOne({ where: { listingId, raterUserId } });
+    }
+
     async submitRating(raterUserId: number, dto: CreateRatingDto): Promise<UserRating> {
         const existing = await this.repo.findOne({
             where: { listingId: dto.listingId, raterUserId },

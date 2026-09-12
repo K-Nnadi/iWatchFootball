@@ -4,6 +4,7 @@ import { PlayerFixtureStat } from './playerFixtureStat.entity';
 import { PlayerFixtureStatService } from './player-fixture-stat.service';
 import { PlayerAdvancedStatsService } from './player-advanced-stats.service';
 import { AttendanceAdvancedStatsService } from './attendance-advanced-stats.service';
+import { CompetitionSeasonStatsController } from './competition-season-stats.controller';
 import { Goal } from '../goal/goal.entity';
 import { Card } from '../card/card.entity';
 import { PlayerLineUp } from '../playerLineUp/playerLineUp.entity';
@@ -28,6 +29,7 @@ import { Player } from '../player/player.entity';
         PlayerAdvancedStatsService,
         AttendanceAdvancedStatsService,
     ],
+    controllers: [CompetitionSeasonStatsController],
     exports: [
         PlayerFixtureStatService,
         PlayerAdvancedStatsService,

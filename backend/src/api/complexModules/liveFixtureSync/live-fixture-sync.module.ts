@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { ApiSportsAdapterModule } from '../../adapters/api-sports/api-sports-adapter.module';
+import { SportApiAdapterModule } from '../../adapters/sportapi/sportapi-adapter.module';
 import { PlatformConfigModule } from '../../modules/platformConfig/platformConfig.module';
 import { LiveFixtureSyncService } from './live-fixture-sync.service';
 import { LiveFixtureSyncScheduler } from './live-fixture-sync.scheduler';
@@ -16,6 +17,7 @@ const bullQueueModule = hasRedis
 @Module({
   imports: [
     ApiSportsAdapterModule,
+    SportApiAdapterModule,
     PlatformConfigModule,
     ...(bullQueueModule ? [bullQueueModule] : []),
   ],

@@ -128,28 +128,53 @@ export function LogsPage() {
 
     // Fetch competitions from the API
     const { data: competitionsData = [], isLoading: isLoadingCompetitions } = useGetQueryCompetition(
-        { take: 200 } as any
+        { take: 500, order: { name: 'ASC' } } as any
     );
 
-    // Fetch TCS entries to derive seasons for the selected competition
+    const competitionSelectData = useMemo(
+        () =>
+            [...competitionsData]
+                .sort((a, b) => {
+                    const featuredDelta = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+                    if (featuredDelta !== 0) return featuredDelta;
+                    const nameA = a.name?.trim() || t('logs.unknownCompetition');
+                    const nameB = b.name?.trim() || t('logs.unknownCompetition');
+                    const countryA = a.country?.trim();
+                    const countryB = b.country?.trim();
+                    const labelA = countryA ? `${nameA} (${countryA})` : nameA;
+                    const labelB = countryB ? `${nameB} (${countryB})` : nameB;
+                    return labelA.localeCompare(labelB, undefined, { sensitivity: 'base' });
+                })
+                .map((c) => {
+                    const name = c.name?.trim() || t('logs.unknownCompetition');
+                    const country = c.country?.trim();
+                    return {
+                        value: String(c.id),
+                        label: country ? `${name} (${country})` : name,
+                    };
+                }),
+        [competitionsData, t],
+    );
+
+    // Fetch TCS entries to derive seasons for the selected competition.
+    // Default take is 100, which only covers ~5 Premier League seasons (20 teams each).
     const { data: tcsForSeasons = [], isLoading: isLoadingSeasons } = useGetQueryTeamCompetitionSeason(
-        { where: { competitionId: selectedCompetition ? Number(selectedCompetition) : undefined } } as any,
+        {
+            where: { competitionId: selectedCompetition ? Number(selectedCompetition) : undefined },
+            take: 2000,
+        } as any,
         { query: { enabled: !!selectedCompetition } as any }
     );
 
-    // Derive unique season IDs from the TCS result
-    const uniqueSeasonIds = useMemo(() => {
-        const seen = new Set<number>();
-        return tcsForSeasons.filter(tcs => {
-            if (seen.has(tcs.seasonId)) return false;
-            seen.add(tcs.seasonId);
-            return true;
-        }).map(tcs => tcs.seasonId);
-    }, [tcsForSeasons]);
-
     // Fetch TCS entries to derive teams for the selected competition + season
     const { data: tcsForTeams = [], isLoading: isLoadingTeamsTcs } = useGetQueryTeamCompetitionSeason(
-        { where: { competitionId: selectedCompetition ? Number(selectedCompetition) : undefined, seasonId: selectedSeason ? Number(selectedSeason) : undefined } } as any,
+        {
+            where: {
+                competitionId: selectedCompetition ? Number(selectedCompetition) : undefined,
+                seasonId: selectedSeason ? Number(selectedSeason) : undefined,
+            },
+            take: 500,
+        } as any,
         { query: { enabled: !!(selectedCompetition && selectedSeason) } as any }
     );
 
@@ -162,19 +187,23 @@ export function LogsPage() {
         }).map(tcs => tcs.teamId);
     }, [tcsForTeams]);
 
-    // All teams loaded globally so we can resolve names for any fixture (form + logged games)
-    const { data: teamsData = [], isLoading: isLoadingTeams } = useGetQueryTeam(
-        { take: 500 } as any
-    );
-
-    // Filter teams to those registered in the selected competition/season (for the Add New Match form)
-    const teams = useMemo(() => {
-        if (!uniqueTeamIds.length) return [];
-        return teamsData.filter(t => uniqueTeamIds.includes(t.id));
-    }, [teamsData, uniqueTeamIds]);
-
     // Load all seasons so we can display proper year labels in the season dropdown
     const { data: allSeasonsData = [] } = useGetAllSeason();
+
+    const uniqueSeasonIds = useMemo(() => {
+        const seen = new Set<number>();
+        const ids: number[] = [];
+        for (const tcs of tcsForSeasons) {
+            if (seen.has(tcs.seasonId)) continue;
+            seen.add(tcs.seasonId);
+            ids.push(tcs.seasonId);
+        }
+        return ids.sort((a, b) => {
+            const yearA = allSeasonsData.find((s) => s.id === a)?.yearStart ?? 0;
+            const yearB = allSeasonsData.find((s) => s.id === b)?.yearStart ?? 0;
+            return yearB - yearA;
+        });
+    }, [tcsForSeasons, allSeasonsData]);
 
     // Fetch real fixtures from the API when all four filters are set (Add New Match form)
     const canFetchFixtures = !!(selectedCompetition && selectedSeason && selectedHomeTeam && selectedAwayTeam);
@@ -255,6 +284,31 @@ export function LogsPage() {
     const { data: loggedFixturesRaw = [], isLoading: isLoadingLoggedFixtures } = useGetQueryFixture(
         { where: { id: { $in: loggedFixtureIds } }, take: 200 } as any,
         { query: { enabled: loggedFixtureIds.length > 0 } as any }
+    );
+
+    const teamIdsForLookup = useMemo(() => {
+        const ids = new Set(uniqueTeamIds);
+        for (const f of loggedFixturesRaw) {
+            if (typeof f.homeTeamId === 'number') ids.add(f.homeTeamId);
+            if (typeof f.awayTeamId === 'number') ids.add(f.awayTeamId);
+        }
+        return Array.from(ids);
+    }, [uniqueTeamIds, loggedFixturesRaw]);
+
+    const { data: teamsData = [], isLoading: isLoadingTeams } = useGetQueryTeam(
+        {
+            where: { id: { $in: teamIdsForLookup.length ? teamIdsForLookup : [-1] } },
+            take: Math.max(teamIdsForLookup.length, 1),
+        } as any,
+        { query: { enabled: teamIdsForLookup.length > 0 } as any },
+    );
+
+    const teams = useMemo(
+        () =>
+            teamsData
+                .filter((t) => uniqueTeamIds.includes(t.id))
+                .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' })),
+        [teamsData, uniqueTeamIds],
     );
 
     const loggedStadiumIds = useMemo(
@@ -615,10 +669,7 @@ export function LogsPage() {
                                         </UiCaption>
                                         <Select
                                             placeholder={t('logs.selectCompetition')}
-                                            data={competitionsData.map((c) => ({
-                                                value: String(c.id),
-                                                label: c.name,
-                                            }))}
+                                            data={competitionSelectData}
                                             value={selectedCompetition}
                                             onChange={(val) => {
                                                 setSelectedCompetition(val);

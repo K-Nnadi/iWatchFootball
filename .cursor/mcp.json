@@ -1,1 +1,19 @@
-{"mcpServers": {"football-docs": {"command": "npx", "args": ["-y", "football-docs@latest"]}}}
+{
+  "mcpServers": {
+    "football-docs": {
+      "command": "npx",
+      "args": ["-y", "football-docs@latest"]
+    },
+    "RapidAPI Hub - SportAPI": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp.rapidapi.com",
+        "--header",
+        "x-api-host: sportapi7.p.rapidapi.com",
+        "--header",
+        "x-api-key: 767f3ca650msha4e19b33f76eb13p19b6dajsn1e910cd13f8a"
+      ]
+    }
+  }
+}

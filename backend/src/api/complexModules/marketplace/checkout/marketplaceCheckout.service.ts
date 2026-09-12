@@ -26,6 +26,8 @@ import { LogService } from '../../../modules/log/log.service';
 import { Ticket } from '../../../modules/ticket/ticket.entity';
 import { ticketAfterResalePurchase } from '../../../modules/ticket/ticket-state.util';
 import { MARKETPLACE_CONFIG, MARKETPLACE_DEFAULTS } from '../marketplace.constants';
+import { EscrowService } from '../escrow.service';
+import { FeeService } from '../fee.service';
 
 const HOLD_MINUTES_CONFIG_KEY = 'ticket_hold_minutes';
 const DEFAULT_HOLD_MINUTES = 10;
@@ -45,6 +47,8 @@ export class MarketplaceCheckoutService {
         private readonly ticketHoldService: TicketHoldService,
         private readonly loyaltyService: LoyaltyService,
         private readonly logService: LogService,
+        private readonly escrowService: EscrowService,
+        private readonly feeService: FeeService,
     ) {}
 
     async holdListing(buyerId: number, listingId: number): Promise<{ expiresAt: string; holderId: string; holdMinutes: number }> {
@@ -78,23 +82,35 @@ export class MarketplaceCheckoutService {
         adminFee: number;
         adminFeeRate: number;
         totalBuyerPays: number;
+        sellerFeeRate: number;
+        sellerNetPayout: number;
+        escrowHeld: boolean;
     }> {
         const listing = await this.listingRepo.findOne({ where: { id: listingId } });
         if (!listing) {
             throw new NotFoundException('Listing not found');
         }
-        const feeRate = await this.platformConfig.getNumber(
-            MARKETPLACE_CONFIG.FEE_RATE,
-            MARKETPLACE_DEFAULTS.FEE_RATE,
-        );
-        const askPrice = Number(listing.askPrice);
-        const adminFee = Math.round(askPrice * feeRate * 100) / 100;
+        const [buyer, seller] = await Promise.all([
+            this.feeService.calculateBuyerTotal(Number(listing.askPrice)),
+            this.feeService.calculateSellerPayout(Number(listing.askPrice)),
+        ]);
         return {
-            askPrice,
-            adminFee,
-            adminFeeRate: feeRate,
-            totalBuyerPays: Math.round((askPrice + adminFee) * 100) / 100,
+            askPrice: buyer.ticketPrice,
+            adminFee: buyer.buyerFee,
+            adminFeeRate: await this.feeService.getBuyerFeeRate(),
+            totalBuyerPays: buyer.total,
+            sellerFeeRate: await this.feeService.getSellerFeeRate(),
+            sellerNetPayout: seller.netPayout,
+            escrowHeld: true,
         };
+    }
+
+    async getPublicFees(): Promise<{ buyerFeeRate: number; sellerFeeRate: number }> {
+        return this.feeService.snapshotRates();
+    }
+
+    async getSellerPayoutPreview(askPrice: number) {
+        return this.feeService.calculateSellerPayout(askPrice);
     }
 
     async confirmPurchase(params: {
@@ -210,32 +226,13 @@ export class MarketplaceCheckoutService {
 
             // Mark listing as SOLD
             listing.status = MarketplaceListingStatus.SOLD;
+            listing.buyerId = params.buyerId;
             await listingRepo.save(listing);
 
             // Record the sale in marketplace_transaction first so we have its id
             // (done after listing update so we can reference it below)
 
-            // Credit seller wallet (get or create Credit record)
-            let sellerCredit = await creditRepo.findOne({
-                where: { userId: listing.sellerId },
-            });
-            if (!sellerCredit) {
-                sellerCredit = creditRepo.create({ userId: listing.sellerId, balance: 0 });
-            }
-            sellerCredit.balance = Math.round((Number(sellerCredit.balance) + askPrice) * 100) / 100;
-            await creditRepo.save(sellerCredit);
-
-            // Seller wallet ledger entry
-            const sellerLedger = txRepo.create({
-                type: TransactionType.CREDIT_TOP_UP,
-                amount: askPrice,
-                description: `Marketplace sale proceeds (listing #${params.listingId})`,
-                userId: listing.sellerId,
-                metadata: { listingId: params.listingId, buyerId: params.buyerId },
-            });
-            await txRepo.save(sellerLedger);
-
-            // Record marketplace transaction
+            // Record marketplace transaction (seller is paid when escrow releases after transfer confirmation)
             const mktTx = mktTxRepo.create({
                 listingId: params.listingId,
                 buyerId: params.buyerId,
@@ -243,10 +240,18 @@ export class MarketplaceCheckoutService {
                 salePrice: askPrice,
                 adminFee,
                 adminFeeRate: feeRate,
-                sellerCreditId: sellerCredit.id,
-                metadata: { idempotencyKey: params.idempotencyKey },
+                metadata: {
+                    idempotencyKey: params.idempotencyKey,
+                    providerPaymentRef: params.providerPaymentRef,
+                },
             });
             await mktTxRepo.save(mktTx);
+
+            await this.escrowService.createHold(manager, {
+                marketplaceTransactionId: mktTx.id,
+                amount: askPrice,
+                currency: 'GBP',
+            });
 
             // Audit: record ticket custody change to buyer
             await this.ownershipHistory.record(manager, {
@@ -295,5 +300,17 @@ export class MarketplaceCheckoutService {
             marketplaceTransactionId: txnResult.marketplaceTransactionId,
             ticketId: txnResult.ticketId,
         };
+    }
+
+    getEscrowForListing(listingId: number, userId: number) {
+        return this.escrowService.getHoldForListing(listingId, userId);
+    }
+
+    releaseEscrow(transactionId: number, userId: number, isAdmin: boolean) {
+        return this.escrowService.release(transactionId, userId, isAdmin);
+    }
+
+    refundEscrow(transactionId: number, userId: number, isAdmin: boolean) {
+        return this.escrowService.refund(transactionId, userId, isAdmin);
     }
 }

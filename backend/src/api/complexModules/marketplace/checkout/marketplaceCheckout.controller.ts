@@ -1,10 +1,12 @@
 import {
+    BadRequestException,
     Body,
     Get,
     Param,
     ParseIntPipe,
     Patch,
     Post,
+    Query,
     Req,
     UnauthorizedException,
     UseGuards,
@@ -67,6 +69,22 @@ export class MarketplaceCheckoutController {
         return this.checkoutService.getFeePreview(listingId);
     }
 
+    @Get('fees')
+    @ApiOperation({ summary: 'Public marketplace buyer/seller fee rates' })
+    async getFees() {
+        return this.checkoutService.getPublicFees();
+    }
+
+    @Get('fees/payout-preview')
+    @ApiOperation({ summary: 'Seller net payout estimate for an asking price' })
+    async getPayoutPreview(@Query('askPrice') askPriceRaw?: string) {
+        const askPrice = Number(askPriceRaw);
+        if (!Number.isFinite(askPrice) || askPrice <= 0) {
+            throw new BadRequestException('askPrice must be a positive number');
+        }
+        return this.checkoutService.getSellerPayoutPreview(askPrice);
+    }
+
     @Post('checkout/confirm')
     @ApiOperation({
         summary: 'Complete a marketplace ticket purchase (atomic: payment + ticket transfer + seller credit)',
@@ -96,6 +114,39 @@ export class MarketplaceCheckoutController {
             providerPaymentRef: dto.providerPaymentRef,
             idempotencyKey: dto.idempotencyKey,
         });
+    }
+
+    @Get('listings/:listingId/escrow')
+    @ApiOperation({ summary: 'Escrow hold status for a listing the caller is a party to' })
+    async getListingEscrow(
+        @Param('listingId', ParseIntPipe) listingId: number,
+        @Req() req: AuthedRequest,
+    ) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException('Not authenticated');
+        return this.checkoutService.getEscrowForListing(listingId, userId);
+    }
+
+    @Post('payments/release/:transactionId')
+    @ApiOperation({ summary: 'Release escrow to the seller after transfer confirmation' })
+    async releaseEscrow(
+        @Param('transactionId', ParseIntPipe) transactionId: number,
+        @Req() req: AuthedRequest,
+    ) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException('Not authenticated');
+        return this.checkoutService.releaseEscrow(transactionId, userId, req.user?.type === 'ADMIN');
+    }
+
+    @Post('payments/refund/:transactionId')
+    @ApiOperation({ summary: 'Refund escrow to the buyer (held funds only)' })
+    async refundEscrow(
+        @Param('transactionId', ParseIntPipe) transactionId: number,
+        @Req() req: AuthedRequest,
+    ) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException('Not authenticated');
+        return this.checkoutService.refundEscrow(transactionId, userId, req.user?.type === 'ADMIN');
     }
 
     @Patch('config/:key')

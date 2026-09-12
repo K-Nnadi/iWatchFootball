@@ -4,7 +4,8 @@ import { In, Repository } from 'typeorm';
 import { Manager } from './manager.entity';
 import { ManagerEmployment } from '../managerEmployment/managerEmployment.entity';
 import { Team } from '../team/team.entity';
-import type { ManagerCareerRow, ManagerProfileResponse } from './manager-profile.types';
+import { Fixture } from '../fixture/fixture.entity';
+import type { ManagerCareerRow, ManagerMatchRow, ManagerProfileResponse } from './manager-profile.types';
 
 @Injectable()
 export class ManagerProfileService {
@@ -13,6 +14,7 @@ export class ManagerProfileService {
         @InjectRepository(ManagerEmployment)
         private readonly employmentRepo: Repository<ManagerEmployment>,
         @InjectRepository(Team) private readonly teamRepo: Repository<Team>,
+        @InjectRepository(Fixture) private readonly fixtureRepo: Repository<Fixture>,
     ) {}
 
     async getProfile(managerId: number): Promise<ManagerProfileResponse> {
@@ -82,6 +84,9 @@ export class ManagerProfileService {
             career.find((c) => c.isCurrent)?.teamId ??
             (manager.teamIds?.length ? manager.teamIds[manager.teamIds.length - 1] : undefined);
 
+        const recentMatches =
+            currentTeamId != null ? await this.loadRecentMatches(currentTeamId, teamById) : [];
+
         return {
             manager: {
                 id: manager.id,
@@ -94,6 +99,85 @@ export class ManagerProfileService {
             career,
             ...(currentTeamId != null ? { currentTeamId } : {}),
             clubsManagedCount: teamIdSet.size,
+            recentMatches,
         };
     }
+
+    private async loadRecentMatches(
+        currentTeamId: number,
+        knownTeams: Map<number, Team>,
+    ): Promise<ManagerMatchRow[]> {
+        const fixtures = await this.fixtureRepo
+            .createQueryBuilder('f')
+            .where('(f."homeTeamId" = :teamId OR f."awayTeamId" = :teamId)', { teamId: currentTeamId })
+            .andWhere('f."deletedAt" IS NULL')
+            .andWhere('f.date <= :now', { now: new Date() })
+            .orderBy('f.date', 'DESC')
+            .addOrderBy('f.id', 'DESC')
+            .take(40)
+            .getMany();
+
+        const scored = fixtures.filter((f) => {
+            const scores = scoresFromFixture(f);
+            return f.homeTeamId != null && f.awayTeamId != null && scores.homeScore != null && scores.awayScore != null;
+        });
+
+        const neededIds = new Set<number>();
+        for (const f of scored) {
+            if (f.homeTeamId != null) neededIds.add(f.homeTeamId);
+            if (f.awayTeamId != null) neededIds.add(f.awayTeamId);
+        }
+
+        const missingIds = [...neededIds].filter((id) => !knownTeams.has(id));
+        const extraTeams =
+            missingIds.length > 0
+                ? await this.teamRepo.find({ where: { id: In(missingIds) } })
+                : [];
+        const teamById = new Map(knownTeams);
+        for (const t of extraTeams) teamById.set(t.id, t);
+
+        return scored.slice(0, 12).map((f) => {
+            const homeTeamId = f.homeTeamId!;
+            const awayTeamId = f.awayTeamId!;
+            const scores = scoresFromFixture(f);
+            return {
+                id: f.id,
+                date: f.date.toISOString(),
+                homeTeamId,
+                awayTeamId,
+                homeTeamName: teamById.get(homeTeamId)?.name ?? `Team #${homeTeamId}`,
+                awayTeamName: teamById.get(awayTeamId)?.name ?? `Team #${awayTeamId}`,
+                ...(scores.homeScore != null ? { homeScore: scores.homeScore } : {}),
+                ...(scores.awayScore != null ? { awayScore: scores.awayScore } : {}),
+                metadata: f.metadata as unknown,
+            };
+        });
+    }
+}
+
+function scoresFromFixture(f: {
+    homeScore?: number | null;
+    awayScore?: number | null;
+    metadata?: unknown;
+}): { homeScore?: number; awayScore?: number } {
+    const fromCol = (v: unknown): number | undefined => {
+        if (typeof v === 'number' && Number.isFinite(v)) return v;
+        if (typeof v === 'string' && v.trim() !== '') {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : undefined;
+        }
+        return undefined;
+    };
+
+    let homeScore = fromCol(f.homeScore);
+    let awayScore = fromCol(f.awayScore);
+    const meta =
+        f.metadata && typeof f.metadata === 'object' && f.metadata !== null
+            ? (f.metadata as Record<string, unknown>)
+            : undefined;
+    if (meta) {
+        if (homeScore === undefined) homeScore = fromCol(meta.homeScore ?? meta.home_score);
+        if (awayScore === undefined) awayScore = fromCol(meta.awayScore ?? meta.away_score);
+    }
+    return { ...(homeScore != null ? { homeScore } : {}), ...(awayScore != null ? { awayScore } : {}) };
 }

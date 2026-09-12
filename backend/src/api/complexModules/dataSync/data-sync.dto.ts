@@ -7,6 +7,7 @@ export const SYNC_STEP = {
   API_FIXTURES: 'api_fixtures',
   API_ENRICH: 'api_enrich',
   SPORTMONKS: 'sportmonks',
+  SPORTAPI: 'sportapi',
 } as const;
 
 export class StatsBombPipelineOptionsDto {
@@ -75,6 +76,24 @@ export class ApiSportsFixturesPipelineDto {
 
   @ApiPropertyOptional({ default: 50, description: 'Per league' })
   maxRequestsPerLeague?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description: 'After each league window, persist GET /fixtures/events for imported matches',
+  })
+  syncEventsAfter?: boolean;
+
+  @ApiPropertyOptional({ default: 20 })
+  syncEventsMaxRequests?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description: 'After each league window, persist GET /fixtures/lineups for imported matches',
+  })
+  syncLineupsAfter?: boolean;
+
+  @ApiPropertyOptional({ default: 20 })
+  syncLineupsMaxRequests?: number;
 }
 
 export class ApiSportsEnrichPipelineDto {
@@ -164,8 +183,50 @@ export class SportMonksPipelineDto {
   @ApiPropertyOptional({ default: true })
   syncFixtureDetails?: boolean;
 
+  @ApiPropertyOptional({ default: true, description: 'Import squads into playerTeamStint' })
+  syncSquads?: boolean;
+
   @ApiPropertyOptional({ default: 'UTC' })
   timezone?: string;
+}
+
+export class SportApiPipelineDto {
+  @ApiPropertyOptional({
+    default: true,
+    description: 'When false, the RapidAPI SportAPI block is skipped',
+  })
+  enabled?: boolean;
+
+  @ApiProperty({
+    type: [Number],
+    example: [17],
+    description: 'Sofascore uniqueTournament ids (17 = Premier League, 7 = Champions League)',
+  })
+  uniqueTournamentIds!: number[];
+
+  @ApiProperty({ description: 'Fixture import window start YYYY-MM-DD' })
+  from!: string;
+
+  @ApiProperty({ description: 'Fixture import window end YYYY-MM-DD' })
+  to!: string;
+
+  @ApiProperty({
+    description: 'Cap on RapidAPI SportAPI HTTP requests for this run',
+    example: 40,
+  })
+  maxApiRequests!: number;
+
+  @ApiPropertyOptional({ default: true })
+  syncStandings?: boolean;
+
+  @ApiPropertyOptional({
+    default: false,
+    description: 'Per-match incidents/lineups/stats — expensive (3 requests each). Keep false on the BASIC quota.',
+  })
+  syncFixtureDetails?: boolean;
+
+  @ApiPropertyOptional({ default: 0, description: 'Timezone offset in seconds from UTC' })
+  timezoneOffset?: number;
 }
 
 export class DataSyncRunDto {
@@ -184,6 +245,9 @@ export class DataSyncRunDto {
   @ApiPropertyOptional({ type: SportMonksPipelineDto })
   sportmonks?: SportMonksPipelineDto;
 
+  @ApiPropertyOptional({ type: SportApiPipelineDto })
+  sportapi?: SportApiPipelineDto;
+
   @ApiPropertyOptional({
     description:
       'When Redis is configured, defaults true so Swagger returns immediately with bullJobId. Set false to run synchronously.',
@@ -199,6 +263,10 @@ export function isSportMonksPipelineEnabled(dto: DataSyncRunDto): boolean {
   return dto.sportmonks != null && dto.sportmonks.enabled !== false;
 }
 
+export function isSportApiPipelineEnabled(dto: DataSyncRunDto): boolean {
+  return dto.sportapi != null && dto.sportapi.enabled !== false;
+}
+
 export function buildDataSyncStepKeys(dto: DataSyncRunDto): string[] {
   const keys: string[] = [];
   if (dto.statsbomb) keys.push(SYNC_STEP.STATS_BOMB);
@@ -210,6 +278,9 @@ export function buildDataSyncStepKeys(dto: DataSyncRunDto): string[] {
   }
   if (isSportMonksPipelineEnabled(dto)) {
     keys.push(SYNC_STEP.SPORTMONKS);
+  }
+  if (isSportApiPipelineEnabled(dto)) {
+    keys.push(SYNC_STEP.SPORTAPI);
   }
   return keys;
 }

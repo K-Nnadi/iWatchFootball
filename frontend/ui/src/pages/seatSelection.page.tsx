@@ -1,5 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { Box, Container, Grid, Paper, Stack, Text, Group, ScrollArea, Alert, useMantineColorScheme } from '@mantine/core';
+import React, { useMemo, useState } from 'react';
+import {
+    Alert,
+    Box,
+    Center,
+    Container,
+    Grid,
+    Group,
+    LoadingOverlay,
+    Paper,
+    ScrollArea,
+    Stack,
+    Text,
+    useMantineColorScheme,
+} from '@mantine/core';
 import { IconMapOff } from '@tabler/icons-react';
 import { notify } from '../shared/notify';
 import { useParams, useLocation } from 'react-router-dom';
@@ -10,22 +23,49 @@ import { buildTicketOfferKey } from '../shared/ticketOffer';
 import { StadiumSeatmapPanel } from '../components/stadium/StadiumSeatmapPanel';
 import { resolveStadiumSections, hasStadiumSeatmap } from '../components/stadium/resolveStadiumSeatmap';
 import { ModernH3 } from '../components/modern';
-import { MatchHeader, FiltersPanel, TicketCard, type Ticket, type TicketFilters, type MatchDetails } from '../components/tickets';
+import { FiltersPanel, TicketCard, type Ticket, type TicketFilters } from '../components/tickets';
+import { MatchHeader, type MatchDetails } from '../components/match';
+import { useGetOneFixture } from '@iWatchFootball/clients/controllers/fixture';
+import { useGetOneTeam } from '@iWatchFootball/clients/controllers/team';
 import { useGetOneStadium } from '@iWatchFootball/clients/controllers/stadium';
+import { useGetOneCompetition } from '@iWatchFootball/clients/controllers/competition';
 import { useTranslation } from '../i18n';
 import './seatSelection.page.css';
 
-// Default match details for fallback
-const DEFAULT_MATCH_DETAILS: MatchDetails = {
-        homeTeam: 'Inter Milan',
-        awayTeam: 'AC Milan',
-        homeTeamId: 3,
-        awayTeamId: 4,
-        homeTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/Inter-Milan-Logo.png',
-        awayTeamLogo: 'https://logos-world.net/wp-content/uploads/2020/06/AC-Milan-Logo.png',
-        date: '2025-01-25T18:00:00',
-        venue: 'San Siro',
+function parseFixtureScore(fixture: { homeScore?: number | null; awayScore?: number | null; metadata?: Record<string, unknown> | null }) {
+    const meta = fixture.metadata;
+    const home =
+        fixture.homeScore ?? (typeof meta?.homeScore === 'number' ? meta.homeScore : undefined);
+    const away =
+        fixture.awayScore ?? (typeof meta?.awayScore === 'number' ? meta.awayScore : undefined);
+    return {
+        home: typeof home === 'number' && Number.isFinite(home) ? home : undefined,
+        away: typeof away === 'number' && Number.isFinite(away) ? away : undefined,
     };
+}
+
+function matchDetailsFromLocation(state: unknown): MatchDetails | null {
+    if (!state || typeof state !== 'object') return null;
+    const s = state as Record<string, unknown>;
+    if (typeof s.homeTeam !== 'string' || typeof s.awayTeam !== 'string' || typeof s.date !== 'string') {
+        return null;
+    }
+    return {
+        matchId: typeof s.matchId === 'string' ? s.matchId : undefined,
+        homeTeam: s.homeTeam,
+        awayTeam: s.awayTeam,
+        homeTeamId: typeof s.homeTeamId === 'number' ? s.homeTeamId : undefined,
+        awayTeamId: typeof s.awayTeamId === 'number' ? s.awayTeamId : undefined,
+        homeTeamLogo: typeof s.homeTeamLogo === 'string' ? s.homeTeamLogo : undefined,
+        awayTeamLogo: typeof s.awayTeamLogo === 'string' ? s.awayTeamLogo : undefined,
+        date: s.date,
+        venue: typeof s.venue === 'string' ? s.venue : '',
+        competition: typeof s.competition === 'string' ? s.competition : undefined,
+        competitionId: typeof s.competitionId === 'number' ? s.competitionId : undefined,
+        stadiumId: typeof s.stadiumId === 'number' ? s.stadiumId : undefined,
+        stadiumMetadata: s.stadiumMetadata,
+    };
+}
 
 export function SeatSelectionPage() {
     const { t } = useTranslation();
@@ -36,28 +76,78 @@ export function SeatSelectionPage() {
     const isDark = colorScheme === 'dark';
     const { addItem, startReservation } = useCartStore();
 
-    const matchDetails: MatchDetails = (routerLocation.state as MatchDetails) || DEFAULT_MATCH_DETAILS;
+    const fixtureNumericId = matchId ? parseInt(matchId, 10) : NaN;
+    const fetchFromApi = Number.isFinite(fixtureNumericId) && fixtureNumericId > 0;
 
-    const { data: stadiumRecord } = useGetOneStadium(matchDetails.stadiumId ?? 0, {
-        query: { enabled: !!matchDetails.stadiumId } as never,
+    const { data: fixture, isLoading: loadingFixture } = useGetOneFixture(fixtureNumericId, {
+        query: { enabled: fetchFromApi } as never,
+    });
+    const homeTeamId = fixture?.homeTeamId;
+    const awayTeamId = fixture?.awayTeamId;
+    const stadiumId = fixture?.stadiumId;
+    const competitionId = fixture?.competitionId;
+
+    const { data: homeTeam, isLoading: loadingHome } = useGetOneTeam(homeTeamId ?? 0, {
+        query: { enabled: fetchFromApi && typeof homeTeamId === 'number' } as never,
+    });
+    const { data: awayTeam, isLoading: loadingAway } = useGetOneTeam(awayTeamId ?? 0, {
+        query: { enabled: fetchFromApi && typeof awayTeamId === 'number' } as never,
+    });
+    const { data: stadium, isLoading: loadingStadium } = useGetOneStadium(stadiumId ?? 0, {
+        query: { enabled: fetchFromApi && typeof stadiumId === 'number' } as never,
+    });
+    const { data: competition, isLoading: loadingCompetition } = useGetOneCompetition(competitionId ?? 0, {
+        query: { enabled: fetchFromApi && typeof competitionId === 'number' } as never,
     });
 
-    const stadiumSections = useMemo(() => {
-        const fromState = resolveStadiumSections({
-            venue: matchDetails.venue,
-            metadata: matchDetails.stadiumMetadata,
-        });
-        if (fromState) return fromState;
-
-        if (stadiumRecord?.metadata) {
-            return resolveStadiumSections({
-                venue: matchDetails.venue,
-                metadata: stadiumRecord.metadata,
-            });
+    const matchDetails: MatchDetails | null = useMemo(() => {
+        if (fetchFromApi) {
+            if (!fixture || !homeTeam || !awayTeam) return null;
+            const scores = parseFixtureScore(
+                fixture as {
+                    homeScore?: number | null;
+                    awayScore?: number | null;
+                    metadata?: Record<string, unknown> | null;
+                },
+            );
+            return {
+                matchId: String(fixture.id),
+                homeTeam: homeTeam.name,
+                awayTeam: awayTeam.name,
+                homeTeamId: fixture.homeTeamId,
+                awayTeamId: fixture.awayTeamId,
+                date: fixture.date,
+                venue: stadium?.name ?? '',
+                competition: competition?.name,
+                competitionId: fixture.competitionId ?? competition?.id,
+                homeTeamLogo: homeTeam.logoUrl,
+                awayTeamLogo: awayTeam.logoUrl,
+                stadiumId: stadium?.id ?? fixture.stadiumId,
+                stadiumMetadata: stadium?.metadata,
+                ...(scores.home != null && scores.away != null
+                    ? { homeScore: scores.home, awayScore: scores.away }
+                    : {}),
+            };
         }
+        return matchDetailsFromLocation(routerLocation.state);
+    }, [fetchFromApi, fixture, homeTeam, awayTeam, stadium, competition, routerLocation.state]);
 
-        return resolveStadiumSections({ venue: matchDetails.venue });
-    }, [matchDetails.venue, matchDetails.stadiumMetadata, stadiumRecord?.metadata]);
+    const stadiumSections = useMemo(() => {
+        const fromApi = resolveStadiumSections({
+            venue: matchDetails?.venue ?? '',
+            metadata: matchDetails?.stadiumMetadata,
+        });
+        if (fromApi) return fromApi;
+        return resolveStadiumSections({ venue: matchDetails?.venue ?? '' });
+    }, [matchDetails?.venue, matchDetails?.stadiumMetadata]);
+
+    const loadingMatch =
+        fetchFromApi &&
+        (loadingFixture ||
+            loadingHome ||
+            loadingAway ||
+            (typeof stadiumId === 'number' && loadingStadium) ||
+            (typeof competitionId === 'number' && loadingCompetition));
 
     const showSeatmap = hasStadiumSeatmap(stadiumSections);
     const [filters, setFilters] = useState<TicketFilters>({
@@ -258,13 +348,28 @@ export function SeatSelectionPage() {
         [allTickets]
     );
 
+    if (fetchFromApi && loadingMatch) {
+        return (
+            <Box pos="relative" mih={320}>
+                <LoadingOverlay visible />
+            </Box>
+        );
+    }
+
+    if (!matchDetails) {
+        return (
+            <Container size="xl" py="xl">
+                <Center>
+                    <Text c="dimmed">{t('match.invalidMatchId')}</Text>
+                </Center>
+            </Container>
+        );
+    }
+
     return (
         <Box className="seat-selection-page" style={{ minHeight: '100vh', padding: '2rem 0', backgroundColor: 'var(--modern-bg-primary)' }}>
             <Container size="xl">
-                {/* Match Header */}
-                <MatchHeader 
-                    matchDetails={matchDetails}
-                />
+                <MatchHeader matchDetails={matchDetails} variant="compact" showViewTicketsButton={false} />
 
                 {/* Filters */}
                 <FiltersPanel
@@ -305,7 +410,7 @@ export function SeatSelectionPage() {
                         </Grid.Col>
                     )}
 
-                    <Grid.Col span={{ base: 12, lg: showSeatmap ? 4 : 8 }} offset={{ lg: showSeatmap ? 0 : 2 }}>
+                    <Grid.Col span={{ base: 12, lg: showSeatmap ? 4 : 12 }}>
                         <Paper
                             p="md"
                             style={{
@@ -313,7 +418,7 @@ export function SeatSelectionPage() {
                                 border: isDark 
                                     ? '1px solid rgba(255, 255, 255, 0.1)' 
                                     : '1px solid var(--modern-border-color)',
-                                height: '600px',
+                                maxHeight: '600px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 transition: 'background-color 0.3s ease, border-color 0.3s ease',

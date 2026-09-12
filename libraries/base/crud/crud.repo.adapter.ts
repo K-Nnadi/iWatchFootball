@@ -1,8 +1,9 @@
 import {
+	And,
 	ArrayContains,
 	Between,
 	DeepPartial,
-	DeleteResult, FindOptionsRelations,
+	DeleteResult, FindOperator, FindOptionsRelations,
 	FindOptionsWhere,
 	ILike,
 	In,
@@ -108,35 +109,10 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 		const parsedWhere = await recurseWithObjFunction(
 			query.where,
 			(obj: any) => {
-				return Object.keys(obj).length === 1 && Object.keys(obj).some((key) => this.keys.includes(key));
+				const keys = Object.keys(obj ?? {});
+				return keys.length > 0 && keys.every((key) => this.keys.includes(key));
 			},
-			(obj: any) => {
-				const specialKey = Object.keys(obj)[0];
-				switch (specialKey) {
-					case '$gte':
-						return MoreThanOrEqual(obj[specialKey]);
-					case '$lte':
-						return LessThanOrEqual(obj[specialKey]);
-					case '$btwn':
-						return Between(obj[specialKey][0], obj[specialKey][1]);
-					case '$gt':
-						return MoreThan(obj[specialKey]);
-					case '$lt':
-						return LessThan(obj[specialKey]);
-					case '$not':
-						return Not(obj[specialKey]);
-					case '$in':
-						return In(obj[specialKey]);
-					case '$like':
-						return ILike(obj[specialKey]);
-					case '$raw':
-						return Raw(obj[specialKey]);
-					case '$contains':
-						return ArrayContains(obj[specialKey]);
-					default:
-						return obj;
-				}
-			}
+			(obj: any) => this.toFindOperator(obj),
 		);
 
 		return {
@@ -145,4 +121,43 @@ export class CrudRepoAdapter<T extends ObjectLiteral & { id: number }, U extends
 			relations: parsedRelations
 		};
 	};
+
+	/** Convert `{ $gte, $lte }` (and other operator maps) into TypeORM FindOperators. */
+	private toFindOperator(obj: Record<string, unknown>): FindOperator<unknown> | Record<string, unknown> {
+		const keys = Object.keys(obj);
+		if (keys.length === 2 && obj.$gte != null && obj.$lte != null) {
+			return Between(obj.$gte, obj.$lte);
+		}
+
+		const operators = keys.map((specialKey) => {
+			switch (specialKey) {
+				case '$gte':
+					return MoreThanOrEqual(obj[specialKey]);
+				case '$lte':
+					return LessThanOrEqual(obj[specialKey]);
+				case '$btwn':
+					return Between((obj[specialKey] as unknown[])[0], (obj[specialKey] as unknown[])[1]);
+				case '$gt':
+					return MoreThan(obj[specialKey]);
+				case '$lt':
+					return LessThan(obj[specialKey]);
+				case '$not':
+					return Not(obj[specialKey]);
+				case '$in':
+					return In(obj[specialKey] as unknown[]);
+				case '$like':
+					return ILike(obj[specialKey] as string);
+				case '$raw':
+					return Raw(obj[specialKey] as string);
+				case '$contains':
+					return ArrayContains(obj[specialKey] as unknown[]);
+				default:
+					return obj[specialKey];
+			}
+		}).filter((op): op is FindOperator<unknown> => op != null && typeof op === 'object');
+
+		if (operators.length === 0) return obj;
+		if (operators.length === 1) return operators[0];
+		return And(...operators);
+	}
 }

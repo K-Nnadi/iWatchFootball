@@ -198,6 +198,73 @@ export async function stripeRetrieveCheckoutSession(
     return stripeGet<StripeCheckoutSessionObject>(`/checkout/sessions/${sessionId}`, secretKey);
 }
 
+export interface StripeConnectAccount {
+    id: string;
+    details_submitted?: boolean;
+    charges_enabled?: boolean;
+    payouts_enabled?: boolean;
+}
+
+export async function stripeCreateConnectAccount(
+    secretKey: string,
+    params: { userId: number; email?: string; country?: string },
+): Promise<StripeConnectAccount> {
+    const body = encodeForm({
+        type: 'express',
+        country: params.country ?? 'GB',
+        email: params.email,
+        'capabilities[card_payments][requested]': true,
+        'capabilities[transfers][requested]': true,
+        'metadata[userId]': String(params.userId),
+    });
+    return stripePost<StripeConnectAccount>('/accounts', secretKey, body);
+}
+
+export async function stripeCreateAccountLink(
+    secretKey: string,
+    params: { accountId: string; refreshUrl: string; returnUrl: string },
+): Promise<{ url: string }> {
+    const body = encodeForm({
+        account: params.accountId,
+        refresh_url: params.refreshUrl,
+        return_url: params.returnUrl,
+        type: 'account_onboarding',
+    });
+    return stripePost<{ url: string }>('/account_links', secretKey, body);
+}
+
+export async function stripeRetrieveConnectAccount(
+    secretKey: string,
+    accountId: string,
+): Promise<StripeConnectAccount> {
+    return stripeGet<StripeConnectAccount>(`/accounts/${accountId}`, secretKey);
+}
+
+export async function stripeCreateTransfer(
+    secretKey: string,
+    params: { amountPence: number; currency: string; destination: string; transferGroup?: string },
+): Promise<{ id: string }> {
+    const body = encodeForm({
+        amount: params.amountPence,
+        currency: params.currency,
+        destination: params.destination,
+        transfer_group: params.transferGroup,
+    });
+    return stripePost<{ id: string }>('/transfers', secretKey, body);
+}
+
+export async function stripeCreateRefund(
+    secretKey: string,
+    params: { paymentIntentId?: string; chargeId?: string; amountPence?: number },
+): Promise<{ id: string; status?: string }> {
+    const body = encodeForm({
+        payment_intent: params.paymentIntentId,
+        charge: params.chargeId,
+        amount: params.amountPence,
+    });
+    return stripePost<{ id: string; status?: string }>('/refunds', secretKey, body);
+}
+
 /** Verify Stripe webhook signature (t=timestamp,v1=sig). */
 export function stripeConstructEvent(
     payload: Buffer | string,

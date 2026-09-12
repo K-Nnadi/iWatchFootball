@@ -17,6 +17,10 @@ import { FixtureTeamStatModule } from '../../modules/fixtureTeamStat/fixtureTeam
 import { GoalModule } from '../../modules/goal/goal.module';
 import { CardModule } from '../../modules/card/card.module';
 import { SubstitutionModule } from '../../modules/substitution/substitution.module';
+import { LineUpModule } from '../../modules/lineUp/lineUp.module';
+import { PlayerLineUpModule } from '../../modules/playerLineUp/playerLineUp.module';
+import { ManagerModule } from '../../modules/manager/manager.module';
+import { ManagerEmploymentModule } from '../../modules/managerEmployment/managerEmployment.module';
 
 @Module({
   imports: [
@@ -35,6 +39,10 @@ import { SubstitutionModule } from '../../modules/substitution/substitution.modu
     GoalModule,
     CardModule,
     SubstitutionModule,
+    LineUpModule,
+    PlayerLineUpModule,
+    ManagerModule,
+    ManagerEmploymentModule,
   ],
   providers: [ApiSportsHttpService, ApiSportsAdapterService],
   controllers: [ApiSportsController],

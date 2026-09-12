@@ -16,7 +16,7 @@ import { IconTag, IconTicket, IconInfoCircle, IconArrowLeft } from '@tabler/icon
 import { notify } from '../../shared/notify';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { ModernH1, ModernH3, ModernBody, ModernButton } from '../../components/modern';
-import { createListing } from '../../shared/api/marketplace.api';
+import { createListing, getSellerConnectStatus, getSellerPayoutPreview } from '../../shared/api/marketplace.api';
 import { getMyTicketLog } from '../../shared/api/userTicketLog.api';
 
 interface OwnedTicket {
@@ -37,6 +37,10 @@ export function CreateListingPage() {
     const [askPrice, setAskPrice] = useState<number | string>('');
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [canList, setCanList] = useState(true);
+    const [connectConfigured, setConnectConfigured] = useState(false);
+    const [payoutNet, setPayoutNet] = useState<number | null>(null);
+    const [sellerFee, setSellerFee] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchMyTickets = async () => {
@@ -63,6 +67,35 @@ export function CreateListingPage() {
         };
         void fetchMyTickets();
     }, []);
+
+    useEffect(() => {
+        void getSellerConnectStatus()
+            .then((s) => {
+                setCanList(s.canList);
+                setConnectConfigured(s.configured);
+            })
+            .catch(() => setCanList(true));
+    }, []);
+
+    useEffect(() => {
+        if (typeof askPrice !== 'number' || askPrice <= 0) {
+            setPayoutNet(null);
+            setSellerFee(null);
+            return;
+        }
+        const handle = window.setTimeout(() => {
+            void getSellerPayoutPreview(askPrice)
+                .then((p) => {
+                    setPayoutNet(p.netPayout);
+                    setSellerFee(p.platformFee);
+                })
+                .catch(() => {
+                    setPayoutNet(null);
+                    setSellerFee(null);
+                });
+        }, 250);
+        return () => window.clearTimeout(handle);
+    }, [askPrice]);
 
     const estimatedFee =
         selectedTicket && typeof askPrice === 'number' && askPrice > 0
@@ -133,6 +166,24 @@ export function CreateListingPage() {
                     the platform until sold or you cancel the listing.
                 </ModernBody>
 
+                {connectConfigured && !canList && (
+                    <Alert
+                        icon={<IconInfoCircle size={18} />}
+                        mb="xl"
+                        color="yellow"
+                        title="Stripe Connect required"
+                    >
+                        Finish seller onboarding before listing.{' '}
+                        <Text
+                            component="span"
+                            style={{ color: 'var(--modern-lime)', cursor: 'pointer' }}
+                            onClick={() => navigateWithTransition('/seller/onboarding')}
+                        >
+                            Open payout setup
+                        </Text>
+                    </Alert>
+                )}
+
                 <Alert
                     icon={<IconInfoCircle size={18} />}
                     mb="xl"
@@ -142,8 +193,9 @@ export function CreateListingPage() {
                         color: 'var(--modern-text-primary)',
                     }}
                 >
-                    Buyers pay a platform service fee on top of your asking price. You receive the
-                    full asking price as platform credit once the ticket is sold.
+                    Buyers pay a platform service fee on top of your asking price. After the sale,
+                    funds stay in escrow until the buyer confirms they received the ticket. A seller
+                    fee is then deducted from your payout.
                 </Alert>
 
                 {/* Step 1: Select ticket */}
@@ -313,10 +365,10 @@ export function CreateListingPage() {
                                 </Group>
                                 <Group justify="space-between">
                                     <Text size="sm" c="dimmed">
-                                        Platform fee (buyer pays ~10%)
+                                        Seller fee (deducted on payout)
                                     </Text>
                                     <Text size="sm" c="dimmed">
-                                        ~{formatPrice(estimatedFee)}
+                                        {sellerFee != null ? formatPrice(sellerFee) : `~${formatPrice(estimatedFee)}`}
                                     </Text>
                                 </Group>
                                 <Divider
@@ -325,10 +377,10 @@ export function CreateListingPage() {
                                 />
                                 <Group justify="space-between">
                                     <Text size="sm" fw={600} style={{ color: 'var(--modern-lime)' }}>
-                                        You receive
+                                        You receive after confirmation
                                     </Text>
                                     <Text size="sm" fw={700} style={{ color: 'var(--modern-lime)' }}>
-                                        {formatPrice(askPrice as number)} in credits
+                                        {formatPrice(payoutNet ?? (askPrice as number) - estimatedFee)}
                                     </Text>
                                 </Group>
                             </Stack>
@@ -360,7 +412,13 @@ export function CreateListingPage() {
                     <ModernButton
                         variant="primary"
                         onClick={() => void handleSubmit()}
-                        disabled={!selectedTicket || typeof askPrice !== 'number' || askPrice <= 0 || submitting}
+                        disabled={
+                            !selectedTicket ||
+                            typeof askPrice !== 'number' ||
+                            askPrice <= 0 ||
+                            submitting ||
+                            (connectConfigured && !canList)
+                        }
                         style={{ flex: 1 }}
                     >
                         {submitting ? <Loader size="xs" color="white" /> : 'List Ticket for Sale'}

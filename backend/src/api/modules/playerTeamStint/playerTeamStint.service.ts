@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CrudRepoAdapter } from '@iWatchFootball/base-tools/crud/crud.repo.adapter';
@@ -7,6 +7,17 @@ import { PlayerTeamStintSource } from '../../enums/playerTeamStint.enum';
 import { Player } from '../player/player.entity';
 import { Transfer } from '../transfer/transfer.entity';
 import { Season } from '../season/season.entity';
+import { Position } from '../position/position.entity';
+import { Manager } from '../manager/manager.entity';
+import { ManagerEmployment } from '../managerEmployment/managerEmployment.entity';
+import { Team } from '../team/team.entity';
+import { TeamCompetitionSeason } from '../teamCompetitionSeason/teamCompetitionSeason.entity';
+import { resolveSquadPositionGroup } from './squad-position-group';
+import type {
+    SquadMemberDto,
+    TeamCurrentManagerResponse,
+    TeamSeasonOptionDto,
+} from './team-squad.types';
 
 export type OpenStintParams = {
     playerId: number;
@@ -25,6 +36,13 @@ export class PlayerTeamStintService extends CrudRepoAdapter<PlayerTeamStint, Cre
         @InjectRepository(Player) private readonly playerRepo: Repository<Player>,
         @InjectRepository(Transfer) private readonly transferRepo: Repository<Transfer>,
         @InjectRepository(Season) private readonly seasonRepo: Repository<Season>,
+        @InjectRepository(Position) private readonly positionRepo: Repository<Position>,
+        @InjectRepository(Manager) private readonly managerRepo: Repository<Manager>,
+        @InjectRepository(ManagerEmployment)
+        private readonly employmentRepo: Repository<ManagerEmployment>,
+        @InjectRepository(Team) private readonly teamRepo: Repository<Team>,
+        @InjectRepository(TeamCompetitionSeason)
+        private readonly tcsRepo: Repository<TeamCompetitionSeason>,
     ) {
         super(stintRepo);
     }
@@ -159,18 +177,27 @@ export class PlayerTeamStintService extends CrudRepoAdapter<PlayerTeamStint, Cre
         teamId: number,
         playerIds: number[],
         seasonId?: number,
+        kitByPlayerId?: Record<number, number>,
     ): Promise<{ opened: number; closed: number }> {
-        const uniquePlayerIds = [...new Set(playerIds.filter((id) => Number.isFinite(id) && id > 0))];
+        const uniquePlayerIds: number[] = [];
+        const seen = new Set<number>();
+        for (const id of playerIds) {
+            if (!Number.isFinite(id) || id <= 0 || seen.has(id)) continue;
+            seen.add(id);
+            uniquePlayerIds.push(id);
+        }
         const importDate = new Date();
 
         let opened = 0;
         for (const playerId of uniquePlayerIds) {
+            const kit = kitByPlayerId?.[playerId];
             await this.openStint({
                 playerId,
                 teamId,
                 startDate: importDate,
                 source: PlayerTeamStintSource.IMPORT,
                 seasonId,
+                ...(kit != null ? { kitNumber: kit } : {}),
             });
             opened += 1;
         }
@@ -200,7 +227,163 @@ export class PlayerTeamStintService extends CrudRepoAdapter<PlayerTeamStint, Cre
     }
 
     async getCurrentSquad(teamId: number, includeLoans = false): Promise<Player[]> {
-        const stints = await this.stintRepo.find({
+        const stints = await this.loadSquadStints(teamId, undefined, includeLoans);
+        return this.playersFromStints(stints);
+    }
+
+    /** Season squad is stints tagged with that seasonId only — no date-overlap fallback. */
+    async getSquadForSeason(teamId: number, seasonId: number, includeLoans = false): Promise<Player[]> {
+        const stints = await this.loadSquadStints(teamId, seasonId, includeLoans);
+        const players = await this.playersFromStints(stints);
+        return players.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    async getSquadMembers(
+        teamId: number,
+        seasonId?: number,
+        includeLoans = false,
+    ): Promise<SquadMemberDto[]> {
+        const stints = await this.loadSquadStints(teamId, seasonId, includeLoans);
+        const uniqueStints = dedupeStintsByPlayer(stints);
+        const players = await this.playersFromStints(uniqueStints);
+        const playerById = new Map(players.map((p) => [p.id, p]));
+
+        const positionIds = new Set<number>();
+        for (const player of players) {
+            for (const pid of player.positionIds ?? []) {
+                if (Number.isFinite(pid) && pid > 0) positionIds.add(pid);
+            }
+        }
+        const positions =
+            positionIds.size > 0
+                ? await this.positionRepo.find({ where: { id: In([...positionIds]) } })
+                : [];
+        const positionById = new Map(positions.map((p) => [p.id, p]));
+
+        const members: SquadMemberDto[] = [];
+        for (const stint of uniqueStints) {
+            const player = playerById.get(stint.playerId);
+            if (!player) continue;
+            const primaryPosId = (player.positionIds ?? []).find((id) => Number.isFinite(id) && id > 0);
+            const pos = primaryPosId != null ? positionById.get(primaryPosId) : undefined;
+            const positionName = pos?.name ?? 'Player';
+            members.push({
+                id: player.id,
+                name: player.name,
+                nationality: player.nationality,
+                dateOfBirth: player.dateOfBirth ? new Date(player.dateOfBirth).toISOString() : null,
+                photoUrl: player.photoUrl ?? null,
+                position: positionName,
+                positionGroup: resolveSquadPositionGroup(positionName, pos?.type),
+                ...(stint.kitNumber != null ? { kitNumber: stint.kitNumber } : {}),
+                isLoan: stint.isLoan ?? false,
+            });
+        }
+
+        if (seasonId != null) {
+            members.sort((a, b) => a.name.localeCompare(b.name));
+        }
+        return members;
+    }
+
+    async getTeamSeasons(teamId: number): Promise<TeamSeasonOptionDto[]> {
+        const team = await this.teamRepo.findOne({ where: { id: teamId } });
+        if (!team) {
+            throw new NotFoundException(`Team ${teamId} not found`);
+        }
+
+        const [stintRows, tcsRows] = await Promise.all([
+            this.stintRepo
+                .createQueryBuilder('s')
+                .select('DISTINCT s.seasonId', 'seasonId')
+                .where('s.teamId = :teamId', { teamId })
+                .andWhere('s.seasonId IS NOT NULL')
+                .getRawMany<{ seasonId: number }>(),
+            this.tcsRepo
+                .createQueryBuilder('t')
+                .select('DISTINCT t.seasonId', 'seasonId')
+                .where('t.teamId = :teamId', { teamId })
+                .getRawMany<{ seasonId: number }>(),
+        ]);
+
+        const ids = new Set<number>();
+        for (const row of [...stintRows, ...tcsRows]) {
+            const n = Number(row.seasonId);
+            if (Number.isFinite(n) && n > 0) ids.add(n);
+        }
+        if (ids.size === 0) return [];
+
+        const seasons = await this.seasonRepo.find({ where: { id: In([...ids]) } });
+        return seasons
+            .sort((a, b) => (b.yearStart ?? 0) - (a.yearStart ?? 0))
+            .map((s) => ({
+                id: s.id,
+                yearStart: s.yearStart,
+                yearEnd: s.yearEnd,
+                label: `${s.yearStart}/${s.yearEnd}`,
+            }));
+    }
+
+    async getCurrentManager(teamId: number): Promise<TeamCurrentManagerResponse> {
+        const team = await this.teamRepo.findOne({ where: { id: teamId } });
+        if (!team) {
+            throw new NotFoundException(`Team ${teamId} not found`);
+        }
+
+        const employment = await this.employmentRepo.findOne({
+            where: { teamId, isCurrent: true },
+            order: { startDate: 'DESC', id: 'DESC' },
+        });
+        if (employment) {
+            const manager = await this.managerRepo.findOne({ where: { id: employment.managerId } });
+            if (manager) {
+                return {
+                    manager: {
+                        id: manager.id,
+                        name: manager.name,
+                        nationality: manager.nationality,
+                    },
+                    source: 'employment',
+                };
+            }
+        }
+
+        if (team.managerId) {
+            const manager = await this.managerRepo.findOne({ where: { id: team.managerId } });
+            if (manager) {
+                return {
+                    manager: {
+                        id: manager.id,
+                        name: manager.name,
+                        nationality: manager.nationality,
+                    },
+                    source: 'teamManagerId',
+                };
+            }
+        }
+
+        return { manager: null };
+    }
+
+    private async loadSquadStints(
+        teamId: number,
+        seasonId: number | undefined,
+        includeLoans: boolean,
+    ): Promise<PlayerTeamStint[]> {
+        if (seasonId != null) {
+            const season = await this.seasonRepo.findOne({ where: { id: seasonId } });
+            if (!season) return [];
+            return this.stintRepo.find({
+                where: {
+                    teamId,
+                    seasonId,
+                    ...(includeLoans ? {} : { isLoan: false }),
+                },
+                order: { kitNumber: 'ASC', id: 'ASC' },
+            });
+        }
+
+        return this.stintRepo.find({
             where: {
                 teamId,
                 isCurrent: true,
@@ -208,59 +391,14 @@ export class PlayerTeamStintService extends CrudRepoAdapter<PlayerTeamStint, Cre
             },
             order: { kitNumber: 'ASC', id: 'ASC' },
         });
-
-        if (stints.length === 0) return [];
-
-        const playerIds = stints.map((s) => s.playerId);
-        const players = await this.playerRepo.find({
-            where: { id: In(playerIds) },
-        });
-        const byId = new Map(players.map((p) => [p.id, p]));
-        return playerIds.map((id) => byId.get(id)).filter((p): p is Player => p != null);
     }
 
-    async getSquadForSeason(teamId: number, seasonId: number, includeLoans = false): Promise<Player[]> {
-        const season = await this.seasonRepo.findOne({ where: { id: seasonId } });
-        if (!season) return [];
-
-        const seasonStart = season.yearStart
-            ? new Date(Date.UTC(season.yearStart, 6, 1))
-            : undefined;
-        const seasonEnd = season.yearEnd
-            ? new Date(Date.UTC(season.yearEnd, 5, 30, 23, 59, 59))
-            : undefined;
-
-        const bySeasonId = await this.stintRepo.find({
-            where: {
-                teamId,
-                seasonId,
-                ...(includeLoans ? {} : { isLoan: false }),
-            },
-        });
-
-        if (bySeasonId.length > 0) {
-            const playerIds = [...new Set(bySeasonId.map((s) => s.playerId))];
-            const players = await this.playerRepo.find({ where: { id: In(playerIds) } });
-            return players.sort((a, b) => a.name.localeCompare(b.name));
-        }
-
-        if (!seasonStart || !seasonEnd) {
-            return this.getCurrentSquad(teamId, includeLoans);
-        }
-
-        const overlapping = await this.stintRepo
-            .createQueryBuilder('s')
-            .where('s.teamId = :teamId', { teamId })
-            .andWhere(includeLoans ? '1=1' : 's.isLoan = false')
-            .andWhere('(s.startDate IS NULL OR s.startDate <= :seasonEnd)', { seasonEnd })
-            .andWhere('(s.endDate IS NULL OR s.endDate >= :seasonStart)', { seasonStart })
-            .getMany();
-
-        const playerIds = [...new Set(overlapping.map((s) => s.playerId))];
-        if (playerIds.length === 0) return [];
-
+    private async playersFromStints(stints: PlayerTeamStint[]): Promise<Player[]> {
+        if (stints.length === 0) return [];
+        const playerIds = [...new Set(stints.map((s) => s.playerId))];
         const players = await this.playerRepo.find({ where: { id: In(playerIds) } });
-        return players.sort((a, b) => a.name.localeCompare(b.name));
+        const byId = new Map(players.map((p) => [p.id, p]));
+        return stints.map((s) => byId.get(s.playerId)).filter((p): p is Player => p != null);
     }
 
     async getCurrentStintsForTeam(teamId: number): Promise<PlayerTeamStint[]> {
@@ -349,4 +487,15 @@ export class PlayerTeamStintService extends CrudRepoAdapter<PlayerTeamStint, Cre
 
         return { fromTransfers, skipped };
     }
+}
+
+function dedupeStintsByPlayer(stints: PlayerTeamStint[]): PlayerTeamStint[] {
+    const seen = new Set<number>();
+    const unique: PlayerTeamStint[] = [];
+    for (const stint of stints) {
+        if (seen.has(stint.playerId)) continue;
+        seen.add(stint.playerId);
+        unique.push(stint);
+    }
+    return unique;
 }

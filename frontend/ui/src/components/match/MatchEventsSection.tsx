@@ -12,6 +12,7 @@ export interface MatchEventsSectionProps {
     awayTeamId?: number;
     homeTeamName: string;
     awayTeamName: string;
+    isLive?: boolean;
 }
 
 interface FixtureEventsPayload {
@@ -529,6 +530,7 @@ export function MatchEventsSection({
     awayTeamId,
     homeTeamName,
     awayTeamName,
+    isLive = false,
 }: MatchEventsSectionProps) {
     const eventsQuery = useQuery({
         queryKey: ['/fixture', fixtureId, 'events'],
@@ -539,6 +541,7 @@ export function MatchEventsSection({
                 signal,
             }),
         enabled: Number.isFinite(fixtureId) && fixtureId > 0,
+        refetchInterval: isLive ? 15_000 : false,
     });
 
     const nameById = useMemo(() => {

@@ -52,6 +52,14 @@ type RowDraft = {
     descriptionDraft: string;
 };
 
+function formatConfigKey(key: string): string {
+    return key
+        .split('_')
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
 function buildDrafts(entries: PlatformConfigEntry[]): Record<string, RowDraft> {
     return Object.fromEntries(
         entries.map((row) => [
@@ -119,7 +127,7 @@ export function PlatformConfigSection() {
 
             const parsed = parseDraftValue(row, draft.valueDraft);
             if (parsed.error) {
-                notify.error(`Invalid value for ${key}`, parsed.error);
+                notify.error(`Invalid value for ${formatConfigKey(key)}`, parsed.error);
                 return;
             }
             updates.push({ row, value: parsed.value, description: draft.descriptionDraft });
@@ -156,7 +164,7 @@ export function PlatformConfigSection() {
 
             notify.success(
                 'Config saved',
-                updates.length === 1 ? updates[0].row.key : `${updates.length} settings updated`,
+                updates.length === 1 ? formatConfigKey(updates[0].row.key) : `${updates.length} settings updated`,
             );
             await refetch();
             if (updates.some(({ row }) => FEATURE_FLAG_KEYS.has(row.key))) {
@@ -245,7 +253,7 @@ export function PlatformConfigSection() {
                                             style={isDirty ? { backgroundColor: 'var(--mantine-color-dark-6)' } : undefined}
                                         >
                                             <Table.Td>
-                                                <Text size="sm" ff="monospace">{row.key}</Text>
+                                                <Text size="sm">{formatConfigKey(row.key)}</Text>
                                             </Table.Td>
                                             <Table.Td>
                                                 <Text size="xs">{row.valueType}</Text>

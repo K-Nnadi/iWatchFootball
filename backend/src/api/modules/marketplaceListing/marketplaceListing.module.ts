@@ -5,6 +5,7 @@ import { Ticket } from '../ticket/ticket.entity';
 import { TicketOwnershipHistoryModule } from '../ticketOwnershipHistory/ticketOwnershipHistory.module';
 import { UserTicketLogModule } from '../userTicketLog/userTicketLog.module';
 import { MarketplaceFeatureModule } from '../../complexModules/marketplace/marketplace-feature.module';
+import { MarketplacePayoutModule } from '../../complexModules/marketplace/marketplace-payout.module';
 import { NotificationModule } from '../notification/notification.module';
 import { MarketplaceDispute } from '../marketplaceDispute/marketplaceDispute.entity';
 import { MarketplaceListing } from './marketplaceListing.entity';
@@ -14,6 +15,7 @@ import { MarketplaceListingService } from './marketplaceListing.service';
 @Module({
     imports: [
         MarketplaceFeatureModule,
+        MarketplacePayoutModule,
         TicketOwnershipHistoryModule,
         UserTicketLogModule,
         NotificationModule,

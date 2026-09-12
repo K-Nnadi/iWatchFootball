@@ -146,6 +146,32 @@ export class ApiSportsImportFixturesDto {
     description: 'Max /fixtures/statistics requests when syncStatsAfter is true.',
   })
   syncStatsMaxRequests?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'After fixtures, call GET /fixtures/events for each imported fixture and persist goal/card/substitution rows.',
+  })
+  syncEventsAfter?: boolean;
+
+  @ApiPropertyOptional({
+    default: 20,
+    description: 'Max /fixtures/events requests when syncEventsAfter is true.',
+  })
+  syncEventsMaxRequests?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'After fixtures, call GET /fixtures/lineups for each imported fixture and persist lineUp / playerLineUp.',
+  })
+  syncLineupsAfter?: boolean;
+
+  @ApiPropertyOptional({
+    default: 20,
+    description: 'Max /fixtures/lineups requests when syncLineupsAfter is true.',
+  })
+  syncLineupsMaxRequests?: number;
 }
 
 export class ApiSportsSyncPrimaryVenuesDto {
@@ -244,6 +270,16 @@ export class ApiSportsImportLeaguesDto {
 
 export class ApiSyncFixtureStatsDto {
   @ApiProperty({ description: 'Local fixture id to sync statistics for' })
+  fixtureId!: number;
+}
+
+export class ApiSyncFixtureEventsDto {
+  @ApiProperty({ description: 'Local fixture id to sync events for' })
+  fixtureId!: number;
+}
+
+export class ApiSyncFixtureLineupsDto {
+  @ApiProperty({ description: 'Local fixture id to sync lineups for' })
   fixtureId!: number;
 }
 
@@ -362,6 +398,12 @@ export class ApiSportsController {
       syncStatsAfter: body.syncStatsAfter === true,
       syncStatsMaxRequests:
         body.syncStatsMaxRequests != null ? Number(body.syncStatsMaxRequests) : undefined,
+      syncEventsAfter: body.syncEventsAfter === true,
+      syncEventsMaxRequests:
+        body.syncEventsMaxRequests != null ? Number(body.syncEventsMaxRequests) : undefined,
+      syncLineupsAfter: body.syncLineupsAfter === true,
+      syncLineupsMaxRequests:
+        body.syncLineupsMaxRequests != null ? Number(body.syncLineupsMaxRequests) : undefined,
     });
   }
 
@@ -538,5 +580,32 @@ export class ApiSportsController {
   @ApiResponse({ status: 200, description: '"ok" | "skipped" | "no_data"' })
   async syncImportFixtureStats(@Body() body: ApiSyncFixtureStatsDto) {
     return this.apiSportsAdapterService.syncFixtureStats(Number(body.fixtureId));
+  }
+
+  @Post('sync/import/fixture-events')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sync finished-match events from API-Sports for one fixture',
+    description:
+      'Calls GET /fixtures/events?fixture={apiId} and upserts goal, card, and substitution rows. ' +
+      'The fixture must already have metadata.providers.apisports.externalId.',
+  })
+  @ApiBody({ type: ApiSyncFixtureEventsDto })
+  @ApiResponse({ status: 200, description: '"ok" | "skipped" | "no_data"' })
+  async syncImportFixtureEvents(@Body() body: ApiSyncFixtureEventsDto) {
+    return this.apiSportsAdapterService.syncEventsForLocalFixture(Number(body.fixtureId));
+  }
+
+  @Post('sync/import/fixture-lineups')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sync lineups from API-Sports for one fixture',
+    description:
+      'Calls GET /fixtures/lineups?fixture={apiId} and upserts lineUp + playerLineUp rows.',
+  })
+  @ApiBody({ type: ApiSyncFixtureLineupsDto })
+  @ApiResponse({ status: 200, description: '"ok" | "skipped" | "no_data"' })
+  async syncImportFixtureLineups(@Body() body: ApiSyncFixtureLineupsDto) {
+    return this.apiSportsAdapterService.syncLineupsForLocalFixture(Number(body.fixtureId));
   }
 }
