@@ -105,7 +105,7 @@ function dayRangeIso(day: Date): { from: string; to: string } {
 }
 
 function uniqueIds(values: Array<number | undefined>): number[] {
-    return [...new Set(values.filter((id): id is number => typeof id === 'number'))];
+    return Array.from(new Set(values.filter((id): id is number => typeof id === 'number')));
 }
 
 function ticketedFixtureIds(

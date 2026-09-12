@@ -148,9 +148,9 @@ export function ManagerPage() {
             m.set(row.homeTeamId, row.homeTeamName);
             m.set(row.awayTeamId, row.awayTeamName);
         }
-        for (const [id, team] of teamById) {
+        teamById.forEach((team, id) => {
             if (team.name) m.set(id, team.name);
-        }
+        });
         return m;
     }, [career, profileMatches, teamById]);
 

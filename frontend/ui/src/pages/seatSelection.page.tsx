@@ -269,6 +269,11 @@ export function SeatSelectionPage() {
             return;
         }
 
+        if (!matchDetails) {
+            notify.error('Match unavailable', 'Cannot reserve tickets without match details.');
+            return;
+        }
+
         const fixtureId = Number.parseInt(matchId, 10);
         if (!Number.isFinite(fixtureId)) {
             notify.error('Invalid match', 'Cannot reserve tickets for this fixture.');

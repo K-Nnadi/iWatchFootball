@@ -377,7 +377,9 @@ export function CompetitionStatsTab({
     const playerById = useMemo(() => {
         const map = playersFromEvents(goals, cards);
         if (fetchedPlayers) {
-            for (const [id, player] of fetchedPlayers) map.set(id, player);
+            fetchedPlayers.forEach((player, id) => {
+                map.set(id, player);
+            });
         }
         return map;
     }, [goals, cards, fetchedPlayers]);

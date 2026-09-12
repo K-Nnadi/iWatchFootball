@@ -1,8 +1,7 @@
-import { Avatar, Badge, Box, Divider, Group, Modal, Stack, Text, UnstyledButton } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-import { IconCalendar, IconCheck, IconExternalLink, IconDownload, IconMapPin } from '@tabler/icons-react';
+import { Avatar, Box, Divider, Group, Modal, Stack, Text, UnstyledButton } from '@mantine/core';
+import { IconCalendar, IconExternalLink, IconDownload, IconMapPin } from '@tabler/icons-react';
 import React, { useState } from 'react';
-import { UiButton, UiCard, UiBody, UiCaption, UiH3 } from '../ui';
+import { UiBadge, UiButton, UiCard, UiBody, UiH3 } from '../ui';
 import { usePageTransition } from '../../hooks/usePageTransition';
 import { MatchEventsSection } from '../match/MatchEventsSection';
 import { useTranslation } from '../../i18n/useTranslation';
@@ -12,11 +11,7 @@ import classes from './fixture.card.module.css';
 function teamInitials(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return '?';
-    if (parts.length === 1) {
-        const w = parts[0];
-        if (w.length <= 2) return w.toUpperCase();
-        return (w[0] + w[w.length - 1]).toUpperCase();
-    }
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
@@ -34,57 +29,29 @@ function shouldShowStage(stage: string, competitionName: string): boolean {
     return true;
 }
 
-function TeamCrestBlock({
+function TeamSide({
     name,
     crestUrl,
     align,
-    compact,
 }: {
     name: string;
     crestUrl?: string;
     align: 'left' | 'right';
-    compact?: boolean;
 }) {
-    const ta = align === 'left' ? 'left' : 'right';
-    const items = align === 'left' ? 'flex-start' : 'flex-end';
-
-    const crest = (
-        <Avatar
-            src={crestUrl?.trim() ? crestUrl.trim() : undefined}
-            alt={name}
-            radius={999}
-            classNames={{ root: classes.crestRoot, image: classes.crestImage }}
-        >
-            <Text fz={compact ? 10 : 'xs'} fw={800} lh={1} c="var(--ui-accent)">
-                {teamInitials(name)}
-            </Text>
-        </Avatar>
-    );
-
-    if (compact) {
-        return (
-            <Group
-                gap="xs"
-                align="center"
-                wrap="nowrap"
-                className={classes.teamRow}
-                style={{ flexDirection: align === 'right' ? 'row-reverse' : 'row' }}
-            >
-                {crest}
-                <Text ta={ta} lineClamp={2} className={classes.teamNameCompact}>
-                    {name}
-                </Text>
-            </Group>
-        );
-    }
-
     return (
-        <Stack justify="flex-start" align={items} className={classes.teamStack} style={{ flex: '1 1 0', minWidth: 0 }}>
-            {crest}
-            <Text ta={ta} lineClamp={2} className={classes.teamName}>
-                {name}
-            </Text>
-        </Stack>
+        <div className={`${classes.teamSide} ${align === 'right' ? classes.teamSideRight : ''}`}>
+            <Avatar
+                src={crestUrl?.trim() ? crestUrl.trim() : undefined}
+                alt={name}
+                radius="xl"
+                classNames={{ root: classes.crestRoot, image: classes.crestImage }}
+            >
+                <Text fz={10} fw={700}>
+                    {teamInitials(name)}
+                </Text>
+            </Avatar>
+            <span className={classes.teamName}>{name}</span>
+        </div>
     );
 }
 
@@ -131,12 +98,12 @@ export function LoggedFixtureCard({
     stage,
 }: LoggedFixtureProps) {
     const { t } = useTranslation();
-    const isCompact = useMediaQuery('(max-width: 48em)');
     const [modalOpen, setModalOpen] = useState(false);
     const { navigateWithTransition } = usePageTransition();
     const fixtureNumericId = fixtureId ? parseInt(fixtureId, 10) : NaN;
     const showStage = shouldShowStage(stage, competitionName);
     const hasValidDate = Boolean(date) && !Number.isNaN(new Date(date).getTime());
+    const canOpenCompetition = competitionId != null && Number.isFinite(competitionId);
 
     const handleDownloadTicket = () => {
         if (!fixtureId) return;
@@ -154,217 +121,72 @@ export function LoggedFixtureCard({
         setModalOpen(false);
     };
 
-    const competitionHeading = competitionId != null && Number.isFinite(competitionId) && (
-        <UnstyledButton
-            type="button"
-            onClick={(e) => {
-                e.stopPropagation();
-                navigateWithTransition(`/competition/${competitionId}`);
-            }}
-            aria-label={t('logs.viewCompetitionAria', { name: competitionName })}
-            styles={{
-                root: {
-                    border: 'none',
-                    background: 'transparent',
-                    padding: 0,
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    maxWidth: '100%',
-                },
-            }}
-        >
-            <Text
-                fz="sm"
-                fw={600}
-                tt="uppercase"
-                lh={1.35}
-                c="var(--ui-text-secondary)"
-                td="underline"
-                style={{ letterSpacing: '0.09em', textUnderlineOffset: 4 }}
-            >
-                {competitionName}
-            </Text>
-        </UnstyledButton>
-    );
-
-    const competitionPlain = !(competitionId != null && Number.isFinite(competitionId)) && (
-        <Text fz="sm" fw={600} tt="uppercase" lh={1.35} c="var(--ui-text-secondary)" style={{ letterSpacing: '0.09em' }}>
-            {competitionName}
-        </Text>
+    const competitionLabel = (
+        <span className={classes.competitionName}>{competitionName}</span>
     );
 
     return (
         <>
             <UiCard
-                hover
-                density={isCompact ? 'compact' : 'default'}
+                density="compact"
                 onClick={() => setModalOpen(true)}
                 className={classes.card}
-                style={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
             >
-                <Box
-                    aria-hidden
-                    style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background:
-                            'radial-gradient(1200px ellipse at 50% -20%, var(--ui-accent-muted), transparent 45%)',
-                        pointerEvents: 'none',
-                        zIndex: 0,
-                    }}
-                />
+                <div className={classes.header}>
+                    {canOpenCompetition ? (
+                        <UnstyledButton
+                            type="button"
+                            className={classes.competitionButton}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigateWithTransition(`/competition/${competitionId}`);
+                            }}
+                            aria-label={t('logs.viewCompetitionAria', { name: competitionName })}
+                        >
+                            {competitionLabel}
+                        </UnstyledButton>
+                    ) : (
+                        competitionLabel
+                    )}
+                    <div className={classes.headerBadges}>
+                        {showStage && (
+                            <UiBadge size="sm" color="gray">
+                                {stage}
+                            </UiBadge>
+                        )}
+                        {isVerified && (
+                            <UiBadge size="sm">{t('logs.verified')}</UiBadge>
+                        )}
+                    </div>
+                </div>
 
-                <Stack gap={0} style={{ position: 'relative', zIndex: 1 }}>
-                    <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs" className={classes.header}>
-                        <Stack gap={4} style={{ flex: '1 1 220px', minWidth: 0 }}>
-                            {competitionHeading}
-                            {competitionPlain}
-                        </Stack>
-                        <Group gap={8} wrap="wrap" justify="flex-end" style={{ flexShrink: 0 }}>
-                            {showStage && (
-                                <Badge
-                                    variant="outline"
-                                    size="sm"
-                                    style={{
-                                        borderColor: 'var(--ui-border)',
-                                        color: 'var(--ui-text-secondary)',
-                                        backgroundColor: 'var(--ui-bg-surface)',
-                                        textTransform: 'capitalize',
-                                        fontWeight: 600,
-                                        fontSize: '0.6875rem',
-                                        letterSpacing: '0.06em',
-                                    }}
-                                >
-                                    {stage}
-                                </Badge>
-                            )}
-                            {isVerified && (
-                                <Badge
-                                    size="sm"
-                                    variant="light"
-                                    leftSection={<IconCheck size={12} />}
-                                    style={{
-                                        backgroundColor: 'var(--ui-accent-muted)',
-                                        color: 'var(--ui-accent)',
-                                        border: '1px solid rgba(0, 200, 83, 0.35)',
-                                        textTransform: 'none',
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    {t('logs.verified')}
-                                </Badge>
-                            )}
-                        </Group>
-                    </Group>
-
-                    {!isCompact && <Divider color="var(--ui-divider)" mb="md" />}
-
-                    <Group
-                        gap={isCompact ? 'sm' : 'lg'}
-                        justify="center"
-                        align="center"
-                        wrap="nowrap"
-                        className={classes.matchRow}
-                    >
-                        <TeamCrestBlock
-                            name={homeTeam}
-                            crestUrl={homeTeamLogo}
-                            align="left"
-                            compact={isCompact}
-                        />
-                        <Stack justify="center" align="center" gap={4} style={{ flexShrink: 0 }}>
-                            <Box className={classes.scoreBox}>
-                                <Text className={classes.scoreText}>
-                                    {scoresAvailable ? `${homeScore} – ${awayScore}` : '— · —'}
-                                </Text>
-                            </Box>
+                <div className={classes.body}>
+                    <div className={classes.matchRow}>
+                        <TeamSide name={homeTeam} crestUrl={homeTeamLogo} align="left" />
+                        <div className={classes.centerBlock}>
+                            <span className={classes.score}>
+                                {scoresAvailable ? `${homeScore} - ${awayScore}` : '–'}
+                            </span>
                             {scoresAvailable ? (
-                                <UiCaption
-                                    style={{
-                                        textTransform: 'uppercase',
-                                        fontWeight: 600,
-                                        letterSpacing: '0.08em',
-                                        opacity: 0.72,
-                                        fontSize: '0.6875rem',
-                                    }}
-                                >
-                                    {t('logs.fullTime')}
-                                </UiCaption>
+                                <span className={classes.status}>{t('logs.fullTime')}</span>
                             ) : null}
-                        </Stack>
-                        <TeamCrestBlock
-                            name={awayTeam}
-                            crestUrl={awayTeamLogo}
-                            align="right"
-                            compact={isCompact}
-                        />
-                    </Group>
+                        </div>
+                        <TeamSide name={awayTeam} crestUrl={awayTeamLogo} align="right" />
+                    </div>
 
                     {(hasValidDate || venue) && (
-                        <>
-                            <Divider color="var(--ui-divider)" mb={isCompact ? 8 : 12} />
-                            <div className={classes.metaRow}>
-                                <div className={classes.metaStart}>
-                                    {hasValidDate && (
-                                        <Group gap={6} align="center" wrap="nowrap">
-                                            <IconCalendar
-                                                size={14}
-                                                stroke={1.75}
-                                                style={{
-                                                    color: 'var(--ui-text-secondary)',
-                                                    opacity: 0.85,
-                                                    flexShrink: 0,
-                                                }}
-                                            />
-                                            <UiCaption
-                                                style={{
-                                                    fontWeight: 500,
-                                                    letterSpacing: '0.04em',
-                                                    lineHeight: 1.35,
-                                                    margin: 0,
-                                                    fontSize: '0.75rem',
-                                                }}
-                                            >
-                                                {formatLogCardDate(date)}
-                                            </UiCaption>
-                                        </Group>
-                                    )}
-                                </div>
-                                <div className={classes.metaEnd}>
-                                    {venue && (
-                                        <Group gap={6} align="center" wrap="nowrap">
-                                            <IconMapPin
-                                                size={14}
-                                                stroke={1.75}
-                                                style={{
-                                                    color: 'var(--ui-text-secondary)',
-                                                    opacity: 0.85,
-                                                    flexShrink: 0,
-                                                }}
-                                            />
-                                            <UiCaption
-                                                className={classes.metaVenueText}
-                                                style={{
-                                                    fontWeight: 500,
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '0.06em',
-                                                    lineHeight: 1.35,
-                                                    margin: 0,
-                                                    fontSize: '0.75rem',
-                                                }}
-                                            >
-                                                {venue}
-                                            </UiCaption>
-                                        </Group>
-                                    )}
-                                </div>
-                            </div>
-                        </>
+                        <div className={classes.metaRow}>
+                            <span className={classes.metaText}>
+                                {hasValidDate ? formatLogCardDate(date) : ''}
+                            </span>
+                            {venue ? (
+                                <span className={`${classes.metaText} ${classes.metaVenue}`}>{venue}</span>
+                            ) : (
+                                <span />
+                            )}
+                        </div>
                     )}
-                </Stack>
+                </div>
             </UiCard>
 
             <Modal
@@ -376,8 +198,8 @@ export function LoggedFixtureCard({
                             {homeTeam} vs {awayTeam}
                         </UiH3>
                         {scoresAvailable ? (
-                            <UiBody style={{ color: 'var(--ui-accent)', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>
-                                {homeScore} – {awayScore}
+                            <UiBody style={{ color: 'var(--ui-text-primary)', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>
+                                {homeScore} - {awayScore}
                             </UiBody>
                         ) : (
                             <UiBody style={{ color: 'var(--ui-text-secondary)', fontSize: '0.85rem', margin: 0 }}>
@@ -418,7 +240,7 @@ export function LoggedFixtureCard({
                 <Stack gap="lg">
                     <Box>
                         <Group justify="space-between" mb="xs" align="flex-start">
-                            {competitionId != null && Number.isFinite(competitionId) ? (
+                            {canOpenCompetition ? (
                                 <UnstyledButton
                                     type="button"
                                     onClick={() => navigateWithTransition(`/competition/${competitionId}`)}
@@ -437,8 +259,6 @@ export function LoggedFixtureCard({
                                             color: 'var(--ui-accent)',
                                             fontSize: '0.875rem',
                                             fontWeight: 600,
-                                            textDecoration: 'underline',
-                                            textUnderlineOffset: 3,
                                             margin: 0,
                                         }}
                                     >
@@ -451,16 +271,9 @@ export function LoggedFixtureCard({
                                 </UiBody>
                             )}
                             {showStage && (
-                                <Badge
-                                    size="sm"
-                                    style={{
-                                        backgroundColor: 'var(--ui-bg-surface)',
-                                        color: 'var(--ui-text-secondary)',
-                                        border: 'none',
-                                    }}
-                                >
+                                <UiBadge size="sm" color="gray">
                                     {stage}
-                                </Badge>
+                                </UiBadge>
                             )}
                         </Group>
                         {venue && (
